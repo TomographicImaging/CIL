@@ -1,4 +1,4 @@
-from cil.optimisation.algorithms import SIRT, GD, ISTA, FISTA
+from cil.optimisation.algorithms import SIRT, GD, ISTA, FISTA, PDHG
 from cil.optimisation.functions import LeastSquares, IndicatorBox, ZeroFunction
 from cil.framework import ImageGeometry, VectorGeometry, VectorData
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, LinearOperator
@@ -265,7 +265,105 @@ class TestStepSizeBB(CCPiTestClass):
         
         
 
-        
-        
+class TestStepSizePDHGStronglyConvex(CCPiTestClass):
+
+    def test_deprecation_warning(self): #TODO: remove when deprecated parameters are removed from PDHG
+        with self.assertWarns(DeprecationWarning):
+            pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=IdentityOperator(ImageGeometry(2, 2)),
+                        gamma_g=0.5)
+
+        with self.assertWarns(DeprecationWarning):
+            pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=IdentityOperator(ImageGeometry(2, 2)),
+                        gamma_fconj=0.5)
+            
+    def test_deprecated_parameters_to_step_size_rule(self): #TODO: remove when deprecated parameters are removed from PDHG
+        pass
+    
+    def test_PDHG_strongly_convex_gamma_g(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        # sigma, tau
+        sigma = 1.0
+        tau = 1.0
+
+        pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
+                    gamma_g=0.5)
+        pdhg.run(1, verbose=0)
+        self.assertAlmostEqual(
+            pdhg.theta, 1.0 / np.sqrt(1 + 2 * pdhg.gamma_g * tau))
+        self.assertAlmostEqual(pdhg.tau, tau * pdhg.theta)
+        self.assertAlmostEqual(pdhg.sigma, sigma / pdhg.theta)
+        pdhg.run(4, verbose=0)
+        self.assertNotEqual(pdhg.sigma, sigma)
+        self.assertNotEqual(pdhg.tau, tau)
+
+        # check negative strongly convex constant
+        with self.assertRaises(ValueError):
+            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
+                        gamma_g=-0.5)
+
+        # check strongly convex constant not a number
+        with self.assertRaises(ValueError):
+            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
+                        gamma_g="-0.5")
+
+    def test_PDHG_strongly_convex_gamma_fcong(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        # sigma, tau
+        sigma = 1.0
+        tau = 1.0
+
+        pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
+                    gamma_fconj=0.5)
+        pdhg.run(1, verbose=0)
+        self.assertEqual(pdhg.theta, 1.0 / np.sqrt(1 +
+                         2 * pdhg.gamma_fconj * sigma))
+        self.assertEqual(pdhg.tau, tau / pdhg.theta)
+        self.assertEqual(pdhg.sigma, sigma * pdhg.theta)
+        pdhg.run(4, verbose=0)
+        self.assertNotEqual(pdhg.sigma, sigma)
+        self.assertNotEqual(pdhg.tau, tau)
+
+        # check negative strongly convex constant
+        try:
+            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
+                        gamma_fconj=-0.5)
+        except ValueError as ve:
+            log.info(str(ve))
+
+        # check strongly convex constant not a number
+        try:
+            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
+                        gamma_fconj="-0.5")
+        except ValueError as ve:
+            log.info(str(ve))
+
+    def test_PDHG_strongly_convex_both_fconj_and_g(self):
+
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        try:
+            pdhg = PDHG(f=f, g=g, operator=operator,
+                        gamma_g=0.5, gamma_fconj=0.5)
+            pdhg.run(verbose=0)
+        except ValueError as err:
+            log.info(str(err))
+      
         
 

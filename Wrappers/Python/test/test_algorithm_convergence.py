@@ -27,6 +27,13 @@ except ImportError:
 
 
 class TestAlgorithmConvergence(CCPiTestClass):
+    
+    
+    
+    
+    
+    
+    
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_num_subsets_1_astra(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(10, 10))

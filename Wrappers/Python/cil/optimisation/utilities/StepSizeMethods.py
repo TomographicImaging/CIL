@@ -275,51 +275,52 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         return ret
 
 
-class PDHG_strongly_convex_update(StepSizeRule):
-
-    def __init__(self, gamma_g=None, gamma_fconj=None):
-        '''Updates step sizes (theta, sigma, tau) in the PDHG algorithm in the cases of primal or dual acceleration using the strongly convexity property.
-        The case where both functions are strongly convex is not available at the moment.
+class PDHGStronglyConvexUpdate(StepSizeRule):
+    '''Updates step sizes (theta, sigma, tau) in the PDHG algorithm in the cases of primal or dual acceleration using the strongly convexity property.
+            The case where both functions are strongly convex is not available at the moment.
 
 
-        The PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex. In these cases, the step-sizes :math:`\sigma` and :math:`\tau` are updated using the :meth:`update_step_sizes` method. A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
+            The PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex. In these cases, the step-sizes :math:`\sigma` and :math:`\tau` are updated using the :meth:`update_step_sizes` method. A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
 
-      .. math::
+        .. math::
 
-          f(x) - \frac{\gamma}{2}\|x\|^{2} \quad\mbox{ is convex. }
-
-
-      * For instance the function :math:`\frac{1}{2}\|x\|^{2}_{2}` is :math:`\gamma` strongly convex for :math:`\gamma\in(-\infty,1]`. We say it is 1-strongly convex because it is the largest constant for which :math:`f - \frac{1}{2}\|\cdot\|^{2}` is convex.
+            f(x) - \frac{\gamma}{2}\|x\|^{2} \quad\mbox{ is convex. }
 
 
-      * The :math:`\|\cdot\|_{1}` norm is not strongly convex. For more information, see `Strongly Convex <https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions>`_.
+        * For instance the function :math:`\frac{1}{2}\|x\|^{2}_{2}` is :math:`\gamma` strongly convex for :math:`\gamma\in(-\infty,1]`. We say it is 1-strongly convex because it is the largest constant for which :math:`f - \frac{1}{2}\|\cdot\|^{2}` is convex.
 
 
-      * If :math:`g` is strongly convex with constant :math:`\gamma` then the step-sizes :math:`\sigma`, :math:`\tau` and :math:`\theta` are updated as:
+        * The :math:`\|\cdot\|_{1}` norm is not strongly convex. For more information, see `Strongly Convex <https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions>`_.
 
 
-      .. math::
-         :nowrap:
+        * If :math:`g` is strongly convex with constant :math:`\gamma` then the step-sizes :math:`\sigma`, :math:`\tau` and :math:`\theta` are updated as:
 
-            \begin{aligned}
 
-                \theta_{n} & = \frac{1}{\sqrt{1 + 2\gamma\tau_{n}}}\\
-                \tau_{n+1} & = \theta_{n}\tau_{n}\\
-                \sigma_{n+1} & = \frac{\sigma_{n}}{\theta_{n}}
+        .. math::
+            :nowrap:
 
-            \end{aligned}
+                \begin{aligned}
 
-      * If :math:`f^{*}` is strongly convex, we swap :math:`\sigma` with :math:`\tau`.
+                    \theta_{n} & = \frac{1}{\sqrt{1 + 2\gamma\tau_{n}}}\\
+                    \tau_{n+1} & = \theta_{n}\tau_{n}\\
+                    \sigma_{n+1} & = \frac{\sigma_{n}}{\theta_{n}}
+
+                \end{aligned}
+
+        * If :math:`f^{*}` is strongly convex, we swap :math:`\sigma` with :math:`\tau`.
 
 
 
-         Parameters
-         -------------
-         gamma_g : positive :obj:`float`, optional, default=None
-            Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
-         gamma_fconj : positive :obj:`float`, optional, default=None
-            Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.
-        '''
+            Parameters
+            -------------
+            gamma_g : positive :obj:`float`, optional, default=None
+                Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
+            gamma_fconj : positive :obj:`float`, optional, default=None
+                Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.
+            '''
+
+    def __init__(self, initial_step_size =(None, None), gamma_g=None, gamma_fconj=None):#TODO: tuple of list 
+        '''Initialises the step size rule'''
 
         if self.gamma_g is not None and self.gamma_fconj is not None:
             raise NotImplementedError(
@@ -347,6 +348,63 @@ class PDHG_strongly_convex_update(StepSizeRule):
             raise ValueError(
                 "Positive float is expected for the strongly convex constant of the convex conjugate of function f, {} is passed".format(gamma_fconj))
 
+        self.initial_step_size = initial_step_size
+        if len(initial_step_size) != 2:
+            raise ValueError(
+                "initial_step_size should be a list or tuple of length two, step_size = {}".format(step_size))
+    
+        
+    def get_initial_step_size(self, algorithm):
+        """Sets sigma and tau step-sizes for the PDHG algorithm. The step sizes can be either scalar or array-objects.
+
+        Parameters
+        ----------
+            sigma : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default=None
+                Step size for the dual problem.
+            tau : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default=None
+                Step size for the primal problem.
+
+        The user can set either, both or none. Values passed by the user will be accepted as long as they are positive numbers,
+        or correct shape array like objects.
+        """
+        self._tau = self.initial_step_size[0]
+        self._sigma = self.initial_step_size[1]
+        
+        # Check acceptable values of the primal-dual step-sizes
+        if self._tau is not None:
+            if isinstance(self._tau, Number):
+                if self._tau <= 0:
+                    raise ValueError(
+                        "The step-sizes of PDHG must be positive, passed tau = {}".format(self._tau))
+            elif self._tau.shape != algorithm.operator.domain_geometry().shape:
+                raise ValueError(" The shape of tau = {0} is not the same as the shape of the domain_geometry = {1}".format(
+                    self._tau.shape, algorithm.operator.domain_geometry().shape))
+
+        if self._sigma is not None:
+            if isinstance(self._sigma, Number):
+                if self._sigma <= 0:
+                    raise ValueError(
+                        "The step-sizes of PDHG are positive, passed sigma = {}".format(self._sigma))
+            elif self._sigma.shape != algorithm.operator.range_geometry().shape:
+                raise ValueError(" The shape of sigma = {0} is not the same as the shape of the range_geometry = {1}".format(
+                    self._sigma.shape, algorithm.operator.range_geometry().shape))
+
+        # Default sigma and tau step-sizes
+        if self._tau is None and self._sigma is None:
+            self._sigma = 1.0/algorithm.operator.norm()
+            self._tau = 1.0/algorithm.operator.norm()
+        elif self._tau is not None and self._sigma is not None:
+            pass
+        elif self._sigma is None and isinstance(self._tau, Number):
+            self._sigma = 1./(self._tau*algorithm.operator.norm()**2)
+        elif self._tau is None and isinstance(self._sigma, Number):
+            self._tau = 1./(self._sigma*algorithm.operator.norm()**2)
+        else:
+            raise NotImplementedError(
+                "If using arrays for sigma or tau both must arrays must be provided.")
+        return self._tau, self._sigma
+    
+    
     def get_step_size(self, algorithm):
         """
         Applies the PDHG strongly convex step size update to calculate the new primal and dual step sizes
@@ -357,28 +415,26 @@ class PDHG_strongly_convex_update(StepSizeRule):
         """
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
-            theta = 1.0 / np.sqrt(1 + 2 * self.gamma_g * algorithm.tau)
-            tau *= theta
-            sigma /= theta
+            algorithm._theta = 1.0 / np.sqrt(1 + 2 * self.gamma_g * algorithm.tau)
+            self._tau *= algorithm._theta
+            self._sigma /= algorithm._theta
 
         # Update sigma and tau based on the strong convexity of F
         # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
         if self.gamma_fconj is not None:
-            theta = 1.0 / np.sqrt(1 + 2 * self.gamma_fconj * algorithm.sigma)
-            sigma *= theta
-            tau /= theta
+            algorithm._theta = 1.0 / np.sqrt(1 + 2 * self.gamma_fconj * algorithm.sigma)
+            self._sigma *= algorithm._theta
+            self._tau /= algorithm._theta
 
-        return theta, sigma, tau
+        return self._tau, self._sigma 
 
 
-class PDHG_adaptive_2013(StepSizeRule):
-
-    def __init__(self, initial_alpha=0.95, beta=0.95, gamma=0.9, delta=1.5, s=None, eta=0.95, auto_stop=True):
-        '''Primal Dual Hybrid Gradient (PDHG) algorithm, see :cite:`CP2011`, :cite:`EZXC2010`.
-
-            Adaptive: https://arxiv.org/pdf/1305.0546
-         Parameters
-         -------------
+class PDHGAdaptiveStepSize2013(StepSizeRule):
+    ''''The PDHG step sizes are updated adaptively based on the method proposed in :cite:`goldstein2013adaptive`.
+        Parameters
+        -------------
+        initial_step_size : list of two positive :obj:`float`, optional, default=[10e5, 10e5]
+            Initial values of the primal and dual step sizes used in the adaptive step size method.
         initial_alpha : positive :obj:`float`, optional, default=0.95
             Initial value of the parameter alpha used in the adaptive step size method.
         beta : positive :obj:`float`, optional, default=0.95
@@ -395,6 +451,9 @@ class PDHG_adaptive_2013(StepSizeRule):
             If True, the adaptive step size method automatically stops updating the step sizes when they have not changed over five consecutive iterations.
 
         '''
+
+    def __init__(self, initial_step_size=[10e5, 10e5], initial_alpha=0.95, beta=0.95, gamma=0.9, delta=1.5, s=None, eta=0.95, auto_stop=True):
+        '''Initialises the step size rule'''
         self.alpha = initial_alpha
         self.eta = eta
         self.beta = beta
@@ -414,6 +473,19 @@ class PDHG_adaptive_2013(StepSizeRule):
         self.x_store = None
 
         self.adaptive = True
+        self.initial_step_size = initial_step_size
+        if len(initial_step_size) != 2:
+            raise ValueError(
+                "initial_step_size should be a list or tuple of length two, step_size = {}".format(step_size))
+ 
+    def get_initial_step_size(self, algorithm):
+        tau = self.initial_step_size[0]
+        sigma = self.initial_step_size[1]
+        if tau is None:
+            tau = 1e5
+        if sigma is None:
+            sigma = 1e5
+        return tau, sigma
 
     def get_step_size(self, algorithm):
         if self.adaptive:
@@ -492,7 +564,7 @@ class PDHG_adaptive_2013(StepSizeRule):
                 del self.x_store
                 del self.y_old
 
-        return algorithm._theta, algorithm._tau, algorithm._sigma
+        return  algorithm._tau, algorithm._sigma
 
     def _calculate_backtracking(self, algorithm):
         """ Calculates the backtracking parameter b used to update step sizes in the adaptive PDHG algorithm.
@@ -518,12 +590,13 @@ class PDHG_adaptive_2013(StepSizeRule):
         return b
 
 
-class PDHG_adaptive_2015(StepSizeRule):
+class PDHGAdaptiveStepSize2015(StepSizeRule):
+    '''The PDHG step sizes are updated adaptively based on the method proposed in :cite:`Goldstein2015`.
 
-    def __init__(self, initial_alpha=0.95, eta=0.95, c=0.9, auto_stop=True):
-        '''The PDHG step sizes are updated adaptively based on the method proposed in :cite:`Goldstein2015`.
-         Parameters
-         -------------
+        Parameters
+        -------------
+        initial_step_size : list of two positive :obj:`float`, optional, default=[10e5, 10e5]
+            Initial values of the primal and dual step sizes used in the adaptive step size method.
         initial_alpha : positive :obj:`float`, optional, default=0.95
         Initial value of the parameter alpha used in the adaptive step size method.
         eta : positive :obj:`float`, optional, default=0.95
@@ -532,6 +605,10 @@ class PDHG_adaptive_2015(StepSizeRule):
             Value of the parameter c used in the adaptive step size method.
 
         '''
+
+    def __init__(self, initial_step_size=[10e5, 10e5],  initial_alpha=0.95, eta=0.95, c=0.9, auto_stop=True):
+        '''Initialises the step size rule'''
+
         self.adaptive = True
         self.alpha = initial_alpha
         self.eta = eta
@@ -546,6 +623,20 @@ class PDHG_adaptive_2015(StepSizeRule):
         self.x_resid = None
         self.y_resid = None
         self.x_store = None
+        self.initial_step_size = initial_step_size
+        if len(initial_step_size) != 2:
+            raise ValueError(
+                "initial_step_size should be a list or tuple of length two, step_size = {}".format(step_size))
+
+        
+    def get_initial_step_size(self, algorithm): #TODO: this needs some proper testing 
+        tau = self.initial_step_size[0]
+        sigma = self.initial_step_size[1]
+        if tau is None:
+            tau = 1e5
+        if sigma is None:
+            sigma = 1e5
+        return tau, sigma
 
     def get_step_size(self, algorithm):
         if self.adaptive:
@@ -621,7 +712,7 @@ class PDHG_adaptive_2015(StepSizeRule):
                 del self.x_store
                 del self.y_old
 
-        return algorithm._theta, algorithm._tau, algorithm._sigma
+        return  algorithm._tau, algorithm._sigma
 
     def _calculate_backtracking(self, algorithm):
         """ Calculates the backtracking parameter b used to update step sizes in the adaptive PDHG algorithm.
@@ -645,3 +736,91 @@ class PDHG_adaptive_2015(StepSizeRule):
             self.c*algorithm._tau*y_change_norm**2 - cross_term
         print(b)
         return b
+
+class PDHGConstantStepSize(StepSizeRule):
+    """
+    Step-size rule that always returns a constant step-size.
+     
+    The user can set either the primal or dual step size, both or none. Values passed by the user will be accepted as long as they are positive numbers,
+        or correct shape array like objects.
+        
+    By default, the step sizes :math:`\sigma` and :math:`\tau` are positive scalars and defined as below:
+
+      * If ``sigma`` is ``None`` and ``tau`` is ``None``:
+
+      .. math::
+
+        \sigma = \frac{1}{\|K\|},  \tau = \frac{1}{\|K\|}
+
+      * If ``tau`` is ``None``:
+
+      .. math::
+
+        \tau = \frac{1}{\sigma\|K\|^{2}}
+
+      * If ``sigma`` is ``None``:
+
+      .. math::
+
+        \sigma = \frac{1}{\tau\|K\|^{2}}
+
+
+    Parameters
+    ----------
+    step_size : list or tuple of length two,  default=[None, None]
+        Initial values of the primal and dual step sizes. If both are ``None`` they are set to the default values defined above. If one is ``None`` it is calculated based on the other and the norm of the operator. If both are provided, they are used as they are, as long as they are positive numbers.
+    """
+
+    def __init__(self,  step_size=[None,None]):
+        '''Initialises the constant step size rule'''
+
+        if len(step_size) != 2:
+            raise ValueError(
+                "step_size should be a list or tuple of length two, step_size = {}".format(step_size))
+        self._tau = step_size[0]
+        self._sigma = step_size[1]
+
+    def get_initial_step_size(self, algorithm):
+        """Sets sigma and tau step-sizes for the PDHG algorithm."""
+        
+        # Check acceptable values of the primal-dual step-sizes
+        if self._tau is not None:
+            if isinstance(self._tau, Number):
+                if self._tau <= 0:
+                    raise ValueError(
+                        "The step-sizes of PDHG must be positive, passed tau = {}".format(self._tau))
+            elif self._tau.shape != algorithm.operator.domain_geometry().shape:
+                raise ValueError(" The shape of tau = {0} is not the same as the shape of the domain_geometry = {1}".format(
+                    self._tau.shape, algorithm.operator.domain_geometry().shape))
+
+        if self._sigma is not None:
+            if isinstance(self._sigma, Number):
+                if self._sigma <= 0:
+                    raise ValueError(
+                        "The step-sizes of PDHG are positive, passed sigma = {}".format(self._sigma))
+            elif self._sigma.shape != algorithm.operator.range_geometry().shape:
+                raise ValueError(" The shape of sigma = {0} is not the same as the shape of the range_geometry = {1}".format(
+                    self._sigma.shape, algorithm.operator.range_geometry().shape))
+
+        # Default sigma and tau step-sizes
+        if self._tau is None and self._sigma is None:
+            self._sigma = 1.0/algorithm.operator.norm()
+            self._tau = 1.0/algorithm.operator.norm()
+        elif self._tau is not None and self._sigma is not None:
+            pass
+        elif self._sigma is None and isinstance(self._tau, Number):
+            self._sigma = 1./(self._tau*algorithm.operator.norm()**2)
+        elif self._tau is None and isinstance(self._sigma, Number):
+            self._tau = 1./(self._sigma*algorithm.operator.norm()**2)
+        else:
+            raise NotImplementedError(
+                "If using arrays for sigma or tau both must arrays must be provided.")
+        return self._tau, self._sigma
+            
+    def get_step_size(self, algorithm):
+        """
+        Returns
+        --------
+        the calculated step size:float
+        """
+        return  self._tau, self._sigma

@@ -981,6 +981,9 @@ class TestPDHG(CCPiTestClass):
 
         # Setup and run the PDHG algorithm
         pdhg1 = PDHG(f=f1, g=g, operator=operator, tau=tau, sigma=sigma)
+        self.assertEqual( pdhg1.tau, tau)
+        self.assertEqual(pdhg1.sigma, sigma)
+        
         pdhg1.update_objective_interval = 200
         pdhg1.run(1000, verbose=0)
 
@@ -1006,7 +1009,6 @@ class TestPDHG(CCPiTestClass):
         # Setup and run the PDHG algorithm
         pdhg1 = PDHG(f=f1, g=g, operator=operator, tau=tau, sigma=sigma,
                      update_objective_interval=200)
-
         pdhg1.run(1000, verbose=0)
 
         rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
@@ -1053,29 +1055,28 @@ class TestPDHG(CCPiTestClass):
         # check if sigma is negative
         with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator,
-                        sigma=-1)
+                        step_size=(None, -1))
 
         # check if tau is negative
         with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator, tau=-1)
+            pdhg = PDHG(f=f, g=g, operator=operator, step_size=(-1, None))
 
         # check if tau is None
         sigma = 3.0
-        pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=(None, sigma))
         self.assertAlmostEqual(pdhg.sigma, sigma)
         self.assertAlmostEqual(pdhg.tau, 1./(sigma * operator.norm()**2))
 
         # check if sigma is None
         tau = 3.0
-        pdhg = PDHG(f=f, g=g, operator=operator, tau=tau)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size= (tau, None))
         self.assertAlmostEqual(pdhg.tau, tau)
         self.assertAlmostEqual(pdhg.sigma, 1./(tau * operator.norm()**2))
 
         # check if sigma/tau are not None
         tau = 1.0
         sigma = 1.0
-        pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
-                    sigma=sigma)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=(tau,sigma))
         self.assertAlmostEqual(pdhg.tau, tau)
         self.assertAlmostEqual(pdhg.sigma, sigma)
 
@@ -1083,132 +1084,43 @@ class TestPDHG(CCPiTestClass):
         ig1 = ImageGeometry(2, 2)
         sigma = ig1.allocate()
         with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator,
-                        sigma=sigma)
+            pdhg = PDHG(f=f, g=g, operator=operator, step_size =(None, sigma))
 
         # check sigma/tau as arrays, tau wrong shape
         tau = ig1.allocate()
         with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator, tau=tau)
+            pdhg = PDHG(f=f, g=g, operator=operator, step_size =(tau, None))
 
         # check sigma not Number or object with correct shape
         with self.assertRaises(AttributeError):
             pdhg = PDHG(f=f, g=g, operator=operator,
-                        sigma="sigma")
+                        step_size = ("sigma", None))
 
         # check tau not Number or object with correct shape
         with self.assertRaises(AttributeError):
             pdhg = PDHG(f=f, g=g, operator=operator,
-                        tau="tau")
+                        step_size =( "tau", None))
 
         # check warning message if condition is not satisfied
         sigma = 4/operator.norm()
         tau = 1/3
         with self.assertWarnsRegex(UserWarning, "Convergence criterion"):
-            pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
-                        sigma=sigma)
+            pdhg = PDHG(f=f, g=g, operator=operator, step_size=(tau,sigma))
 
         # check no warning message if check convergence is false
         sigma = 4/operator.norm()
         tau = 1/3
         with warnings.catch_warnings(record=True) as warnings_log:
-            pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
-                        sigma=sigma, check_convergence=False)
+            pdhg = PDHG(f=f, g=g, operator=operator, step_size=(tau,sigma) , check_convergence=False)
         self.assertEqual(warnings_log, [])
 
         # check no warning message if condition is satisfied
         sigma = 1/operator.norm()
         tau = 1/3
         with warnings.catch_warnings(record=True) as warnings_log:
-            pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
-                        sigma=sigma)
+            pdhg = PDHG(f=f, g=g, operator=operator, step_size=[tau, sigma])
         self.assertEqual(warnings_log, [])
 
-    def test_PDHG_strongly_convex_gamma_g(self):
-        ig = ImageGeometry(3, 3)
-        data = ig.allocate('random', seed=3)
-
-        f = L2NormSquared(b=data)
-        g = L2NormSquared()
-        operator = IdentityOperator(ig)
-
-        # sigma, tau
-        sigma = 1.0
-        tau = 1.0
-
-        pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                    gamma_g=0.5)
-        pdhg.run(1, verbose=0)
-        self.assertAlmostEqual(
-            pdhg.theta, 1.0 / np.sqrt(1 + 2 * pdhg.gamma_g * tau))
-        self.assertAlmostEqual(pdhg.tau, tau * pdhg.theta)
-        self.assertAlmostEqual(pdhg.sigma, sigma / pdhg.theta)
-        pdhg.run(4, verbose=0)
-        self.assertNotEqual(pdhg.sigma, sigma)
-        self.assertNotEqual(pdhg.tau, tau)
-
-        # check negative strongly convex constant
-        with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        gamma_g=-0.5)
-
-        # check strongly convex constant not a number
-        with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        gamma_g="-0.5")
-
-    def test_PDHG_strongly_convex_gamma_fcong(self):
-        ig = ImageGeometry(3, 3)
-        data = ig.allocate('random', seed=3)
-
-        f = L2NormSquared(b=data)
-        g = L2NormSquared()
-        operator = IdentityOperator(ig)
-
-        # sigma, tau
-        sigma = 1.0
-        tau = 1.0
-
-        pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                    gamma_fconj=0.5)
-        pdhg.run(1, verbose=0)
-        self.assertEqual(pdhg.theta, 1.0 / np.sqrt(1 +
-                         2 * pdhg.gamma_fconj * sigma))
-        self.assertEqual(pdhg.tau, tau / pdhg.theta)
-        self.assertEqual(pdhg.sigma, sigma * pdhg.theta)
-        pdhg.run(4, verbose=0)
-        self.assertNotEqual(pdhg.sigma, sigma)
-        self.assertNotEqual(pdhg.tau, tau)
-
-        # check negative strongly convex constant
-        try:
-            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        gamma_fconj=-0.5)
-        except ValueError as ve:
-            log.info(str(ve))
-
-        # check strongly convex constant not a number
-        try:
-            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        gamma_fconj="-0.5")
-        except ValueError as ve:
-            log.info(str(ve))
-
-    def test_PDHG_strongly_convex_both_fconj_and_g(self):
-
-        ig = ImageGeometry(3, 3)
-        data = ig.allocate('random', seed=3)
-
-        f = L2NormSquared(b=data)
-        g = L2NormSquared()
-        operator = IdentityOperator(ig)
-
-        try:
-            pdhg = PDHG(f=f, g=g, operator=operator,
-                        gamma_g=0.5, gamma_fconj=0.5)
-            pdhg.run(verbose=0)
-        except ValueError as err:
-            log.info(str(err))
 
     def test_pdhg_theta(self):
         ig = ImageGeometry(3, 3)

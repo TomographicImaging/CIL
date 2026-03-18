@@ -702,14 +702,15 @@ In each iteration of the :code:`TestAlgo`, the objective :math:`x` is reduced by
 
 Step size methods 
 ------------------
-A step size method is a class which acts on an algorithm and can be passed to  `cil.optimisation.algorithm.GD`, `cil.optimisation.algorithm.ISTA`  `cil.optimisation.algorithm.FISTA` and it's method `get_step_size` is called after the calculation of the gradient before the gradient descent step is taken. It outputs a float value to be used as the step-size. 
+A step size method is a class which acts on an algorithm and can be passed to a selection of the CIL algorithms.  
 
 Currently in CIL we have a base class:
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.StepSizeRule
    :members:
 
-We also have a number of example classes:
+We also have a number of example classes. Firstly, for the gradient based algorithms  `cil.optimisation.algorithm.GD`, `cil.optimisation.algorithm.ISTA`  `cil.optimisation.algorithm.FISTA` and it's method `get_step_size` is called after the calculation of the gradient before the gradient descent step is taken. It outputs a float value to be used as the step-size. 
+
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.ConstantStepSize
    :members:
@@ -718,6 +719,17 @@ We also have a number of example classes:
    :members:
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule
+   :members:
+
+For cil.optimisation.algorithm.PDHG  the method `get_step_sizes` is called at the end of each iteration and outputs the primal and dual step sizes to be used in the next iteration. Example step size rules include: 
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.PDHGConstantStepSize
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.PDHGAdaptiveStepSize2013
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.PDHGAdaptiveStepSize2015
    :members:
 
 

@@ -321,7 +321,9 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
 
     def __init__(self, initial_step_size =(None, None), gamma_g=None, gamma_fconj=None):#TODO: tuple of list 
         '''Initialises the step size rule'''
-
+        
+        self.gamma_g = gamma_g
+        self.gamma_fconj = gamma_fconj
         if self.gamma_g is not None and self.gamma_fconj is not None:
             raise NotImplementedError(
                 "PDHG strongly convex step size update not implemented for both primal and dual acceleration. Please choose only one of gamma_g or gamma_fconj.")

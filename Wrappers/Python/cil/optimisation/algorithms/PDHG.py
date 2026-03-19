@@ -205,12 +205,6 @@ class PDHG(Algorithm):
         self._gamma_fconj = kwargs.pop('gamma_fconj', None) #To be deprecated
         if self._gamma_g is not None or self._gamma_fconj is not None: #To be deprecated
             warnings.warn("The parameter `gamma_g` is being deprecated. In the future, if you would like to utilise strong convexity you should use the step size method cil.optimisation.utilities.StepSizeMethods.PDHGStronglyConvexUpdate.", DeprecationWarning)
-            if self._gamma_g is not None and self._gamma_g <= 0:
-                raise ValueError(
-                    "The strongly convex constant gamma_g must be positive, passed gamma_g = {}".format(self._gamma_g))
-            if self._gamma_fconj is not None and self._gamma_fconj <= 0:
-                raise ValueError(
-                    "The strongly convex constant gamma_fconj must be positive, passed gamma_fconj = {}".format(self._gamma_fconj))
             step_size = PDHGStronglyConvexUpdate( initial_step_size =(self._tau, self._sigma), gamma_g=self._gamma_g, gamma_fconj=self._gamma_fconj)
         
         
@@ -307,7 +301,7 @@ class PDHG(Algorithm):
         self.configured = True
         log.info("%s configured", self.__class__.__name__)
 
-    def _previous_solution(self):
+    def _update_previous_solution(self):
         """
         Swaps the references to current and previous solution based on the
         :func:`~Algorithm.previous_solution` of the base class :class:`Algorithm`.

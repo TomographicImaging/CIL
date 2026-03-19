@@ -1,9 +1,9 @@
 from cil.optimisation.algorithms import SIRT, GD, ISTA, FISTA, PDHG
-from cil.optimisation.functions import LeastSquares, IndicatorBox, ZeroFunction
+from cil.optimisation.functions import LeastSquares, IndicatorBox, ZeroFunction, L2NormSquared
 from cil.framework import ImageGeometry, VectorGeometry, VectorData
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, LinearOperator
 
-from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule
+from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate
 import numpy as np
 
 from testclass import CCPiTestClass
@@ -291,11 +291,12 @@ class TestStepSizePDHGStronglyConvex(CCPiTestClass):
         sigma = 1.0
         tau = 1.0
 
-        pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                    gamma_g=0.5)
+        step_size_rule = PDHGStronglyConvexUpdate(initial_step_size = (tau,sigma), gamma_g=0.5)
+        pdhg = PDHG(f=f, g=g, operator=operator, 
+                    step_size=step_size_rule)
         pdhg.run(1, verbose=0)
         self.assertAlmostEqual(
-            pdhg.theta, 1.0 / np.sqrt(1 + 2 * pdhg.gamma_g * tau))
+            pdhg.theta, 1.0 / np.sqrt(1 + 2 * step_size_rule.gamma_g * tau))
         self.assertAlmostEqual(pdhg.tau, tau * pdhg.theta)
         self.assertAlmostEqual(pdhg.sigma, sigma / pdhg.theta)
         pdhg.run(4, verbose=0)
@@ -323,12 +324,11 @@ class TestStepSizePDHGStronglyConvex(CCPiTestClass):
         # sigma, tau
         sigma = 1.0
         tau = 1.0
-
-        pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                    gamma_fconj=0.5)
+        step_size_rule = PDHGStronglyConvexUpdate(initial_step_size=(tau,sigma), gamma_fconj=0.5)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=step_size_rule)
         pdhg.run(1, verbose=0)
         self.assertEqual(pdhg.theta, 1.0 / np.sqrt(1 +
-                         2 * pdhg.gamma_fconj * sigma))
+                         2 * step_size_rule .gamma_fconj * sigma))
         self.assertEqual(pdhg.tau, tau / pdhg.theta)
         self.assertEqual(pdhg.sigma, sigma * pdhg.theta)
         pdhg.run(4, verbose=0)
@@ -336,18 +336,17 @@ class TestStepSizePDHGStronglyConvex(CCPiTestClass):
         self.assertNotEqual(pdhg.tau, tau)
 
         # check negative strongly convex constant
-        try:
+        with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
                         gamma_fconj=-0.5)
-        except ValueError as ve:
-            log.info(str(ve))
+
 
         # check strongly convex constant not a number
-        try:
-            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        gamma_fconj="-0.5")
-        except ValueError as ve:
-            log.info(str(ve))
+        with self.assertRaises(ValueError):
+            
+            step_size_rule = PDHGStronglyConvexUpdate(gamma_fconj="-0.5")
+
+
 
     def test_PDHG_strongly_convex_both_fconj_and_g(self):
 
@@ -358,12 +357,11 @@ class TestStepSizePDHGStronglyConvex(CCPiTestClass):
         g = L2NormSquared()
         operator = IdentityOperator(ig)
 
-        try:
+        with self.assertRaises(NotImplementedError):
             pdhg = PDHG(f=f, g=g, operator=operator,
                         gamma_g=0.5, gamma_fconj=0.5)
             pdhg.run(verbose=0)
-        except ValueError as err:
-            log.info(str(err))
+
       
         
 

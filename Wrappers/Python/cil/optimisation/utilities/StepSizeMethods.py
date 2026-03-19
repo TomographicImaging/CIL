@@ -369,42 +369,42 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
         The user can set either, both or none. Values passed by the user will be accepted as long as they are positive numbers,
         or correct shape array like objects.
         """
-        self._tau = self.initial_step_size[0]
-        self._sigma = self.initial_step_size[1]
+        self.tau = self.initial_step_size[0]
+        self.sigma = self.initial_step_size[1]
         
         # Check acceptable values of the primal-dual step-sizes
-        if self._tau is not None:
-            if isinstance(self._tau, Number):
-                if self._tau <= 0:
+        if self.tau is not None:
+            if isinstance(self.tau, Number):
+                if self.tau <= 0:
                     raise ValueError(
-                        "The step-sizes of PDHG must be positive, passed tau = {}".format(self._tau))
-            elif self._tau.shape != algorithm.operator.domain_geometry().shape:
+                        "The step-sizes of PDHG must be positive, passed tau = {}".format(self.tau))
+            elif self.tau.shape != algorithm.operator.domain_geometry().shape:
                 raise ValueError(" The shape of tau = {0} is not the same as the shape of the domain_geometry = {1}".format(
-                    self._tau.shape, algorithm.operator.domain_geometry().shape))
+                    self.tau.shape, algorithm.operator.domain_geometry().shape))
 
-        if self._sigma is not None:
-            if isinstance(self._sigma, Number):
-                if self._sigma <= 0:
+        if self.sigma is not None:
+            if isinstance(self.sigma, Number):
+                if self.sigma <= 0:
                     raise ValueError(
-                        "The step-sizes of PDHG are positive, passed sigma = {}".format(self._sigma))
-            elif self._sigma.shape != algorithm.operator.range_geometry().shape:
+                        "The step-sizes of PDHG are positive, passed sigma = {}".format(self.sigma))
+            elif self.sigma.shape != algorithm.operator.range_geometry().shape:
                 raise ValueError(" The shape of sigma = {0} is not the same as the shape of the range_geometry = {1}".format(
-                    self._sigma.shape, algorithm.operator.range_geometry().shape))
+                    self.sigma.shape, algorithm.operator.range_geometry().shape))
 
         # Default sigma and tau step-sizes
-        if self._tau is None and self._sigma is None:
-            self._sigma = 1.0/algorithm.operator.norm()
-            self._tau = 1.0/algorithm.operator.norm()
-        elif self._tau is not None and self._sigma is not None:
+        if self.tau is None and self.sigma is None:
+            self.sigma = 1.0/algorithm.operator.norm()
+            self.tau = 1.0/algorithm.operator.norm()
+        elif self.tau is not None and self.sigma is not None:
             pass
-        elif self._sigma is None and isinstance(self._tau, Number):
-            self._sigma = 1./(self._tau*algorithm.operator.norm()**2)
-        elif self._tau is None and isinstance(self._sigma, Number):
-            self._tau = 1./(self._sigma*algorithm.operator.norm()**2)
+        elif self.sigma is None and isinstance(self.tau, Number):
+            self.sigma = 1./(self.tau*algorithm.operator.norm()**2)
+        elif self.tau is None and isinstance(self.sigma, Number):
+            self.tau = 1./(self.sigma*algorithm.operator.norm()**2)
         else:
             raise NotImplementedError(
                 "If using arrays for sigma or tau both must arrays must be provided.")
-        return self._tau, self._sigma
+        return self.tau, self.sigma
     
     
     def get_step_size(self, algorithm):
@@ -418,17 +418,17 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
             algorithm._theta = 1.0 / np.sqrt(1 + 2 * self.gamma_g * algorithm.tau)
-            self._tau *= algorithm._theta
-            self._sigma /= algorithm._theta
+            self.tau *= algorithm._theta
+            self.sigma /= algorithm._theta
 
         # Update sigma and tau based on the strong convexity of F
         # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
         if self.gamma_fconj is not None:
             algorithm._theta = 1.0 / np.sqrt(1 + 2 * self.gamma_fconj * algorithm.sigma)
-            self._sigma *= algorithm._theta
-            self._tau /= algorithm._theta
+            self.sigma *= algorithm._theta
+            self.tau /= algorithm._theta
 
-        return self._tau, self._sigma 
+        return self.tau, self.sigma 
 
 
 class PDHGAdaptiveStepSize2013(StepSizeRule):
@@ -779,45 +779,45 @@ class PDHGConstantStepSize(StepSizeRule):
         if len(step_size) != 2:
             raise ValueError(
                 "step_size should be a list or tuple of length two, step_size = {}".format(step_size))
-        self._tau = step_size[0]
-        self._sigma = step_size[1]
+        self.tau = step_size[0]
+        self.sigma = step_size[1]
 
     def get_initial_step_size(self, algorithm):
         """Sets sigma and tau step-sizes for the PDHG algorithm."""
         
         # Check acceptable values of the primal-dual step-sizes
-        if self._tau is not None:
-            if isinstance(self._tau, Number):
-                if self._tau <= 0:
+        if self.tau is not None:
+            if isinstance(self.tau, Number):
+                if self.tau <= 0:
                     raise ValueError(
-                        "The step-sizes of PDHG must be positive, passed tau = {}".format(self._tau))
-            elif self._tau.shape != algorithm.operator.domain_geometry().shape:
+                        "The step-sizes of PDHG must be positive, passed tau = {}".format(self.tau))
+            elif self.tau.shape != algorithm.operator.domain_geometry().shape:
                 raise ValueError(" The shape of tau = {0} is not the same as the shape of the domain_geometry = {1}".format(
-                    self._tau.shape, algorithm.operator.domain_geometry().shape))
+                    self.tau.shape, algorithm.operator.domain_geometry().shape))
 
-        if self._sigma is not None:
-            if isinstance(self._sigma, Number):
-                if self._sigma <= 0:
+        if self.sigma is not None:
+            if isinstance(self.sigma, Number):
+                if self.sigma <= 0:
                     raise ValueError(
-                        "The step-sizes of PDHG are positive, passed sigma = {}".format(self._sigma))
-            elif self._sigma.shape != algorithm.operator.range_geometry().shape:
+                        "The step-sizes of PDHG are positive, passed sigma = {}".format(self.sigma))
+            elif self.sigma.shape != algorithm.operator.range_geometry().shape:
                 raise ValueError(" The shape of sigma = {0} is not the same as the shape of the range_geometry = {1}".format(
-                    self._sigma.shape, algorithm.operator.range_geometry().shape))
+                    self.sigma.shape, algorithm.operator.range_geometry().shape))
 
         # Default sigma and tau step-sizes
-        if self._tau is None and self._sigma is None:
-            self._sigma = 1.0/algorithm.operator.norm()
-            self._tau = 1.0/algorithm.operator.norm()
-        elif self._tau is not None and self._sigma is not None:
+        if self.tau is None and self.sigma is None:
+            self.sigma = 1.0/algorithm.operator.norm()
+            self.tau = 1.0/algorithm.operator.norm()
+        elif self.tau is not None and self.sigma is not None:
             pass
-        elif self._sigma is None and isinstance(self._tau, Number):
-            self._sigma = 1./(self._tau*algorithm.operator.norm()**2)
-        elif self._tau is None and isinstance(self._sigma, Number):
-            self._tau = 1./(self._sigma*algorithm.operator.norm()**2)
+        elif self.sigma is None and isinstance(self.tau, Number):
+            self.sigma = 1./(self.tau*algorithm.operator.norm()**2)
+        elif self.tau is None and isinstance(self.sigma, Number):
+            self.tau = 1./(self.sigma*algorithm.operator.norm()**2)
         else:
             raise NotImplementedError(
                 "If using arrays for sigma or tau both must arrays must be provided.")
-        return self._tau, self._sigma
+        return self.tau, self.sigma
             
     def get_step_size(self, algorithm):
         """
@@ -825,4 +825,4 @@ class PDHGConstantStepSize(StepSizeRule):
         --------
         the calculated step size:float
         """
-        return  self._tau, self._sigma
+        return  self.tau, self.sigma

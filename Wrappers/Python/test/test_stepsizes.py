@@ -3,12 +3,13 @@ from cil.optimisation.functions import LeastSquares, IndicatorBox, ZeroFunction,
 from cil.framework import ImageGeometry, VectorGeometry, VectorData
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, LinearOperator
 
-from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate
+from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize
 import numpy as np
 
 from testclass import CCPiTestClass
 from unittest.mock import MagicMock
 
+import warnings
 
 class TestStepSizes(CCPiTestClass):
 
@@ -262,23 +263,140 @@ class TestStepSizeBB(CCPiTestClass):
         alg.run(1)
         self.assertTrue(ss_rule.is_short)
 
+class TestPDHGConstantStepSize(CCPiTestClass):
+    
+    def test_deprecated_parameters(self): #TODO: remove when deprecated parameters are removed from PDHG
         
+        with self.assertWarns(DeprecationWarning):
+            pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=IdentityOperator(ImageGeometry(2, 2)),
+                        sigma=0.5)
+        self.assertEqual(pdhg.sigma, 0.5)
+        self.assertEqual(pdhg.step_size_rule.sigma, 0.5)
+        self.assertEqual(pdhg.step_size_rule.tau, 1./(0.5 * pdhg.operator.norm()**2))
+        self.assertTrue(isinstance(pdhg.step_size_rule, PDHGConstantStepSize))
+        
+        with self.assertWarns(DeprecationWarning):
+            pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=IdentityOperator(ImageGeometry(2, 2)),
+                        tau=0.5)
+        self.assertEqual(pdhg.tau, 0.5)
+        self.assertEqual(pdhg.step_size_rule.tau, 0.5)
+        self.assertEqual(pdhg.step_size_rule.sigma, 1./(0.5 * pdhg.operator.norm()**2))
+        self.assertTrue(isinstance(pdhg.step_size_rule, PDHGConstantStepSize))
+        
+        with self.assertWarns(DeprecationWarning):
+            pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=IdentityOperator(ImageGeometry(2, 2)),
+                        sigma=0.5, tau=0.5)
+        self.assertEqual(pdhg.sigma, 0.5)
+        self.assertEqual(pdhg.tau, 0.5)
+        self.assertTrue(isinstance(pdhg.step_size_rule, PDHGConstantStepSize))
+        
+        
+        
+    
+    def test_PDHG_step_sizes(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = 3*IdentityOperator(ig)
+
+        # check if sigma, tau are None
+        pdhg = PDHG(f=f, g=g, operator=operator)
+        self.assertAlmostEqual(pdhg.sigma, 1./operator.norm())
+        self.assertAlmostEqual(pdhg.tau, 1./operator.norm())
+        self.assertTrue(isinstance(pdhg.step_size_rule, PDHGConstantStepSize))
+
+        # check if sigma is negative
+        with self.assertRaises(ValueError):
+            pdhg = PDHG(f=f, g=g, operator=operator,
+                        step_size=(None, -1))
+
+        # check if tau is negative
+        with self.assertRaises(ValueError):
+            pdhg = PDHG(f=f, g=g, operator=operator, step_size=(-1, None))
+
+        # check if tau is None
+        sigma = 3.0
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=(None, sigma))
+        self.assertAlmostEqual(pdhg.sigma, sigma)
+        self.assertAlmostEqual(pdhg.tau, 1./(sigma * operator.norm()**2))
+        self.assertTrue(isinstance(pdhg.step_size_rule, PDHGConstantStepSize))
+        
+        # check if sigma is None
+        tau = 3.0
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size= (tau, None))
+        self.assertAlmostEqual(pdhg.tau, tau)
+        self.assertAlmostEqual(pdhg.sigma, 1./(tau * operator.norm()**2))
+        self.assertTrue(isinstance(pdhg.step_size_rule, PDHGConstantStepSize))
+
+
+        # check if sigma/tau are not None
+        tau = 1.0
+        sigma = 1.0
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=(tau,sigma))
+        self.assertAlmostEqual(pdhg.tau, tau)
+        self.assertAlmostEqual(pdhg.sigma, sigma)
+        self.assertTrue(isinstance(pdhg.step_size_rule, PDHGConstantStepSize))
+
+
+        # check sigma/tau as arrays, sigma wrong shape
+        ig1 = ImageGeometry(2, 2)
+        sigma = ig1.allocate()
+        with self.assertRaises(ValueError):
+            pdhg = PDHG(f=f, g=g, operator=operator, step_size =(None, sigma))
+
+        # check sigma/tau as arrays, tau wrong shape
+        tau = ig1.allocate()
+        with self.assertRaises(ValueError):
+            pdhg = PDHG(f=f, g=g, operator=operator, step_size =(tau, None))
+
+        # check sigma not Number or object with correct shape
+        with self.assertRaises(AttributeError):
+            pdhg = PDHG(f=f, g=g, operator=operator,
+                        step_size = ("sigma", None))
+
+        # check tau not Number or object with correct shape
+        with self.assertRaises(AttributeError):
+            pdhg = PDHG(f=f, g=g, operator=operator,
+                        step_size =( "tau", None))
+
+        # check warning message if condition is not satisfied
+        sigma = 4/operator.norm()
+        tau = 1/3
+        with self.assertWarnsRegex(UserWarning, "Convergence criterion"):
+            pdhg = PDHG(f=f, g=g, operator=operator, step_size=(tau,sigma))
+
+        # check no warning message if check convergence is false
+        sigma = 4/operator.norm()
+        tau = 1/3
+        with warnings.catch_warnings(record=True) as warnings_log:
+            pdhg = PDHG(f=f, g=g, operator=operator, step_size=(tau,sigma) , check_convergence=False)
+        self.assertEqual(warnings_log, [])
+
+        # check no warning message if condition is satisfied
+        sigma = 1/operator.norm()
+        tau = 1/3
+        with warnings.catch_warnings(record=True) as warnings_log:
+            pdhg = PDHG(f=f, g=g, operator=operator, step_size=[tau, sigma])
+        self.assertEqual(warnings_log, [])
+
+  
         
 
 class TestStepSizePDHGStronglyConvex(CCPiTestClass):
 
-    def test_deprecation_warning(self): #TODO: remove when deprecated parameters are removed from PDHG
+    def test_deprecated_parameters(self): #TODO: remove when deprecated parameters are removed from PDHG
         with self.assertWarns(DeprecationWarning):
             pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=IdentityOperator(ImageGeometry(2, 2)),
-                        gamma_g=0.5)
+                        gamma_g=0.5)        
 
         with self.assertWarns(DeprecationWarning):
             pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=IdentityOperator(ImageGeometry(2, 2)),
                         gamma_fconj=0.5)
+        self.assertEqual(pdhg.step_size_rule.gamma_fconj, 0.5)
             
-    def test_deprecated_parameters_to_step_size_rule(self): #TODO: remove when deprecated parameters are removed from PDHG
-        pass
-    
+
     def test_PDHG_strongly_convex_gamma_g(self):
         ig = ImageGeometry(3, 3)
         data = ig.allocate('random', seed=3)

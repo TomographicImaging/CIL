@@ -195,10 +195,10 @@ class PDHG(Algorithm):
         if step_size is not None: #To be deprecated
             if self._sigma is not None or self._tau is not None: #To be deprecated
                 raise ValueError( "The parameters `sigma` and `tau` are being deprecated in favour of `step_size`. You have passed both. Instead please pass these as part of the `step_size` argument, either as a tuple of (sigma, tau) or using a compatible step size rule.", DeprecationWarning)
-        else:
-            if self._sigma is not None or self._tau is not None: #To be deprecated
-                warnings.warn("The parameters `sigma` and `tau` are being deprecated. In the future, please pass these as part of the `step_size` argument, either as a tuple of (sigma, tau) or using a compatible step size rule.")
-                step_size = (self._tau, self._sigma)
+        
+        if self._sigma is not None or self._tau is not None: #To be deprecated
+            warnings.warn("The parameters `sigma` and `tau` are being deprecated. In the future, please pass these as part of the `step_size` argument, either as a tuple of (sigma, tau) or using a compatible step size rule.", DeprecationWarning)
+            step_size = (self._tau, self._sigma)
 
 
         self._gamma_g = kwargs.pop('gamma_g', None) #To be deprecated
@@ -219,12 +219,12 @@ class PDHG(Algorithm):
 
     @property
     def tau(self):
-        """The primal step-size """
+        """The primal step-size - Returns the currently being used step size for the primal problem. Note that this can be updated at each iteration if a step size rule is used."""
         return self._tau
 
     @property
     def sigma(self):
-        """The dual step-size """
+        """The dual step-size  - Returns the currently being used step size for the dual problem. Note that this can be updated at each iteration if a step size rule is used."""
         return self._sigma
 
     @property

@@ -3,7 +3,7 @@ from cil.optimisation.functions import LeastSquares, IndicatorBox, ZeroFunction,
 from cil.framework import ImageGeometry, VectorGeometry, VectorData
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, LinearOperator
 
-from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize
+from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015
 import numpy as np
 
 from testclass import CCPiTestClass
@@ -482,4 +482,66 @@ class TestStepSizePDHGStronglyConvex(CCPiTestClass):
 
       
         
+class TestPDHGAdaptive2013(CCPiTestClass):
+    
+
+
+    def test_init(self):
+        rule = PDHGAdaptiveStepSize2013(initial_step_size=[1.0, 2.0])
+        self.assertEqual(rule.initial_step_size, [1.0, 2.0])
+        self.assertAlmostEqual(rule.alpha, 0.95)
+
+    def test_init_invalid(self):
+        with self.assertRaises(ValueError):
+            PDHGAdaptiveStepSize2013(initial_step_size=[1.0])
+
+    def test_initial_step_size_defaults(self):
+        rule = PDHGAdaptiveStepSize2013(initial_step_size=[None, None])
+        tau, sigma = rule.get_initial_step_size(None)
+        self.assertEqual(tau, 1e5)
+        self.assertEqual(sigma, 1e5)
+        
+        rule = PDHGAdaptiveStepSize2013(initial_step_size=[3.2, None])
+        tau, sigma = rule.get_initial_step_size(None)
+        self.assertEqual(tau, 3.2)
+        self.assertEqual(sigma, 1e5)
+        
+        rule = PDHGAdaptiveStepSize2013(initial_step_size=[None, 3.2])
+        tau, sigma = rule.get_initial_step_size(None)
+        self.assertEqual(tau, 1e5)
+        self.assertEqual(sigma, 3.2)
+        
+    def test_backtracking_calculation(self): 
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+        
+        rule = PDHGAdaptiveStepSize2013(initial_step_size=[1.0, 1.0], initial_alpha=0, gamma=1)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        pdhg.x_old = operator.domain.allocate(0)
+        pdhg.y_old = operator.range.allocate(0)
+        pdhg.x = operator.domain.allocate(1)
+        pdhg.y = operator.range.allocate(1)
+        self.assertEqual(rule.gamma, 1)
+        self.assertEqual(pdhg.sigma, 1)
+        self.assertEqual(pdhg.tau, 1)
+        b = rule._calculate_backtracking(pdhg)
+        self.assertEqual(rule.x_resid.norm(), 3)
+        self.assertEqual(rule.y_resid.norm(), 3)
+        self.assertNumpyArrayAlmostEqual(rule.x_resid.as_array(), pdhg.y_tmp.as_array())
+        self.assertEqual(rule.y_resid.dot(pdhg.y_tmp), 9)
+        self.assertEqual(b, 1)
+        
+
+    def test_backtracking(self): #TODO:
+        pass 
+
+    def test_changing_ration(self): #TODO:
+        pass
+
+    def test_stopping_criterion(self): #TODO:
+        pass
 

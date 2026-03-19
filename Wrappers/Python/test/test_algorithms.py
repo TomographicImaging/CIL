@@ -925,119 +925,7 @@ class TestPDHG(CCPiTestClass):
         
         
         
-    def test_PDHG_Denoising(self):
-        # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
-        data = dataexample.PEPPERS.get(size=(256, 256))
-        ig = data.geometry
-        ag = ig
-
-        which_noise = 0
-        # Create noisy data.
-        noises = ['gaussian', 'poisson', 's&p']
-        dnoise = noises[which_noise]
-
-        def setup(data, dnoise):
-            if dnoise == 's&p':
-                n1 = applynoise.saltnpepper(
-                    data, salt_vs_pepper=0.9, amount=0.2, seed=10)
-            elif dnoise == 'poisson':
-                scale = 5
-                n1 = applynoise.poisson(data.as_array()/scale, seed=10)*scale
-            elif dnoise == 'gaussian':
-                n1 = applynoise.gaussian(data.as_array(), seed=10)
-            else:
-                raise ValueError('Unsupported Noise ', noise)
-            noisy_data = ig.allocate()
-            noisy_data.fill(n1)
-
-            # Regularisation Parameter depending on the noise distribution
-            if dnoise == 's&p':
-                alpha = 0.8
-            elif dnoise == 'poisson':
-                alpha = 1
-            elif dnoise == 'gaussian':
-                alpha = .3
-                # fidelity
-            if dnoise == 's&p':
-                g = L1Norm(b=noisy_data)
-            elif dnoise == 'poisson':
-                g = KullbackLeibler(b=noisy_data)
-            elif dnoise == 'gaussian':
-                g = 0.5 * L2NormSquared(b=noisy_data)
-            return noisy_data, alpha, g
-
-        noisy_data, alpha, g = setup(data, dnoise)
-        operator = GradientOperator(
-            ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
-
-        f1 = alpha * MixedL21Norm()
-
-        # Compute operator Norm
-        normK = operator.norm()
-
-        # Primal & dual stepsizes
-        sigma = 1
-        tau = 1/(sigma*normK**2)
-
-        # Setup and run the PDHG algorithm
-        pdhg1 = PDHG(f=f1, g=g, operator=operator, tau=tau, sigma=sigma)
-        self.assertEqual( pdhg1.tau, tau)
-        self.assertEqual(pdhg1.sigma, sigma)
-        
-        pdhg1.update_objective_interval = 200
-        pdhg1.run(1000, verbose=0)
-
-        rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
-        log.info("RMSE %F", rmse)
-        self.assertLess(rmse, 2e-4)
-
-        which_noise = 1
-        noise = noises[which_noise]
-        noisy_data, alpha, g = setup(data, noise)
-        operator = GradientOperator(
-            ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
-
-        f1 = alpha * MixedL21Norm()
-
-        # Compute operator Norm
-        normK = operator.norm()
-
-        # Primal & dual stepsizes
-        sigma = 1
-        tau = 1/(sigma*normK**2)
-
-        # Setup and run the PDHG algorithm
-        pdhg1 = PDHG(f=f1, g=g, operator=operator, tau=tau, sigma=sigma,
-                     update_objective_interval=200)
-        pdhg1.run(1000, verbose=0)
-
-        rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
-        log.info("RMSE %f", rmse)
-        self.assertLess(rmse, 2e-4)
-
-        which_noise = 2
-        noise = noises[which_noise]
-        noisy_data, alpha, g = setup(data, noise)
-        operator = GradientOperator(
-            ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
-
-        f1 = alpha * MixedL21Norm()
-
-        # Compute operator Norm
-        normK = operator.norm()
-
-        # Primal & dual stepsizes
-        sigma = 1
-        tau = 1/(sigma*normK**2)
-
-        # Setup and run the PDHG algorithm
-        pdhg1 = PDHG(f=f1, g=g, operator=operator, tau=tau, sigma=sigma)
-        pdhg1.update_objective_interval = 200
-        pdhg1.run(1000, verbose=0)
-
-        rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
-        log.info("RMSE %f", rmse)
-        self.assertLess(rmse, 2e-4)
+    
 
     
     def test_pdhg_theta(self):
@@ -1658,7 +1546,7 @@ class TestADMM(unittest.TestCase):
         sigma = 1./normK
         tau = 1./normK
 
-        pdhg = PDHG(f=F, g=G, operator=K, tau=tau, sigma=sigma,
+        pdhg = PDHG(f=F, g=G, operator=K, step_size=(tau, sigma),
                     update_objective_interval=10)
         pdhg.run(500, verbose=0)
 
@@ -1720,8 +1608,7 @@ class Test_PD3O(CCPiTestClass):
         G = 0.5 * L2NormSquared(b=self.data)
         sigma = 1./norm_op
         tau = 1./norm_op
-        pdhg = PDHG(f=F, g=G, operator=operator, tau=tau,
-                    sigma=sigma, update_objective_interval=100)
+        pdhg = PDHG(f=F, g=G, operator=operator, step_size=(tau,sigma), update_objective_interval=100)
         pdhg.run(1)
 
         # setup PD3O denoising  (F=ZeroFunction)

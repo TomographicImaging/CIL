@@ -478,7 +478,7 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
         self.initial_step_size = initial_step_size
         if len(initial_step_size) != 2:
             raise ValueError(
-                "initial_step_size should be a list or tuple of length two, step_size = {}".format(step_size))
+                "initial_step_size should be a list or tuple of length two, step_size = {}".format(initial_step_size))
  
     def get_initial_step_size(self, algorithm):
         tau = self.initial_step_size[0]
@@ -523,14 +523,8 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
 
                 print('After possible reduction',
                       algorithm._tau, algorithm._sigma)
-                algorithm.operator.adjoint(self.y_resid, out=algorithm.x_tmp)
-                algorithm.operator.direct(self.x_resid, out=algorithm.y_tmp)
-                self.x_resid.sapyb((1/algorithm._tau),
-                                   algorithm.x_tmp, -1.0, out=algorithm.x_tmp)
-                self.y_resid.sapyb((1/algorithm._sigma),
-                                   algorithm.y_tmp, -1.0, out=algorithm.y_tmp)
-                self.p_norm = algorithm.x_tmp.norm()
-                self.d_norm = algorithm.y_tmp.norm()
+                
+                self._calculate_pnorm_dnorm(algorithm)
                 print('p_norm = {}, d_norm = {}'.format(
                     self.p_norm, self.d_norm))
                 print('self.s, self.delta = {}, {}'.format(self.s, self.delta))
@@ -567,6 +561,16 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
                 del self.y_old
 
         return  algorithm._tau, algorithm._sigma
+
+    def _calculate_pnorm_dnorm(self, algorithm):
+        algorithm.operator.adjoint(self.y_resid, out=algorithm.x_tmp)
+        algorithm.operator.direct(self.x_resid, out=algorithm.y_tmp)
+        self.x_resid.sapyb((1/algorithm._tau),
+                           algorithm.x_tmp, -1.0, out=algorithm.x_tmp)
+        self.y_resid.sapyb((1/algorithm._sigma),
+                           algorithm.y_tmp, -1.0, out=algorithm.y_tmp)
+        self.p_norm = algorithm.x_tmp.norm()
+        self.d_norm = algorithm.y_tmp.norm()
 
     def _calculate_backtracking(self, algorithm):
         """ Calculates the backtracking parameter b used to update step sizes in the adaptive PDHG algorithm.
@@ -628,7 +632,7 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
         self.initial_step_size = initial_step_size
         if len(initial_step_size) != 2:
             raise ValueError(
-                "initial_step_size should be a list or tuple of length two, step_size = {}".format(step_size))
+                "initial_step_size should be a list or tuple of length two, step_size = {}".format(initial_step_size))
 
         
     def get_initial_step_size(self, algorithm): #TODO: this needs some proper testing 

@@ -223,7 +223,6 @@ class FGP_TV(TV_Base):
         self.alpha = alpha
         self.max_iteration = max_iteration
         self.tolerance = tolerance
-        self.nonnegativity = nonnegativity
         self.device = device
 
         super(FGP_TV, self).__init__(strong_convexity_constant=strong_convexity_constant)

@@ -435,7 +435,7 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
     ''''The PDHG step sizes are updated adaptively based on the method proposed in :cite:`goldstein2013adaptive`.
         Parameters
         -------------
-        initial_step_size : list of two positive :obj:`float`, optional, default=[10e5, 10e5]
+        initial_step_size : list of two positive :obj:`float`, optional, default=[10/algorithm.operator.norm(), 10/algorithm.operator.norm()]
             Initial values of the primal and dual step sizes used in the adaptive step size method.
         initial_alpha : positive :obj:`float`, optional, default=0.95
             Initial value of the parameter alpha used in the adaptive step size method.
@@ -454,7 +454,7 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
 
         '''
 
-    def __init__(self, initial_step_size=[10e5, 10e5], initial_alpha=0.95, beta=0.95, gamma=0.9, delta=1.5, s=None, eta=0.95, auto_stop=True):
+    def __init__(self, initial_step_size=[None,None], initial_alpha=0.95, beta=0.95, gamma=0.9, delta=1.5, s=None, eta=0.95, auto_stop=True):
         '''Initialises the step size rule'''
         self.alpha = initial_alpha
         self.eta = eta
@@ -484,9 +484,9 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
         tau = self.initial_step_size[0]
         sigma = self.initial_step_size[1]
         if tau is None:
-            tau = 1e5
+            tau = 10/algorithm.operator.norm()
         if sigma is None:
-            sigma = 1e5
+            sigma = 10/algorithm.operator.norm()
         return tau, sigma
 
     def get_step_size(self, algorithm):
@@ -586,7 +586,7 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
         algorithm.y.sapyb(1.0, self.y_old, -1.0, out=self.y_resid)
         y_change_norm = self.y_resid.norm()
         algorithm.operator.direct(self.x_resid, out=algorithm.y_tmp)
-        cross_term = np.real(2*algorithm._sigma *
+        cross_term = np.abs(2*algorithm._sigma *
                              algorithm._tau*self.y_resid.dot(algorithm.y_tmp))
         print('cross_term = ', cross_term, 'x_change_norm = ',
               x_change_norm, 'y_change_norm = ', y_change_norm)
@@ -601,7 +601,7 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
 
         Parameters
         -------------
-        initial_step_size : list of two positive :obj:`float`, optional, default=[10e5, 10e5]
+        initial_step_size : list of two positive :obj:`float`, optional, default= [10/algorithm.operator.norm(), 10/algorithm.operator.norm()]
             Initial values of the primal and dual step sizes used in the adaptive step size method.
         initial_alpha : positive :obj:`float`, optional, default=0.95
         Initial value of the parameter alpha used in the adaptive step size method.
@@ -612,7 +612,7 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
 
         '''
 
-    def __init__(self, initial_step_size=[10e5, 10e5],  initial_alpha=0.95, eta=0.95, c=0.9, auto_stop=True):
+    def __init__(self, initial_step_size=[None, None],  initial_alpha=0.95, eta=0.95, c=0.9, auto_stop=True):
         '''Initialises the step size rule'''
 
         self.adaptive = True
@@ -639,9 +639,9 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
         tau = self.initial_step_size[0]
         sigma = self.initial_step_size[1]
         if tau is None:
-            tau = 1e5
+            tau = 10/algorithm.operator.norm()
         if sigma is None:
-            sigma = 1e5
+            sigma = 10/algorithm.operator.norm()
         return tau, sigma
 
     def get_step_size(self, algorithm):
@@ -655,12 +655,12 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
             if self.p_norm > self.tolerance and self.d_norm > self.tolerance:
                 # print('Before adaptive', self.tau, self.sigma)
                 b = self._calculate_backtracking(algorithm)
-                while b > 1:
+                while b < 0:
 
                     print(
-                        'Multiplying step sizes by beta/b, beta = {}, b = {}'.format(self.beta, b))
-                    algorithm._tau *= self.beta/b
-                    algorithm._sigma *= self.beta/b
+                        'Multiplying step sizes by 1/2')
+                    algorithm._tau *= 0.5
+                    algorithm._sigma *= 0.5
 
                     # Swap x and x_store
                     tmp = algorithm.x
@@ -668,7 +668,7 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
                     self.x_store = tmp
 
                     print(
-                        'Multiplying step sizes by beta/b, beta = {}, b = {}'.format(self.beta, b))
+                        'Multiplying step sizes by 1/2')
                     print('tau = {}, sigma = {}'.format(
                         algorithm._tau, algorithm._sigma))
                     algorithm._pdhg_update()
@@ -742,6 +742,60 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
             self.c*algorithm._tau*y_change_norm**2 - cross_term
         print(b)
         return b
+
+class PDHGBayesOptimisationStepSize(StepSizeRule):
+    
+    def __init__(self, gamma_bounds=None, n_initial_points=5, n_calls=20, n_iterations=10):
+        '''Initialises the step size rule'''
+
+        self.gamma_bounds = gamma_bounds
+        if gamma_bounds is not None:
+            if len(gamma_bounds) != 2:
+                raise ValueError(
+                    "gamma_bounds should be a list or tuple of length two, gamma_bounds = {}".format(gamma_bounds))
+            
+        else: 
+            self.gamma_bounds= (1e-5, 1e5)
+        self.n_initial_points = n_initial_points
+        self.n_calls = n_calls
+        self.n_iterations = n_iterations
+        
+    
+    def get_initial_step_size(self, algorithm):
+        try: 
+            from skopt import gp_minimize
+        except ImportError:
+            raise ImportError("skopt is required for the PDHGBayesOptimisationStepSize rule. Please install scikit-optimize to use this step size rule.")
+        update_objective_interval = algorithm.update_objective_interval 
+        algorithm.update_objective_interval = self.n_iterations-1
+        
+        def objective_function(gamma):
+            gamma=gamma[0]
+            # Set the step sizes based on the current gamma
+            tau = 1.0 / (gamma * algorithm.operator.norm())
+            sigma = 1.0*gamma / (algorithm.operator.norm())
+            
+            # Run a few iterations of the PDHG algorithm
+   
+            algorithm.set_up(initial = algorithm.initial, f = algorithm.f, g = algorithm.g, operator = algorithm.operator, step_size = [tau,sigma])
+            algorithm.iteration = -1
+            
+            algorithm.run(self.n_iterations, callbacks = [])
+
+            print( len(algorithm.objective))
+            return algorithm.objective[-1]
+        gp_result = gp_minimize(objective_function, [self.gamma_bounds], n_random_starts=self.n_initial_points, n_calls=self.n_calls)
+        algorithm.set_up(initial = algorithm.initial, f = algorithm.f, g = algorithm.g, operator = algorithm.operator, step_size = [1.0 / (gp_result.x[0] * algorithm.operator.norm()), 1.0*gp_result.x[0] / (algorithm.operator.norm())])
+        algorithm.update_objective_interval = update_objective_interval
+        algorithm.iteration = -1
+        self.tau = 1.0 / (gp_result.x[0] * algorithm.operator.norm())
+        self.sigma = 1.0*gp_result.x[0] / (algorithm.operator.norm())
+        return  self.tau, self.sigma
+    
+    def get_step_size(self, algorithm):
+        return self.tau, self.sigma
+
+
 
 class PDHGConstantStepSize(StepSizeRule):
     """

@@ -184,7 +184,7 @@ class PDHG(Algorithm):
                  **kwargs):
         """Initialisation of the PDHG algorithm"""
 
-
+        self.initial = initial
         self._sigma = kwargs.pop('sigma', None) #To be deprecated
         self._tau = kwargs.pop('tau', None) #To be deprecated
         self._theta = kwargs.pop('theta', 1.0)
@@ -268,7 +268,7 @@ class PDHG(Algorithm):
             raise ValueError("The `step_size` argument must be either None, a PDHG compatible step size rule or a tuple of (sigma, tau) where sigma is the step size for the dual problem and tau is the step size for the primal problem.")
 
 
-        self._tau, self._sigma = self.step_size_rule.get_initial_step_size(self)
+        
         
         print('Initial step sizes: tau = {}, sigma = {}'.format(
             self.tau, self.sigma))
@@ -298,6 +298,9 @@ class PDHG(Algorithm):
         self.x_tmp = self.operator.domain_geometry().allocate(0)
         self.y_tmp = self.operator.range_geometry().allocate(0)
 
+        self._tau, self._sigma = self.step_size_rule.get_initial_step_size(self)
+        
+        
         self.configured = True
         log.info("%s configured", self.__class__.__name__)
 

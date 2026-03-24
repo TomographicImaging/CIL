@@ -532,7 +532,8 @@ class TestCILSIRFPrecond(unittest.TestCase):
         trunc = pet.TruncateToCylinderProcessor()
         trunc.apply(initial_image)
 
-        ista = ISTA(initial = initial_image, f = obj_fun, g = IndicatorBox(lower=0.),  step_size = -1.0, 
+        # accelerated=False to temporarily fix https://github.com/SyneRBI/SIRF-SuperBuild/issues/987
+        ista = ISTA(initial = initial_image, f = obj_fun, g = IndicatorBox(lower=0., accelerated=False),  step_size = -1.0, 
                     preconditioner=sens,update_objective_interval=1)
         ista.run(10, verbose=0)      
 

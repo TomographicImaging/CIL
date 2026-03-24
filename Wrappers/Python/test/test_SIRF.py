@@ -527,14 +527,19 @@ class TestCILSIRFPrecond(unittest.TestCase):
         recon.process()
         reconstructed_image=recon.get_output()    
 
-        sens = AdaptiveSensitivity(self.acq_model, delta = 0., max_iterations = 200)
+        lin_acq_mod = self.acq_model.get_linear_acquisition_model()
+        sens = AdaptiveSensitivity(lin_acq_model, delta = 0., max_iterations = 200)
 
         trunc = pet.TruncateToCylinderProcessor()
         trunc.apply(initial_image)
 
         # accelerated=False to temporarily fix https://github.com/SyneRBI/SIRF-SuperBuild/issues/987
-        ista = ISTA(initial = initial_image, f = obj_fun, g = IndicatorBox(lower=0., accelerated=False),  step_size = -1.0, 
-                    preconditioner=sens,update_objective_interval=1)
+        ista = ISTA(initial=initial_image, 
+                    f=obj_fun, 
+                    g=IndicatorBox(lower=0., accelerated=False), 
+                    step_size = -1.0, 
+                    preconditioner=sens,
+                    update_objective_interval=1)
         ista.run(10, verbose=0)      
 
         print("adad")

@@ -319,9 +319,9 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
                 Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.
             '''
 
-    def __init__(self, initial_step_size =(None, None), gamma_g=None, gamma_fconj=None):#TODO: tuple of list 
+    def __init__(self, initial_step_size=(None, None), gamma_g=None, gamma_fconj=None):  # TODO: tuple of list
         '''Initialises the step size rule'''
-        
+
         self.gamma_g = gamma_g
         self.gamma_fconj = gamma_fconj
         if self.gamma_g is not None and self.gamma_fconj is not None:
@@ -354,8 +354,7 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
         if len(initial_step_size) != 2:
             raise ValueError(
                 "initial_step_size should be a list or tuple of length two, step_size = {}".format(step_size))
-    
-        
+
     def get_initial_step_size(self, algorithm):
         """Sets sigma and tau step-sizes for the PDHG algorithm. The step sizes can be either scalar or array-objects.
 
@@ -371,7 +370,7 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
         """
         self.tau = self.initial_step_size[0]
         self.sigma = self.initial_step_size[1]
-        
+
         # Check acceptable values of the primal-dual step-sizes
         if self.tau is not None:
             if isinstance(self.tau, Number):
@@ -405,8 +404,7 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
             raise NotImplementedError(
                 "If using arrays for sigma or tau both must arrays must be provided.")
         return self.tau, self.sigma
-    
-    
+
     def get_step_size(self, algorithm):
         """
         Applies the PDHG strongly convex step size update to calculate the new primal and dual step sizes
@@ -417,22 +415,25 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
         """
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
-            algorithm._theta = 1.0 / np.sqrt(1 + 2 * self.gamma_g * algorithm.tau)
+            algorithm._theta = 1.0 / \
+                np.sqrt(1 + 2 * self.gamma_g * algorithm.tau)
             self.tau *= algorithm._theta
             self.sigma /= algorithm._theta
 
         # Update sigma and tau based on the strong convexity of F
         # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
         if self.gamma_fconj is not None:
-            algorithm._theta = 1.0 / np.sqrt(1 + 2 * self.gamma_fconj * algorithm.sigma)
+            algorithm._theta = 1.0 / \
+                np.sqrt(1 + 2 * self.gamma_fconj * algorithm.sigma)
             self.sigma *= algorithm._theta
             self.tau /= algorithm._theta
 
-        return self.tau, self.sigma 
+        return self.tau, self.sigma
 
 
 class PDHGAdaptiveStepSize2013(StepSizeRule):
     ''''The PDHG step sizes are updated adaptively based on the method proposed in :cite:`goldstein2013adaptive`.
+
         Parameters
         -------------
         initial_step_size : list of two positive :obj:`float`, optional, default=[10/algorithm.operator.norm(), 10/algorithm.operator.norm()]
@@ -452,9 +453,14 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
         auto_stop : :obj:`boolean`, optional, default=True
             If True, the adaptive step size method automatically stops updating the step sizes when they have not changed over five consecutive iterations.
 
+
+       Notes
+       -----
+       This method is memory expensive, requiring the storage of 2 extra image copies and 2 extra data copies. The auto-stop option is implemented to stop the adaptive step size updates when the step sizes have not changed for 5 consecutive iterations, releasing the memory used to store the extra images and data and reducing ongoing computational costs. For a more time expensive, but less memory expensive method, see :class:`PDHGBayesOptimisationStepSize` which does not require the storage of extra images and data.
+
         '''
 
-    def __init__(self, initial_step_size=[None,None], initial_alpha=0.95, beta=0.95, gamma=0.9, delta=1.5, s=None, eta=0.95, auto_stop=True):
+    def __init__(self, initial_step_size=[None, None], initial_alpha=0.95, beta=0.95, gamma=0.9, delta=1.5, s=None, eta=0.95, auto_stop=True):
         '''Initialises the step size rule'''
         self.alpha = initial_alpha
         self.eta = eta
@@ -479,7 +485,7 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
         if len(initial_step_size) != 2:
             raise ValueError(
                 "initial_step_size should be a list or tuple of length two, step_size = {}".format(initial_step_size))
- 
+
     def get_initial_step_size(self, algorithm):
         tau = self.initial_step_size[0]
         sigma = self.initial_step_size[1]
@@ -500,67 +506,64 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
                 self.x_store = algorithm.operator.domain_geometry().allocate(0)  # Extra image 2
             # adaptive step sizes only when above tolerance
             if self.p_norm > self.tolerance and self.d_norm > self.tolerance:
-                # print('Before adaptive', self.tau, self.sigma)
+                log.debug('Before adaptive step-size step, tau = {}, sigma = {}'.format(
+                    algorithm._tau, algorithm._sigma))
                 b = self._calculate_backtracking(algorithm)
                 while b > 1:
-
-                    print(
-                        'Multiplying step sizes by beta/b, beta = {}, b = {}'.format(self.beta, b))
                     algorithm._tau *= self.beta/b
                     algorithm._sigma *= self.beta/b
+                    log.debug(' Backtracking step - multiplying primal and dual step sizes by beta/b = {}, new step sizes are tau = {}, sigma ={}'.format(
+                        self.beta / b, algorithm._tau, algorithm._sigma))
 
                     # Swap x and x_store
                     tmp = algorithm.x
                     algorithm.x = self.x_store
                     self.x_store = tmp
-
-                    print(
-                        'Multiplying step sizes by beta/b, beta = {}, b = {}'.format(self.beta, b))
-                    print('tau = {}, sigma = {}'.format(
-                        algorithm._tau, algorithm._sigma))
                     algorithm._pdhg_update()
                     b = self._calculate_backtracking(algorithm)
+                    count = 0
 
-                print('After possible reduction',
-                      algorithm._tau, algorithm._sigma)
-                
+                log.debug('After backtacking step, tau = {}, sigma = {}'.format(
+                    algorithm._tau, algorithm._sigma))
+
                 self._calculate_pnorm_dnorm(algorithm)
-                print('p_norm = {}, d_norm = {}'.format(
+                log.debug('Started the rebalancing step with p_norm = {}, d_norm = {}'.format(
                     self.p_norm, self.d_norm))
-                print('self.s, self.delta = {}, {}'.format(self.s, self.delta))
                 if self.p_norm < (self.s/self.delta)*self.d_norm:
-                    print('2*self.p_norm < self.d_norm')
                     algorithm._tau *= (1 - self.alpha)
                     algorithm._sigma /= (1 - self.alpha)
                     self.alpha *= self.eta
                     self.count = 0
+                    log.debug('p_norm < (s.delta)*d_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
+                        algorithm._tau, algorithm._sigma))
                 elif (self.s*self.delta)*self.d_norm < self.p_norm:
-                    print('2*self.d_norm < self.p_norm')
                     algorithm._tau /= (1 - self.alpha)
                     algorithm._sigma *= (1 - self.alpha)
                     self.alpha *= self.eta
                     self.count = 0
+                    log.debug('(s/delta)p_norm < d_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
+                        algorithm._tau, algorithm._sigma))
                 else:
-                    print('No change')
+                    log.debug('No change from the rebalancing step, step sizes are tau = {}, sigma ={}'.format(
+                        algorithm._tau, algorithm._sigma))
                     self.count += 1
                     pass
-                print('After adaptive', algorithm._tau,
-                      algorithm._sigma, self.alpha)
             else:
-                print('No adaptive step size update, below tolerance')
+                log.debug('No change from the rebalancing step as pnorm and dnorm are below threshold, step sizes are tau = {}, sigma ={}'.format(
+                    algorithm._tau, algorithm._sigma))
             # Can i do something other than copying every iteration?
             self.y_old = algorithm.y.copy()
 
             if self.count > 10 and self.auto_stop:
                 self.adaptive = False
-                print(
-                    'Automatic stopping of adaptive step size updates, step sizes have not changed for 5 iterations')
+                log.debug('Automatic stopping of adaptive step size updates, step sizes have not changed for 5 iterations, step sizes are tau = {}, sigma ={}'.format(
+                    algorithm._tau, algorithm._sigma))
                 del self.x_resid
                 del self.y_resid
                 del self.x_store
                 del self.y_old
 
-        return  algorithm._tau, algorithm._sigma
+        return algorithm._tau, algorithm._sigma
 
     def _calculate_pnorm_dnorm(self, algorithm):
         algorithm.operator.adjoint(self.y_resid, out=algorithm.x_tmp)
@@ -581,18 +584,16 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
         """
 
         algorithm.x.sapyb(1.0, algorithm.x_old, -1.0, out=self.x_resid)
-        print('self.x, self.x_old = ', algorithm.x.norm(), algorithm.x_old.norm())
         x_change_norm = self.x_resid.norm()
         algorithm.y.sapyb(1.0, self.y_old, -1.0, out=self.y_resid)
         y_change_norm = self.y_resid.norm()
         algorithm.operator.direct(self.x_resid, out=algorithm.y_tmp)
         cross_term = np.abs(2*algorithm._sigma *
-                             algorithm._tau*self.y_resid.dot(algorithm.y_tmp))
-        print('cross_term = ', cross_term, 'x_change_norm = ',
-              x_change_norm, 'y_change_norm = ', y_change_norm)
+                            algorithm._tau*self.y_resid.dot(algorithm.y_tmp))
+
         b = cross_term/((self.gamma*algorithm._sigma)*x_change_norm **
                         2 + (self.gamma*algorithm._tau)*y_change_norm**2)
-        print(b)
+        log.debug('Backtracking value = {}'.format(b))
         return b
 
 
@@ -610,6 +611,10 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
         c : positive :obj:`float`, optional, default=0.9
             Value of the parameter c used in the adaptive step size method.
 
+
+       Notes
+       -----
+       This method is memory expensive, requiring the storage of 2 extra image copies and 2 extra data copies. The auto-stop option is implemented to stop the adaptive step size updates when the step sizes have not changed for 5 consecutive iterations, releasing the memory used to store the extra images and data and reducing ongoing computational costs. For a more time expensive, but less memory expensive method, see :class:`PDHGBayesOptimisationStepSize` which does not require the storage of extra images and data.
         '''
 
     def __init__(self, initial_step_size=[None, None],  initial_alpha=0.95, eta=0.95, c=0.9, auto_stop=True):
@@ -634,8 +639,7 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
             raise ValueError(
                 "initial_step_size should be a list or tuple of length two, step_size = {}".format(initial_step_size))
 
-        
-    def get_initial_step_size(self, algorithm): #TODO: this needs some proper testing 
+    def get_initial_step_size(self, algorithm):
         tau = self.initial_step_size[0]
         sigma = self.initial_step_size[1]
         if tau is None:
@@ -651,31 +655,29 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
                 self.x_resid = algorithm.operator.domain_geometry().allocate(0)  # Extra image 1
                 self.y_resid = algorithm.operator.range_geometry().allocate(0)  # Extra range data 2
                 self.x_store = algorithm.operator.domain_geometry().allocate(0)  # Extra image 2
-            # adaptive step sizes only when above tolerance
             if self.p_norm > self.tolerance and self.d_norm > self.tolerance:
-                # print('Before adaptive', self.tau, self.sigma)
+                log.debug('Before adaptive step-size step, tau = {}, sigma = {}'.format(
+                    algorithm._tau, algorithm._sigma))
+
                 b = self._calculate_backtracking(algorithm)
                 while b < 0:
 
-                    print(
-                        'Multiplying step sizes by 1/2')
                     algorithm._tau *= 0.5
                     algorithm._sigma *= 0.5
-
+                    log.debug(' Backtracking step - multiplying primal and dual step sizes by 1/2, new step sizes are tau = {}, sigma ={}'.format(
+                        algorithm._tau, algorithm._sigma))
                     # Swap x and x_store
                     tmp = algorithm.x
                     algorithm.x = self.x_store
                     self.x_store = tmp
 
-                    print(
-                        'Multiplying step sizes by 1/2')
-                    print('tau = {}, sigma = {}'.format(
-                        algorithm._tau, algorithm._sigma))
                     algorithm._pdhg_update()
                     b = self._calculate_backtracking(algorithm)
+                    count = 0
 
-                print('After possible reduction',
-                      algorithm._tau, algorithm._sigma)
+                log.debug('After backtacking step, tau = {}, sigma = {}'.format(
+                    algorithm._tau, algorithm._sigma))
+
                 algorithm.operator.adjoint(self.y_resid, out=algorithm.x_tmp)
                 algorithm.operator.direct(self.x_resid, out=algorithm.y_tmp)
                 self.x_resid.sapyb((1/algorithm._tau),
@@ -684,41 +686,43 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
                                    algorithm.y_tmp, -1.0, out=algorithm.y_tmp)
                 self.p_norm = algorithm.x_tmp.norm()
                 self.d_norm = algorithm.operator.norm()*algorithm.y_tmp.norm()
-                print('p_norm = {}, d_norm = {}'.format(
+                log.debug('Started the rebalancing step with p_norm = {}, d_norm = {}'.format(
                     self.p_norm, self.d_norm))
                 if 2*self.p_norm < self.d_norm:
-                    print('2*self.p_norm < self.d_norm')
                     algorithm._tau *= (1 - self.alpha)
                     algorithm._sigma /= (1 - self.alpha)
                     self.alpha *= self.eta
                     self.count = 0
+                    log.debug('2*p_norm < d_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
+                        algorithm._tau, algorithm._sigma))
                 elif 2*self.d_norm < self.p_norm:
-                    print('2*self.d_norm < self.p_norm')
                     algorithm._tau /= (1 - self.alpha)
                     algorithm._sigma *= (1 - self.alpha)
                     self.alpha *= self.eta
                     self.count = 0
+                    log.debug('2*p_norm < d_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
+                        algorithm._tau, algorithm._sigma))
                 else:
-                    print('No change')
+                    log.debug('No change from the rebalancing step, step sizes are tau = {}, sigma ={}'.format(
+                        algorithm._tau, algorithm._sigma))
+                    self.count += 1
                     self.count += 1
                     pass
-                print('After adaptive', algorithm._tau,
-                      algorithm._sigma, self.alpha)
             else:
-                print('No adaptive step size update, below tolerance')
+                log.debug('No change from the rebalancing step as pnorm and dnorm are below threshold, step sizes are tau = {}, sigma ={}'.format(
+                    algorithm._tau, algorithm._sigma))
             # Can i do something other than copying every iteration?
             self.y_old = algorithm.y.copy()
 
             if self.count > 10 and self.auto_stop:
                 self.adaptive = False
-                print(
-                    'Automatic stopping of adaptive step size updates, step sizes have not changed for 5 iterations')
-                del self.x_resid
+                log.debug('Automatic stopping of adaptive step size updates, step sizes have not changed for 5 iterations, step sizes are tau = {}, sigma ={}'.format(
+                    algorithm._tau, algorithm._sigma))
                 del self.y_resid
                 del self.x_store
                 del self.y_old
 
-        return  algorithm._tau, algorithm._sigma
+        return algorithm._tau, algorithm._sigma
 
     def _calculate_backtracking(self, algorithm):
         """ Calculates the backtracking parameter b used to update step sizes in the adaptive PDHG algorithm.
@@ -729,23 +733,37 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
         """
 
         algorithm.x.sapyb(1.0, algorithm.x_old, -1.0, out=self.x_resid)
-        print('self.x, self.x_old = ', algorithm.x.norm(), algorithm.x_old.norm())
         x_change_norm = self.x_resid.norm()
         algorithm.y.sapyb(1.0, self.y_old, -1.0, out=self.y_resid)
         y_change_norm = self.y_resid.norm()
         algorithm.operator.direct(self.x_resid, out=algorithm.y_tmp)
         cross_term = np.abs(4*algorithm._sigma*algorithm._tau *
                             self.y_resid.dot(algorithm.y_tmp))
-        print('cross_term = ', cross_term, 'x_change_norm = ',
-              x_change_norm, 'y_change_norm = ', y_change_norm)
         b = self.c*algorithm._sigma*x_change_norm**2 + \
             self.c*algorithm._tau*y_change_norm**2 - cross_term
-        print(b)
+        log.debug('Backtracking value = {}'.format(b))
         return b
 
+
 class PDHGBayesOptimisationStepSize(StepSizeRule):
-    
-    def __init__(self, gamma_bounds=None, n_initial_points=5, n_calls=20, n_iterations=10):
+    """The ratio between the primal and dual step sizes (gamma) in the PDHG algorithm is chosen using a guassian process Bayesian optimisation, choosing the gamma that gives the best performance after a small number of iterations. The step sizes are chosen at the beginning of the algorithm and then kept constant throughout the iterations.
+        Parameters
+        -------------
+        gamma_bounds : list or tuple of length two, optional, the default is an approximation of [1e-5, 1e6]*norm(A)/norm(b) where A is the operator and b is the data, which is a good initial guess for the ratio between the primal and dual step sizes in the PDHG algorithm.
+            Bounds for the ratio between the primal and dual step sizes (gamma) in the Bayesian optimisation. The gamma that gives the best performance after a small number of iterations is chosen as the ratio between the primal and dual step sizes for the PDHG algorithm. The default bounds are (1e-5, 1e5).
+        n_initial_points : int, optional, default=5
+            Number of initial random evaluations of the objective function in the Bayesian optimisation.
+        n_calls : int, optional, default=20
+            Total number of evaluations of the objective function in the Bayesian optimisation, including the initial random evaluations.
+        n_iterations : int, optional, default=10
+            Number of iterations to run the PDHG algorithm for each evaluation of the objective function in the Bayesian optimisation. The gamma that gives the best performance after this number of iterations is chosen as the ratio between the primal and dual step sizes for the PDHG algorithm.
+
+        Notes
+        -----
+        This is a computationally expensive step size rule, as it requires running the PDHG algorithm for a number of iterations for each evaluation of the objective function in the Bayesian optimisation. It is recommended to use this step size rule where you are memory constrained but less time constrained. For the opposite case, where you are more time constrained, not memory constrained, we recommend using the :class:`PDHGAdaptiveStepSize2013` or :class:`PDHGAdaptiveStepSize2015` step size rules, which are adaptive step size rules that update the step sizes at each iteration based on the observed behaviour of the algorithm.
+        """
+
+    def __init__(self, gamma_bounds=None, n_initial_points=11, n_calls=30, n_iterations=10):
         '''Initialises the step size rule'''
 
         self.gamma_bounds = gamma_bounds
@@ -753,57 +771,86 @@ class PDHGBayesOptimisationStepSize(StepSizeRule):
             if len(gamma_bounds) != 2:
                 raise ValueError(
                     "gamma_bounds should be a list or tuple of length two, gamma_bounds = {}".format(gamma_bounds))
-            
-        else: 
-            self.gamma_bounds= (1e-5, 1e5)
+
         self.n_initial_points = n_initial_points
         self.n_calls = n_calls
         self.n_iterations = n_iterations
-        
-    
+
     def get_initial_step_size(self, algorithm):
-        try: 
+        try:
             from skopt import gp_minimize
         except ImportError:
-            raise ImportError("skopt is required for the PDHGBayesOptimisationStepSize rule. Please install scikit-optimize to use this step size rule.")
-        update_objective_interval = algorithm.update_objective_interval 
+            raise ImportError(
+                "skopt is required for the PDHGBayesOptimisationStepSize rule. Please install scikit-optimize to use this step size rule.")
+
+        if self.gamma_bounds is None:
+            ratio = np.sqrt(algorithm.f(algorithm.operator.direct(
+                0*algorithm.x)))/algorithm.operator.norm()
+            log.debug("ratio: {}".format(ratio))
+            self.gamma_bounds = (1e-5/ratio, 1e5/ratio)
+            log.debug(
+                "gamma_bounds not provided, set to (1e-5/ratio, 1e5/ratio) = {}".format(self.gamma_bounds))
+            x0 = [[np.log((1/ratio)*10**i)] for i in range(-5, 5, 1)]
+            log.debug("Initial points are {}".format(x0))
+        else:
+            x0 = None
+        log_gamma_bounds = (
+            np.log(self.gamma_bounds[0]), np.log(self.gamma_bounds[1]))
+        update_objective_interval = algorithm.update_objective_interval
         algorithm.update_objective_interval = self.n_iterations-1
-        
-        def objective_function(gamma):
-            gamma=gamma[0]
+
+        def objective_function(log_gamma):
+            gamma = np.exp(log_gamma[0])
+            log.debug(
+                "Evaluating objective function for gamma = {}".format(gamma))
             # Set the step sizes based on the current gamma
             tau = 1.0 / (gamma * algorithm.operator.norm())
             sigma = 1.0*gamma / (algorithm.operator.norm())
-            
-            # Run a few iterations of the PDHG algorithm
-   
-            algorithm.set_up(initial = algorithm.initial, f = algorithm.f, g = algorithm.g, operator = algorithm.operator, step_size = [tau,sigma])
-            algorithm.iteration = -1
-            
-            algorithm.run(self.n_iterations, callbacks = [])
 
-            print( len(algorithm.objective))
+            algorithm.set_up(initial=algorithm.initial, f=algorithm.f,
+                             g=algorithm.g, operator=algorithm.operator, step_size=[tau, sigma])
+            algorithm.iteration = -1
+
+            algorithm.run(self.n_iterations, callbacks=[])
+            log.debug("Objective function value for gamma = {}: {}".format(
+                gamma, algorithm.objective[-1]))
             return algorithm.objective[-1]
-        gp_result = gp_minimize(objective_function, [self.gamma_bounds], n_random_starts=self.n_initial_points, n_calls=self.n_calls)
-        algorithm.set_up(initial = algorithm.initial, f = algorithm.f, g = algorithm.g, operator = algorithm.operator, step_size = [1.0 / (gp_result.x[0] * algorithm.operator.norm()), 1.0*gp_result.x[0] / (algorithm.operator.norm())])
+
+        gp_result = gp_minimize(objective_function, [
+                                log_gamma_bounds], acq_optimizer='sampling', x0=x0, n_random_starts=self.n_initial_points, n_calls=self.n_calls, )
+        algorithm.set_up(initial=algorithm.initial, f=algorithm.f, g=algorithm.g, operator=algorithm.operator, step_size=[
+                         1.0 / (gp_result.x[0] * algorithm.operator.norm()), 1.0*gp_result.x[0] / (algorithm.operator.norm())])
         algorithm.update_objective_interval = update_objective_interval
         algorithm.iteration = -1
-        self.tau = 1.0 / (gp_result.x[0] * algorithm.operator.norm())
-        self.sigma = 1.0*gp_result.x[0] / (algorithm.operator.norm())
-        return  self.tau, self.sigma
-    
-    def get_step_size(self, algorithm):
+        log.debug("Best gamma found: {}, with objective function value: {}".format(
+            np.exp(gp_result.x[0]), gp_result.fun))
+        if log.isEnabledFor(logging.DEBUG):
+            from matplotlib import pyplot as plt
+            from skopt.plots import plot_convergence, plot_gaussian_process
+            plot_convergence(gp_result)
+            plt.show()
+            plot_gaussian_process(gp_result)
+            plt.yscale('log')
+            plt.xlabel('log gamma')
+            plt.title("Best gamma found: {}, with objective function value: {}".format(
+                np.exp(gp_result.x[0]), gp_result.fun))
+            plt.show()
+
+        self.tau = 1.0 / (np.exp(gp_result.x[0]) * algorithm.operator.norm())
+        self.sigma = 1.0*np.exp(gp_result.x[0]) / (algorithm.operator.norm())
         return self.tau, self.sigma
 
+    def get_step_size(self, algorithm):
+        return self.tau, self.sigma
 
 
 class PDHGConstantStepSize(StepSizeRule):
     """
     Step-size rule that always returns a constant step-size.
-     
+
     The user can set either the primal or dual step size, both or none. Values passed by the user will be accepted as long as they are positive numbers,
         or correct shape array like objects.
-        
+
     By default, the step sizes :math:`\sigma` and :math:`\tau` are positive scalars and defined as below:
 
       * If ``sigma`` is ``None`` and ``tau`` is ``None``:
@@ -831,7 +878,7 @@ class PDHGConstantStepSize(StepSizeRule):
         Initial values of the primal and dual step sizes. If both are ``None`` they are set to the default values defined above. If one is ``None`` it is calculated based on the other and the norm of the operator. If both are provided, they are used as they are, as long as they are positive numbers.
     """
 
-    def __init__(self,  step_size=[None,None]):
+    def __init__(self,  step_size=[None, None]):
         '''Initialises the constant step size rule'''
 
         if len(step_size) != 2:
@@ -842,7 +889,7 @@ class PDHGConstantStepSize(StepSizeRule):
 
     def get_initial_step_size(self, algorithm):
         """Sets sigma and tau step-sizes for the PDHG algorithm."""
-        
+
         # Check acceptable values of the primal-dual step-sizes
         if self.tau is not None:
             if isinstance(self.tau, Number):
@@ -876,11 +923,11 @@ class PDHGConstantStepSize(StepSizeRule):
             raise NotImplementedError(
                 "If using arrays for sigma or tau both must arrays must be provided.")
         return self.tau, self.sigma
-            
+
     def get_step_size(self, algorithm):
         """
         Returns
         --------
         the calculated step size:float
         """
-        return  self.tau, self.sigma
+        return self.tau, self.sigma

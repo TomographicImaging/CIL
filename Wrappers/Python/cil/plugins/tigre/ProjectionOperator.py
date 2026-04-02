@@ -201,8 +201,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         if out is None:
             out = AcquisitionData(arr_out,
                                   deep_copy=False,
-                                  geometry=self._range_geometry.copy(),
-                                  suppress_warning=True)
+                                  geometry=self._range_geometry.copy())
         else:
             out.fill(arr_out)
         return out
@@ -234,8 +233,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         if out is None:
             out = ImageData(arr_out,
                             deep_copy=False,
-                            geometry=self._domain_geometry.copy(),
-                            suppress_warning=True)
+                            geometry=self._domain_geometry.copy())
         else:
             out.fill(arr_out)
         return out

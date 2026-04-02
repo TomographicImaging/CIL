@@ -23,7 +23,7 @@ from scipy.fft import fftfreq
 
 import numpy as np
 import ctypes
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 c_double_p = ctypes.POINTER(ctypes.c_double)
@@ -267,11 +267,7 @@ class GenericFilteredBackProjection(Reconstructor):
         matplotlib.pyplot
             A plot of the filter
         """
-        try:
-            import matplotlib.pyplot as plt
-        except ImportError as exc:
-            msg = "matplotlib-base (e.g. `conda install conda-forge::matplotlib-base`)"
-            raise ImportError(f"Please install {msg}") from exc
+        import matplotlib.pyplot as plt
 
         filter_array = self.get_filter_array()
         filter_length = 2**self.fft_order
@@ -381,11 +377,11 @@ class FDK(GenericFilteredBackProjection):
     supported_backends = ['tigre']
 
     def __init__ (self, input, image_geometry=None, filter='ram-lak'):
-        #call parent initialiser
-        super().__init__(input, image_geometry, filter, backend='tigre')
 
         if not AcquisitionType.CONE & input.geometry.geom_type:
-            raise TypeError("This reconstructor is for cone-beam data only.")
+            raise TypeError(f"This reconstructor can only be used with standard cone-beam data, got {input.geometry.geom_type}.")
+
+        super().__init__(input, image_geometry, filter, backend='tigre')
 
 
     def _calculate_weights(self, acquisition_geometry):
@@ -490,12 +486,11 @@ class FBP(GenericFilteredBackProjection):
 
     def __init__ (self, input, image_geometry=None, filter='ram-lak', backend='tigre'):
 
-        super().__init__(input, image_geometry, filter, backend)
-        self.set_split_processing(False)
-
         if not AcquisitionType.PARALLEL & input.geometry.geom_type:
             raise TypeError("This reconstructor is for parallel-beam data only.")
 
+        super().__init__(input, image_geometry, filter, backend)
+        self.set_split_processing(False)
 
     def set_split_processing(self, slices_per_chunk=0):
         """
@@ -548,7 +543,7 @@ class FBP(GenericFilteredBackProjection):
         self.operator = self._PO_class(ig_slice,ag_slice)
 
     def _process_chunk(self, i, step):
-        self.data_slice.fill(np.squeeze(self.input.array[:,i:i+step,:]))
+        np.take(self.input.array, np.arange(i,i+step), axis=self.input.get_dimension_axis("vertical"), out=self.data_slice.array)
         if not self.filter_inplace:
             self._pre_filtering(self.data_slice)
 
@@ -578,7 +573,7 @@ class FBP(GenericFilteredBackProjection):
         if self.slices_per_chunk:
             if AcquisitionType.DIM2 & self.acquisition_geometry.dimension:
                 raise ValueError("Only 3D datasets can be processed in chunks with `set_split_processing`")
-            elif self.acquisition_geometry.system_description == 'advanced':
+            elif self.acquisition_geometry.system_description != 'simple' and self.acquisition_geometry.system_description != 'offset':
                 raise ValueError("Only simple and offset geometries can be processed in chunks with `set_split_processing`")
             elif self.acquisition_geometry.get_ImageGeometry() != self.image_geometry:
                 raise ValueError("Only default image geometries can be processed in chunks `set_split_processing`")

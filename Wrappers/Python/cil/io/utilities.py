@@ -27,30 +27,20 @@ def get_compress(compression=None):
 
     Parameters:
     -----------
-    compression : string, int. Default is None, no compression.
-        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16' and deprecated 0, 8, 16.
+    compression : string. Default is None, no compression.
+        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16'.
 
     Returns:
     --------
     compress : bool, True if compression is required, False otherwise
 
-    Note:
-    -----
-
-    The use of int is deprecated and will be removed in the future. Use string instead.
-
     '''
-    if isinstance(compression, int):
-        warn("Use string instead of int", DeprecationWarning, stacklevel=2)
-
-    if compression is None or compression == 0:
+    if compression is None:
         compress = False
-    elif compression in [ 8, 'uint8']:
-        compress = True
-    elif compression in [ 16, 'uint16']:
+    elif compression in ['uint8', 'uint16']:
         compress = True
     else:
-        raise ValueError('Compression bits not valid. Got {0} expected value in {1}'.format(compression, [0,8,16, None, 'uint8', 'uint16']))
+        raise ValueError('Compression bits not valid. Got {0} expected value in {1}'.format(compression, [None, 'uint8', 'uint16']))
 
     return compress
 
@@ -63,23 +53,21 @@ def get_compressed_dtype(data, compression=None):
     -----------
     data : DataContainer, numpy array
         the data to be compressed
-    compression : string, int. Default is None, no compression.
-        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16' and deprecated 0, 8, 16.
+    compression : string. Default is None, no compression.
+        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16'.
 
     Returns:
     --------
     dtype : numpy type, the numpy type to be used for compression
     '''
-    if isinstance(compression, int):
-        warn("Use string instead of int", DeprecationWarning, stacklevel=2)
-    if compression is None or compression == 0:
+    if compression is None:
         dtype = data.dtype
-    elif compression in [ 8, 'uint8']:
+    elif compression == 'uint8':
         dtype = np.uint8
-    elif compression in [ 16, 'uint16']:
+    elif compression == 'uint16':
         dtype = np.uint16
     else:
-        raise ValueError('Compression bits not valid. Got {0} expected value in {1}'.format(compression, [0,8,16]))
+        raise ValueError('Compression bits not valid. Got {0} expected value in {1}'.format(compression, [None, 'uint8', 'uint16']))
 
     return dtype
 
@@ -90,18 +78,16 @@ def get_compression_scale_offset(data, compression=0):
     -----------
     data : DataContainer, numpy array
         The data to be compressed
-    compression : string, int. Default is None, no compression.
-        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16' and deprecated 0, 8, 16.
+    compression : string. Default is None, no compression.
+        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16'.
 
     Returns:
     --------
     scale : float, the scale to be applied to the data for compression to the specified number of bits
     offset : float, the offset to be applied to the data for compression to the specified number of bits
     '''
-    if isinstance(compression, int):
-        warn("Use string instead of int", DeprecationWarning, stacklevel=2)
 
-    if compression is None or compression == 0:
+    if compression is None:
         # no compression
         # return scale 1.0 and offset 0.0
         return 1.0, 0.0

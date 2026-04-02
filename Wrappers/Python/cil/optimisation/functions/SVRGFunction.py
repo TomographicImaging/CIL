@@ -60,7 +60,7 @@ class SVRGFunction(ApproximateGradientSumFunction):
     snapshot_update_interval : positive int or None, optional
         The interval for updating the full gradient (taking a snapshot). The default is 2*len(functions) so a "snapshot" is taken every 2*len(functions) iterations. If the user passes `0` then no full gradient snapshots will be taken. 
     store_gradients : bool, default: `False`
-        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.
+        Flag indicating whether to store and update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.
 
 
     """
@@ -156,11 +156,11 @@ class SVRGFunction(ApproximateGradientSumFunction):
 
     def _update_full_gradient_and_return(self, x, out=None):
         """
-        Takes a "snapshot" at the point :math:`x`, saving both the point :math:` \tilde{x}=x` and its gradient :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}`. The function returns :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}` as the gradient calculation. If :code:`store_gradients==True`, the gradient of all the :math:`f_i`s is computed and stored at the "snapshot"..
+        Takes a "snapshot" at the point :math:`x`, saving both the point :math:`\tilde{x}=x` and its gradient :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}`. The function returns :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}` as the gradient calculation. If :code:`store_gradients==True`, the gradient of all the :math:`f_i`s is computed and stored at the "snapshot"..
 
         Parameters
         ----------
-        Takes a "snapshot" at the point :math:`x`. The function returns :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}` as the gradient calculation. If :code:`store_gradients==True`, the gradient of all the :math:`f_i`s is stored, otherwise only  the sum of the gradients and the snapshot point :math:` \tilde{x}=x` are stored.
+        Takes a "snapshot" at the point :math:`x`. The function returns :math:`\sum_{i=0}^{n-1}f_i{\tilde{x}}` as the gradient calculation. If :code:`store_gradients==True`, the gradient of all the :math:`f_i`s is stored, otherwise only  the sum of the gradients and the snapshot point :math:`\tilde{x}=x` are stored.
         out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
 
         Returns
@@ -224,12 +224,15 @@ class LSVRGFunction(SVRGFunction):
     snapshot_update_probability: positive float, default: 1/n
         The probability of updating the full gradient (taking a snapshot) at each iteration. The default is :math:`1./n` so, in expectation, a snapshot will be taken every :math:`n` iterations. 
     store_gradients : bool, default: `False`
-        Flag indicating whether to store an update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and its gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.
+        Flag indicating whether to store and update a list of gradients for each function :math:`f_i` or just to store the snapshot point :math:`\tilde{x}` and it's gradient :math:`\nabla \sum_{i=0}^{n-1}f_i(\tilde{x})`.
+    seed: int
+        Seed for calculating the random update snapshot intervals (generated using numpy.random).
 
         
     Reference
     ---------
     Kovalev, D., Horváth, S. &; Richtárik, P.. (2020). Don’t Jump Through Hoops and Remove Those Loops:  SVRG and Katyusha are Better Without the Outer Loop. Proceedings of the 31st International Conference  on Algorithmic Learning Theory, in Proceedings of Machine Learning Research 117:451-467 Available from https://proceedings.mlr.press/v117/kovalev20a.html.
+
 
     Note
     ----

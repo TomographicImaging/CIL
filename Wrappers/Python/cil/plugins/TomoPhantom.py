@@ -189,6 +189,6 @@ def get_ImageData(num_model, geometry):
             raise ValueError('Wrong ImageGeometry')
 
 
-    im_data = ImageData(phantom_arr, geometry=ig, suppress_warning=True)
+    im_data = ImageData(phantom_arr, geometry=ig)
     im_data.reorder(list(geometry.dimension_labels))
     return im_data

@@ -35,7 +35,8 @@ Institutions Key:
 12 - Australian e-Health Research, Australia
 13 - KU Leuven
 14 - Independent Contributor
-15 - Universiteit Leiden
+15 - Washington University in St. Louis
+16 - Universiteit Leiden
 
 CIL Developers in date order:
 Edoardo Pasca (2017 – present) - 1
@@ -49,6 +50,7 @@ Margaret Duff (2023 - present) - 1
 Casper da Costa-Luis (2023 - present) - 1
 Hannah Robarts (2023 - present) - 1
 Danica Sugic (2024 - present) - 1
+Franck Vidal (2024 - present) - 1
 
 CIL Contributors:
 Srikanth Nagella (2017-2018) - 1
@@ -72,8 +74,17 @@ Joshua Hellier (2024) - 3
 Nicholas Whyatt (2024) - 1
 Rasmia Kulan (2024) - 1
 Emmanuel Ferdman (2025) - 14
+Maike Meier (2025) - 1
 Mariam Demir (2025) - 1
-Willem Jan Palenstijn (2025) - 15
+Satwik Pani (2025) - 15
+Hok Shing Wong (2025) - 7
+Francis M Watson (2025) - 3
+Hussam Alhassan (2025) - 1
+Adam Doherty (2025) - 5
+Evan Kiely (2025) - 10
+Jeppe Klitgaard (2026) - 2
+Willem Jan Palenstijn (2026) - 16
+
 
 CIL Advisory Board:
 Llion Evans - 9

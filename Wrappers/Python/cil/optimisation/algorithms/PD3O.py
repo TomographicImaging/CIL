@@ -18,9 +18,74 @@
 
 
 from cil.optimisation.algorithms import Algorithm
-from cil.optimisation.functions import ZeroFunction
+from cil.optimisation.functions import ZeroFunction, ScaledFunction, SGFunction, SVRGFunction, LSVRGFunction, SAGAFunction, SAGFunction, ApproximateGradientSumFunction
 import logging
 import warnings
+
+class FunctionWrappingForPD3O():  
+    """
+    An internal class that wraps the functions, :math:`f`, in PD3O to allow :math:`f` to be an `ApproximateGradientSumFunction`. 
+    
+    Note that currently :math:`f`  can be any type of deterministic function, an `ApproximateGradientSumFunction` or a scaled `ApproximateGradientSumFunction` but this is not set up to work for a `SumFunction` or `TranslatedFunction` which contains `ApproximateGradientSumFunction`s. 
+    
+    Parameters
+    ----------
+    f : function 
+        The function :math:`f` to use in PD3O
+    """
+    def __init__(self, f):  
+        self.f = f 
+        self.scalar = 1
+        while isinstance(self.f, ScaledFunction):
+            self.scalar *= self.f.scalar
+            self.f = self.f.function
+            
+        self._gradient_call_index = 0
+        
+        if isinstance(self.f, (SVRGFunction, LSVRGFunction)):
+            self.gradient = self.svrg_gradient
+        elif isinstance(self.f, ApproximateGradientSumFunction):  
+            self.gradient = self.approximate_sum_function_gradient
+        else:
+            self.gradient = f.gradient
+        
+    def svrg_gradient(self, x, out=None):
+        if self._gradient_call_index == 0:  
+            self._gradient_call_index += 1  
+            self.f.gradient(x, out) 
+        else: 
+            if len(self.f.data_passes_indices[-1]) == self.f.sampler.num_indices:  
+                self.f._update_full_gradient_and_return(x, out=out)  
+            else:  
+                self.f.approximate_gradient( x, self.f.function_num, out=out)  
+            self.f._data_passes_indices.pop(-1)   
+            self._gradient_call_index = 0  
+            
+        if self.scalar != 1:
+            out *= self.scalar
+        return out
+    
+    def approximate_sum_function_gradient(self, x, out=None):
+        if self._gradient_call_index == 0:  
+            self._gradient_call_index += 1  
+            self.f.gradient(x, out) 
+        else: 
+            self.f.approximate_gradient( x, self.f.function_num, out=out) 
+            self._gradient_call_index = 0  
+             
+        if self.scalar != 1:
+            out *= self.scalar
+        return out
+    
+
+    def __call__(self, x):  
+        return self.scalar * self.f(x)  
+    
+    @property
+    def L(self):
+        return  abs(self.scalar) * self.f.L
+    
+    
 class PD3O(Algorithm):
     
 
@@ -45,6 +110,13 @@ class PD3O(Algorithm):
         initial : DataContainer, optional default is a container of zeros, in the domain of the operator 
             Initial point for the  algorithm.             
 
+        Note
+        -----
+        Note that currently :math:`f` in PD3O can be any type of deterministic function, an `ApproximateGradientSumFunction` or a scaled `ApproximateGradientSumFunction`.
+        
+        Note
+        -----
+        We have not implemented or tested when  :math:`f` is a stochastic function (`ApproximateGradientSumFunction`) wrapped as a `SumFunction` or `TranslatedFunction`.  
 
         Reference
         ---------
@@ -64,12 +136,12 @@ class PD3O(Algorithm):
         
         logging.info("{} setting up".format(self.__class__.__name__, ))
         
-        self.f = f # smooth function
-        if isinstance(self.f, ZeroFunction):
-            warnings.warn(" If self.f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma ", UserWarning)
+        if isinstance(f, ZeroFunction):
+            warnings.warn(" If f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma ", UserWarning)
             if gamma is None:
                 gamma = 1.0/operator.norm()                      
         
+        self.f = FunctionWrappingForPD3O(f) 
         self.g = g # proximable
         self.h = h # composite
         self.operator = operator

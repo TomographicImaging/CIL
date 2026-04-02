@@ -71,7 +71,7 @@ class Test_Cone2D_Projectors_CPU_toy(unittest.TestCase, TestCommon_ProjectionOpe
     def setUp(self):
         setup_parameters(self)
         self.Cone2D()
-        self.tolerance_linearity = 1e-7
+        self.tolerance_linearity = 2e-5
         self.tolerance_norm = 1e-3
 
 
@@ -98,5 +98,5 @@ class Test_Parallel2D_Projectors_CPU_toy(unittest.TestCase, TestCommon_Projectio
     def setUp(self):
         setup_parameters(self)
         self.Parallel2D()
-        self.tolerance_linearity = 1e-10
+        self.tolerance_linearity = 4e-6
         self.tolerance_norm = 1e-6

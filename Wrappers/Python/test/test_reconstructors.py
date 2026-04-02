@@ -22,7 +22,7 @@ from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CO
 from scipy.fft  import fft, ifft
 from skimage.transform.radon_transform import _get_fourier_filter as skimage_get_fourier_filter
 import numpy as np
-from utils import has_tigre, has_ipp, has_astra, has_nvidia, has_matplotlib, initialise_tests
+from utils import has_tigre, has_ipp, has_astra, has_nvidia, has_matplotlib, has_skimage, initialise_tests
 
 from cil.recon.Reconstructor import Reconstructor # checks on baseclass
 from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
@@ -36,15 +36,22 @@ import tempfile
 initialise_tests()
 
 if has_tigre:
-    from cil.plugins.tigre import ProjectionOperator as ProjectionOperator
+    from cil.plugins.tigre import ProjectionOperator as ProjectionOperator_tigre
     from cil.plugins.tigre import FBP as FBP_tigre
     from tigre.utilities.filtering import ramp_flat, filter
+
+if has_astra:
+    from cil.plugins.astra import ProjectionOperator as ProjectionOperator_astra
+    from cil.plugins.astra import FBP as FBP_astra
 
 if has_matplotlib:
     import matplotlib.testing.compare as compare
 
+if has_skimage:
+    from skimage.transform.radon_transform import _get_fourier_filter as skimage_get_fourier_filter
 
-class Test_Reconstructor(unittest.TestCase):
+@unittest.skipUnless(has_tigre, "TIGRE not installed")
+class Test_Reconstructor_tigre(unittest.TestCase):
 
     def setUp(self):
         #%% Setup Geometry
@@ -75,18 +82,17 @@ class Test_Reconstructor(unittest.TestCase):
                                      .set_labels(['angle','vertical','horizontal'])
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-        self.ad3D = self.ag3D.allocate('random')
+        self.ad3D = self.ag3D.allocate('random', seed=3)
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+        self.ad2D = self.ag.allocate('random', seed=3)
+
     def test_defaults(self):
         reconstructor = Reconstructor(self.ad3D)
         self.assertEqual(id(reconstructor.input),id(self.ad3D))
         self.assertEqual(reconstructor.image_geometry,self.ig3D)
         self.assertEqual(reconstructor.backend, 'tigre')
 
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_set_input(self):
         reconstructor = Reconstructor(self.ad3D)
         self.assertEqual(id(reconstructor.input),id(self.ad3D))
@@ -102,8 +108,6 @@ class Test_Reconstructor(unittest.TestCase):
         with self.assertRaises(TypeError):
             reconstructor = Reconstructor(self.ag3D)
 
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_weak_input(self):
 
         data = self.ad3D.copy()
@@ -117,8 +121,6 @@ class Test_Reconstructor(unittest.TestCase):
         reconstructor.set_input(self.ad3D)
         self.assertEqual(id(reconstructor.input),id(self.ad3D))
 
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_set_image_data(self):
         reconstructor = Reconstructor(self.ad3D)
 
@@ -126,15 +128,14 @@ class Test_Reconstructor(unittest.TestCase):
         reconstructor.set_image_geometry(self.ig3D)
         self.assertEqual(reconstructor.image_geometry,self.ig3D)
 
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_set_backend(self):
 
         with self.assertRaises(ValueError):
             reconstructor = Reconstructor(self.ad3D, backend='unsupported_backend')
 
 
-class Test_GenericFilteredBackProjection(unittest.TestCase):
+@unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+class Test_GenericFilteredBackProjection_tigre(unittest.TestCase):
 
     def setUp(self):
         #%% Setup Geometry
@@ -165,11 +166,9 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
                                      .set_labels(['angle','vertical','horizontal'])
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-        self.ad3D = self.ag3D.allocate('random')
+        self.ad3D = self.ag3D.allocate('random', seed=4)
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def check_defaults(self, reconstructor):
         self.assertEqual(reconstructor.filter, 'ram-lak')
         self.assertEqual(reconstructor.fft_order, 8)
@@ -185,15 +184,11 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
 
         self.assertEqual(reconstructor.image_geometry,self.ig3D)
 
-
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_defaults(self):
 
         reconstructor = GenericFilteredBackProjection(self.ad3D)
         self.check_defaults(reconstructor)
 
-
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_reset(self):
         reconstructor = GenericFilteredBackProjection(self.ad3D)
         reconstructor.set_fft_order(10)
@@ -211,8 +206,6 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         reconstructor.reset()
         self.check_defaults(reconstructor)
 
-
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_set_filter(self):
         reconstructor = GenericFilteredBackProjection(self.ad3D)
 
@@ -240,8 +233,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor.set_filter(filter[1:-1])
 
-
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_skimage, "SKIMAGE not installed")
     def test_get_filter_array(self):
 
         reconstructor = GenericFilteredBackProjection(self.ad3D)
@@ -271,8 +263,6 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
             response = skimage_get_fourier_filter(2**order, filter)
             np.testing.assert_almost_equal(arr, response[:,0], 6, "Failed with filter {}".format(filter))
 
-
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_set_fft_order(self):
         reconstructor = GenericFilteredBackProjection(self.ad3D)
         reconstructor.set_fft_order(10)
@@ -281,8 +271,6 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor.set_fft_order(2)
 
-
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_set_filter_inplace(self):
         reconstructor = GenericFilteredBackProjection(self.ad3D)
         reconstructor.set_filter_inplace(True)
@@ -301,10 +289,10 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         FBP_filter = ramp*(np.cos(freq*np.pi*4)+1*np.cos(1/5*freq*np.pi/2))/2
         return FBP_filter
 
-    @unittest.skipUnless(has_tigre and has_ipp and has_matplotlib, "TIGRE, IPP or matplotlib not installed")
+    @unittest.skipUnless(has_matplotlib, "matplotlib not installed")
     def test_plot_filter(self):
         """
-        Tests that the filters are plotted correctly for two different 
+        Tests that the filters are plotted correctly for two different
         values of cutoff. This is done for all preset filters and the custom filter.
         The plots are compared to stored png files.
         The test will not show any screen output.
@@ -332,7 +320,9 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
                 plot.close()
         os.removedirs(test_plot_folder)
 
-class Test_FDK(unittest.TestCase):
+
+@unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+class Test_FDK_tigre(unittest.TestCase):
 
     def setUp(self):
         #%% Setup Geometry
@@ -363,11 +353,9 @@ class Test_FDK(unittest.TestCase):
                                      .set_labels(['angle','vertical','horizontal'])
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-        self.ad3D = self.ag3D.allocate('random')
+        self.ad3D = self.ag3D.allocate('random', seed=5)
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_set_filter(self):
 
         reconstructor = FDK(self.ad3D)
@@ -382,8 +370,6 @@ class Test_FDK(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor.set_filter(filter[1:-1])
 
-
-    @unittest.skipUnless(has_tigre and has_ipp, "Prerequisites not met")
     def test_filtering(self):
         ag = AcquisitionGeometry.create_Cone3D([0,-1,0],[0,2,0])\
             .set_panel([64,3],[0.1,0.1])\
@@ -414,8 +400,6 @@ class Test_FDK(unittest.TestCase):
         diff = (out1-out2).abs().max()
         self.assertLess(diff, 1e-5)
 
-
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_weights(self):
         ag = AcquisitionGeometry.create_Cone3D([0,-1,0],[0,2,0])\
             .set_panel([3,4],[0.1,0.2])\
@@ -444,7 +428,8 @@ class Test_FDK(unittest.TestCase):
         self.assertLess(diff, 1e-5)
 
 
-class Test_FBP(unittest.TestCase):
+@unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+class Test_FBP_tigre(unittest.TestCase):
 
     def setUp(self):
         #%% Setup Geometry
@@ -471,11 +456,9 @@ class Test_FBP(unittest.TestCase):
                                      .set_labels(['angle','vertical','horizontal'])
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-        self.ad3D = self.ag3D.allocate('random')
+        self.ad3D = self.ag3D.allocate('random', seed=3)
         self.ig3D = self.ag3D.get_ImageGeometry()
 
-
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_set_filter(self):
         reconstructor = FBP(self.ad3D)
         filter = reconstructor.get_filter_array()
@@ -489,7 +472,6 @@ class Test_FBP(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor.set_filter(filter[1:-1])
 
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_split_processing(self):
         reconstructor = FBP(self.ad3D)
 
@@ -501,8 +483,6 @@ class Test_FBP(unittest.TestCase):
         reconstructor.reset()
         self.assertEqual(reconstructor.slices_per_chunk, 0)
 
-
-    @unittest.skipUnless(has_tigre and has_ipp, "Prerequisites not met")
     def test_filtering(self):
         ag = AcquisitionGeometry.create_Parallel3D()\
             .set_panel([64,3],[0.1,0.1])\
@@ -533,8 +513,6 @@ class Test_FBP(unittest.TestCase):
         diff = (out1-out2).abs().max()
         self.assertLess(diff, 1e-5)
 
-
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_weights(self):
         ag = AcquisitionGeometry.create_Parallel3D()\
             .set_panel([3,4],[0.1,0.2])\
@@ -550,8 +528,6 @@ class Test_FBP(unittest.TestCase):
 
         np.testing.assert_allclose(weights,weights_new)
 
-
-    @unittest.skipUnless(has_astra and has_ipp, "ASTRA or IPP not installed")
     def test_set_backend(self):
 
         ag = AcquisitionGeometry.create_Parallel3D()\
@@ -654,20 +630,8 @@ class Test_FBP_tigre_ipp(unittest.TestCase):
         self.ig = self.img_data.geometry
         self.ag = self.acq_data.geometry
 
-    def test_results_3D_tigre(self):
+    def test_results_3D(self):
         reconstructor = FBP(self.acq_data)
-
-        reco = reconstructor.run(verbose=0)
-        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)
-
-        reco2 = reco.copy()
-        reco2.fill(0)
-        reconstructor.run(out=reco2, verbose=0)
-        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
-
-    def test_results_3D_astra(self):
-        self.acq_data.reorder('astra')
-        reconstructor = FBP(self.acq_data, backend='astra')
 
         reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)
@@ -707,25 +671,11 @@ class Test_FBP_tigre_ipp(unittest.TestCase):
         reconstructor.run(out=reco2, verbose=0)
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
 
-    def test_results_2D_tigre(self):
+    def test_results_2D(self):
         data2D = self.acq_data.get_slice(vertical='centre')
         img_data2D = self.img_data.get_slice(vertical='centre')
 
         reconstructor = FBP(data2D)
-        reco = reconstructor.run(verbose=0)
-        np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)
-
-        reco2 = reco.copy()
-        reco2.fill(0)
-        reconstructor.run(out=reco2, verbose=0)
-        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
-
-    def test_results_2D_astra(self):
-        data2D = self.acq_data.get_slice(vertical='centre')
-        data2D.reorder('astra')
-        img_data2D = self.img_data.get_slice(vertical='centre')
-
-        reconstructor = FBP(data2D, backend='astra')
         reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)
 
@@ -757,6 +707,96 @@ class Test_FBP_tigre_ipp(unittest.TestCase):
 
         data_filtered= self.acq_data.copy()
         reconstructor_inplace = FBP(data_filtered)
+        reconstructor_inplace.set_filter_inplace(True)
+        reconstructor_inplace.run(out=reco, verbose=0)
+
+        diff = (data_filtered - self.acq_data).abs().mean()
+        self.assertGreater(diff,0.8)
+
+
+@unittest.skipUnless(has_astra and has_nvidia and has_ipp, "ASTRA or IPP not installed")
+class Test_FBP_astra_ipp(unittest.TestCase):
+    def setUp(self):
+        self.acq_data = SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.img_data = SIMULATED_SPHERE_VOLUME.get()
+
+        self.acq_data=np.log(self.acq_data)
+        self.acq_data*=-1.0
+        self.acq_data.reorder('astra')
+
+        self.ig = self.img_data.geometry
+        self.ag = self.acq_data.geometry
+
+    def test_results_3D(self):
+        reconstructor = FBP(self.acq_data, backend='astra')
+
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
+
+    def test_results_3D_split(self):
+
+        reconstructor = FBP(self.acq_data, backend='astra')
+        reconstructor.set_split_processing(8)
+
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
+
+    def test_results_3D_split_reverse(self):
+        acq_data = self.acq_data.copy()
+        acq_data.geometry.config.panel.origin = 'top-left'
+
+        reconstructor = FBP(acq_data, backend='astra')
+        reconstructor.set_split_processing(8)
+
+        expected_image = np.flip(self.img_data.as_array(),0)
+
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), expected_image,atol=1e-3)
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
+
+    def test_results_2D(self):
+        data2D = self.acq_data.get_slice(vertical='centre')
+        data2D.reorder('astra')
+        img_data2D = self.img_data.get_slice(vertical='centre')
+
+        reconstructor = FBP(data2D, backend='astra')
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)
+
+    def test_results_with_astra(self):
+        fbp_astra = FBP_astra(self.ig, self.ag)
+        reco_astra = fbp_astra(self.acq_data)
+
+        reconstructor_cil = FBP(self.acq_data, backend='astra')
+        reco_cil = reconstructor_cil.run(verbose=0)
+
+        np.testing.assert_allclose(reco_cil.as_array(), reco_astra.as_array(),atol=1e-4)
+
+    def test_results_inplace_filtering(self):
+        reconstructor = FBP(self.acq_data, backend='astra')
+        reco = reconstructor.run(verbose=0)
+
+        data_filtered= self.acq_data.copy()
+        reconstructor_inplace = FBP(data_filtered, backend='astra')
         reconstructor_inplace.set_filter_inplace(True)
         reconstructor_inplace.run(out=reco, verbose=0)
 

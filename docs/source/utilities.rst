@@ -19,6 +19,8 @@
 Utilities
 *********
 
+By default, CIL will look for small (built-in) data in `{sys.prefix}/share/cil`,
+and larger remote (downloadable) data in the `CIL_DATA_DIR` environment variable (if present).
 
 Test datasets
 =============
@@ -33,9 +35,6 @@ A set of simulated volumes and CT data
    :members:
 
 .. autoclass:: cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA
-   :members:
-
-.. autoclass:: cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA
    :members:
 
 
@@ -136,5 +135,14 @@ link_islicer - link islicer objects by index
    :members:
    :inherited-members:
 
+
+Shrink volume
+=============
+VolumeShrinker - create a cropped reconstruction volume from image data
+--------------------------
+
+.. autoclass:: cil.utilities.shrink_volume.VolumeShrinker
+   :members:
+   :inherited-members:
 
 :ref:`Return Home <mastertoc>`

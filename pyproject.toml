@@ -1,22 +1,20 @@
 [build-system]
-requires = ["setuptools>=64", "setuptools_scm>=8"]
-build-backend = "setuptools.build_meta"
+requires = [
+    "setuptools>=64",
+    "setuptools_scm>=8",
+    "scikit-build-core>=0.10",
+    #"ipp-devel==2021.12.*", # PyPI conflicts with conda package
+]
+build-backend = "scikit_build_core.build"
 
-[tool.setuptools_scm]
-version_file = "Wrappers/Python/cil/version.py"
-version_file_template = """
-version = '{version}'
-major = {version_tuple[0]}
-minor = {version_tuple[1]}
-patch = {version_tuple[2]}
-commit_hash = '{scm_version.node}'
-num_commit = {scm_version.distance}
-# work-around for https://github.com/pypa/setuptools_scm/issues/1059
-if (commit_hash, num_commit) == ('None', 0):
-    import re
-    if (_v := re.search(r'\\.dev(\\d+)\\+(\\w+)', version)):
-        num_commit, commit_hash = int(_v.group(1)), _v.group(2)
-"""
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.16"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+sdist.include = ["Wrappers/Python/cil/version.py"]
+sdist.exclude = ["scripts", "docs", "Wrappers/Python/data", "Wrappers/Python/test", ".*"]
+[tool.scikit-build.wheel.packages]
+cil = "Wrappers/Python/cil"
 
 [tool.setuptools]
 package-dir = {"" = "Wrappers/Python"}
@@ -42,3 +40,53 @@ maintainers = [{name="CIL developers", email="tomography+cil@stfc.ac.uk"}]
 requires-python = ">=3.10"
 readme = "README.md"
 keywords = ["tomography", "optimisation"]
+dependencies = [
+    #"cil-data>=22", # missing from PyPI
+    "dxchange>=0.2.1",  # Minimal release for OLE dtype fix: https://github.com/data-exchange/dxchange/pull/124#issue-3828961474
+    "h5py",
+    #"ipp==2021.12.*", # PyPI conflicts with conda package
+    "numba",
+    "numpy>=1.23, <2.0.0",
+    "olefile>=0.46",
+    "pillow",
+    "pywavelets",
+    "scipy>=1.4.0",
+    "tqdm",
+    "packaging",
+]
+[project.optional-dependencies]
+plugins = [
+    "ipywidgets",
+    #"tomophantom==2.0.0", # [linux] # missing from PyPI
+]
+gpu = [
+    "astra-toolbox>=1.9.9.dev5,<=2.1", # [not osx]
+    #"tigre>=2.4,<=2.6", # missing from PyPI
+]
+[dependency-groups]
+test = [
+    #"ccpi-regulariser=24.0.1", # [not osx] # missing from PyPI
+    "cvxpy",
+    "matplotlib-base>=3.3",
+    "packaging",
+    "scikit-image",
+    "unittest-parametrize",
+    "wget",
+    "zenodo_get>=1.6",
+]
+docs = [
+  "jinja2",
+  #"pydata-sphinx-theme",
+  "recommonmark",
+  "sphinx",
+  "sphinx_rtd_theme",
+  "sphinx-autobuild",
+  "sphinx-click",
+  "sphinx-copybutton",
+  "sphinx-panels",
+  "sphinxcontrib-bibtex",
+  "nbsphinx",
+  "sphinx-gallery",
+  "sphinx-copybutton",
+  "notebook",
+]

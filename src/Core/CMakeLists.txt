@@ -15,8 +15,7 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# Richard Brown (UCL)
-
+# Satwik Pani (Washington University in St. Louis)
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 if(NOT DEFINED CMAKE_BUILD_TYPE)
@@ -27,9 +26,8 @@ message ("OpenMP_CXX_FLAGS ${OpenMP_CXX_FLAGS}")
 find_package(OpenMP REQUIRED)
 add_definitions(${OpenMP_CXX_FLAGS})
 
-
 if (WIN32)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ddll_EXPORTS")
+  add_definitions("/Ddll_EXPORTS")
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNUCC")
@@ -52,80 +50,27 @@ else()
   set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
 endif()
 
-if(NOT DEFINED IPP_LIBRARY)
-  if (UNIX)
-    set(IPP_LIBRARY ${CMAKE_INSTALL_PREFIX}/lib)
-  elseif(WIN32)
-    set(IPP_LIBRARY ${CMAKE_INSTALL_PREFIX}/Library/lib)
-  endif()
-endif()
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+find_package(IPP)
 
-if(NOT DEFINED IPP_INCLUDE)
-  set(IPP_INCLUDE ${CMAKE_INSTALL_PREFIX}/include)
-endif()
+list(APPEND cilacc_SOURCES utilities.cpp axpby.cpp FiniteDifferenceLibrary.cpp)
+list(APPEND cilacc_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include)
+list(APPEND cilacc_LIBRARIES ${OpenMP_EXE_LINKER_FLAGS})
 
-if (UNIX)
-  find_library(IPP_CORE libippcore.so PATHS ${IPP_LIBRARY})
-  find_library(IPP_S libipps.so PATHS ${IPP_LIBRARY})
-  find_library(IPP_VM libippvm.so PATHS ${IPP_LIBRARY})
-  find_library(IPP_I libippi.so PATHS ${IPP_LIBRARY})
-elseif(WIN32)
-  find_library(IPP_CORE ippcore PATHS ${IPP_LIBRARY})
-  find_library(IPP_S ipps PATHS ${IPP_LIBRARY})
-  find_library(IPP_VM ippvm PATHS ${IPP_LIBRARY})
-  find_library(IPP_I ippi PATHS ${IPP_LIBRARY})
-endif()
-
-if(IPP_CORE AND IPP_S AND IPP_VM AND IPP_I)
-  set(USE_IPP TRUE)
-  message("IPP libraries found")
+if(IPP_FOUND)
+  list(APPEND cilacc_SOURCES FBP_filtering.cpp Binning.cpp)
+  list(APPEND cilacc_INCLUDES ${IPP_INCLUDE_DIRS})
+  list(APPEND cilacc_LIBRARIES ${IPP_LIBRARIES})
 else()
-  set(USE_IPP FALSE)
-  message("IPP libraries not found, FBP_filtering not in build")
+  message(WARNING "IPP libraries not found, FBP_filtering not in build")
 endif()
 
-if(USE_IPP)
-  add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/Binning.cpp)
+add_library(cilacc SHARED ${cilacc_SOURCES})
+target_link_libraries(cilacc ${cilacc_LIBRARIES})
+include_directories(cilacc PUBLIC ${cilacc_INCLUDES})
 
-
-  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S} ${IPP_I} ${IPP_VM})
-  include_directories(cilacc PUBLIC ${IPP_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-else()
-  add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp )
-
-  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS})
-  include_directories(cilacc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-endif()
-
-## Install
-#include(GNUInstallDirs)
-#install(TARGETS cilacc
-#	RUNTIME DESTINATION bin
-#    LIBRARY DESTINATION lib
-#    ARCHIVE DESTINATION lib
-#	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
-#	)
-
-if (UNIX)
-message ("I'd install into ${CMAKE_INSTALL_PREFIX}/lib")
 install(TARGETS cilacc
-	LIBRARY DESTINATION lib
-	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
-	)
-elseif(WIN32)
-message ("I'd install into ${CMAKE_INSTALL_PREFIX} lib bin")
-  install(TARGETS cilacc
-	RUNTIME DESTINATION Library/bin
-	ARCHIVE DESTINATION lib
-	CONFIGURATIONS ${CMAKE_BUILD_TYPE}
-	)
-endif()
-
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/Core/include/
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cil)
+        LIBRARY DESTINATION ${SKBUILD_PROJECT_NAME}/lib
+        RUNTIME DESTINATION ${SKBUILD_PROJECT_NAME}/lib)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+        DESTINATION ${SKBUILD_PROJECT_NAME}/include/${SKBUILD_PROJECT_NAME})

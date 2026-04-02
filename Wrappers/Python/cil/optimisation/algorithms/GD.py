@@ -36,7 +36,7 @@ class GD(Algorithm):
     f: CIL function (:meth:`~cil.optimisation.functions.Function`. ) with a defined gradient method 
         The function to be minimised. 
     step_size: positive real float or subclass of :meth:`~cil.optimisation.utilities.StepSizeRule`, default = None 
-        If you pass a float this will be used as a constant step size. If left as None and do not pass a step_size_rule then the Armijio rule will be used to perform backtracking to choose a step size at each iteration. If a child class of :meth:`cil.optimisation.utilities.StepSizeRule`' is passed then it's method `get_step_size` is called for each update. 
+        If you pass a float this will be used as a constant step size. If left as None and do not pass a step size rule then the Armijo rule will be used to perform backtracking to choose a step size at each iteration (:meth:`~cil.optimisation.utilities.ArmijoStepSizeRule`). If a child class of :meth:`cil.optimisation.utilities.StepSizeRule`' is passed then its method `get_step_size` is called for each update. 
     preconditioner: class with a `apply` method or a function that takes an initialised CIL function as an argument and modifies a provided `gradient`.
             This could be a custom `preconditioner` or one provided in :meth:`~cil.optimisation.utilities.preconditioner`. If None is passed  then `self.gradient_update` will remain unmodified. 
 
@@ -119,9 +119,9 @@ class GD(Algorithm):
             self.preconditioner.apply(
                 self, self.gradient_update, out=self.gradient_update)
 
-        step_size = self.step_size_rule.get_step_size(self)
+        self._step_size = self.step_size_rule.get_step_size(self)
 
-        self.x.sapyb(1.0, self.gradient_update, -step_size, out=self.x)
+        self.x.sapyb(1.0, self.gradient_update, -self._step_size, out=self.x)
 
     def update_objective(self):
         self.loss.append(self._objective_function(self.solution))
@@ -137,11 +137,18 @@ class GD(Algorithm):
 
     @property
     def step_size(self):
+        '''
+        Returns the most recently used step size. Note, if the step-size is set by a non-constant step size rule, you must use the algorithm run or update method before this getter will return the most recently used step size. 
+        '''
+        
         if isinstance(self.step_size_rule, ConstantStepSize):
             return self.step_size_rule.step_size
         else:
-            raise TypeError(
-                "There is not a constant step size, it is set by a step-size rule")
+            try: 
+                return self._step_size
+            except AttributeError:
+                raise NotImplementedError("Note the step-size is set by a step-size rule and could change with each iteration. Call the algorithm run or update method first and then this function will give the most recently used step size.")
+
 
     def calculate_objective_function_at_point(self, x):
         """ Calculates the objective at a given point x

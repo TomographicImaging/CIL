@@ -16,12 +16,30 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import numpy
+import warnings
 
 from .data_container import DataContainer
 from .labels import ImageDimension, Backend
 
 class ImageData(DataContainer):
-    '''DataContainer for holding 2D or 3D DataContainer'''
+    """
+    DataContainer for holding 2D or 3D image data
+    
+    Parameters
+    ----------
+    array : numpy.ndarray or DataContainer
+        The data array. Default None creates an empty array of size determined by the geometry.
+    deep_copy : bool, default is False
+        If True, the array will be deep copied. If False, the array will be shallow copied.
+    geometry : ImageGeometry
+        The geometry of the data. If the dtype of the array and geometry are different, the geometry dtype will be overridden.
+
+    **kwargs:
+        dtype : numpy.dtype
+            Specify the data type of the ImageData array, this is useful if you pass None to array and want to over-ride the dtype of the geometry. 
+            If an array is passed, dtype must match the dtype of the array.
+    """
+    
     __container_priority__ = 1
 
     @property
@@ -47,24 +65,26 @@ class ImageData(DataContainer):
                  geometry=None,
                  **kwargs):
 
-        dtype = kwargs.get('dtype', numpy.float32)
-
+        dtype = kwargs.pop('dtype', None)
+        if dtype is not None and array is not None:
+            if dtype != array.dtype:
+                    raise TypeError('dtype must match the array dtype got {} expected {}'.format(dtype, array.dtype))
 
         if geometry is None:
             raise AttributeError("ImageData requires a geometry")
 
-
-        labels = kwargs.get('dimension_labels', None)
-        if labels is not None and labels != geometry.dimension_labels:
-                raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
-
         if array is None:
+            if dtype is None:
+                dtype = geometry.dtype
             array = numpy.empty(geometry.shape, dtype=dtype)
+
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
+
         elif issubclass(type(array) , numpy.ndarray):
             # remove singleton dimensions
             array = numpy.squeeze(array)
+
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
 
@@ -75,6 +95,9 @@ class ImageData(DataContainer):
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
 
         super(ImageData, self).__init__(array, deep_copy, geometry=geometry, **kwargs)
+
+        if kwargs:
+            warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)
 
     def __eq__(self, other):
         '''
@@ -132,7 +155,7 @@ class ImageData(DataContainer):
         if len(out.shape) == 1 or geometry_new is None:
             return out
         else:
-            return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)
+            return ImageData(out.array, deep_copy=False, geometry=geometry_new)
 
 
     def apply_circular_mask(self, radius=0.99, in_place=True):

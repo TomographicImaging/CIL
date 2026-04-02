@@ -308,7 +308,7 @@ class LinearOperator(Operator):
                     apply_adjoint = False
 
         if initial is None:
-            x0 = operator.domain_geometry().allocate('random', seed=seed)
+            x0 = operator.domain_geometry().allocate('random_deprecated', seed=seed)
         else:
             x0 = initial.copy()
 

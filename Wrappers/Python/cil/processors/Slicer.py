@@ -18,6 +18,7 @@
 
 from cil.framework import (DataProcessor, AcquisitionData, ImageData, DataContainer, ImageGeometry, VectorGeometry,
                            AcquisitionGeometry)
+from cil.framework.labels import AcquisitionType
 import numpy as np
 import weakref
 import logging
@@ -156,6 +157,10 @@ class Slicer(DataProcessor):
         for key in self._roi_input.keys():
             if key not in data.dimension_labels:
                 raise ValueError('Wrong label is specified for roi, expected one of {}.'.format(data.dimension_labels))
+            if isinstance(self._geometry , (AcquisitionGeometry)) and self._geometry.geom_type & AcquisitionType.CONE_FLEX \
+                    and key in ['vertical', 'horizontal']:
+                raise NotImplementedError("Cone-Flex geometry is not supported by this processor for slicing along 'vertical' or 'horizontal'")
+
 
         return True
 
@@ -313,8 +318,13 @@ class Slicer(DataProcessor):
                 geometry_new.set_channels(num_channels=n_elements)
 
             elif axis == 'angle':
-
                 geometry_new.config.angles.angle_data = self._get_angles(roi)
+
+            elif axis == 'projection':
+                geometry_new.config.system.num_positions = int(np.ceil((roi.stop - roi.start )/ roi.step))
+                geometry_new.config.system.source = self._geometry.config.system.source[roi.start:roi.stop:roi.step]
+                geometry_new.config.system.detector = self._geometry.config.system.detector[roi.start:roi.stop:roi.step]
+                
 
             elif axis == 'horizontal':
                 pixel_offset = ((self._shape_in[i] -1 - self._pixel_indices[i][1]) - self._pixel_indices[i][0])*0.5

@@ -111,7 +111,7 @@ class FBP(DataProcessor):
                 arr_out = fbp(self.get_input().as_array(), self.tigre_geom, self.tigre_angles)
 
         if out is None:
-            out = ImageData(arr_out, deep_copy=False, geometry=self.image_geometry.copy(), suppress_warning=True)
+            out = ImageData(arr_out, deep_copy=False, geometry=self.image_geometry.copy())
             return out
         else:
             out.fill(arr_out)

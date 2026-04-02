@@ -27,39 +27,95 @@ The :code:`AcquisitionGeometry` class holds the system acquisition parameters.
 
 .. autoclass:: cil.framework.AcquisitionGeometry
 
-We create the appropriate :code:`AcquisitionGeometry` for our data by using the static methods:
+Create the geometry object
+--------------------------
+
+We create the appropriate :code:`AcquisitionGeometry` for our data. This gives us an acquisition geometry object configured with the spatial geometry of the system.
+The following methods are available to create the geometry object, use the one that matches your data acquisition system.
+
 
 Parallel2D Geometry
--------------------
+^^^^^^^^^^^^^^^^^^^
+
+Geometry for a 2D parallel beam system. This describes circular-scan data from a single row of detector pixels for parallel beam data i.e. synchrotron data.
+
 .. automethod:: cil.framework.AcquisitionGeometry.create_Parallel2D
 
+
 Parallel3D Geometry
--------------------
+^^^^^^^^^^^^^^^^^^^
+
+Geometry for a 3D parallel beam system. This describes circular-scan data from a 2D array of detector pixels for parallel beam data i.e. synchrotron data.
+
 .. automethod:: cil.framework.AcquisitionGeometry.create_Parallel3D
 
+
 Cone2D Geometry (Fanbeam)
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Geometry for a 2D cone-beam system. This describes circular-scan data from a single row of detector pixels for cone/fan-beam data i.e. micro-CT data.
+
 .. automethod:: cil.framework.AcquisitionGeometry.create_Cone2D
 
+
 Cone3D Geometry
----------------
+^^^^^^^^^^^^^^^
+
+Geometry for a 3D cone-beam system. This describes circular-scan data from a 2D array of detector pixels for cone/fan-beam data i.e. micro-CT data.
+
 .. automethod:: cil.framework.AcquisitionGeometry.create_Cone3D
 
 
-Configure the geometry
-----------------------
-This gives us an acquisition geometry object configured with the spatial geometry of the system.
+Cone3D_Flex Geometry
+^^^^^^^^^^^^^^^^^^^^
 
-It is then necessary to configure the panel, angular data and dimension labels:
+Geometry for a 3D cone-beam system with flexible detector and source positions. This geometry allows for different detector and source positions for each radiograph.
+
+.. automethod:: cil.framework.AcquisitionGeometry.create_Cone3D_Flex
+
+
+
+Configure the geometry object
+-----------------------------
+
+Once the geometry is created, we must configure it further. The following methods are available to set the parameters of the geometry.
+
+
+Set the angles of the projections
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For circular geometries, we must set the angles of the projections. This is not necessary for Cone3D_Flex geometries, as the rotation is described by the system geometry
+
+.. automethod:: cil.framework.AcquisitionGeometry.set_angles
+
+
+Set the detector parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+It is necessary to configure the panel of the system. This is applied to all the projections in the geometry:
 
 .. automethod:: cil.framework.AcquisitionGeometry.set_panel
-.. automethod:: cil.framework.AcquisitionGeometry.set_angles
+
+
+Set the dimension labels
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set the order of the dimension labels, this describe how the data is stored in memory:
+
 .. automethod:: cil.framework.AcquisitionGeometry.set_labels
+
+
+Set the number of channels
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set the number of channels for the data, this can be used to add an additional dimension to the data for multi-spectral data:
+
 .. automethod:: cil.framework.AcquisitionGeometry.set_channels
 
 
 Use the geometry
 ----------------
+
 We can use this geometry to generate related objects. Including a 2D slice :code:`AcquisitionGeometry`, an :code:`AcquisitionData` container, and a default :code:`ImageGeometry`.
 
 .. automethod:: cil.framework.AcquisitionGeometry.get_slice
@@ -179,7 +235,7 @@ Partitioner
 
 This method partitions an instance of tomography :code:`AcquisitionData` into a number of batches. For example, to use with a stochastic optimisation method. 
 
-The partitioning is done by taking batches of angles and the corresponding data collected by taking projections along these angles. The partitioner method chooses what angles go in which batch depending on the `mode` and takes in an `AquisitionData` object and outputs a `BlockDataContainer` where each element in the block is  `AquisitionData` object with the batch of data and corresponding geometry. 
+The partitioning is done by taking batches of angles and the corresponding data collected by taking projections along these angles. The partitioner method chooses what angles go in which batch depending on the `mode` and takes in an `AcquisitionData` object and outputs a `BlockDataContainer` where each element in the block is  `AcquisitionData` object with the batch of data and corresponding geometry. 
 We consider a **batch** to be a subset of the :code:`AcquisitionData` and the verb, **to partition**, to be the act of splitting into batches. 
  
 

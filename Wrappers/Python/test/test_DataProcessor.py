@@ -34,8 +34,9 @@ from cil.recon import FBP
 
 from cil.processors import CentreOfRotationCorrector
 from cil.processors.CofR_xcorrelation import CofR_xcorrelation
+from cil.processors.CofR_image_sharpness import CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser, Normaliser
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder, PaganinProcessor, FluxNormaliser, Normaliser, LaminographyGeometryCorrector
 import gc
 
 from utils import has_numba
@@ -44,6 +45,7 @@ if has_numba:
 
 from scipy import constants
 from scipy.fft import ifftshift
+from scipy.spatial.transform import Rotation as R
 
 from utils import has_astra, has_tigre, has_nvidia, has_tomophantom, initialise_tests, has_ipp, has_matplotlib
 
@@ -180,7 +182,7 @@ class TestBinner_cillacc(unittest.TestCase):
 class TestBinner(unittest.TestCase):
     def test_set_up_processor(self):
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         channel = range(0,10,3)
         vertical = range(0,8,2)
@@ -383,6 +385,21 @@ class TestBinner(unittest.TestCase):
 
             self.assertEqual(ag_gold[i], ag_out, msg="Binning acquisition geometry with roi {}".format(i))
 
+    def test_process_acquisition_geometry_cone3DFlex(self):
+ 
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+
+        roi = {'channel':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)}
+
+        proc = Binner(roi=roi)
+
+        with self.assertRaises(NotImplementedError):
+            proc.set_input(ag)
 
     def test_process_image_geometry(self):
 
@@ -447,7 +464,7 @@ class TestBinner(unittest.TestCase):
     def test_bin_array_consistency(self):
 
         ig = ImageGeometry(64,32,16,channels=8)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         roi = {'horizontal_x':(1,-1,16),'horizontal_y':(1,-1,8),'channel':(1,-1,2),'vertical':(1,-1,4)}
 
@@ -486,7 +503,7 @@ class TestBinner(unittest.TestCase):
         Binning results tested with test_binning_cpp_ so this is checking wrappers with axis labels and geometry
         """
         ig = ImageGeometry(4,6,8,0.1,0.2,0.3,0.4,0.5,0.6,channels=10)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         channel = range(0,10,2)
         vertical = range(0,8,2)
@@ -534,7 +551,7 @@ class TestBinner(unittest.TestCase):
         Binning results tested with test_binning_cpp_ so this is checking wrappers with axis labels and geometry
         """
         ag = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,8,endpoint=False)).set_panel([4,6],[0.1,0.2]).set_channels(10)
-        data = ag.allocate('random')
+        data = ag.allocate('random', seed=42)
 
         channel = range(0,10,2)
         angle = range(0,8,2)
@@ -813,7 +830,7 @@ class TestSlicer(unittest.TestCase):
 
     def test_set_up_processor(self):
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         channel = range(0,10,3)
         vertical = range(0,8,2)
@@ -1058,6 +1075,48 @@ class TestSlicer(unittest.TestCase):
 
             self.assertEqual(ag_gold[i], ag_out, msg="Slicing acquisition geometry with roi {0}. \nExpected:\n{1}\nGot\n{2}".format(i,ag_gold[i], ag_out))
 
+    def test_process_acquisition_geometry_cone3DFlex(self):
+ 
+        source_position_set=[[0,-100000,0], [0,-90000,0], [0,-90000,1], [0,-80000,0]]
+        detector_position_set=[[0,0,0], [0,0,1], [0,0,2], [0,0,3]]
+        detector_direction_x_set=[[1, 0, 0], [0.5, 0, 0], [1, 0, 0], [0.8,0,0]]
+        detector_direction_y_set=[[0, 0, 1], [0,0,0.8], [0,0,1.1], [0,0,1.2]]
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+        roi_invalid = {'channel':(None,None,None),'vertical':(None,None,None),'horizontal':(None,None,None)}
+
+        with self.assertRaises(NotImplementedError):
+            proc = Slicer(roi=roi_invalid)
+            proc.set_input(ag)
+        
+        roi_valid =  {'projection':(1,3,2)}
+
+        slicer = Slicer(roi=roi_valid)
+        sliced = slicer(ag)
+
+        expected_source_position_set = source_position_set[1:3:2]
+        expected_detector_position_set = detector_position_set[1:3:2]
+        expected_detector_direction_x_set = detector_direction_x_set[1:3:2]
+        expected_detector_direction_y_set = detector_direction_y_set[1:3:2]
+        expected_num_positions = len(expected_source_position_set)
+
+        expected_acq_geometry = AcquisitionGeometry.create_Cone3D_Flex(
+            expected_source_position_set, expected_detector_position_set, expected_detector_direction_x_set, expected_detector_direction_y_set)
+        expected_acq_geometry.set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+        numpy.testing.assert_allclose(expected_source_position_set, [x.position for x in sliced.config.system.source])
+        numpy.testing.assert_allclose(expected_num_positions, sliced.config.system.num_positions)
+        self.assertEqual(expected_acq_geometry, sliced)
+
+        roi_channels = {'channel':(1,3,2)}
+
+        slicer = Slicer(roi=roi_channels)
+        sliced = slicer(ag)
+        ag_expected = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(1)
+
+        self.assertEqual(ag_expected, sliced)
+
+       
 
     def test_process_image_geometry(self):
 
@@ -1125,7 +1184,7 @@ class TestSlicer(unittest.TestCase):
     def test_slice_image_data(self):
 
         ig = ImageGeometry(4,6,8,0.1,0.2,0.3,0.4,0.5,0.6,channels=10)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
 
         channel = range(0,10,2)
         vertical = range(0,8,2)
@@ -1165,7 +1224,7 @@ class TestSlicer(unittest.TestCase):
     def test_slice_acquisition_data(self):
 
         ag = AcquisitionGeometry.create_Cone3D([0,-50,0],[0,50,0]).set_angles(numpy.linspace(0,360,8,endpoint=False)).set_panel([4,6],[0.1,0.2]).set_channels(10)
-        data = ag.allocate('random')
+        data = ag.allocate('random', seed=42)
 
         channel = range(0,10,2)
         angle = range(0,8,2)
@@ -1564,7 +1623,33 @@ class TestCofR_xcorrelation(unittest.TestCase):
         processor = CentreOfRotationCorrector.xcorrelation(slice_index = 'centre', projection_index = 0, ang_tol=1)
         with self.assertRaises(ValueError):
             processor.set_input(data_limited)           
-    
+
+
+class TestCentreOfRotation_cone3D_Flex(unittest.TestCase):
+
+    def setUp(self):
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+        self.data = ag.allocate('random')
+
+    def test_image_sharpness_acquisition_geometry_cone3DFlex(self):
+        #mock the _configure_FBP method to bypass the backprojector setup
+        with patch.object(CofR_image_sharpness, '_configure_FBP', return_value=None):
+            corr = CofR_image_sharpness()
+
+        with self.assertRaises(ValueError):
+            corr.set_input(self.data)
+
+    def test_x_corr_acquisition_geometry_cone3DFlex(self):
+        corr = CofR_xcorrelation()
+
+        with self.assertRaises(ValueError):
+            corr.set_input(self.data)
+
+
 class TestCentreOfRotation_parallel(unittest.TestCase):
 
     def setUp(self):
@@ -1667,7 +1752,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)
 
 
-class TestPaddder(unittest.TestCase):
+class TestPadder(unittest.TestCase):
 
     def setUp(self):
 
@@ -1691,7 +1776,7 @@ class TestPaddder(unittest.TestCase):
     def test_set_up(self):
 
         ig = ImageGeometry(20,22,23,0.1,0.2,0.3,0.4,0.5,0.6,channels=24)
-        data = ig.allocate('random')
+        data = ig.allocate('random', seed=42)
         dim_order = ['channel','vertical','horizontal_y','horizontal_x']
 
         pad_width = {'horizontal_x':(3,4),'vertical':(5,6),'channel':(7,8)}
@@ -1814,6 +1899,18 @@ class TestPaddder(unittest.TestCase):
         self.assertEqual(geometry_padded, geometry_gold,
         msg="Padder failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(geometry_padded, geometry_gold))
 
+    def test_process_acquisition_geometry_cone3DFlex(self):
+ 
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,64],[0.1,0.2]).set_channels(4)
+
+        proc = Padder('constant', pad_width=self.ag_pad_width, pad_values=0.0)
+
+        with self.assertRaises(NotImplementedError):
+            proc.set_input(ag)
 
     def test_process_acquisition_geometry_origin(self):
         geometry = self.ag2
@@ -1841,7 +1938,7 @@ class TestPaddder(unittest.TestCase):
     def test_process_data(self):
 
         geometry = self.ig
-        data = geometry.allocate('random')
+        data = geometry.allocate('random', seed=42)
 
         proc = Padder('constant', pad_width=self.ig_pad_width, pad_values=0.5)
         proc.set_input(data)
@@ -1866,7 +1963,7 @@ class TestPaddder(unittest.TestCase):
 
         proc = Padder('constant', pad_width=self.ag_pad_width, pad_values=0.5)
 
-        data_in = self.ag.allocate('random')
+        data_in = self.ag.allocate('random', seed=42)
 
         data_gold = self.ag_padded.allocate(0.5)
         data_gold.array[c[0]:-c[1],:,v[0]:-v[1],h[0]:-h[1]] = data_in.array
@@ -1900,7 +1997,7 @@ class TestPaddder(unittest.TestCase):
 
         proc = Padder('constant', pad_width=self.ig_pad_width, pad_values=0.5)
 
-        data_in = self.ig.allocate('random')
+        data_in = self.ig.allocate('random', seed=42)
 
         data_gold = self.ig_padded.allocate(0.5)
         data_gold.array[c[0]:-c[1],v[0]:-v[1],hy[0]:-hy[1],hx[0]:-hx[1]] = data_in.array
@@ -2381,7 +2478,7 @@ class TestMaskGenerator(unittest.TestCase):
                         voxel_num_y=10)
         AG = AcquisitionGeometry.create_Parallel3D().set_panel((10,10)).set_angles(1)
 
-        data = IG.allocate('random')
+        data = IG.allocate('random', seed=42)
 
         data.as_array()[2,3] = float('inf')
         data.as_array()[4,5] = float('nan')
@@ -2482,9 +2579,7 @@ class TestMaskGenerator(unittest.TestCase):
                             voxel_num_y=200)
 
         AG = AcquisitionGeometry.create_Parallel3D().set_panel((200,200)).set_angles(1)
-        data = IG.allocate()
-        numpy.random.seed(10)
-        data.fill(numpy.random.rand(200,200))
+        data = IG.allocate('random', seed=2)
         data.as_array()[7,4] += 10 * numpy.std(data.as_array()[7,:])
 
         data_as_data_container = DataContainer(data.as_array().copy())
@@ -2602,7 +2697,7 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
                                 'angle',\
                                 'channel']
 
-        ad = AG.allocate('random')
+        ad = AG.allocate('random', seed=42)
 
         s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1,
                                             accelerated=accelerated)
@@ -2654,7 +2749,7 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
                                 'angle',\
                                 'channel']
 
-        ad = AG.allocate('random')
+        ad = AG.allocate('random', seed=42)
 
         s = AbsorptionTransmissionConverter(white_level=10)
         s.set_input(ad)
@@ -2679,8 +2774,8 @@ class TestMasker(unittest.TestCase):
                             voxel_num_y=5,
                             voxel_num_z=5)
         
-        self.data_2D_init = IG_2D.allocate('random')
-        self.data_3D_init = IG_3D.allocate('random')
+        self.data_2D_init = IG_2D.allocate('random', seed=42)
+        self.data_3D_init = IG_3D.allocate('random', seed=42)
 
         self.data_2D = self.data_2D_init.copy()
         self.data_3D = self.data_3D_init.copy()
@@ -2870,7 +2965,14 @@ class TestPaganinProcessor(unittest.TestCase):
             .set_panel([128,128],0.1)\
             .set_channels(4)
 
-        self.data_multichannel = ag.allocate('random')
+        self.data_multichannel = ag.allocate('random', seed=3)
+
+        source_position_set=[[0,-100000,0]]
+        detector_position_set=[[0,0,0]]
+        detector_direction_x_set=[[1, 0, 0]]
+        detector_direction_y_set=[[0, 0, 1]]
+        cone_flex_ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([3,3])
+        self.data_cone_flex  = cone_flex_ag.allocate('random', seed=3)
 
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
@@ -2923,6 +3025,8 @@ class TestPaganinProcessor(unittest.TestCase):
             data.reorder('astra')
             with self.assertRaises(ValueError):
                 processor.set_input(data)
+        with self.assertRaises(NotImplementedError):
+            processor.set_input(self.data_cone_flex)
 
 
     def test_PaganinProcessor_set_geometry(self):
@@ -2995,7 +3099,7 @@ class TestPaganinProcessor(unittest.TestCase):
         # check alpha and mu are calculated correctly
         wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
         mu = 4.0*numpy.pi*beta/(wavelength)
-        alpha = 60000*delta/mu
+        alpha = 60000*delta/mu/self.data_cone.geometry.magnification
 
         self.data_cone.geometry.config.units='m'
         processor.set_input(self.data_cone)
@@ -3008,8 +3112,8 @@ class TestPaganinProcessor(unittest.TestCase):
         self.assertEqual(processor.mu, mu, msg=self.error_message(processor, 'mu'))
         
         kx,ky = numpy.meshgrid( 
-            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
-            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h),
+            numpy.arange(-Nx/2, Nx/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification),
+            numpy.arange(-Ny/2, Ny/2, 1, dtype=numpy.float64) * (2*numpy.pi)/(Nx*self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification),
             sparse=False, 
             indexing='ij'
             )
@@ -3025,7 +3129,7 @@ class TestPaganinProcessor(unittest.TestCase):
         processor.filter_Nx = Nx
         processor.filter_Ny = Ny
         processor._create_filter()
-        filter = ifftshift(1/(1. - (2*alpha/self.data_cone.geometry.pixel_size_h**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h*ky) -2)))
+        filter = ifftshift(1/(1. - (2*alpha/(self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification)**2)*(numpy.cos(self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification*kx) + numpy.cos(self.data_cone.geometry.pixel_size_h/self.data_cone.geometry.magnification*ky) -2)))
         numpy.testing.assert_allclose(processor.filter, filter)
 
         # check unknown method raises error
@@ -3050,7 +3154,7 @@ class TestPaganinProcessor(unittest.TestCase):
         # check alpha and mu are calculated correctly
         wavelength = (constants.h*constants.speed_of_light)/(energy*constants.electron_volt)
         mu = 4.0*numpy.pi*beta/(wavelength)
-        alpha = 60000*delta/mu
+        alpha = 60000*delta/mu/self.data_cone.geometry.magnification
         self.assertEqual(processor.delta, delta, msg=self.error_message(processor, 'delta'))
         self.assertEqual(processor.beta, beta, msg=self.error_message(processor, 'beta'))
         self.assertEqual(processor.alpha, alpha, msg=self.error_message(processor, 'alpha'))
@@ -3158,6 +3262,313 @@ class TestPaganinProcessor(unittest.TestCase):
         sys.stderr = sys.__stderr__
         self.assertLessEqual(quality_measures.mse(output, thickness), 0.05)
 
+class TestLaminographyGeometryCorrector(unittest.TestCase):
+
+    def setUp(self):
+        self.data_parallel = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data_parallel.reorder('astra')
+        
+        # Additional test data
+        self.data_cone = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        self.data_cone.reorder('astra')
+        
+        # Create cone flex geometry data
+        source_position_set = [[0, -100000, 0]] * 3
+        detector_position_set = [[0, 0, 0]] * 3
+        detector_direction_x_set = [[1, 0, 0]] * 3
+        detector_direction_y_set = [[0, 0, 1]] * 3
+        cone_flex_ag = AcquisitionGeometry.create_Cone3D_Flex(
+            source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set
+        ).set_panel([32, 32])
+        arr = numpy.random.rand(3, 32, 32).astype(numpy.float32)
+        self.data_cone_flex = AcquisitionData(arr, geometry=cone_flex_ag)
+
+    def error_message(self, processor, test_parameter):
+        return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
+
+    @unittest.skipUnless(has_astra, "Astra not installed")
+    def test_LaminographyGeometryCorrector_init(self):
+        # test default values are initialised
+        processor = LaminographyGeometryCorrector()
+        test_parameter = ['parameter_bounds', 'parameter_tolerance', 
+                          'coarse_binning', 'final_binning', 'angle_subsampling', 'image_geometry', 'evaluations']
+        test_value = [[(-10, 10), (-20, 20)], (0.01, 0.01),
+                      None, None, None, None, []]
+
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor, test_parameter[i]), test_value[i], 
+                           msg=self.error_message(processor, test_parameter[i]))
+
+        # test non-default values are initialised
+        processor = LaminographyGeometryCorrector(
+                                         parameter_bounds=[(20, 35), (-5, 15)],
+                                         parameter_tolerance=(0.1, 0.1),
+                                         coarse_binning=2,
+                                         final_binning=1,
+                                         angle_subsampling=2,
+                                         image_geometry=None)
+        test_value = [[(20, 35), (-5, 15)], (0.1, 0.1),
+                      2, 1, 2, None]
+
+        for i in numpy.arange(len(test_value)):
+            self.assertEqual(getattr(processor, test_parameter[i]), test_value[i],
+                           msg=self.error_message(processor, test_parameter[i]))
+
+    @unittest.skipUnless(has_astra, "Astra not installed")
+    def test_LaminographyGeometryCorrector_check_input(self):
+        processor = LaminographyGeometryCorrector()
+        
+        # test with parallel beam data - should work
+        processor.set_input(self.data_parallel)
+        data2 = processor.get_input()
+        numpy.testing.assert_allclose(data2.as_array(), self.data_parallel.as_array())
+
+        # check there is an error when the wrong data type is input
+        with self.assertRaises(TypeError):
+            processor.set_input(self.data_parallel.geometry)
+
+        with self.assertRaises(TypeError):
+            processor.set_input(self.data_parallel.as_array())
+
+        dc = DataContainer(self.data_parallel.as_array())
+        with self.assertRaises(TypeError):
+            processor.set_input(dc)
+
+        # check with different data order - should raise error
+        data_reorder = self.data_parallel.copy()
+        data_reorder.reorder('astra')
+        data_reorder.reorder(['angle','horizontal','vertical'])
+        with self.assertRaises(ValueError):
+            processor.set_input(data_reorder)
+
+        # Test that cone beam data raises NotImplementedError
+        processor = LaminographyGeometryCorrector()
+        with self.assertRaises(NotImplementedError):
+            processor.set_input(self.data_cone)
+            processor.check_input(self.data_cone)
+
+        # Test that cone flex geometry raises NotImplementedError
+        processor = LaminographyGeometryCorrector()
+        with self.assertRaises(NotImplementedError):
+            processor.set_input(self.data_cone_flex)
+
+    @unittest.skipUnless(has_astra, "Astra not installed")
+    def test_LaminographyGeometryCorrector_update_geometry(self):
+        processor = LaminographyGeometryCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([512, 512], pixel_size=(1.0, 1.0))
+        
+        tilt_deg = 35.0
+        cor_pix = 5.0
+        
+        ag_updated = processor._update_geometry(ag, tilt_deg, cor_pix)
+        
+        # Verify CoR was updated
+        self.assertAlmostEqual(ag_updated.config.system.rotation_axis.position[0], cor_pix)
+        
+        # Verify rotation axis direction was modified (should be tilted)
+        original_axis = numpy.array([0, 0, 1])
+        tilted_axis = ag_updated.config.system.rotation_axis.direction
+        assert not numpy.allclose(tilted_axis, original_axis)
+    
+        # Test tilt around x-axis (default)
+        processor = LaminographyGeometryCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([512, 512], pixel_size=(1.0, 1.0))
+        
+        tilt_deg = 30.0
+        cor_pix = 0.0
+        tilt_x = numpy.array([1, 0, 0])
+        
+        ag_updated_x = processor._update_geometry(ag, tilt_deg, cor_pix, tilt_direction_vector=tilt_x)
+        
+        updated_axis = ag_updated_x.config.system.rotation_axis.direction
+        # When tilting around x-axis, z-component should change, x-component should stay ~1
+        self.assertAlmostEqual(updated_axis[0], 0, places=5)
+
+        # Test tilt around y-axis
+        processor = LaminographyGeometryCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([512, 512], pixel_size=(1.0, 1.0))
+        
+        tilt_deg = 30.0
+        cor_pix = 0.0
+        tilt_y = numpy.array([0, 1, 0])
+        
+        ag_updated_y = processor._update_geometry(ag, tilt_deg, cor_pix, tilt_direction_vector=tilt_y)
+        
+        updated_axis = ag_updated_y.config.system.rotation_axis.direction
+        # When tilting around y-axis, x-component should change
+        original_axis = numpy.array([0, 0, 1])
+        self.assertFalse(numpy.allclose(updated_axis, original_axis))
+
+        # Test tilt around z-axis
+        processor = LaminographyGeometryCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([512, 512], pixel_size=(1.0, 1.0))
+        
+        tilt_deg = 45.0
+        cor_pix = 0.0
+        tilt_z = numpy.array([0, 0, 1])
+        
+        ag_updated_z = processor._update_geometry(ag, tilt_deg, cor_pix, tilt_direction_vector=tilt_z)
+        
+        # Tilting around the rotation axis itself should not change the direction
+        original_axis = numpy.array([0, 0, 1])
+        updated_axis = ag_updated_z.config.system.rotation_axis.direction
+        numpy.testing.assert_allclose(updated_axis, original_axis, atol=1e-5)
+
+        # Test with zero tilt
+        processor = LaminographyGeometryCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([512, 512], pixel_size=(1.0, 1.0))
+        
+        tilt_deg = 0.0
+        cor_pix = 5.0
+        
+        ag_updated = processor._update_geometry(ag, tilt_deg, cor_pix)
+        
+        # With zero tilt, rotation axis should remain unchanged
+        original_axis = numpy.array([0, 0, 1])
+        updated_axis = ag_updated.config.system.rotation_axis.direction
+        numpy.testing.assert_allclose(updated_axis, original_axis, atol=1e-5)
+        # CoR should still be updated
+        self.assertAlmostEqual(ag_updated.config.system.rotation_axis.position[0], cor_pix)
+
+        # Test that panel size is preserved after geometry update
+        processor = LaminographyGeometryCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        panel_size = (512, 512)
+        ag.set_panel(panel_size, pixel_size=(1.0, 1.0))
+        
+        original_panel = ag.config.panel.num_pixels
+        
+        ag_updated = processor._update_geometry(ag, 35.0, 5.0)
+        updated_panel = ag_updated.config.panel.num_pixels
+        
+        # Panel size should be unchanged
+        self.assertEqual(original_panel[0], updated_panel[0])
+        self.assertEqual(original_panel[1], updated_panel[1])
+
+        # Test that number of angles is preserved
+        processor = LaminographyGeometryCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        num_angles = 15
+        ag.set_angles(numpy.linspace(0, numpy.pi, num_angles))
+        ag.set_panel([128, 128])
+        
+        original_num_angles = len(ag.angles)
+        
+        ag_updated = processor._update_geometry(ag, 30.0, 3.0)
+        updated_num_angles = len(ag_updated.angles)
+        
+        # Number of angles should be preserved
+        self.assertEqual(original_num_angles, updated_num_angles)
+
+        # Test that rotation axis direction remains normalized (unit vector)
+        processor = LaminographyGeometryCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([256, 256])
+        
+        tilt_deg = 45.0
+        cor_pix = 10.0
+        
+        ag_updated = processor._update_geometry(ag, tilt_deg, cor_pix)
+        
+        # Check that rotation axis is a unit vector
+        axis = ag_updated.config.system.rotation_axis.direction
+        axis_norm = numpy.linalg.norm(axis)
+        self.assertAlmostEqual(axis_norm, 1.0, places=5)
+
+        # Test with extreme tilt angles
+        processor = LaminographyGeometryCorrector()
+        
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_angles(numpy.linspace(0, numpy.pi, 10))
+        ag.set_panel([128, 128])
+        
+        original_panel = ag.config.panel.num_pixels
+        
+        # Test with 90 degree tilt
+        ag_updated_90 = processor._update_geometry(ag, 90.0, 0.0)
+        self.assertEqual(ag_updated_90.config.panel.num_pixels[0], original_panel[0])
+        
+        # Test with 180 degree tilt
+        ag_updated_180 = processor._update_geometry(ag, 180.0, 0.0)
+        self.assertEqual(ag_updated_180.config.panel.num_pixels[0], original_panel[0])
+
+    @unittest.skipUnless(has_astra and has_nvidia, "ASTRA GPU not installed")
+    def test_LaminographyGeometryCorrector_process(self):
+        # get volume
+        vol = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        vol.reorder('astra')
+        ig = vol.geometry
+        
+        # forward project with tilt and cor offset
+        tilt = 37.7 # degrees
+        cor_offset = -2.4 # pixels
+        tilt_direction = numpy.array([1, 0, 0])
+        untilted_rotation_axis = numpy.array([0, 0, 1])
+
+        rotation_matrix = R.from_rotvec(numpy.deg2rad(tilt) * tilt_direction)
+        tilted_rotation_axis = rotation_matrix.apply(untilted_rotation_axis)
+        angles = numpy.arange(0,360,5)
+        ag = AcquisitionGeometry.create_Parallel3D(rotation_axis_direction=tilted_rotation_axis)\
+            .set_angles(angles)\
+            .set_panel(vol.shape[0:2], (vol.geometry.voxel_size_x, vol.geometry.voxel_size_y))
+        ag.set_centre_of_rotation(cor_offset, distance_units='pixels')
+        ag.set_labels(['vertical', 'angle','horizontal'])
+
+        A = AstraProjectionOperator(ig, ag)
+        proj = A.direct(vol)
+
+        # update geometry with guess values
+        tilt_guess = 35 # degrees
+        cor_guess = 0
+        rotation_matrix_guess = R.from_rotvec(numpy.deg2rad(tilt_guess) * tilt_direction)
+        tilted_rotation_axis_guess = rotation_matrix_guess.apply(untilted_rotation_axis)
+        proj.geometry.config.system.rotation_axis.direction = tilted_rotation_axis_guess
+        proj.geometry.set_centre_of_rotation(cor_guess, distance_units='pixels')
+
+        # run LaminographyGeometryCorrector
+        tolerance = 0.5 # choose high tolerance for quick convergence
+        processor = LaminographyGeometryCorrector(parameter_bounds=[(30,40),(-5,5)], 
+                                                parameter_tolerance=(tolerance, tolerance))
+        processor.set_input(proj)
+        
+        sys.stdout = open(os.devnull, "w")
+        sys.stderr = open(os.devnull, "w")
+        corrected_proj = processor.get_output()
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+
+        # check the fitted values are within the tolerance of the true values
+        U = corrected_proj.geometry.config.system.rotation_axis.direction
+        V = corrected_proj.geometry.config.system.detector.direction_y
+        c = numpy.cross(U, V)
+        d = numpy.dot(U, V)
+        c_norm = numpy.linalg.norm(c)
+        tilt_fit = numpy.rad2deg(numpy.arctan2(c_norm, d))
+        cor_fit = corrected_proj.geometry.get_centre_of_rotation(distance_units='pixels')['offset'][0]
+
+        self.assertLessEqual(abs(tilt_fit - tilt), tolerance)
+        self.assertLessEqual(abs(cor_fit - cor_offset), tolerance)
+
 class TestFluxNormaliser(unittest.TestCase):
 
     def setUp(self):
@@ -3167,7 +3578,7 @@ class TestFluxNormaliser(unittest.TestCase):
             .set_angles(numpy.linspace(0,360,360,endpoint=False))\
             .set_panel([128,128],0.1)\
             .set_channels(4)
-        self.data_multichannel = ag.allocate('random')
+        self.data_multichannel = ag.allocate('random', seed=42)
         self.data_slice = self.data_parallel.get_slice(vertical=1)
         self.data_reorder = self.data_cone.copy()
         self.data_reorder.reorder(['angle','horizontal','vertical'])
@@ -3179,6 +3590,13 @@ class TestFluxNormaliser(unittest.TestCase):
                         [[4,5,6],[4,5,6],[4,5,6]], 
                         [[7,8,9],[7,8,9],[7,8,9]]])
         self.data_simple = AcquisitionData(arr, geometry=ag)
+
+        source_position_set=[[0,-100000,0]]*3
+        detector_position_set=[[0,0,0]]*3
+        detector_direction_x_set=[[1, 0, 0]]*3
+        detector_direction_y_set=[[0, 0, 1]]*3
+        cone_flex_ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([3,3])
+        self.cone_flex  = AcquisitionData(arr, geometry=cone_flex_ag)
 
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
@@ -3204,6 +3622,11 @@ class TestFluxNormaliser(unittest.TestCase):
         processor = FluxNormaliser()
         with self.assertRaises(ValueError):
             processor.check_input(self.data_cone)
+
+        # check there's a not implemented error if cone flex geom is used:
+        processor = FluxNormaliser(flux=[1,2,3])
+        with self.assertRaises(NotImplementedError):
+            processor.check_input(self.cone_flex)
 
     def test_calculate_flux(self):
         # check there is an error if flux array size is not equal to the number of angles in data
@@ -3240,22 +3663,22 @@ class TestFluxNormaliser(unittest.TestCase):
         processor = FluxNormaliser(flux = 0)
         processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
-            processor._calculate_flux()
+            processor.get_output()
 
         processor = FluxNormaliser(flux = 0.0)
         processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
-            processor._calculate_flux()
+            processor.get_output()
 
         processor = FluxNormaliser(flux=numpy.zeros(len(self.data_cone.geometry.angles)))
         processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
-            processor._calculate_flux()
+            processor.get_output()
 
         processor = FluxNormaliser(flux=numpy.zeros(len(self.data_cone.geometry.angles), dtype=numpy.uint16))
         processor.set_input(self.data_cone)
         with self.assertRaises(ValueError):
-            processor._calculate_flux()
+            processor.get_output()
 
     def test_calculate_target(self):
 

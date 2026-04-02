@@ -1,9 +1,30 @@
+#  Copyright 2024 United Kingdom Research and Innovation
+#  Copyright 2024 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
+
 from abc import ABC, abstractmethod
 from functools import partialmethod
 
 from tqdm.auto import tqdm as tqdm_auto
 from tqdm.std import tqdm as tqdm_std
 import numpy as np
+
+tqdm_std.monitor_interval = 0  # disable background monitoring thread
 
 
 class Callback(ABC):
@@ -135,50 +156,50 @@ class LogfileCallback(TextProgressCallback):
     def __init__(self, log_file, mode='a', **kwargs):
         self.fd = open(log_file, mode=mode)
         super().__init__(file=self.fd, **kwargs)
-        
+
 class EarlyStoppingObjectiveValue(Callback):
     '''Callback that stops iterations if the change in the objective value is less than a provided threshold value.
 
     Parameters
     ----------
-    threshold: float, default 1e-6 
+    threshold: float, default 1e-6
 
     Note
     -----
     This callback only compares the last two calculated objective values. If `update_objective_interval` is greater than 1, the objective value is not calculated at each iteration (which is the default behaviour), only every `update_objective_interval` iterations.
-    
+
     '''
     def __init__(self, threshold=1e-6):
         self.threshold=threshold
-    
-    
+
+
     def __call__(self, algorithm):
         if len(algorithm.loss)>=2:
             if np.abs(algorithm.loss[-1]-algorithm.loss[-2])<self.threshold:
                 raise StopIteration
-                
+
 class CGLSEarlyStopping(Callback):
-    '''Callback to work with CGLS. It causes the algorithm to terminate if  :math:`||A^T(Ax-b)||_2 < \epsilon||A^T(Ax_0-b)||_2` where `epsilon` is set to default as '1e-6', :math:`x` is the current iterate and :math:`x_0` is the initial value. 
-    It will also terminate if the algorithm begins to diverge i.e. if :math:`||x||_2> \omega`, where `omega` is set to default as 1e6. 
-    
+    '''Callback to work with CGLS. It causes the algorithm to terminate if  :math:`||A^T(Ax-b)||_2 < \epsilon||A^T(Ax_0-b)||_2` where `epsilon` is set to default as '1e-6', :math:`x` is the current iterate and :math:`x_0` is the initial value.
+    It will also terminate if the algorithm begins to diverge i.e. if :math:`||x||_2> \omega`, where `omega` is set to default as 1e6.
+
     Parameters
     ----------
-    epsilon: float, default 1e-6 
+    epsilon: float, default 1e-6
         Usually a small number: the algorithm to terminate if :math:`||A^T(Ax-b)||_2 < \epsilon||A^T(Ax_0-b)||_2`
-    omega: float, default 1e6 
+    omega: float, default 1e6
         Usually a large number: the algorithm will terminate if  :math:`||x||_2> \omega`
-        
+
     Note
     -----
-    This callback is implemented to replicate the automatic behaviour of CGLS in CIL versions <=24. It also replicates the behaviour of https://web.stanford.edu/group/SOL/software/cgls/. 
+    This callback is implemented to replicate the automatic behaviour of CGLS in CIL versions <=24. It also replicates the behaviour of https://web.stanford.edu/group/SOL/software/cgls/.
     '''
     def __init__(self, epsilon=1e-6, omega=1e6):
         self.epsilon=epsilon
         self.omega=omega
-    
-    
+
+
     def __call__(self, algorithm):
-        
+
         if (algorithm.norms <= algorithm.norms0 * self.epsilon):
             print('The norm of the residual is less than {} times the norm of the initial residual and so the algorithm is terminated'.format(self.epsilon))
             raise StopIteration
@@ -186,5 +207,3 @@ class CGLSEarlyStopping(Callback):
         if algorithm.normx >= self.omega:
             print('The norm of the solution is greater than {} and so the algorithm is terminated'.format(self.omega))
             raise StopIteration
-            
-        

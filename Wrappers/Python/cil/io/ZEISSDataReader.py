@@ -16,22 +16,15 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Andrew Shartis (UES, Inc.)
-
-
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
 from cil.framework.labels import AngleUnit, AcquisitionDimension, ImageDimension
 import numpy as np
 import os
-import olefile
 import logging
-dxchange_logger = logging.getLogger('dxchange')
-dxchange_logger.setLevel(logging.ERROR)
-
-import dxchange
 import warnings
 
 
-class ZEISSDataReader(object):
+class ZEISSDataReader:
 
     '''
     Create a reader for ZEISS files
@@ -162,6 +155,10 @@ class ZEISSDataReader(object):
             self._setup_image_geometry()
 
     def read_metadata(self):
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "pkg_resources is deprecated", UserWarning)
+            import dxchange
+        import olefile
         # Read one image to get the metadata
         _,metadata = dxchange.read_txrm(self.file_name,((0,1),(None),(None)))
 
@@ -258,6 +255,9 @@ class ZEISSDataReader(object):
         '''
         Reads projections and return Acquisition (TXRM) or Image (TXM) Data container
         '''
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "pkg_resources is deprecated", UserWarning)
+            import dxchange
         # Load projections or slices from file
         slice_range = None
         if self._roi:
@@ -273,7 +273,7 @@ class ZEISSDataReader(object):
                     (int(self._metadata['x-shifts'][num]),int(self._metadata['y-shifts'][num])), \
                     axis=(1,0))
 
-            acq_data = AcquisitionData(array=data, deep_copy=False, geometry=self._geometry.copy(),suppress_warning=True)
+            acq_data = AcquisitionData(array=data, deep_copy=False, geometry=self._geometry.copy())
             return acq_data
         else:
             ig_data = ImageData(array=data, deep_copy=False, geometry=self._geometry.copy())

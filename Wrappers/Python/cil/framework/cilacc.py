@@ -15,19 +15,13 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Joshua DM Hellier (University of Manchester) [refactorer]
 import ctypes
-import platform
-from ctypes import util
-# check for the extension
+from importlib.metadata import distribution
 
-if platform.system() == 'Linux':
-    dll = 'libcilacc.so'
-elif platform.system() == 'Windows':
-    dll_file = 'cilacc.dll'
-    dll = util.find_library(dll_file)
-elif platform.system() == 'Darwin':
-    dll = 'libcilacc.dylib'
-else:
-    raise ValueError('Not supported platform, ', platform.system())
-
-cilacc = ctypes.cdll.LoadLibrary(dll)
+try:
+    dist = distribution("cil").locate_file("cil/lib")
+    cilacc_path = next(dist.glob("*cilacc.*"))
+except StopIteration:
+    raise FileNotFoundError("cilacc library not found")
+cilacc = ctypes.cdll.LoadLibrary(str(cilacc_path))

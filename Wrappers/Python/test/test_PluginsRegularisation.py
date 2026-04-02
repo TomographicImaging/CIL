@@ -290,11 +290,19 @@ class TestPlugin(unittest.TestCase):
 
         # Isotropic FGP_TV CCPiReg toolkit (gpu)
         TV_regtoolkit_gpu_iso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'gpu')
-        res_TV_regtoolkit_gpu_iso = TV_regtoolkit_gpu_iso.proximal(self.data, tau=1.0)
+        try:
+            res_TV_regtoolkit_gpu_iso = TV_regtoolkit_gpu_iso.proximal(self.data, tau=1.0)
+        except TypeError as te:
+            if str(te) == "'NoneType' object is not callable":
+                raise TypeError("GPU code is not available. Please check the ccpi-regulariser version: if installed via conda it should have 'cuda' in the package name.")
 
         # Anisotropic FGP_TV CCPiReg toolkit (gpu)
         TV_regtoolkit_gpu_aniso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'gpu', isotropic=False)
-        res_TV_regtoolkit_gpu_aniso = TV_regtoolkit_gpu_aniso.proximal(self.data, tau=1.0)
+        try:
+            res_TV_regtoolkit_gpu_aniso = TV_regtoolkit_gpu_aniso.proximal(self.data, tau=1.0)
+        except TypeError as te:
+            if str(te) == "'NoneType' object is not callable":
+                raise TypeError("GPU code is not available. Please check the ccpi-regulariser version: if installed via conda it should have 'cuda' in the package name.")
 
         # Anisotropic FGP_TV CCPiReg toolkit (cpu)
         TV_regtoolkit_cpu_aniso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'cpu', isotropic=False)

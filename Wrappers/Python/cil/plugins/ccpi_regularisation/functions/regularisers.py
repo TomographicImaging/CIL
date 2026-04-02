@@ -31,6 +31,16 @@ import warnings
 from numbers import Number
 
 class RegulariserFunction(Function):
+
+    def __init__(self, device='cpu'):
+        self.device = device
+        if device == 'gpu':
+            from ccpi.filters.utils import cilregcuda
+            has_ccpi_regularisation_cuda = False if cilregcuda is None else True
+            if not has_ccpi_regularisation_cuda:
+                raise ValueError("GPU code is not available. Please check the ccpi-regulariser version: if installed via conda it should have 'cuda' in the package name, or select device='cpu'.")
+        super(RegulariserFunction, self).__init__()
+
     def proximal(self, x, tau, out=None):
 
         r""" Generic proximal method for a RegulariserFunction
@@ -111,9 +121,10 @@ class TV_Base(RegulariserFunction):
 
     """
 
-    def __init__(self, strong_convexity_constant = 0):
+    def __init__(self, strong_convexity_constant = 0, device='cpu'):
 
         self.strong_convexity_constant = strong_convexity_constant
+        super(TV_Base, self).__init__(device=device)
 
     def __call__(self,x):
         in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
@@ -226,7 +237,7 @@ class FGP_TV(TV_Base):
         self.nonnegativity = nonnegativity
         self.device = device
 
-        super(FGP_TV, self).__init__(strong_convexity_constant=strong_convexity_constant)
+        super(FGP_TV, self).__init__(strong_convexity_constant=strong_convexity_constant, device=device)
 
     def _fista_on_dual_rof(self, in_arr, tau):
 
@@ -305,6 +316,8 @@ class TGV(RegulariserFunction):
         if kwargs.get('iter_TGV', None) is not None:
             # raise ValueError('iter_TGV parameter has been superseded by num_iter. Use that instead.')
             self.num_iter = kwargs.get('iter_TGV')
+        
+        super(TGV, self).__init__(device=device)
 
     def __call__(self,x):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
@@ -408,6 +421,8 @@ class FGP_dTV(RegulariserFunction):
         self.reference = np.asarray(reference.as_array(), dtype=np.float32)
         self.eta = eta
 
+        super(FGP_dTV, self).__init__(device=device)
+
     def __call__(self,x):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
@@ -463,6 +478,8 @@ class TNV(RegulariserFunction):
         self.alpha = alpha
         self.max_iteration = max_iteration
         self.tolerance = tolerance
+
+        super(TNV, self).__init__(device='cpu')
 
     def __call__(self,x):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))

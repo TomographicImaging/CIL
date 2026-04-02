@@ -22,13 +22,14 @@ from cil.utilities import dataexample
 from cil.optimisation.functions import TotalVariation
 from cil.framework import ImageGeometry
 
-from utils import has_nvidia, has_ccpi_regularisation, initialise_tests
+from utils import has_nvidia, has_ccpi_regularisation, has_ccpi_regularisation_cuda, initialise_tests
 
 initialise_tests()
 
 if has_ccpi_regularisation:
     from ccpi.filters import regularisers
     from cil.plugins.ccpi_regularisation.functions import FGP_TV, TGV, FGP_dTV, TNV
+    
 
 
 
@@ -278,7 +279,7 @@ class TestPlugin(unittest.TestCase):
         np.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_cpu_iso.array, decimal=3)
         np.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_cpu_aniso.array, decimal=3)
 
-    @unittest.skipUnless(has_ccpi_regularisation and has_nvidia, "Skipping as CCPi Regularisation Toolkit is not installed")
+    @unittest.skipUnless(has_ccpi_regularisation and has_nvidia and has_ccpi_regularisation_cuda, "Skipping as CCPi Regularisation Toolkit CUDA is not installed")
     def test_TotalVariation_vs_FGP_TV_gpu(self):
         # Isotropic TV cil
         TV_cil_iso = self.alpha * TotalVariation(max_iteration=self.iterations, warm_start=False)
@@ -290,20 +291,12 @@ class TestPlugin(unittest.TestCase):
 
         # Isotropic FGP_TV CCPiReg toolkit (gpu)
         TV_regtoolkit_gpu_iso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'gpu')
-        try:
-            res_TV_regtoolkit_gpu_iso = TV_regtoolkit_gpu_iso.proximal(self.data, tau=1.0)
-        except TypeError as te:
-            if str(te) == "'NoneType' object is not callable":
-                raise TypeError("GPU code is not available. Please check the ccpi-regulariser version: if installed via conda it should have 'cuda' in the package name.")
-
+        res_TV_regtoolkit_gpu_iso = TV_regtoolkit_gpu_iso.proximal(self.data, tau=1.0)
+        
         # Anisotropic FGP_TV CCPiReg toolkit (gpu)
         TV_regtoolkit_gpu_aniso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'gpu', isotropic=False)
-        try:
-            res_TV_regtoolkit_gpu_aniso = TV_regtoolkit_gpu_aniso.proximal(self.data, tau=1.0)
-        except TypeError as te:
-            if str(te) == "'NoneType' object is not callable":
-                raise TypeError("GPU code is not available. Please check the ccpi-regulariser version: if installed via conda it should have 'cuda' in the package name.")
-
+        res_TV_regtoolkit_gpu_aniso = TV_regtoolkit_gpu_aniso.proximal(self.data, tau=1.0)
+        
         # Anisotropic FGP_TV CCPiReg toolkit (cpu)
         TV_regtoolkit_cpu_aniso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'cpu', isotropic=False)
         res_TV_regtoolkit_cpu_aniso = TV_regtoolkit_cpu_aniso.proximal(self.data, tau=1.0)

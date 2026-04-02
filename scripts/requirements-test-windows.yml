@@ -15,15 +15,15 @@ name: cil_dev
 channels:
   - conda-forge
   - nvidia
-  - https://software.repos.intel.com/python/conda
+  - https://tomography.stfc.ac.uk/conda
 dependencies:
   - python >=3.10
-  - numpy >=1.23,<2
+  - numpy >=1.23,<3
   - ccpi::cil-data >=22
-  - ccpi::tigre 2.6
-  - ccpi::ccpi-regulariser 24.0.1
-  - ccpi::tomophantom 2.0.0
-  - astra-toolbox 2.1 cuda*
+  - ccpi/label/dev::tigre 3.1.*
+  - ccpi::ccpi-regulariser * cuda*
+  - httomo::tomophantom 3.*
+  - astra-toolbox::astra-toolbox 2.*
   - cvxpy
   - python-wget
   - scikit-image

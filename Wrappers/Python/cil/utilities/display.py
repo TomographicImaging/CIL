@@ -785,7 +785,7 @@ class _ShowGeometry(object):
         world_limits = self.ax.get_w_lims()
         self.ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
-        l = self.ax.plot(np.NaN, np.NaN, '-', color='none', label='')[0]
+        l = self.ax.plot(np.nan, np.nan, '-', color='none', label='')[0]
 
         for i in range(3):
             self.handles.insert(2,l)

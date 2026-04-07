@@ -214,7 +214,7 @@ class FGP_TV(TV_Base):
 
         if nonnegativity is None: # Deprecate this warning in future versions and allow nonnegativity to be default False in the init.
             warnings.warn('Note that the default behaviour now sets the nonnegativity constraint to False ', UserWarning, stacklevel=2)
-            nonnegativity=False
+            self.nonnegativity=False
         if nonnegativity == True:
             self.nonnegativity = 1
         else:
@@ -223,7 +223,7 @@ class FGP_TV(TV_Base):
         self.alpha = alpha
         self.max_iteration = max_iteration
         self.tolerance = tolerance
-        self.nonnegativity = nonnegativity
+        #self.nonnegativity = nonnegativity
         self.device = device
 
         super(FGP_TV, self).__init__(strong_convexity_constant=strong_convexity_constant)

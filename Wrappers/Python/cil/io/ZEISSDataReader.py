@@ -16,6 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Andrew Shartis (UES, Inc.)
+
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
 from cil.framework.labels import AngleUnit, AcquisitionDimension, ImageDimension
 import numpy as np
@@ -78,14 +79,27 @@ class ZEISSDataReader:
             dictionary with roi to load for each axis:
             ``{'axis_labels_1': (start, end, step),'axis_labels_2': (start, end, step)}``.
             ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.
+            This accepts negative indexing.
 
         Notes
         -----
         `roi` behaviour:
+            The indices provided are start inclusive, stop exclusive.
+
             ``'axis_label': -1`` is a shortcut to load all elements along axis.
 
             ``start`` and ``end`` can be specified as ``None`` which is equivalent
             to ``start = 0`` and ``end = load everything to the end``, respectively.
+
+            The ROI accepts negative indexing. i.e. {'axis_name1':(10, -10)} will 
+            crop the dimension symmetrically
+            The following two examples are equivalent, if the size of the horizontal dimension is 2000:
+
+            >>> reader1 = ZeissDataReader(file_name, roi={'horizontal': (10, -10)})
+
+            >>> reader2 = ZeissDataReader(file_name, roi={'horizontal': (10, 1990)})
+
+            For more info on negative indexing in python see: https://numpy.org/doc/stable/user/basics.indexing.html
 
             **Acquisition Data**
 

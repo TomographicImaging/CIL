@@ -108,7 +108,7 @@ if module_info is None:
 else:
     has_ccpi_regularisation = True
     from ccpi.filters.utils import cilregcuda
-    has_ccpi_regularisation_cuda = False if cilregcuda is None else True
+    has_ccpi_regularisation_cuda = cilregcuda is not None
 
 system_state['has_ccpi_regularisation']= has_ccpi_regularisation
 system_state['has_ccpi_regularisation_cuda']= has_ccpi_regularisation_cuda

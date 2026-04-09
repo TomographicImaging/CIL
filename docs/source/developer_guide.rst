@@ -185,12 +185,13 @@ Install Visual Studio Community (or higher) and select the **Desktop development
 If you are developing on Windows with conda, you need to have access to both the Visual Studio compiler and the conda environment. 
 
 You can achieve this in two ways:
+
 1. by opening a "Developer Command Prompt for Visual Studio" and activating the conda environment from there. This requires you 
-to know the path to the `conda.bat` file, which is typically located in the `condabin` subdirectory of your conda installation. 
-Once located you need to run `<path_to>\conda.bat activate <env_name>` to activate the conda environment, and then you can run the build command from there.
-2. by opening the conda prompt and running the `vcvarsall.bat x64` file from the Visual Studio installation (with `x64` argument). 
-This requires you to know the path to the `vcvarsall.bat` file, 
-which is typically located in the `VC/Auxiliary/Build` subdirectory of your Visual Studio installation.
+   to know the path to the ``conda.bat`` file, which is typically located in the ``condabin`` subdirectory of your conda installation. 
+   Once located you need to run ``<path_to>\conda.bat activate <env_name>`` to activate the conda environment, and then you can run the build command from there.
+2. by opening the conda prompt and running the ``vcvarsall.bat x64`` file from the Visual Studio installation (with ``x64`` argument). 
+   This requires you to know the path to the ``vcvarsall.bat`` file, 
+   which is typically located in the ``VC/Auxiliary/Build`` subdirectory of your Visual Studio installation.
 
 Building documentation locally
 ------------------------------

@@ -1528,9 +1528,7 @@ class TestTotalVariation(unittest.TestCase):
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not initially set to zero")
         test=tv.proximal(data, 1.)
-        print(test)
         a=np.sum(np.linalg.norm(test))
-        print(np.linalg.norm(test))
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_equal(np.any(np.not_equal(x.as_array(), checkp2[i].as_array())), True, err_msg="The stored value of p2 doesn't change after calling proximal")
         np.testing.assert_almost_equal(np.sum(np.linalg.norm(test)),126.3372581, err_msg="Incorrect value of the proximal", decimal=4)
@@ -1858,26 +1856,22 @@ class TestIndicatorBox(unittest.TestCase):
         im = ig.allocate(2)
         ib = IndicatorBox(lower=-2 * mask, accelerated=accelerated)
         for val, res in zip([2, -3], [0, np.inf]):
-            print("test1", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
         im = ig.allocate(2)
         ib = IndicatorBox(lower=-2 * mask, upper=None, accelerated=accelerated)
         for val, res in zip([2, -3], [0, np.inf]):
-            print("test1", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
         im = ig.allocate(2)
         ib = IndicatorBox(upper=2 * mask, accelerated=accelerated)
         for val, res in zip([-1, 3], [0, np.inf]):
-            print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
         ib = IndicatorBox(upper=2 * mask, lower=None, accelerated=accelerated)
         for val, res in zip([-1, 3], [0, np.inf]):
-            print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
@@ -1885,7 +1879,6 @@ class TestIndicatorBox(unittest.TestCase):
                           lower=-2 * mask,
                           accelerated=accelerated)
         for val, res in zip([-1, 1, 3], [np.inf, np.inf, np.inf]):
-            print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
@@ -1905,7 +1898,6 @@ class TestIndicatorBox(unittest.TestCase):
         ib = IndicatorBox(lower=-2 * mask, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([2, -3], [0, 0]):
-            print("test1", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
@@ -1913,14 +1905,12 @@ class TestIndicatorBox(unittest.TestCase):
         ib = IndicatorBox(upper=2 * mask, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([-1, 3], [0, 0]):
-            print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
         ib = IndicatorBox(lower=-2 * mask, upper=None, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([2, -3], [0, 0]):
-            print("test1", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
@@ -1928,7 +1918,6 @@ class TestIndicatorBox(unittest.TestCase):
         ib = IndicatorBox(upper=2 * mask, lower=None, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([-1, 3], [0, 0]):
-            print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
@@ -1937,7 +1926,6 @@ class TestIndicatorBox(unittest.TestCase):
                           accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([-1, 1, 3], [0, 0, 0]):
-            print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
@@ -1965,7 +1953,6 @@ class TestIndicatorBox(unittest.TestCase):
         ib = IndicatorBox(upper=2 * mask, accelerated=accelerated)
         for val, res in zip([-1, 3], [ig.allocate(-1), 2 * mask]):
             # log.info("test1 %r %r", val, res)
-            print("test2", val, res)
             im.fill(val)
             np.testing.assert_allclose(
                 ib.proximal(im, 1).as_array(), res.as_array())
@@ -1975,7 +1962,6 @@ class TestIndicatorBox(unittest.TestCase):
                           lower=-2 * mask,
                           accelerated=accelerated)
         for val, res in zip([-1, -3, 1], [-1 * mask, -2 * mask, 1 * mask]):
-            print("test3", val, res)
             im.fill(val)
             np.testing.assert_allclose(
                 ib.proximal(im, 1).as_array(), res.as_array())

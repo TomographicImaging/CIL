@@ -13,7 +13,7 @@ test:
   requires:
     - pip
     - python-wget
-    - cvxpy                   # [linux]
+    - cvxpy <= 1.7.5                  # [linux]
     - scikit-image
     - tomophantom 2.0.0       # [linux]
     - tigre 2.6

@@ -16,6 +16,7 @@
     - cvxpy maximum version set to 1.7.5 to fix #2303 (#2304)
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
+    - Update on build instructions in README and developer guide for all OS
   - Enhancements:
     - Add prefix argument to TIFFStackReader to load a subset of TIFF files in
     a folder (#2239)

@@ -17,7 +17,120 @@ Developers' Guide
 *****************
 
 CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adhere to the following conventions. New additions must comply with
-the following.
+the conventions and documentation guidelines described in this section.
+
+Building CIL from source code
+==============================
+
+Getting the code
+^^^^^^^^^^^^^^^^
+
+In case of local development and testing it is useful to be able to build the software directly. 
+You should first clone this repository as:
+
+.. code:: sh
+
+   git clone git@github.com:TomographicImaging/CIL
+
+The parameter ``--depth 1`` can be added to create a shallow clone with a history truncated to the specified number of commits reducing the size of the clone.
+See `git documentation <https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---depthdepth>`_
+
+
+Building with ``pip``
+^^^^^^^^^^^^^^^^^^^^^
+
+Install Dependencies
+""""""""""""""""""
+
+We suggest creating a conda environment with all the dependencies for building CIL using the appropriate command for your operating system:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 65 15
+
+   * - OS
+     - Command
+     - Status
+   * - Linux
+     - ``conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml``
+     - Tested
+   * - Windows
+     - ``conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml``
+     - Tested
+   * - MacOS (ARM)
+     - ``conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development_osx.yml``
+     - Experimental
+
+.. note::
+   Currently only Linux and Windows are tested and supported. The support on MacOS (ARM) is experimental and certain features are not available and not working, such as FFT filtering for FDK.
+
+Build CIL
+""""""""
+
+A C++ compiler is required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
+
+
+.. code:: sh
+
+   pip install -e .
+
+.. note::
+   You need to have a **working compiler** on your system, such as Visual Studio on Windows, GCC on Linux and XCode on MacOS.
+
+
+If not installing inside a conda environment, then the user might need to set the locations of optional libraries:
+
+.. code:: sh
+
+   pip install -e . -Ccmake.define.IPP_ROOT="<path_to_ipp>" -Ccmake.define.OpenMP_ROOT="<path_to_openmp>" -Ccmake.define.CMAKE_BUILD_TYPE=RelWithDebInfo
+
+Notes for Windows users
+""""""""""""""""
+One option for development on Windows is using `WSL <https://learn.microsoft.com/en-us/windows/wsl/install#change-the-default-linux-distribution-installed>`_
+Launch WSL and install build-essential using:
+
+.. code:: sh
+   apt install build-essential
+
+This will enable you to then follow the linux instructions for creating the environment and building CIL.
+
+Alternatively, to use Windows itself...
+
+Install Visual Studio Community (or higher) and select the **Desktop development with C++** workload.
+
+If you are developing on Windows with conda, you need to have access to both the Visual Studio compiler and have created the conda environment using the command for Windows above. 
+
+You can achieve this in two ways:
+
+1. by opening a "Developer Command Prompt for Visual Studio" and activating the conda environment from there. This requires you 
+   to know the path to the ``conda.bat`` file, which is typically located in the ``condabin`` subdirectory of your conda installation. 
+   Once located you need to run ``<path_to>\conda.bat activate <env_name>`` to activate the conda environment, and then you can run the build command from there.
+2. by opening the conda prompt and running the ``vcvarsall.bat x64`` file from the Visual Studio installation (with ``x64`` argument), and then running the build command.
+   This requires you to know the path to the ``vcvarsall.bat`` file, 
+   which is typically located in the ``VC/Auxiliary/Build`` subdirectory of your Visual Studio installation.
+
+Note: we tested these instructions with Visual Studio 2026 version 18.1.1
+
+
+Building with Docker
+^^^^^^^^^^^^^^^^^^^^^
+In the repository root, simply update submodules and run ``docker build``:
+
+.. code:: sh
+
+   git submodule update --init --recursive
+   docker build . -t ghcr.io/tomographicimaging/cil
+
+
+Testing
+^^^^^^^
+Once installed, CIL functionality can be tested using the following command:
+
+.. code:: sh
+   
+   export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy
+   python -m unittest discover -v ./Wrappers/Python/test
+
 
 Conventions on new CIL objects
 ==============================
@@ -110,6 +223,7 @@ Rendered
 .. automethod:: cil.recon.FBP.FBP.run
 
 
+
 Building documentation locally
 ------------------------------
 
@@ -133,11 +247,11 @@ a HTTP server to view the documentation.
 
 Example:
 ::
-  git clone --recurse-submodule git@github.com:TomographicImaging/CIL
+  git clone git@github.com:TomographicImaging/CIL
   cd CIL
-  sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
+  conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml
   conda activate ENVIRONMENT_NAME
-  pip install .
+  pip install -e .
   cd docs
   conda update -n base -c defaults conda
   conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME

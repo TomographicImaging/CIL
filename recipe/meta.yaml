@@ -13,7 +13,7 @@ test:
   requires:
     - pip
     - python-wget
-    - cvxpy                   # [linux]
+    - cvxpy <= 1.7.5                  # [linux]
     - scikit-image
     - tomophantom 2.0.0       # [linux]
     - tigre 2.6
@@ -22,7 +22,7 @@ test:
     - astra-toolbox 2.1 {{ 'cuda*' if environ.get('TESTS_FORCE_GPU', '') else 'py*' }}
     - matplotlib-base >=3.3
     - zenodo_get >=1.6
-    - dxchange
+    - dxchange >= 0.2.1
     - olefile >=0.46
 
   source_files:

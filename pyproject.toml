@@ -42,7 +42,7 @@ readme = "README.md"
 keywords = ["tomography", "optimisation"]
 dependencies = [
     #"cil-data>=22", # missing from PyPI
-    "dxchange",
+    "dxchange>=0.2.1",  # Minimal release for OLE dtype fix: https://github.com/data-exchange/dxchange/pull/124#issue-3828961474
     "h5py",
     #"ipp==2021.12.*", # PyPI conflicts with conda package
     "numba",
@@ -66,7 +66,7 @@ gpu = [
 [dependency-groups]
 test = [
     #"ccpi-regulariser=24.0.1", # [not osx] # missing from PyPI
-    "cvxpy",
+    "cvxpy<=1.7.5",
     "matplotlib-base>=3.3",
     "packaging",
     "scikit-image",

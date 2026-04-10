@@ -242,11 +242,11 @@ a HTTP server to view the documentation.
 
 Example:
 ::
-  git clone --recurse-submodule git@github.com:TomographicImaging/CIL
+  git clone git@github.com:TomographicImaging/CIL
   cd CIL
-  sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
+  conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml
   conda activate ENVIRONMENT_NAME
-  pip install .
+  pip install -e .
   cd docs
   conda update -n base -c defaults conda
   conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME

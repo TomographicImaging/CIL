@@ -414,9 +414,6 @@ class Slicer(DataProcessor):
         else:
             new_geometry = None
 
-        print("New geometry: ", new_geometry)
-        print("Shape out: ", self._shape_out)
-
         # return if just acting on geometry
         if not self._data_array:
             return new_geometry
@@ -425,7 +422,6 @@ class Slicer(DataProcessor):
         if out is None:
             if new_geometry is not None:
                 data_out = new_geometry.allocate(None)
-                print("New geometry shape: ", data_out.shape)
             else:
                 processed_array = np.empty(self._shape_out,dtype=np.float32)
                 data_out = DataContainer(processed_array,False, self._labels_out)

@@ -25,7 +25,7 @@ dependencies:
   - ccpi::ccpi-regulariser 24.0.1
   - ccpi::tomophantom 2.0.0
   - astra-toolbox 2.1 cuda*
-  - cvxpy
+  - cvxpy <= 1.7.5
   - python-wget
   - scikit-image
   - packaging
@@ -39,7 +39,7 @@ dependencies:
   - matplotlib-base >=3.3
   - h5py
   - pillow
-  - dxchange
+  - dxchange >=0.2.1
   - olefile >=0.46
   - pywavelets
   - numba

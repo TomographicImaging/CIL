@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.io.NikonDataReader &#8212; CIL 25.0.1.dev29+g25c1ac831 documentation</title>
+    <title>cil.io.NikonDataReader &#8212; CIL 25.0.1.dev30+g5eb2e0277 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=a4e01486"></script>
+    <script src="../../../../_static/documentation_options.js?v=7cffca58"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev29+g25c1ac831';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev30+g5eb2e0277';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev29+g25c1ac831" />
+  <meta name="docsearch:version" content="25.0.1.dev30+g5eb2e0277" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -545,6 +545,8 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    `roi` behaviour:</span>
+<span class="sd">        The indices provided are start inclusive, stop exclusive.</span>
+
 <span class="sd">        Files are stacked along axis_0. axis_1 and axis_2 correspond</span>
 <span class="sd">        to row and column dimensions, respectively.</span>
 
@@ -558,7 +560,16 @@
 
 <span class="sd">        ``start`` and ``end`` can be specified as ``None`` which is equivalent</span>
 <span class="sd">        to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
-<span class="sd">        Start and end also can be negative.</span>
+<span class="sd">        Start and end also can be negative. i.e. {&#39;axis_name1&#39;:(10, -10)} will </span>
+<span class="sd">        crop the dimension symmetrically</span>
+
+<span class="sd">        The following two examples are equivalent, if the size of the horizontal dimension is 2000:</span>
+
+<span class="sd">        &gt;&gt;&gt; reader1 = NikonDataReader(file_name, roi={&#39;horizontal&#39;: (10, -10)})</span>
+
+<span class="sd">        &gt;&gt;&gt; reader2 = NikonDataReader(file_name, roi={&#39;horizontal&#39;: (10, 1990)})</span>
+
+<span class="sd">        For more info on negative indexing in python see: https://numpy.org/doc/stable/user/basics.indexing.html</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
 

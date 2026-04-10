@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Read/ write AcquisitionData and ImageData &#8212; CIL 25.0.1.dev29+g25c1ac831 documentation</title>
+    <title>Read/ write AcquisitionData and ImageData &#8212; CIL 25.0.1.dev30+g5eb2e0277 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=a4e01486"></script>
+    <script src="../_static/documentation_options.js?v=7cffca58"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev29+g25c1ac831';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev30+g5eb2e0277';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Framework" href="../framework/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev29+g25c1ac831" />
+  <meta name="docsearch:version" content="25.0.1.dev30+g5eb2e0277" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -728,7 +728,8 @@ Note: in general output array size in bin mode != output array size in slice mod
 </dl>
 <p class="rubric">Notes</p>
 <dl>
-<dt><cite>roi</cite> behaviour:</dt><dd><p>Files are stacked along axis_0. axis_1 and axis_2 correspond
+<dt><cite>roi</cite> behaviour:</dt><dd><p>The indices provided are start inclusive, stop exclusive.</p>
+<p>Files are stacked along axis_0. axis_1 and axis_2 correspond
 to row and column dimensions, respectively.</p>
 <p>Files are stacked in alphabetic order.</p>
 <p>To skip projections or to change number of projections to load,
@@ -737,7 +738,16 @@ will skip first 100 projections and will load 200 projections.</p>
 <p><code class="docutils literal notranslate"><span class="pre">'angle':</span> <span class="pre">-1</span></code> is a shortcut to load all elements along axis.</p>
 <p><code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> can be specified as <code class="docutils literal notranslate"><span class="pre">None</span></code> which is equivalent
 to <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">=</span> <span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">=</span> <span class="pre">load</span> <span class="pre">everything</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">end</span></code>, respectively.
-Start and end also can be negative.</p>
+Start and end also can be negative. i.e. {‘axis_name1’:(10, -10)} will
+crop the dimension symmetrically</p>
+<p>The following two examples are equivalent, if the size of the horizontal dimension is 2000:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader1</span> <span class="o">=</span> <span class="n">NikonDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">)})</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader2</span> <span class="o">=</span> <span class="n">NikonDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1990</span><span class="p">)})</span>
+</pre></div>
+</div>
+<p>For more info on negative indexing in python see: <a class="reference external" href="https://numpy.org/doc/stable/user/basics.indexing.html">https://numpy.org/doc/stable/user/basics.indexing.html</a></p>
 </dd>
 </dl>
 <dl class="py method">
@@ -781,18 +791,36 @@ and [‘vertical, ‘angle’, horizontal’] if more than 1 slice is loaded.</p
 <li><p><strong>file_name</strong> (<em>str</em>) – file name to read</p></li>
 <li><p><strong>roi</strong> (<em>dict</em><em>, </em><em>default None</em>) – dictionary with roi to load for each axis:
 <code class="docutils literal notranslate"><span class="pre">{'axis_labels_1':</span> <span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step),'axis_labels_2':</span> <span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step)}</span></code>.
-<code class="docutils literal notranslate"><span class="pre">axis_labels</span></code> are defined by ImageGeometry and AcquisitionGeometry dimension labels.</p></li>
+<code class="docutils literal notranslate"><span class="pre">axis_labels</span></code> are defined by ImageGeometry and AcquisitionGeometry dimension labels.
+This accepts negative indexing.</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
 <dl>
-<dt><cite>roi</cite> behaviour:</dt><dd><p>For ImageData to skip files or to change number of files to load,
-adjust <code class="docutils literal notranslate"><span class="pre">vertical</span></code>. E.g. <code class="docutils literal notranslate"><span class="pre">'vertical':</span> <span class="pre">(100,</span> <span class="pre">300)</span></code> will skip first 100 files
-and will load 200 files.</p>
+<dt><cite>roi</cite> behaviour:</dt><dd><p>The indices provided are start inclusive, stop exclusive.</p>
 <p><code class="docutils literal notranslate"><span class="pre">'axis_label':</span> <span class="pre">-1</span></code> is a shortcut to load all elements along axis.</p>
 <p><code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> can be specified as <code class="docutils literal notranslate"><span class="pre">None</span></code> which is equivalent
 to <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">=</span> <span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">=</span> <span class="pre">load</span> <span class="pre">everything</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">end</span></code>, respectively.</p>
+<p>The ROI accepts negative indexing. i.e. {‘axis_name1’:(10, -10)} will
+crop the dimension symmetrically
+The following two examples are equivalent, if the size of the horizontal dimension is 2000:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader1</span> <span class="o">=</span> <span class="n">ZeissDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">)})</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader2</span> <span class="o">=</span> <span class="n">ZeissDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1990</span><span class="p">)})</span>
+</pre></div>
+</div>
+<p>For more info on negative indexing in python see: <a class="reference external" href="https://numpy.org/doc/stable/user/basics.indexing.html">https://numpy.org/doc/stable/user/basics.indexing.html</a></p>
+<p><strong>Acquisition Data</strong></p>
+<p>The axis labels in the <cite>roi</cite> dict for <cite>AcquisitionData</cite> will be:
+<code class="docutils literal notranslate"><span class="pre">{'angle':(...),'vertical':(...),'horizontal':(...)}</span></code></p>
+<p><strong>Image Data</strong></p>
+<p>The axis labels in the <cite>roi</cite> dict for <cite>ImageData</cite> will be:
+<code class="docutils literal notranslate"><span class="pre">{'angle':(...),'vertical':(...),'horizontal':(...)}</span></code></p>
+<p>To skip files or to change number of files to load,
+adjust <code class="docutils literal notranslate"><span class="pre">vertical</span></code>. E.g. <code class="docutils literal notranslate"><span class="pre">'vertical':</span> <span class="pre">(100,</span> <span class="pre">300)</span></code> will skip first 100 files
+and will load 200 files.</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -805,26 +833,13 @@ to <code class="docutils literal notranslate"><span class="pre">start</span> <sp
 <li><p><strong>file_name</strong> (<em>str</em>) – file name to read</p></li>
 <li><p><strong>roi</strong> (<em>dict</em><em>, </em><em>default None</em>) – dictionary with roi to load for each axis:
 <code class="docutils literal notranslate"><span class="pre">{'axis_labels_1':</span> <span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step),'axis_labels_2':</span> <span class="pre">(start,</span> <span class="pre">end,</span> <span class="pre">step)}</span></code>.
-<code class="docutils literal notranslate"><span class="pre">axis_labels</span></code> are defined by ImageGeometry and AcquisitionGeometry dimension labels.</p></li>
+<code class="docutils literal notranslate"><span class="pre">axis_labels</span></code> are defined by ImageGeometry and AcquisitionGeometry dimension labels.
+This accepts negative indexing.</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<dl>
-<dt><cite>roi</cite> behaviour:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">'axis_label':</span> <span class="pre">-1</span></code> is a shortcut to load all elements along axis.</p>
-<p><code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> can be specified as <code class="docutils literal notranslate"><span class="pre">None</span></code> which is equivalent
-to <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">=</span> <span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">=</span> <span class="pre">load</span> <span class="pre">everything</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">end</span></code>, respectively.</p>
-<p><strong>Acquisition Data</strong></p>
-<p>The axis labels in the <cite>roi</cite> dict for <cite>AcquisitionData</cite> will be:
-<code class="docutils literal notranslate"><span class="pre">{'angle':(...),'vertical':(...),'horizontal':(...)}</span></code></p>
-<p><strong>Image Data</strong></p>
-<p>The axis labels in the <cite>roi</cite> dict for <cite>ImageData</cite> will be:
-<code class="docutils literal notranslate"><span class="pre">{'angle':(...),'vertical':(...),'horizontal':(...)}</span></code></p>
-<p>To skip files or to change number of files to load,
-adjust <code class="docutils literal notranslate"><span class="pre">vertical</span></code>. E.g. <code class="docutils literal notranslate"><span class="pre">'vertical':</span> <span class="pre">(100,</span> <span class="pre">300)</span></code> will skip first 100 files
-and will load 200 files.</p>
-</dd>
-</dl>
+<p>For more info on the parameters see the class docstring.</p>
 </dd></dl>
 
 <dl class="py method">

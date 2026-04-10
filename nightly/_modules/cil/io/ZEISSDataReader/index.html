@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.io.ZEISSDataReader &#8212; CIL 25.0.1.dev29+g25c1ac831 documentation</title>
+    <title>cil.io.ZEISSDataReader &#8212; CIL 25.0.1.dev30+g5eb2e0277 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=a4e01486"></script>
+    <script src="../../../../_static/documentation_options.js?v=7cffca58"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev29+g25c1ac831';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev30+g5eb2e0277';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev29+g25c1ac831" />
+  <meta name="docsearch:version" content="25.0.1.dev30+g5eb2e0277" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -505,6 +505,7 @@
 <span class="c1"># Authors:</span>
 <span class="c1"># CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt</span>
 <span class="c1"># Andrew Shartis (UES, Inc.)</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">ImageGeometry</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework.labels</span><span class="w"> </span><span class="kn">import</span> <span class="n">AngleUnit</span><span class="p">,</span> <span class="n">AcquisitionDimension</span><span class="p">,</span> <span class="n">ImageDimension</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -528,18 +529,41 @@
 <span class="sd">        dictionary with roi to load for each axis:</span>
 <span class="sd">        ``{&#39;axis_labels_1&#39;: (start, end, step),&#39;axis_labels_2&#39;: (start, end, step)}``.</span>
 <span class="sd">        ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.</span>
+<span class="sd">        This accepts negative indexing.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    `roi` behaviour:</span>
-<span class="sd">        For ImageData to skip files or to change number of files to load,</span>
-<span class="sd">        adjust ``vertical``. E.g. ``&#39;vertical&#39;: (100, 300)`` will skip first 100 files</span>
-<span class="sd">        and will load 200 files.</span>
+<span class="sd">        The indices provided are start inclusive, stop exclusive.</span>
 
 <span class="sd">        ``&#39;axis_label&#39;: -1`` is a shortcut to load all elements along axis.</span>
 
 <span class="sd">        ``start`` and ``end`` can be specified as ``None`` which is equivalent</span>
 <span class="sd">        to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
+
+<span class="sd">        The ROI accepts negative indexing. i.e. {&#39;axis_name1&#39;:(10, -10)} will </span>
+<span class="sd">        crop the dimension symmetrically</span>
+<span class="sd">        The following two examples are equivalent, if the size of the horizontal dimension is 2000:</span>
+
+<span class="sd">        &gt;&gt;&gt; reader1 = ZeissDataReader(file_name, roi={&#39;horizontal&#39;: (10, -10)})</span>
+
+<span class="sd">        &gt;&gt;&gt; reader2 = ZeissDataReader(file_name, roi={&#39;horizontal&#39;: (10, 1990)})</span>
+
+<span class="sd">        For more info on negative indexing in python see: https://numpy.org/doc/stable/user/basics.indexing.html</span>
+
+<span class="sd">        **Acquisition Data**</span>
+
+<span class="sd">        The axis labels in the `roi` dict for `AcquisitionData` will be:</span>
+<span class="sd">        ``{&#39;angle&#39;:(...),&#39;vertical&#39;:(...),&#39;horizontal&#39;:(...)}``</span>
+
+<span class="sd">        **Image Data**</span>
+
+<span class="sd">        The axis labels in the `roi` dict for `ImageData` will be:</span>
+<span class="sd">        ``{&#39;angle&#39;:(...),&#39;vertical&#39;:(...),&#39;horizontal&#39;:(...)}``</span>
+
+<span class="sd">        To skip files or to change number of files to load,</span>
+<span class="sd">        adjust ``vertical``. E.g. ``&#39;vertical&#39;: (100, 300)`` will skip first 100 files</span>
+<span class="sd">        and will load 200 files.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -571,28 +595,12 @@
 <span class="sd">            dictionary with roi to load for each axis:</span>
 <span class="sd">            ``{&#39;axis_labels_1&#39;: (start, end, step),&#39;axis_labels_2&#39;: (start, end, step)}``.</span>
 <span class="sd">            ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.</span>
-
+<span class="sd">            This accepts negative indexing.</span>
+<span class="sd">            </span>
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        `roi` behaviour:</span>
-<span class="sd">            ``&#39;axis_label&#39;: -1`` is a shortcut to load all elements along axis.</span>
+<span class="sd">        For more info on the parameters see the class docstring.</span>
 
-<span class="sd">            ``start`` and ``end`` can be specified as ``None`` which is equivalent</span>
-<span class="sd">            to ``start = 0`` and ``end = load everything to the end``, respectively.</span>
-
-<span class="sd">            **Acquisition Data**</span>
-
-<span class="sd">            The axis labels in the `roi` dict for `AcquisitionData` will be:</span>
-<span class="sd">            ``{&#39;angle&#39;:(...),&#39;vertical&#39;:(...),&#39;horizontal&#39;:(...)}``</span>
-
-<span class="sd">            **Image Data**</span>
-
-<span class="sd">            The axis labels in the `roi` dict for `ImageData` will be:</span>
-<span class="sd">            ``{&#39;angle&#39;:(...),&#39;vertical&#39;:(...),&#39;horizontal&#39;:(...)}``</span>
-
-<span class="sd">            To skip files or to change number of files to load,</span>
-<span class="sd">            adjust ``vertical``. E.g. ``&#39;vertical&#39;: (100, 300)`` will skip first 100 files</span>
-<span class="sd">            and will load 200 files.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="c1"># check if file exists</span>
@@ -624,17 +632,20 @@
 
             <span class="c1"># check roi labels and create tuple for slicing</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">roi</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">zeiss_data_order</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid roi key: </span><span class="si">{}</span><span class="s1">. Keys should be one of </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">zeiss_data_order</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
                 <span class="n">idx</span> <span class="o">=</span> <span class="n">zeiss_data_order</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">roi</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">roi</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
                         <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="k">continue</span>
-
                         <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span> <span class="c1">#start and stop</span>
-                            <span class="n">default_roi</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">default_roi</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span>
+                            <span class="n">adjusted_x</span> <span class="o">=</span> <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">default_roi</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span>
+                            <span class="k">if</span> <span class="n">adjusted_x</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">adjusted_x</span> <span class="o">&gt;</span> <span class="n">default_roi</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid roi value: </span><span class="si">{}</span><span class="s1"> for key: </span><span class="si">{}</span><span class="s1">. Values should be between -</span><span class="si">{}</span><span class="s1"> and </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default_roi</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">default_roi</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+                            <span class="n">default_roi</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">default_roi</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span>
                         <span class="k">else</span><span class="p">:</span> <span class="c1">#step</span>
                             <span class="n">default_roi</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span>  <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
-
             <span class="bp">self</span><span class="o">.</span><span class="n">_roi</span> <span class="o">=</span> <span class="n">default_roi</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slice_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>

@@ -132,7 +132,7 @@ The parameter `--depth 1` can be added to create a shallow clone with a history 
 
 #### Install Dependencies
 
-We suggest creating a conda environment with all the dependencies for building CIL running the following shell script depending on operating system:
+We suggest creating a conda environment with all the dependencies for building CIL using the appropriate command for your operating system:
 
 | OS | Command | Status |
 |----|----|----|
@@ -146,11 +146,10 @@ We suggest creating a conda environment with all the dependencies for building C
 
 #### Build CIL
 
-A C++ compiler is required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
+A C++ compiler is required to build the source code. Let's suppose that the user is in the source directory, then the following command should work:
 
 ```sh
 pip install -e .
-
 > [!NOTE]
 > You need to have a **working compiler** on your system, such as Visual Studio on Windows, GCC on Linux and XCode on MacOS.
 

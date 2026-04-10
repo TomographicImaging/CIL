@@ -16,9 +16,6 @@
 Developers' Guide
 *****************
 
-
-
-
 CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adhere to the following conventions. New additions must comply with
 the following.
 
@@ -131,7 +128,7 @@ Building with ``pip``
 Install Dependencies
 """"""""""""""""""
 
-We suggest creating a conda environment with all the dependencies for building CIL running the following shell script depending on operating system:
+We suggest creating a conda environment with all the dependencies for building CIL using the appropriate command for your operating system:
 
 .. list-table::
    :header-rows: 1
@@ -179,20 +176,27 @@ If not installing inside a conda environment, then the user might need to set th
 
 Notes for Windows users
 """"""""""""""""
+One option for development on Windows is using [WSL](:https://learn.microsoft.com/en-us/windows/wsl/install#change-the-default-linux-distribution-installed).
+Launch WSL and install build-essential using:
+``apt install build-essentials``
+This will enable you to then follow the linux instructions for creating the environment and building CIL.
+
+Alternatively, to use Windows itself...
 
 Install Visual Studio Community (or higher) and select the **Desktop development with C++** workload.
 
-If you are developing on Windows with conda, you need to have access to both the Visual Studio compiler and the conda environment. 
+If you are developing on Windows with conda, you need to have access to both the Visual Studio compiler and have created the conda environment using the command for Windows above. 
 
 You can achieve this in two ways:
 
 1. by opening a "Developer Command Prompt for Visual Studio" and activating the conda environment from there. This requires you 
    to know the path to the ``conda.bat`` file, which is typically located in the ``condabin`` subdirectory of your conda installation. 
    Once located you need to run ``<path_to>\conda.bat activate <env_name>`` to activate the conda environment, and then you can run the build command from there.
-2. by opening the conda prompt and running the ``vcvarsall.bat x64`` file from the Visual Studio installation (with ``x64`` argument). 
+2. by opening the conda prompt and running the ``vcvarsall.bat x64`` file from the Visual Studio installation (with ``x64`` argument), and then running the build command.
    This requires you to know the path to the ``vcvarsall.bat`` file, 
    which is typically located in the ``VC/Auxiliary/Build`` subdirectory of your Visual Studio installation.
 
+Note: we tested these instructions with Visual Studio 2026 version 18.1.1
 Building documentation locally
 ------------------------------
 

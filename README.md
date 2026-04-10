@@ -120,62 +120,7 @@ Jupyter Notebooks usage examples without any local installation are provided in 
 
 ## Building CIL from source code
 
-### Getting the code
-
-In case of development it is useful to be able to build the software directly. You should clone this repository as
-
-```sh
-git clone git@github.com:TomographicImaging/CIL
-```
-The parameter `--depth 1` can be added to create a shallow clone with a history truncated to the specified number of commits reducing the size of the clone, see [git documentation](https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---depthdepth). 
-### Building with `pip`
-
-#### Install Dependencies
-
-We suggest creating a conda environment with all the dependencies for building CIL using the appropriate command for your operating system:
-
-| OS | Command | Status |
-|----|----|----|
-| Linux | `conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml`| Tested |
-| Windows | `conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml`| Tested |
-| MacOS (ARM) | `conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development_osx.yml`| Experimental |
-
-> [!NOTE]
-> Currently only Linux and Windows are tested and supported. The support on MacOS (ARM) is experimental and certain features are not available/working, such as FFT filtering for FDK.
-
-
-#### Build CIL
-
-A C++ compiler is required to build the source code. Let's suppose that the user is in the source directory, then the following command should work:
-
-```sh
-pip install -e .
-> [!NOTE]
-> You need to have a **working compiler** on your system, such as Visual Studio on Windows, GCC on Linux and XCode on MacOS.
-
-If not installing inside a conda environment, then the user might need to set the locations of optional libraries:
-
-```sh
-pip install . -Ccmake.define.IPP_ROOT="<path_to_ipp>" -Ccmake.define.OpenMP_ROOT="<path_to_openmp>"
-```
-
-### Building with Docker
-
-In the repository root, simply update submodules and run `docker build`:
-
-```sh
-git submodule update --init --recursive
-docker build . -t ghcr.io/tomographicimaging/cil
-```
-
-### Testing
-
-Once installed, CIL functionality can be tested using the following command:
-
-```sh
-export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy
-python -m unittest discover -v ./Wrappers/Python/test
-```
+For instructions on how to build CIL from source code, please see our [Developers' Guide](https://tomographicimaging.github.io/CIL/nightly/developer_guide/)
 
 ## Citing CIL
 

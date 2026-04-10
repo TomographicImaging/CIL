@@ -116,11 +116,14 @@ Getting the code
 ^^^^^^^^^^^^^^^^
 
 In case of local development and testing it is useful to be able to build the software directly. 
-You should first clone this repository as
+You should first clone this repository as:
 
 .. code:: sh
 
    git clone git@github.com:TomographicImaging/CIL
+
+The parameter `--depth 1` can be added to create a shallow clone with a history truncated to the specified number of commits reducing the size of the clone, see [git documentation](https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---depthdepth). 
+### Building with `pip`
 
 Building with ``pip``
 ^^^^^^^^^^^^^^^^^^^^^
@@ -167,7 +170,6 @@ A C++ compiler is required to build the source code. Let's suppose that the user
    You need to have a **working compiler** on your system, such as Visual Studio on Windows, GCC on Linux and XCode on MacOS.
 
 
-
 If not installing inside a conda environment, then the user might need to set the locations of optional libraries:
 
 .. code:: sh
@@ -197,6 +199,26 @@ You can achieve this in two ways:
    which is typically located in the ``VC/Auxiliary/Build`` subdirectory of your Visual Studio installation.
 
 Note: we tested these instructions with Visual Studio 2026 version 18.1.1
+
+
+Building with Docker
+^^^^^^^^^^^^^^^^^^^^^
+In the repository root, simply update submodules and run `docker build`:
+
+.. code:: sh
+   git submodule update --init --recursive
+   docker build . -t ghcr.io/tomographicimaging/cil
+
+
+Testing
+^^^^^^^
+Once installed, CIL functionality can be tested using the following command:
+
+.. code:: sh
+   export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy
+   python -m unittest discover -v ./Wrappers/Python/test
+
+
 Building documentation locally
 ------------------------------
 

@@ -17,7 +17,10 @@ Developers' Guide
 *****************
 
 CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adhere to the following conventions. New additions must comply with
-the following.
+the conventions and documentation guidelines described in this section.
+
+
+
 
 Conventions on new CIL objects
 ==============================
@@ -110,7 +113,7 @@ Rendered
 .. automethod:: cil.recon.FBP.FBP.run
 
 Building CIL from source code
------------------------------
+==============================
 
 Getting the code
 ^^^^^^^^^^^^^^^^
@@ -122,8 +125,9 @@ You should first clone this repository as:
 
    git clone git@github.com:TomographicImaging/CIL
 
-The parameter `--depth 1` can be added to create a shallow clone with a history truncated to the specified number of commits reducing the size of the clone, see [git documentation](https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---depthdepth). 
-### Building with `pip`
+The parameter ``--depth 1`` can be added to create a shallow clone with a history truncated to the specified number of commits reducing the size of the clone.
+See `git documentation <https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---depthdepth>`_
+
 
 Building with ``pip``
 ^^^^^^^^^^^^^^^^^^^^^
@@ -158,11 +162,8 @@ Build CIL
 
 A C++ compiler is required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
 
-.. list-table::
-   :header-rows: 1
-   :widths: 20 80
 
-.. code::sh
+.. code:: sh
 
    pip install -e .
 
@@ -178,9 +179,12 @@ If not installing inside a conda environment, then the user might need to set th
 
 Notes for Windows users
 """"""""""""""""
-One option for development on Windows is using [WSL](:https://learn.microsoft.com/en-us/windows/wsl/install#change-the-default-linux-distribution-installed).
+One option for development on Windows is using `WSL <https://learn.microsoft.com/en-us/windows/wsl/install#change-the-default-linux-distribution-installed>`_
 Launch WSL and install build-essential using:
-``apt install build-essentials``
+
+.. code:: sh
+   apt install build-essential
+
 This will enable you to then follow the linux instructions for creating the environment and building CIL.
 
 Alternatively, to use Windows itself...
@@ -203,9 +207,10 @@ Note: we tested these instructions with Visual Studio 2026 version 18.1.1
 
 Building with Docker
 ^^^^^^^^^^^^^^^^^^^^^
-In the repository root, simply update submodules and run `docker build`:
+In the repository root, simply update submodules and run ``docker build``:
 
 .. code:: sh
+
    git submodule update --init --recursive
    docker build . -t ghcr.io/tomographicimaging/cil
 
@@ -215,6 +220,7 @@ Testing
 Once installed, CIL functionality can be tested using the following command:
 
 .. code:: sh
+   
    export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy
    python -m unittest discover -v ./Wrappers/Python/test
 

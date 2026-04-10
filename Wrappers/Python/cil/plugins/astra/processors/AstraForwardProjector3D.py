@@ -15,6 +15,8 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Willem Jan Palenstijn (Universiteit Leiden)
+
 from cil.framework import DataProcessor, AcquisitionData
 from cil.framework.labels import ImageDimension, AcquisitionDimension
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_3D

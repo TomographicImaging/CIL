@@ -19,6 +19,7 @@
   - Enhancements:
     - Add prefix argument to TIFFStackReader to load a subset of TIFF files in
     a folder (#2239)
+    - Update ASTRA interface to `direct_FP3D/BP3D` removing copies for GPU `ProjectionOperator` calls (#2134)
 
 * 25.0.0
   - New features:

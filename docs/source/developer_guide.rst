@@ -19,99 +19,6 @@ Developers' Guide
 CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adhere to the following conventions. New additions must comply with
 the conventions and documentation guidelines described in this section.
 
-
-
-
-Conventions on new CIL objects
-==============================
-
-For each class there are **essential**, and **non-essential** parameters. The non-essential can be further be divided in **often configured** and **advanced** parameters:
-
-* essential
-* non-essential
-
-  * often-configured
-  * advanced
-
-The definition of what are the essential, often-configured and advanced parameters depends on the actual class.
-
-Creator
--------
-
-To create an instance of a class, the creator of a class should require the **essential** and **often-configured** parameters as named parameters.
-
-It should not accept positional arguments `*args` or key-worded arguments `**kwargs` so that the user can clearly understand what parameters are necessary to
-create the instance.
-
-Setter methods and properties
------------------------------
-
-Use of `property` is favoured instead of class members to store parameters so that the parameters can be protected.
-
-The class should provide setter methods to change all the parameters at any time. Setter methods to set multiple parameters at the same time is also accepted.
-Setter methods should be named `set_<parameter>`. The use of `set_` helps IDEs and user to find what they should change in an instance of a class.
-
-
-Other methods
--------------
-
-Methods that are not meant to be used by the user should have a `_` (underscore) at the beginning of the name.
-All methods should follow the convention of small caps underscore separated words.
-
-Logging and warning
-===================
-We follow pythons convention on logging (see e.g. https://docs.python.org/3/howto/logging.html). In particular:
-
-.. list-table:: Logging and warning guidelines
-   :header-rows: 1
-   :widths: 40 60
-
-   * - Task you want to perform
-     - The best tool for the task
-   * - Display console output for ordinary usage of a command line script or program
-     - ``print()``
-   * - Report events that occur during normal operation of a program
-       (e.g. for status monitoring or fault investigation)
-     - A logger’s ``info()`` (or ``debug()`` method for very detailed output for diagnostic purposes)
-   * - Issue a warning regarding a particular runtime event
-     - ``warnings.warn()``  if the issue is avoidable and the user's code
-       should be modified to eliminate the warning.
-
-       A logger’s ``warning()`` method if there is nothing the user can do about
-       the situation, but the event should still be noted
-   * - Report an error regarding a particular runtime event
-     - Raise an exception
-
-
-Documentation
-=============
-
-Docstrings
-----------
-
-The Core Imaging Library (CIL) follows the `NumpyDoc <https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard>`_
-style with the `PyData Sphinx HTML theme <https://pydata-sphinx-theme.readthedocs.io/en/latest/>`_.
-When contributing your code please refer to `this <https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard>`_ link
-for docstring formatting and this rendered `example <https://numpydoc.readthedocs.io/en/latest/example.html#example>`_.
-
-Example from ``cil``
-^^^^^^^^^^^^^^^^^^^^
-
-The following provides an example of the docstring format used within ``cil``, and the rendered documentation generated from it.
-
-Source
-""""""
-
-.. literalinclude:: ../../Wrappers/Python/cil/recon/FBP.py
-   :caption: `FBP.run method from cil.io.recon.FBP`
-   :language: python
-   :pyobject: FBP.run
-
-Rendered
-""""""""
-
-.. automethod:: cil.recon.FBP.FBP.run
-
 Building CIL from source code
 ==============================
 
@@ -223,6 +130,98 @@ Once installed, CIL functionality can be tested using the following command:
    
    export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy
    python -m unittest discover -v ./Wrappers/Python/test
+
+
+Conventions on new CIL objects
+==============================
+
+For each class there are **essential**, and **non-essential** parameters. The non-essential can be further be divided in **often configured** and **advanced** parameters:
+
+* essential
+* non-essential
+
+  * often-configured
+  * advanced
+
+The definition of what are the essential, often-configured and advanced parameters depends on the actual class.
+
+Creator
+-------
+
+To create an instance of a class, the creator of a class should require the **essential** and **often-configured** parameters as named parameters.
+
+It should not accept positional arguments `*args` or key-worded arguments `**kwargs` so that the user can clearly understand what parameters are necessary to
+create the instance.
+
+Setter methods and properties
+-----------------------------
+
+Use of `property` is favoured instead of class members to store parameters so that the parameters can be protected.
+
+The class should provide setter methods to change all the parameters at any time. Setter methods to set multiple parameters at the same time is also accepted.
+Setter methods should be named `set_<parameter>`. The use of `set_` helps IDEs and user to find what they should change in an instance of a class.
+
+
+Other methods
+-------------
+
+Methods that are not meant to be used by the user should have a `_` (underscore) at the beginning of the name.
+All methods should follow the convention of small caps underscore separated words.
+
+Logging and warning
+===================
+We follow pythons convention on logging (see e.g. https://docs.python.org/3/howto/logging.html). In particular:
+
+.. list-table:: Logging and warning guidelines
+   :header-rows: 1
+   :widths: 40 60
+
+   * - Task you want to perform
+     - The best tool for the task
+   * - Display console output for ordinary usage of a command line script or program
+     - ``print()``
+   * - Report events that occur during normal operation of a program
+       (e.g. for status monitoring or fault investigation)
+     - A logger’s ``info()`` (or ``debug()`` method for very detailed output for diagnostic purposes)
+   * - Issue a warning regarding a particular runtime event
+     - ``warnings.warn()``  if the issue is avoidable and the user's code
+       should be modified to eliminate the warning.
+
+       A logger’s ``warning()`` method if there is nothing the user can do about
+       the situation, but the event should still be noted
+   * - Report an error regarding a particular runtime event
+     - Raise an exception
+
+
+Documentation
+=============
+
+Docstrings
+----------
+
+The Core Imaging Library (CIL) follows the `NumpyDoc <https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard>`_
+style with the `PyData Sphinx HTML theme <https://pydata-sphinx-theme.readthedocs.io/en/latest/>`_.
+When contributing your code please refer to `this <https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard>`_ link
+for docstring formatting and this rendered `example <https://numpydoc.readthedocs.io/en/latest/example.html#example>`_.
+
+Example from ``cil``
+^^^^^^^^^^^^^^^^^^^^
+
+The following provides an example of the docstring format used within ``cil``, and the rendered documentation generated from it.
+
+Source
+""""""
+
+.. literalinclude:: ../../Wrappers/Python/cil/recon/FBP.py
+   :caption: `FBP.run method from cil.io.recon.FBP`
+   :language: python
+   :pyobject: FBP.run
+
+Rendered
+""""""""
+
+.. automethod:: cil.recon.FBP.FBP.run
+
 
 
 Building documentation locally

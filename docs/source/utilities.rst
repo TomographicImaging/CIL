@@ -136,4 +136,13 @@ link_islicer - link islicer objects by index
    :inherited-members:
 
 
+Shrink volume
+=============
+VolumeShrinker - create a cropped reconstruction volume from image data
+--------------------------
+
+.. autoclass:: cil.utilities.shrink_volume.VolumeShrinker
+   :members:
+   :inherited-members:
+
 :ref:`Return Home <mastertoc>`

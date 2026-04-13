@@ -34,7 +34,8 @@ class PaganinProcessor(Processor):
 
     r"""
     Processor to retrieve quantitative information from phase contrast images
-    using the Paganin phase retrieval algorithm described in [1]
+    using the Paganin phase retrieval algorithm described in [1] or CTF method
+    as described in [4]
 
     Parameters
     ----------
@@ -164,6 +165,7 @@ class PaganinProcessor(Processor):
     - [1] https://doi.org/10.1046/j.1365-2818.2002.01010.x
     - [2] https://henke.lbl.gov/optical_constants/getdb2.html
     - [3] https://iopscience.iop.org/article/10.1088/2040-8986/abbab9
+    - [4] https://opg.optica.org/oe/fulltext.cfm?uri=oe-26-9-11110
     With thanks to colleagues at DTU for help with the initial implementation
     of the phase retrieval algorithm
 
@@ -247,7 +249,10 @@ class PaganinProcessor(Processor):
                     slice(self.pad, self.pad + proj_shape[1]))
 
         # pre-calculate the scaling factor
-        scaling_factor = -(1/self.mu)
+        if self.filter_type == "paganin_method":
+            scaling_factor = -(1/self.mu)
+        elif self.filter_type == "ctf_method":
+            scaling_factor = 0.5*self.delta/self.beta
 
         # loop over the channels
         for j in range(data.geometry.channels):
@@ -257,15 +262,22 @@ class PaganinProcessor(Processor):
                 padded_buffer[buffer_slice] = data.array[j, i, :, :]
 
                 if self.full_retrieval==True:
-                    # apply the filter in fourier space, apply log and scale
-                    fI = fft2(padded_buffer)
-                    iffI = ifft2(fI*self.filter).real
-                    np.log(iffI, out=padded_buffer)
-                    np.multiply(scaling_factor, padded_buffer, out=padded_buffer)
+                    if self.filter_type == "paganin_method":  
+                        # apply the filter in fourier space, apply log and scale
+                        fI = fft2(padded_buffer)
+                        iffI = ifft2(fI*self.filter).real
+                        np.log(iffI, out=padded_buffer)
+                        np.multiply(scaling_factor, padded_buffer, out=padded_buffer)
+                    elif self.filter_type == "ctf_method":
+                        # apply the filter in fourier space and scale
+                        padded_buffer = ifft2(scaling_factor*(fI-self.dirac)*self.filter).real
                 else:
                     # apply the filter in fourier space
                     fI = fft2(padded_buffer)
-                    padded_buffer[:] = ifft2(fI*self.filter).real
+                    if self.filter_type == "paganin_method":
+                        padded_buffer[:] = ifft2(fI*self.filter).real
+                    elif self.filter_type == "ctf_method":
+                        padded_buffer[:] = ifft2((fI-self.dirac)*self.filter).real
 
                 out.array[j, i, :, :] = padded_buffer[buffer_slice]
 
@@ -490,6 +502,12 @@ class PaganinProcessor(Processor):
             self.filter =  ifftshift(1/(1. - (2*self.alpha/pixel_size_dmag**2)
                                         *(np.cos(pixel_size_dmag*kx)
                                           + np.cos(pixel_size_dmag*ky) -2)))
+        elif self.filter_type == "ctf_method":
+            self.filter = ifftshift(1./(np.cos(self.alpha
+                                           *(kx**2 + ky**2)) +
+                                      (self.delta/self.beta)*np.sin(self.alpha
+                                            *(kx**2 + ky**2))))
+            self.dirac = ifftshift(np.bitwise_and(kx==0,ky==0).astype(np.float64))
         else:
             raise ValueError("filter_type not recognised: got {0} expected one\
                               of 'paganin_method' or \
@@ -507,7 +525,10 @@ class PaganinProcessor(Processor):
         Function to calculate alpha, a constant defining the Paganin filter
         strength
         '''
-        self.alpha = (self.propagation_distance/self.magnification)*self.delta/self.mu
+        if self.filter_type == "paganin_method":
+            self.alpha = (self.propagation_distance/self.magnification)*self.delta/self.mu
+        elif self.filter_type == "ctf_method":
+            self.alpha = (self.propagation_distance/self.magnification)*self.wavelength/(4.0*np.pi)
 
     def _energy_to_wavelength(self, energy, energy_units, return_units):
         '''

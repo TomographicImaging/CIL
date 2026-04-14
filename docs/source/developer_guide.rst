@@ -84,8 +84,10 @@ If not installing inside a conda environment, then the user might need to set th
 
    pip install -e . -Ccmake.define.IPP_ROOT="<path_to_ipp>" -Ccmake.define.OpenMP_ROOT="<path_to_openmp>" -Ccmake.define.CMAKE_BUILD_TYPE=RelWithDebInfo
 
+
 Notes for Windows users
-""""""""""""""""
+"""""""""""""""""""""""
+
 One option for development on Windows is using `WSL <https://learn.microsoft.com/en-us/windows/wsl/install#change-the-default-linux-distribution-installed>`_
 Launch WSL and install build-essential using:
 
@@ -114,6 +116,7 @@ Note: we tested these instructions with Visual Studio 2026 version 18.1.1
 
 Building with Docker
 ^^^^^^^^^^^^^^^^^^^^^
+
 In the repository root, simply update submodules and run ``docker build``:
 
 .. code:: sh
@@ -124,6 +127,7 @@ In the repository root, simply update submodules and run ``docker build``:
 
 Testing
 ^^^^^^^
+
 Once installed, CIL functionality can be tested using the following command:
 
 .. code:: sh

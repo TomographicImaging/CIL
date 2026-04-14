@@ -48,7 +48,8 @@ jobs:
       name: build
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
-        pip install .
+        conda list
+        pip install .[test,gpu]
     - name: test
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
@@ -78,7 +79,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
         environment-file: scripts/requirements-test.yml
         activate-environment: cil_dev
-    - run: pip install .
+    - run: |
+        conda list
+        pip install .[test]
     - name: test
       run: python -m unittest discover -v ./Wrappers/Python/test
   conda-matrix:

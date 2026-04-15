@@ -43,13 +43,13 @@ class Algorithm:
     def __init__(self, update_objective_interval=1):
 
         self.iteration = -1
+        self.max_iteration = 1
         self.__loss = []
         self.memopt = False
         self.configured = False
         self._iteration = []
         self.update_objective_interval = update_objective_interval
         self.iter_string = 'Iter'
-        self.max_iteration = 1
 
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''

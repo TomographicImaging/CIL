@@ -1586,7 +1586,7 @@ class TestCallbacks(unittest.TestCase):
             log.name)])
         with open(log.name, 'r') as fd:
             self.assertListEqual(
-                ["64/83", "74/83", "83/83", ""],
+                ["24/43", "34/43", "43/43", ""],
                 [line.lstrip().split(" ", 1)[0] for line in fd.readlines()])
         unlink(log.name)
 

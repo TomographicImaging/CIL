@@ -25,7 +25,7 @@ from scipy.fft import fft2
 from scipy.fft import ifft2
 from scipy.fft import ifftshift
 from scipy import constants
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import logging
 
 log = logging.getLogger(__name__)
@@ -116,12 +116,12 @@ class PaganinProcessor(Processor):
         - :math:`T`, is the sample thickness,
         - :math:`\mu = \frac{4\pi\beta}{\lambda}` is the material linear
           attenuation coefficient where :math:`\beta` is the complex part of the
-          material refractive index [2] and :math:`\lambda=\frac{hc}{E}` is the 
+          material refractive index [2] and :math:`\lambda=\frac{hc}{E}` is the
           probe wavelength,
         - :math:`I_{norm}` is the input image which is expected to be the
           normalised transmission data,
-        - :math:`\Delta` is the propagation distance. In cone-beam geometry, 
-          :math:`\Delta` is scaled by the magnification :math:`M` as described 
+        - :math:`\Delta` is the propagation distance. In cone-beam geometry,
+          :math:`\Delta` is scaled by the magnification :math:`M` as described
           in [1],
         - :math:`\alpha = \frac{\Delta\delta}{\mu}` is a parameter determining
           the strength of the filter to be applied in Fourier space where
@@ -203,22 +203,22 @@ class PaganinProcessor(Processor):
     def check_input(self, data):
         if not isinstance(data, (AcquisitionData)):
             raise TypeError('Processor only supports AcquisitionData')
-        
+
         if data.geometry.geom_type & AcquisitionType.CONE_FLEX:
             raise NotImplementedError("Processor not implemented for CONE_FLEX geometry.")
-        
+
         if data.dtype!=np.float32:
             raise TypeError('Processor only support dtype=float32')
-        
+
         cil_order = tuple(AcquisitionDimension.get_order_for_engine('cil',data.geometry))
         if data.dimension_labels != cil_order:
             raise ValueError("This processor requires CIL data order, consider using `data.reorder('cil')`")
-    
+
         return True
 
     def process(self, out=None):
 
-        data  = self.get_input()            
+        data  = self.get_input()
         # set the geometry parameters to use from data.geometry unless the
         # geometry is overridden with an override_geometry
         self._set_geometry(data.geometry, self.override_geometry)
@@ -229,12 +229,12 @@ class PaganinProcessor(Processor):
         target_shape = (
             data.get_dimension_size('channel')  if 'channel' in data.dimension_labels else 1,
             data.geometry.num_projections,
-            data.get_dimension_size('vertical') if 'vertical' in data.dimension_labels else 1, 
+            data.get_dimension_size('vertical') if 'vertical' in data.dimension_labels else 1,
             data.get_dimension_size('horizontal') if 'horizontal' in data.dimension_labels else 1)
-            
+
         data.array = np.reshape(data.array, target_shape)
         out.array = np.reshape(out.array, target_shape)
-        
+
         # create a filter based on the shape of the data
         proj_shape = data.array.shape[-2:]
         self.filter_Nx = proj_shape[0]+self.pad*2
@@ -243,12 +243,12 @@ class PaganinProcessor(Processor):
 
         # allocate padded buffer
         padded_buffer = np.zeros((self.filter_Nx, self.filter_Ny), dtype=data.dtype)
-        buffer_slice = (slice(self.pad, self.pad + proj_shape[0]), 
+        buffer_slice = (slice(self.pad, self.pad + proj_shape[0]),
                     slice(self.pad, self.pad + proj_shape[1]))
-        
+
         # pre-calculate the scaling factor
         scaling_factor = -(1/self.mu)
-        
+
         # loop over the channels
         for j in range(data.geometry.channels):
             # loop over the projections
@@ -266,9 +266,9 @@ class PaganinProcessor(Processor):
                     # apply the filter in fourier space
                     fI = fft2(padded_buffer)
                     padded_buffer[:] = ifft2(fI*self.filter).real
-                
+
                 out.array[j, i, :, :] = padded_buffer[buffer_slice]
-                        
+
         data.array = np.squeeze(data.array)
         out.array = np.squeeze(out.array)
         return out
@@ -469,7 +469,7 @@ class PaganinProcessor(Processor):
             self.alpha = override_filter['alpha']
         else:
             self._calculate_alpha()
-           
+
 	# calculate pixel size at sample plane, used for defining fourier mesh
         pixel_size_dmag = self.pixel_size/self.magnification
 

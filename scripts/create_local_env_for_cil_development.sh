@@ -49,7 +49,7 @@ conda_args=(create --name="$name"
   python="$python"
   numpy="$numpy"
   cmake'>=3.16'
-  dxchange
+  dxchange'>=0.2.1'
   h5py
   llvm-openmp
   ipp'>=2021.10'
@@ -84,7 +84,7 @@ else
     astra-toolbox=2.1=cuda*
     ccpi-regulariser=24.0.1
     cil-data
-    cvxpy
+    cvxpy<=1.7.5
     ipywidgets
     packaging
     python-wget

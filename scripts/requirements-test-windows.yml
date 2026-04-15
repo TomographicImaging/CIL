@@ -24,7 +24,7 @@ dependencies:
   - ccpi::ccpi-regulariser 24.0.1
   - ccpi::tomophantom 2.0.0
   - astra-toolbox 2.1 cuda*
-  - cvxpy
+  - cvxpy!=1.8.2
   - python-wget
   - scikit-image
   - packaging

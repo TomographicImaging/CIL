@@ -78,8 +78,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         environment-file: scripts/requirements-test.yml
         activate-environment: cil_dev
-    - run: |
-        pip install .
+    - run: pip install .
     - name: test
       run: python -m unittest discover -v ./Wrappers/Python/test
   conda-matrix:

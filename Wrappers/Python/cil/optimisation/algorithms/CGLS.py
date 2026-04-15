@@ -45,11 +45,7 @@ class CGLS(Algorithm):
         Initial guess 
     data : DataContainer in the range of the operator 
         Acquired data to reconstruct
-        
-    Note
-    -----
-    Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks and in particular the CGLSEarlyStopping callback replicated the old behaviour.
-
+    
     Reference
     ---------
     https://web.stanford.edu/group/SOL/software/cgls/
@@ -57,13 +53,6 @@ class CGLS(Algorithm):
     def __init__(self, initial=None, operator=None, data=None, **kwargs):
         '''initialisation of the algorithm
         '''
-        #We are deprecating tolerance 
-        self.tolerance=kwargs.pop("tolerance", None)
-        if self.tolerance is not None:
-            warnings.warn( stacklevel=2, category=DeprecationWarning, message="Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks and in particular the CGLSEarlyStopping callback replicated the old behaviour")
-        else:
-            self.tolerance = 0
-        
         super(CGLS, self).__init__(**kwargs)
 
         if initial is None and operator is not None:
@@ -125,8 +114,6 @@ class CGLS(Algorithm):
         #self.p = self.s + self.beta * self.p
         self.p.sapyb(self.beta, self.s, 1, out=self.p)
 
-        self.normx = self.x.norm()# TODO: Deprecated, remove when CGLS tolerance is removed
-
 
     def update_objective(self):
         a = self.r.squared_norm()
@@ -134,15 +121,3 @@ class CGLS(Algorithm):
             raise StopIteration()
         self.loss.append(a)
 
-    def should_stop(self): # TODO: Deprecated, remove when CGLS tolerance is removed
-        return self.flag() or super().should_stop()
-
-    def flag(self): # TODO: Deprecated, remove when CGLS tolerance is removed
-        '''returns whether the tolerance has been reached'''
-        flag  = (self.norms <= self.norms0 * self.tolerance) or (self.normx * self.tolerance >= 1)
-
-        if flag:
-            self.update_objective()
-            print('Tolerance is reached: {}'.format(self.tolerance))
-
-        return flag

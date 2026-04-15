@@ -142,10 +142,10 @@ class SPDHG(Algorithm):
             update_objective_interval=update_objective_interval)
 
         self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                    initial=initial,  sampler=sampler, prob_weights=prob_weights,  **kwargs)
+                    initial=initial,  sampler=sampler, prob_weights=prob_weights)
 
     def set_up(self, f, g, operator, sigma=None, tau=None,
-               initial=None,   sampler=None, prob_weights=None, **deprecated_kwargs):
+               initial=None,   sampler=None, prob_weights=None):
         '''set-up of the algorithm
         '''
         log.info("%s setting up", self.__class__.__name__)
@@ -162,8 +162,6 @@ class SPDHG(Algorithm):
         
         self._prob_weights = getattr(sampler, 'prob_weights', prob_weights) 
         
-        self._deprecated_set_prob(deprecated_kwargs, sampler) 
-        
         if self._prob_weights is None: 
             self._prob_weights = [1/self._ndual_subsets]*self._ndual_subsets
         
@@ -177,11 +175,7 @@ class SPDHG(Algorithm):
             self._sampler = sampler
         
         #Set the norms of the operators
-        self._deprecated_set_norms(deprecated_kwargs) 
         self._norms = operator.get_norms_as_list()
-        #Check for other kwargs
-        if deprecated_kwargs:
-            raise ValueError("Additional keyword arguments passed but not used: {}".format(deprecated_kwargs))
 
         self.set_step_sizes(sigma=sigma, tau=tau)
 
@@ -206,56 +200,6 @@ class SPDHG(Algorithm):
 
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
-
-    def _deprecated_set_prob(self, deprecated_kwargs, sampler):
-        """
-        Handle deprecated keyword arguments for backward compatibility.
-
-        Parameters
-        ----------
-        deprecated_kwargs : dict
-            Dictionary of keyword arguments.
-        sampler : Sampler           
-            Sampler class for selecting the next index for the SPDHG update.
-
-        Notes
-        -----
-        This method is called by the set_up method.
-        """
-        
-        prob = deprecated_kwargs.pop('prob', None)
-
-        if prob is not None:
-            if (self._prob_weights is None) and (sampler is None):
-                warnings.warn('`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). To pass probabilities to the calculation for `sigma` and `tau` please use `prob_weights`. ', DeprecationWarning, stacklevel=2)
-                self._prob_weights = prob
-            else:
-
-                raise ValueError(
-                    '`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. You passed  a `prob` argument, and either a `prob_weights` argument or a sampler. Please remove the `prob` argument.')
-
-
-
-    def _deprecated_set_norms(self, deprecated_kwargs):
-        """
-        Handle deprecated keyword arguments for backward compatibility.
-
-        Parameters
-        ----------
-        deprecated_kwargs : dict
-            Dictionary of keyword arguments.
-
-        Notes
-        -----
-        This method is called by the set_up method.
-        """
-        norms = deprecated_kwargs.pop('norms', None)
-        
-        if norms is not None:
-            self.operator.set_norms(norms)
-            warnings.warn(
-                ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`', DeprecationWarning, stacklevel=2)
-
 
         
     @property

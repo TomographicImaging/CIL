@@ -22,7 +22,7 @@ from warnings import warn
 
 import numpy as np
 
-from cil.optimisation.utilities.callbacks import Callback, LogfileCallback, _OldCallback, ProgressCallback
+from cil.optimisation.utilities.callbacks import Callback, ProgressCallback
 
 
 class Algorithm:
@@ -40,24 +40,15 @@ class Algorithm:
         The objective (or loss) is calculated and saved every `update_objective_interval`.  1 means every iteration, 2 every 2 iterations and so forth. This is by default 1 and should be increased when evaluating the objective is computationally expensive.
     """
 
-    def __init__(self, update_objective_interval=1, max_iteration=None, log_file=None):
+    def __init__(self, update_objective_interval=1):
 
         self.iteration = -1
-        self.__max_iteration = 1
-        if max_iteration is not None:
-            warn("use `Algorithm.run(iterations)` instead of `Algorithm(max_iteration)`", DeprecationWarning, stacklevel=2)
-            self.__max_iteration = max_iteration
         self.__loss = []
         self.memopt = False
         self.configured = False
         self._iteration = []
         self.update_objective_interval = update_objective_interval
-        # self.x = None
         self.iter_string = 'Iter'
-        if log_file is not None:
-            warn("use `run(callbacks=[LogfileCallback(log_file)])` instead of `log_file`",
-                 DeprecationWarning, stacklevel=2)
-            self.__log_file = log_file
 
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
@@ -65,21 +56,6 @@ class Algorithm:
     def update(self):
         '''A single iteration of the algorithm'''
         raise NotImplementedError
-
-    def should_stop(self):
-        '''default stopping criterion: number of iterations
-
-        The user can change this in concrete implementation of iterative algorithms.'''
-        return self.iteration > self.max_iteration
-
-    def __set_up_logger(self, *_, **__):
-        """Do not use: this is being deprecated"""
-        warn("use `run(callbacks=[LogfileCallback(log_file)])` instead", DeprecationWarning, stacklevel=2)
-
-    def max_iteration_stop_criterion(self):
-        """Do not use: this is being deprecated"""
-        warn("use `should_stop()` instead of `max_iteration_stop_criterion()`", DeprecationWarning, stacklevel=2)
-        return self.iteration > self.max_iteration
 
     def __iter__(self):
         '''Algorithm is an iterable'''
@@ -204,16 +180,6 @@ class Algorithm:
 
     objective = loss # alias
 
-    @property
-    def max_iteration(self):
-        '''gets the maximum number of iterations'''
-        return self.__max_iteration
-
-    @max_iteration.setter
-    def max_iteration(self, value):
-        '''sets the maximum number of iterations'''
-        assert isinstance(value, Integral) or np.isposinf(value)
-        self.__max_iteration = value
 
     @property
     def update_objective_interval(self):
@@ -227,7 +193,7 @@ class Algorithm:
             raise ValueError('interval must be an integer >= 0')
         self.__update_objective_interval = value
 
-    def run(self, iterations=None, callbacks: Optional[List[Callback]]=None, verbose=1, **kwargs):
+    def run(self, iterations=None, callbacks: Optional[List[Callback]]=None, verbose=1):
         r"""run upto :code:`iterations` with callbacks/logging.
         
         For a demonstration of callbacks see https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb
@@ -245,9 +211,6 @@ class Algorithm:
         if iterations is None:
             raise ValueError("`run()` missing number of `iterations`")
         
-        if 'print_interval' in kwargs:
-            warn("use `TextProgressCallback(miniters)` instead of `run(print_interval)`",
-                 DeprecationWarning, stacklevel=2)
         if np.isposinf(iterations):
             if callbacks is None:
                 raise ValueError("Infinite iterations require a callback with a stopping criterion that raises `StopIteration`")
@@ -257,13 +220,6 @@ class Algorithm:
         if callbacks is None:
             callbacks = [ProgressCallback(verbose=verbose)]
             
-        
-        # transform old-style callbacks into new
-        callback = kwargs.get('callback', None)
-        if callback is not None:
-            callbacks.append(_OldCallback(callback, verbose=verbose))
-        if hasattr(self, '__log_file'):
-            callbacks.append(LogfileCallback(self.__log_file, verbose=verbose))
 
         if self.should_stop():
             print("Stop criterion has been reached.")
@@ -273,9 +229,7 @@ class Algorithm:
             iterations+=1
 
         # call `__next__` upto `iterations` times or until `StopIteration` is raised
-        self.max_iteration = self.iteration + iterations
-        iters = (count(self.iteration) if np.isposinf(self.max_iteration)
-                 else range(self.iteration, self.max_iteration))
+        iters = range(self.iteration, self.iteration + iterations)
         for _ in iters:
             try:
                 self.__next__()
@@ -293,15 +247,4 @@ class Algorithm:
             obj = obj[0]
         return {'objective': obj}
 
-    def objective_to_string(self, verbose=False):
-        """Do not use: this is being deprecated"""
-        warn("consider using `run(callbacks=[LogfileCallback(log_file)])` instead", DeprecationWarning, stacklevel=2)
-        return str(self.objective_to_dict(verbose=verbose))
 
-    def verbose_output(self, *_, **__):
-        """Do not use: this is being deprecated"""
-        warn("use `run(callbacks=[ProgressCallback()])` instead", DeprecationWarning, stacklevel=2)
-
-    def verbose_header(self, *_, **__):
-        """Do not use: this is being deprecated"""
-        warn("consider using `run(callbacks=[LogfileCallback(log_file)])` instead", DeprecationWarning, stacklevel=2)

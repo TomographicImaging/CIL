@@ -247,17 +247,6 @@ class TestGD(CCPiTestClass):
             gd.run(np.inf, callbacks=[StopCallback()])
         self.assertEqual(gd.iteration, 9)
 
-    def test_gd_deprecate_atol_rtol(self):
-        with self.assertWarns(DeprecationWarning):
-            initial=VectorData(np.array([1.1,1.1]))
-            b=VectorData(np.array([1.,1.]))
-            A=IdentityOperator(b.geometry)
-            gd = GD(initial=initial, f=LeastSquares(A,b ), step_size=1, atol=1, rtol=2)
-            
-        self.assertEqual(gd.rtol, 2.)
-        self.assertEqual(gd.atol, 1.)
-        gd.run(10)
-        self.assertEqual(gd.iteration, 0)
         
 class Test_APGD(CCPiTestClass):
     def setUp(self):
@@ -746,17 +735,6 @@ class TestCGLS(CCPiTestClass):
         self.alg = CGLS(initial=self.initial, operator=self.operator, data=self.data,
                         update_objective_interval=2)
 
-    # can be deprecated when tolerance is deprecated in CGLS
-    def test_initialization_with_default_tolerance(self):
-
-        self.assertEqual(self.alg.tolerance, 0)
-
-    # can be deprecated when tolerance is deprecated in CGLS
-    def test_initialization_with_custom_tolerance(self):
-        with self.assertWarns(DeprecationWarning):
-            alg = CGLS(initial=self.initial, operator=self.operator,
-                       data=self.data, tolerance=0.01)
-        self.assertEqual(alg.tolerance, 0.01)
 
     def test_set_up(self):
         # Test the set_up method
@@ -794,33 +772,6 @@ class TestCGLS(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(
             self.alg.x.as_array(), self.data.as_array())
 
-    # can be deprecated when tolerance is deprecated in CGLS
-    def test_should_stop_flag_false(self):
-        # Mocking norms to ensure tolerance isn't reached
-        self.alg.run(2)
-        self.alg.norms = 10
-        self.alg.norms0 = 99
-        self.alg.tolerance = 0.1
-        self.alg.normx = 0.1
-
-        self.assertFalse(self.alg.flag())
-
-    # can be deprecated when tolerance is deprecated in CGLS
-    def test_should_stop_flag_true(self):
-        # Mocking norms to ensure tolerance is reached
-        self.alg.run(4)
-        self.alg.norms = 1
-        self.alg.norms0 = 10
-        self.alg.tolerance = 0.1
-        self.alg.normx = 10
-
-        self.assertTrue(self.alg.flag())
-
-    # can be deprecated when tolerance is deprecated in CGLS
-    def test_tolerance_reached_immediately(self):
-        alg = CGLS(initial=self.operator.domain_geometry().allocate(
-            0), operator=self.operator, data=self.operator.domain_geometry().allocate(0))
-        alg.run(2)
 
     def test_update_objective(self):
         # Mocking squared_norm to return a finite value
@@ -1529,28 +1480,6 @@ class TestSPDHG(CCPiTestClass):
         with self.assertRaises(IndexError):
             spdhg.run(12)
 
-    def test_spdhg_deprecated_vargs(self):
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, norms=[
-                      1]*len(self.A), prob=[1/(self.subsets-1)]*(self.subsets-1)+[0])
-
-        self.assertListEqual(self.A.get_norms_as_list(), [1]*len(self.A))
-        self.assertListEqual(spdhg._norms, [1]*len(self.A))
-        self.assertListEqual(spdhg._sampler.prob_weights, [
-                             1/(self.subsets-1)]*(self.subsets-1)+[0])
-        self.assertListEqual(spdhg._prob_weights, [
-                             1/(self.subsets-1)]*(self.subsets-1)+[0])
-
-        with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, prob=[1/(self.subsets-1)]*(
-                self.subsets-1)+[0], sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
-
-        with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,  prob=[1/(self.subsets-1)]*(
-                self.subsets-1)+[0], prob_weights=[1/(self.subsets-1)]*(self.subsets-1)+[0])
-
-        with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sfdsdf=3,
-                          sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
 
     def test_spdhg_set_norms(self):
 
@@ -1642,12 +1571,6 @@ class TestCallbacks(unittest.TestCase):
         def update_objective(self):
             self.loss.append(2 ** getattr(self, 'x', np.nan))
 
-    def test_deprecated_kwargs(self):
-        with self.assertWarnsRegex(DeprecationWarning, 'max_iteration'):
-            self.PrintAlgo(max_iteration=1000)
-
-        with self.assertWarnsRegex(DeprecationWarning, 'log_file'):
-            self.PrintAlgo(log_file="")
 
     def test_progress(self):
         algo = self.PrintAlgo()
@@ -1657,16 +1580,10 @@ class TestCallbacks(unittest.TestCase):
         algo.run(3, callbacks=[callbacks.TextProgressCallback()])  # upto 23
         self.assertListEqual(algo.iterations, [-1, 10, 20])
 
-        with self.assertWarnsRegex(DeprecationWarning, 'print_interval'):
-            algo.run(40, print_interval=2)  # upto 63
-
-        def old_callback(iteration, objective, solution):
-            print(f"Called {iteration} {objective} {solution}")
-
         log = NamedTemporaryFile(delete=False)
         log.close()
         algo.run(20, callbacks=[callbacks.LogfileCallback(
-            log.name)], callback=old_callback)
+            log.name)])
         with open(log.name, 'r') as fd:
             self.assertListEqual(
                 ["64/83", "74/83", "83/83", ""],

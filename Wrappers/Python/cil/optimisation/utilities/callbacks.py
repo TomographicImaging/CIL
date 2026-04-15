@@ -43,22 +43,6 @@ class Callback(ABC):
         pass
 
 
-class _OldCallback(Callback):
-    '''Converts an old-style :code:`def callback` to a new-style :code:`class Callback`.
-
-    Parameters
-    ----------
-    callback: :code:`callable(iteration, objective, x)`
-    '''
-    def __init__(self, callback, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.func = callback
-
-    def __call__(self, algorithm):
-        if algorithm.update_objective_interval > 0 and algorithm.iteration % algorithm.update_objective_interval == 0:
-            self.func(algorithm.iteration, algorithm.get_last_objective(return_all=self.verbose>=2), algorithm.x)
-
-
 class ProgressCallback(Callback):
     ''':code:`tqdm`-based progress bar.
 

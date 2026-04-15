@@ -103,6 +103,7 @@ class ArmijoStepSizeRule(StepSizeRule):
         '''
         
         self.alpha_orig = alpha
+        self.alpha = alpha
         self.beta = beta 
         self.max_iterations = max_iterations
         if self.max_iterations is None:

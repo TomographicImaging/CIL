@@ -49,6 +49,7 @@ class Algorithm:
         self._iteration = []
         self.update_objective_interval = update_objective_interval
         self.iter_string = 'Iter'
+        self.max_iteration = 1
 
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
@@ -66,8 +67,6 @@ class Algorithm:
 
         This method triggers :code:`update()` and :code:`update_objective()`
         '''
-        if self.should_stop():
-            raise StopIteration
         if self.iteration == -1 and self.update_objective_interval > 0:
             self._iteration.append(self.iteration)
             self.update_objective()
@@ -220,11 +219,6 @@ class Algorithm:
         if callbacks is None:
             callbacks = [ProgressCallback(verbose=verbose)]
             
-
-        if self.should_stop():
-            print("Stop criterion has been reached.")
-        
-
         if self.iteration == -1 and self.update_objective_interval>0:
             iterations+=1
 

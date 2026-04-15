@@ -215,12 +215,14 @@ class Algorithm:
                 raise ValueError("Infinite iterations require a callback with a stopping criterion that raises `StopIteration`")
             else:
                 warn("Infinite iterations require a callback with a stopping criterion that raises `StopIteration`", UserWarning, stacklevel=2)
-        
+
         if callbacks is None:
             callbacks = [ProgressCallback(verbose=verbose)]
             
         if self.iteration == -1 and self.update_objective_interval>0:
             iterations+=1
+
+        self.max_iteration = self.iteration + iterations
 
         # call `__next__` upto `iterations` times or until `StopIteration` is raised
         iters = range(self.iteration, self.iteration + iterations)

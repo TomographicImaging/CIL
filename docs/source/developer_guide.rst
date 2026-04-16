@@ -88,7 +88,7 @@ If not installing inside a conda environment, then the user might need to set th
 Notes for Windows users
 """""""""""""""""""""""
 
-One option for development on Windows is using `WSL <https://learn.microsoft.com/en-us/windows/wsl/install#change-the-default-linux-distribution-installed>`_
+One option for development on Windows is using `Windows Subsystem for Linux (WSL) <https://learn.microsoft.com/en-us/windows/wsl/install#change-the-default-linux-distribution-installed>`_
 Launch WSL and install build-essential using:
 
 .. code:: sh

@@ -48,7 +48,7 @@ jobs:
       name: build
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"
-        pip install . -v
+        pip install .
     - name: test
       run: |
         conda activate "${{ steps.reqs.outputs.envname }}"

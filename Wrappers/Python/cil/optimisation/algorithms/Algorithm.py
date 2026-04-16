@@ -43,12 +43,13 @@ class Algorithm:
     def __init__(self, update_objective_interval=1):
 
         self.iteration = -1
-        self.max_iteration = 1
+        self.__max_iteration = 1
         self.__loss = []
         self.memopt = False
         self.configured = False
         self._iteration = []
         self.update_objective_interval = update_objective_interval
+        self.x = None
         self.iter_string = 'Iter'
 
     def set_up(self, *args, **kwargs):
@@ -225,7 +226,8 @@ class Algorithm:
         self.max_iteration = self.iteration + iterations
 
         # call `__next__` upto `iterations` times or until `StopIteration` is raised
-        iters = range(self.iteration, self.iteration + iterations)
+        iters = (count(self.iteration) if np.isposinf(self.max_iteration)
+                 else range(self.iteration, self.max_iteration))
         for _ in iters:
             try:
                 self.__next__()

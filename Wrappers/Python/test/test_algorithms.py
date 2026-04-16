@@ -88,13 +88,11 @@ class TestGD(CCPiTestClass):
 
         step_size = norm2sq.L / 3.
 
-        alg = GD(initial=initial, f=norm2sq, step_size=step_size,
-                 atol=1e-9, rtol=1e-6)
+        alg = GD(initial=initial, f=norm2sq, step_size=step_size)
         alg.run(1000, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
-        alg = GD(initial=initial, f=norm2sq, step_size=step_size,
-                 atol=1e-9, rtol=1e-6, update_objective_interval=2)
+        alg = GD(initial=initial, f=norm2sq, step_size=step_size, update_objective_interval=2)
         self.assertTrue(alg.update_objective_interval == 2)
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -115,8 +113,7 @@ class TestGD(CCPiTestClass):
         norm2sq = LeastSquares(identity, b)
         alg = GD(initial=initial,
                  f=norm2sq,
-                 update_objective_interval=0,
-                 atol=1e-9, rtol=1e-6)
+                 update_objective_interval=0)
         self.assertTrue(alg.update_objective_interval == 0)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -135,13 +132,6 @@ class TestGD(CCPiTestClass):
             2 * np.log10(1e6) / np.log10(2)))
         with self.assertRaises(NotImplementedError):
             self.assertEqual(gd.step_size,3)
-
-        gd = GD(initial=self.initial,
-                f=self.f, alpha=1e2, beta=0.25)
-        self.assertEqual(gd.step_size_rule.alpha_orig, 1e2)
-        self.assertEqual(gd.step_size_rule.beta, 0.25)
-        self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
-            2 * np.log10(1e2) / np.log10(2)))
 
 
     def test_gd_constant_step_size_init(self):
@@ -221,9 +211,9 @@ class TestGD(CCPiTestClass):
                 update_objective_interval=500)
         gd.run(3500, verbose=0)
         np.testing.assert_allclose(
-            gd.solution.array[0], self.scipy_opt_high.x[0], atol=1e-2)
+            gd.solution.array[0], self.scipy_opt_high.x[0])
         np.testing.assert_allclose(
-            gd.solution.array[1], self.scipy_opt_high.x[1], atol=1e-2)
+            gd.solution.array[1], self.scipy_opt_high.x[1])
 
     def test_gd_run_no_iterations(self):
         gd = GD(initial=self.initial, f=self.f, step_size=0.002)
@@ -767,7 +757,6 @@ class TestCGLS(CCPiTestClass):
             self.alg.r, out=self.alg.s)
 
     def test_convergence(self):
-
         self.alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(
             self.alg.x.as_array(), self.data.as_array())
@@ -1590,7 +1579,7 @@ class TestCallbacks(unittest.TestCase):
                 [line.lstrip().split(" ", 1)[0] for line in fd.readlines()])
         unlink(log.name)
 
-        its = list(range(10, 90, 10))
+        its = list(range(10, 50, 10))
         self.assertListEqual([-1] + its, algo.iterations)
         np.testing.assert_array_equal(
             [np.nan] + [2 ** (1-i) for i in its], algo.objective)

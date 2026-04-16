@@ -15,7 +15,7 @@ test:
     - python-wget
     - cvxpy <= 1.7.5          # [linux]
     - scikit-image
-    - tomophantom 3.0.3       # [linux]
+    - tomophantom 3.0.3
     - tigre 2.6
     - packaging
     - ccpi-regulariser 24.0.1 # [not osx]

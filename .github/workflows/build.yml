@@ -140,12 +140,12 @@ jobs:
         conda-remove-defaults: "true"
     - run: conda install boa
     - name: conda build
-      run: >
+      run: |
         conda config --set remote_connect_timeout_secs 60 
         conda config --set remote_max_retries 5
         conda config --set remote_read_timeout_secs 120
         conda config --set remote_backoff_factor 5
-        conda mambabuild -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }}
+        conda mambabuild -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }} \
         --no-test --output-folder dist recipe
     - uses: actions/upload-artifact@v4
       with:
@@ -175,12 +175,12 @@ jobs:
         name: cil-py${{ matrix.python-version }}-${{ matrix.os }}
         path: dist
     - name: conda test
-      run: >
+      run: |
         conda config --set remote_connect_timeout_secs 60 
         conda config --set remote_max_retries 5
         conda config --set remote_read_timeout_secs 120
         conda config --set remote_backoff_factor 5
-        conda mambabuild -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }}
+        conda mambabuild -c conda-forge -c https://tomography.stfc.ac.uk/conda --override-channels --python=${{ matrix.python-version }} \
         --test dist/*/cil-*.tar.bz2 --extra-deps numpy=${{ matrix.numpy-version }}
   conda-upload:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')

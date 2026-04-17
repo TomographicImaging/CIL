@@ -37,7 +37,7 @@ where `<env_name>` is `cil_demos`, `cil_demos_cpu` or whatever name you specifie
 #### Install CIL into an existing environment
 If you prefer to install CIL with minimal dependencies into an existing environment you can use:
 ```sh
-conda install -c https://tomography.stfc.ac.uk/conda -c conda-forge -c ccpi cil=25.0.0
+conda install -c https://software.repos.intel.com/python/conda -c conda-forge -c ccpi cil=25.0.0
 ```
 A number of additional dependencies are required for specific functionality in CIL, these should be added to your environment as necessary. See the dependency table below for details.
 

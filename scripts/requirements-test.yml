@@ -14,8 +14,7 @@
 name: cil_dev
 channels:
   - conda-forge
-  - nvidia
-  - https://tomography.stfc.ac.uk/conda
+  - https://software.repos.intel.com/python/conda
 dependencies:
   - python >=3.10
   - numpy >=1.23,<3

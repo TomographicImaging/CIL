@@ -49,7 +49,6 @@ class Algorithm:
         self.configured = False
         self._iteration = []
         self.update_objective_interval = update_objective_interval
-        self.x = None
         self.iter_string = 'Iter'
 
     def set_up(self, *args, **kwargs):
@@ -180,6 +179,16 @@ class Algorithm:
 
     objective = loss # alias
 
+    @property
+    def max_iteration(self):
+        '''gets the maximum number of iterations'''
+        return self.__max_iteration
+
+    @max_iteration.setter
+    def max_iteration(self, value):
+        '''sets the maximum number of iterations'''
+        assert isinstance(value, Integral) or np.isposinf(value)
+        self.__max_iteration = value
 
     @property
     def update_objective_interval(self):

@@ -97,9 +97,8 @@ Launch WSL and install build-essential using:
 
 This will enable you to then follow the linux instructions for creating the environment and building CIL.
 
-Alternatively, to use Windows itself...
 
-Install Visual Studio Community (or higher) and select the **Desktop development with C++** workload.
+To build for windows you can install Visual Studio Community (or higher) and select the **Desktop development with C++** workload.
 
 If you are developing on Windows with conda, you need to have access to both the Visual Studio compiler and have created the conda environment using the command for Windows above. 
 

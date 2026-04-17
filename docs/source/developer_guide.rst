@@ -92,6 +92,7 @@ One option for development on Windows is using `Windows Subsystem for Linux (WSL
 Launch WSL and install build-essential using:
 
 .. code:: sh
+
    apt install build-essential
 
 This will enable you to then follow the linux instructions for creating the environment and building CIL.

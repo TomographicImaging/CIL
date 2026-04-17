@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.plugins.TomoPhantom &#8212; CIL 25.0.1.dev32+gfac074bb2 documentation</title>
+    <title>cil.plugins.TomoPhantom &#8212; CIL 25.0.1.dev33+g38b872673 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=26292b39"></script>
+    <script src="../../../../_static/documentation_options.js?v=cceb6289"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev32+gfac074bb2';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev33+g38b872673';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev32+gfac074bb2" />
+  <meta name="docsearch:version" content="25.0.1.dev33+g38b872673" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -512,26 +512,12 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">ctypes</span><span class="o">,</span><span class="w"> </span><span class="nn">platform</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ctypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">util</span>
-<span class="c1"># check for the extension</span>
-<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Linux&#39;</span><span class="p">:</span>
-    <span class="n">dll</span> <span class="o">=</span> <span class="s1">&#39;libctomophantom.so&#39;</span>
-<span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Windows&#39;</span><span class="p">:</span>
-    <span class="n">dll_file</span> <span class="o">=</span> <span class="s1">&#39;ctomophantom.dll&#39;</span>
-    <span class="n">dll</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">find_library</span><span class="p">(</span><span class="n">dll_file</span><span class="p">)</span>
-<span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Darwin&#39;</span><span class="p">:</span>
-    <span class="n">dll</span> <span class="o">=</span> <span class="s1">&#39;libctomophantom.dylib&#39;</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not supported platform, &#39;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">())</span>
-
-<span class="n">libtomophantom</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">cdll</span><span class="o">.</span><span class="n">LoadLibrary</span><span class="p">(</span><span class="n">dll</span><span class="p">)</span>
-
-
+<span class="kn">import</span><span class="w"> </span><span class="nn">ctypes</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tomophantom.ctypes.external</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">external</span>
 
 <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">tomophantom</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
-<span class="n">path_library2D</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;Phantom2DLibrary.dat&quot;</span><span class="p">)</span>
-<span class="n">path_library3D</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;Phantom3DLibrary.dat&quot;</span><span class="p">)</span>
+<span class="n">path_library2D</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;phantomlib&quot;</span><span class="p">,</span> <span class="s2">&quot;Phantom2DLibrary.dat&quot;</span><span class="p">)</span>
+<span class="n">path_library3D</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;phantomlib&quot;</span><span class="p">,</span> <span class="s2">&quot;Phantom3DLibrary.dat&quot;</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">is_model_temporal</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns whether a model in the TomoPhantom library is temporal</span>
@@ -578,24 +564,20 @@
 <span class="sd">    :type num_dims: int, default 2</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">num_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">libtomophantom</span><span class="o">.</span><span class="n">checkParams2D</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">),</span>  <span class="c1"># pointer to the params array</span>
+        <span class="n">external</span><span class="o">.</span><span class="n">c_checkParams2D</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">),</span>  <span class="c1"># pointer to the params array</span>
                                   <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">,</span>                                   <span class="c1"># model number selector (int)</span>
                                   <span class="n">ctypes</span><span class="o">.</span><span class="n">c_char_p</span><span class="p">]</span>                  <span class="c1"># string to the library file</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">10</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-        <span class="n">params_p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">))</span>
-        <span class="n">lib2d_p</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path_library2D</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
-        <span class="n">libtomophantom</span><span class="o">.</span><span class="n">checkParams2D</span><span class="p">(</span><span class="n">params_p</span><span class="p">,</span> <span class="n">num_model</span><span class="p">,</span> <span class="n">lib2d_p</span><span class="p">)</span>
+        <span class="n">external</span><span class="o">.</span><span class="n">c_checkParams2D</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">num_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path_library2D</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">params</span>
 
     <span class="k">elif</span> <span class="n">num_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="n">libtomophantom</span><span class="o">.</span><span class="n">checkParams3D</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">),</span>  <span class="c1"># pointer to the params array</span>
+        <span class="n">external</span><span class="o">.</span><span class="n">c_checkParams3D</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">),</span>  <span class="c1"># pointer to the params array</span>
                                   <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">,</span>                                   <span class="c1"># model number selector (int)</span>
                                   <span class="n">ctypes</span><span class="o">.</span><span class="n">c_char_p</span><span class="p">]</span>                  <span class="c1"># string to the library file</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">11</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-        <span class="n">params_p</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">))</span>
-        <span class="n">lib2d_p</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path_library3D</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
-        <span class="n">libtomophantom</span><span class="o">.</span><span class="n">checkParams3D</span><span class="p">(</span><span class="n">params_p</span><span class="p">,</span> <span class="n">num_model</span><span class="p">,</span> <span class="n">lib2d_p</span><span class="p">)</span>
+        <span class="n">external</span><span class="o">.</span><span class="n">c_checkParams3D</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">num_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path_library3D</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">params</span>
 

@@ -13,13 +13,13 @@ test:
   requires:
     - pip
     - python-wget
-    - cvxpy <= 1.7.5                  # [linux]
+    - cvxpy
     - scikit-image
     - tomophantom 3.0.3
-    - tigre 2.6
+    - tigre 3.1.3
     - packaging
-    - ccpi-regulariser 24.0.1 # [not osx]
-    - astra-toolbox 2.1 {{ 'cuda*' if environ.get('TESTS_FORCE_GPU', '') else 'py*' }}
+    - ccpi-regulariser 25.0.0 {{ 'cuda*' if environ.get('TESTS_FORCE_GPU', '') else 'cpu*' }} # [not osx]
+    - astra-toolbox 2.4
     - matplotlib-base >=3.3
     - zenodo_get >=1.6
     - dxchange >= 0.2.1
@@ -52,9 +52,9 @@ requirements:
     - scikit-build-core >=0.10
 
   run:
-    - {{ pin_compatible('python', min_pin='x.x') }}
+    - {{ pin_compatible('python', min_pin='x.x', max_pin='x') }}
     - ipp {{ ipp_version }}
-    - numpy >=1.23,<2
+    - numpy >=1.23,<3
     - scipy >=1.4
     - h5py
     - pillow
@@ -66,7 +66,7 @@ requirements:
   # version constraints of optional dependencies
   run_constrained:
     - tomophantom >=3.0.3
-    - astra-toolbox >=1.9.9.dev5
+    - astra-toolbox >=2.1
     - tigre >=2.4
     - ccpi-regulariser >=24.0.1
     - olefile >=0.46

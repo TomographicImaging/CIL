@@ -14,17 +14,16 @@
 name: cil_dev
 channels:
   - conda-forge
-  - nvidia
   - https://software.repos.intel.com/python/conda
 dependencies:
   - python >=3.10
-  - numpy >=1.23,<2
+  - numpy >=1.23,<3
   - llvm-openmp
   - ccpi::cil-data >=22
-  - ccpi::tigre 2.6
-  - ccpi::ccpi-regulariser 24.0.1
+  - ccpi/label/dev::tigre 3.1.*
+  - ccpi::ccpi-regulariser 25.0.0 cuda*
   - ccpi::tomophantom 3.0.3
-  - astra-toolbox 2.1 cuda*
+  - astra-toolbox::astra-toolbox 2.*
   - cvxpy <= 1.7.5
   - python-wget
   - scikit-image

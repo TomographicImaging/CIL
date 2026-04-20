@@ -16,12 +16,14 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Joshua DM Hellier (University of Manchester) [refactorer]
-import numpy
+import numpy as np
 import warnings
 
 from .labels import AcquisitionDimension, Backend, AcquisitionType
 from .data_container import DataContainer
 from .partitioner import Partitioner
+import array_api_compat
+from array_api_compat import array_namespace # https://data-apis.org/array-api-compat/
 
 
 class AcquisitionData(DataContainer, Partitioner):
@@ -83,17 +85,15 @@ class AcquisitionData(DataContainer, Partitioner):
         if array is None:
             if dtype is None:
                 dtype = geometry.dtype
-            array = numpy.empty(geometry.shape, dtype)
+            xp = np
+            array = xp.empty(geometry.shape, dtype=dtype)
     
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
 
-        elif issubclass(type(array) , numpy.ndarray):
-            # remove singleton dimensions
-            array = numpy.squeeze(array)
-
         else:
-            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
+            # remove singleton dimensions
+            array = array.squeeze()
 
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
@@ -118,13 +118,13 @@ class AcquisitionData(DataContainer, Partitioner):
         bool
             True if the two objects are equal, False otherwise.
         '''
-
+        # FIXME: address this
         if isinstance(other, AcquisitionData):
-            if numpy.array_equal(self.as_array(), other.as_array()) \
+            if np.array_equal(self.as_array(), other.as_array()) \
                 and self.geometry == other.geometry \
                 and self.dtype == other.dtype:
                 return True 
-        elif numpy.array_equal(self.as_array(), other) and self.dtype==other.dtype:
+        elif np.array_equal(self.as_array(), other) and self.dtype==other.dtype:
             return True
         else:
             return False
@@ -149,7 +149,7 @@ class AcquisitionData(DataContainer, Partitioner):
             dim = self.geometry.dimension_labels.index('vertical')
 
             centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
-            ind0 = int(numpy.floor(centre_slice_pos))
+            ind0 = int(np.floor(centre_slice_pos))
             w2 = centre_slice_pos - ind0
             kwargs['vertical'] = ind0
             out = DataContainer.get_slice(self, **kwargs)

@@ -3,12 +3,15 @@
     - LSQR algorithm added to the CIL algorithm class (#1975)
     - Add `VolumeShrinker` tool to reduce the size of the reconstruction volume from an `AcquisitionData` (#2221)
     - LaminographyGeometryCorrector tool added to processors (#2259)
+    - Added `get_centre_slice` method to `ImageData`, `ImageGeometry`, and `AcquisitionGeometry`. (#2235)
+    - Allows passing vertical='centre' to `ImageGeometry.get_slice` (#2235)
   - Bug fixes:
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)
     - `cilacc` path lookup no longer broken for editable installations (#2257)
     - update `version.py` to use `importlib` & fix tagless installation #2255 (#2269)
     - Fixed behaviour of `ZeissDataReader` when negative values are passed in the ROI (#2244)
+    - Sets `center_x`, `center_y`, `center_z` appropriately for `ImageGeometry` returned by `get_slice` (#2235)
   - Dependencies:
     - olefile and dxchange are optional dependencies, instead of required (#2209)
     - dxchange minimum version set to 0.2.1 to fix #2256 (#2268)

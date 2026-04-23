@@ -174,27 +174,65 @@ class ImageGeometry(metaclass=BackwardCompat):
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
         '''
-        Returns a new ImageGeometry of a single slice of in the requested direction.
+        Returns a new ImageGeometry of a single slice in the requested direction.
+
+        Parameters
+        ----------
+        channel : int or 'centre', optional
+            The channel index to slice. Default is None (no slicing).
+        vertical : int or 'centre', optional
+            The vertical index to slice. Default is None (no slicing).
+        horizontal_x : int, optional
+            The horizontal x index to slice. Default is None (no slicing).
+        horizontal_y : int, optional
+            The horizontal y index to slice. Default is None (no slicing).
+        Returns
+        -------
+        geometry_new : ImageGeometry
+            A new ImageGeometry object representing the sliced geometry.
+
+        Note
+        ----
+        Slicing on vertical with 'centre' will return the central slice in that dimension.
+        Slicing on channels returns a geometry with a single channel, however the channel label is not
+        typically stored in the geometry.
         '''
+
         geometry_new = self.copy()
         if channel is not None:
             geometry_new.channels = 1
-
             try:
                 geometry_new.channel_labels = [self.channel_labels[channel]]
             except:
                 geometry_new.channel_labels = None
 
         if vertical is not None:
-            geometry_new.voxel_num_z = 0
+            geometry_new.voxel_num_z = 1
+            if vertical != 'centre':
+                if vertical == 0:
+                    warnings.warn("Slicing vertical at index 0 results in a geometry \
+                                  offset along the vertical axis. If you do not require an offset ImageGeometry, set vertical='centre",
+                                  UserWarning)
+                voxel_offset = (self.voxel_num_z)/2 - (vertical+0.5)
+                geometry_new.center_z -= voxel_offset * geometry_new.voxel_size_z
 
         if horizontal_y is not None:
-            geometry_new.voxel_num_y = 0
+            geometry_new.voxel_num_y = 1
+            voxel_offset = (self.voxel_num_y)/2 - (horizontal_y +0.5)
+            geometry_new.center_y -= voxel_offset * geometry_new.voxel_size_y
 
         if horizontal_x is not None:
-            geometry_new.voxel_num_x = 0
+            geometry_new.voxel_num_x = 1
+            voxel_offset = (self.voxel_num_x)/2 - (horizontal_x+0.5)
+            geometry_new.center_x -= voxel_offset * geometry_new.voxel_size_x
 
         return geometry_new
+    
+    def get_centre_slice(self):
+        '''
+        Returns a new ImageGeometry of the centre slice in the vertical direction.
+        '''
+        return self.get_slice(vertical='centre')
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []

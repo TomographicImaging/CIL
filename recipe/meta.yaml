@@ -30,6 +30,7 @@ test:
 
   commands:
     - pip install unittest-parametrize
+    - pip install bm3d
     - python -m unittest discover -v -s Wrappers/Python/test
 
 {% set ipp_version = '2021.12' %}

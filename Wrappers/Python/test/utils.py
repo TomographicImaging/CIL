@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2021 United Kingdom Research and Innovation
+#  Copyright 2021 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,6 +12,9 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import os
 import subprocess
@@ -31,7 +33,7 @@ def startTestRun(self):
     """Called once before any tests are executed.
     """
     #set logging
-    logging.basicConfig(level=logging.WARNING) 
+    logging.basicConfig(level=logging.WARNING)
 
     print("\n----------------------------------------------------------------------")
     print("TEST SYSTEM CONFIGURATION")
@@ -55,12 +57,16 @@ try:
     subprocess.check_output('nvidia-smi')
     has_nvidia = True
 except:
+    if os.environ.get("TESTS_FORCE_GPU", ""):
+        raise ImportError
     has_nvidia = False
 system_state['has_nvidia']=has_nvidia
 
 #astra
 module_info = importlib.util.find_spec("astra")
 if module_info is None:
+    if os.environ.get("TESTS_FORCE_GPU", ""):
+        raise ImportError
     has_astra = False
 else:
     has_astra = True
@@ -69,6 +75,8 @@ system_state['has_astra']=has_astra
 #tigre
 module_info = importlib.util.find_spec("tigre")
 if module_info is None:
+    if os.environ.get("TESTS_FORCE_GPU", ""):
+        raise ImportError
     has_tigre = False
 else:
     has_tigre = True
@@ -92,13 +100,18 @@ system_state['has_ipp']=has_ipp
 #ccpi-regularisation toolkit
 module_info = importlib.util.find_spec("ccpi")
 if module_info != None:
-    module_info = importlib.util.find_spec("ccpi.filters.cpu_regularisers")
+    module_info = importlib.util.find_spec("ccpi.filters.regularisers")
 
 if module_info is None:
     has_ccpi_regularisation = False
+    has_ccpi_regularisation_cuda = False
 else:
     has_ccpi_regularisation = True
+    from ccpi.filters.utils import cilregcuda
+    has_ccpi_regularisation_cuda = cilregcuda is not None
+
 system_state['has_ccpi_regularisation']= has_ccpi_regularisation
+system_state['has_ccpi_regularisation_cuda']= has_ccpi_regularisation_cuda
 
 
 #tomophantom
@@ -118,6 +131,30 @@ else:
     has_numba = True
 system_state['has_numba']= has_numba
 
+module_info = importlib.util.find_spec("matplotlib")
+if module_info is None:
+    has_matplotlib = False
+else:
+    has_matplotlib = True
+system_state['has_matplotlib'] = has_matplotlib
+
+#has_skimage
+module_info = importlib.util.find_spec("skimage")
+if module_info is None:
+    has_skimage = False
+else:
+    has_skimage = True
+system_state['has_skimage']= has_skimage
+
+#has_zenodo_get
+module_info = importlib.util.find_spec("zenodo_get")
+if module_info is None:
+    has_zenodo_get = False
+else:
+    import zenodo_get
+
+    has_zenodo_get = hasattr(zenodo_get, 'zenodo_get')
+system_state['has_zenodo_get'] = has_zenodo_get
 
 # to disable prints from 3rd part libraries and tests
 def disable_print():

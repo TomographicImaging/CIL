@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,17 +12,22 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 from utils import initialise_tests
-import numpy
-from cil.framework import ImageGeometry, AcquisitionGeometry
-from cil.framework import ImageData, AcquisitionData
-from cil.framework import BlockDataContainer, DataContainer
+import numpy as np
+from cil.framework import ImageGeometry, AcquisitionGeometry, VectorGeometry, ImageData, Partitioner, AcquisitionData, DataContainer
+from cil.framework import BlockDataContainer, BlockGeometry
 import functools
 
 from cil.optimisation.operators import GradientOperator, IdentityOperator, BlockOperator
 from testclass import CCPiTestClass as BDCUnittest
+
+from cil.utilities import dataexample
+import numpy
 
 initialise_tests()
 
@@ -103,12 +107,12 @@ class TestBlockDataContainer(BDCUnittest):
     def test_BlockDataContainer(self):
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
-        
+
         # data0 = ImageData(geometry=ig0)
         # data1 = ImageData(geometry=ig1) + 1
         data0 = ig0.allocate(0.)
         data1 = ig1.allocate(1.)
-    
+
         # data2 = ImageData(geometry=ig0) + 2
         # data3 = ImageData(geometry=ig1) + 3
         data2 = ig0.allocate(2.)
@@ -119,223 +123,223 @@ class TestBlockDataContainer(BDCUnittest):
 
         cp2 = BlockDataContainer(data0+1, data2+1)
         d = cp2 + data0
-        self.assertEqual(d.get_item(0).as_array()[0][0][0], 1) 
+        self.assertEqual(d.get_item(0).as_array()[0][0][0], 1)
         try:
             d = cp2 + data1
             self.assertTrue(False)
         except ValueError as ve:
             self.assertTrue(True)
         d = cp2 - data0
-        self.assertEqual(d.get_item(0).as_array()[0][0][0], 1) 
+        self.assertEqual(d.get_item(0).as_array()[0][0][0], 1)
         try:
             d = cp2 - data1
             self.assertTrue(False)
         except ValueError as ve:
             self.assertTrue(True)
         d = cp2 * data2
-        self.assertEqual(d.get_item(0).as_array()[0][0][0], 2) 
+        self.assertEqual(d.get_item(0).as_array()[0][0][0], 2)
         try:
             d = cp2 * data1
             self.assertTrue(False)
         except ValueError as ve:
             self.assertTrue(True)
-            
+
         a = [ (el, ot) for el,ot in zip(cp0.containers,cp1.containers)]
         #cp2 = BlockDataContainer(*a)
         cp2 = cp0.add(cp1)
         self.assertEqual (cp2.get_item(0).as_array()[0][0][0] , 2.)
         self.assertEqual (cp2.get_item(1).as_array()[0][0][0] , 4.)
-        
-        cp2 = cp0 + cp1 
+
+        cp2 = cp0 + cp1
         self.assertTrue (cp2.get_item(0).as_array()[0][0][0] == 2.)
         self.assertTrue (cp2.get_item(1).as_array()[0][0][0] == 4.)
-        cp2 = cp0 + 1 
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 1. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
+        cp2 = cp0 + 1
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 1. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
         cp2 = cp0 + [1 ,2]
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 1. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 3., decimal = 5)
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 1. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 3., decimal = 5)
         cp2 += cp1
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , +3. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , +6., decimal = 5)
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , +3. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , +6., decimal = 5)
+
         cp2 += 1
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , +4. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , +7., decimal = 5)
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , +4. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , +7., decimal = 5)
+
         cp2 += [-2,-1]
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 2. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 6., decimal = 5)
-        
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 2. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 6., decimal = 5)
+
+
         cp2 = cp0.subtract(cp1)
         assert (cp2.get_item(0).as_array()[0][0][0] == -2.)
         assert (cp2.get_item(1).as_array()[0][0][0] == -2.)
         cp2 = cp0 - cp1
         assert (cp2.get_item(0).as_array()[0][0][0] == -2.)
         assert (cp2.get_item(1).as_array()[0][0][0] == -2.)
-        
-        cp2 = cp0 - 1 
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , -1. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 0, decimal = 5)
+
+        cp2 = cp0 - 1
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , -1. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 0, decimal = 5)
         cp2 = cp0 - [1 ,2]
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , -1. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -1., decimal = 5)
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , -1. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -1., decimal = 5)
+
         cp2 -= cp1
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , -3. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -4., decimal = 5)
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , -3. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -4., decimal = 5)
+
         cp2 -= 1
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , -4. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -5., decimal = 5)
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , -4. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -5., decimal = 5)
+
         cp2 -= [-2,-1]
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , -2. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -4., decimal = 5)
-        
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , -2. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -4., decimal = 5)
+
+
         cp2 = cp0.multiply(cp1)
         assert (cp2.get_item(0).as_array()[0][0][0] == 0.)
         assert (cp2.get_item(1).as_array()[0][0][0] == 3.)
         cp2 = cp0 * cp1
         assert (cp2.get_item(0).as_array()[0][0][0] == 0.)
         assert (cp2.get_item(1).as_array()[0][0][0] == 3.)
-        
-        cp2 = cp0 * 2 
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2, decimal = 5)
-        cp2 = 2 * cp0  
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2, decimal = 5)
+
+        cp2 = cp0 * 2
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2, decimal = 5)
+        cp2 = 2 * cp0
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2, decimal = 5)
         cp2 = cp0 * [3 ,2]
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
-        cp2 = cp0 * numpy.asarray([3 ,2])
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
-        
-        cp2 = [3,2] * cp0 
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
-        cp2 = numpy.asarray([3,2]) * cp0 
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
+        cp2 = cp0 * np.asarray([3 ,2])
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
+
+        cp2 = [3,2] * cp0
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
+        cp2 = np.asarray([3,2]) * cp0
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
+
         try:
-            cp2 = [3,2,3] * cp0 
-            #numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-            #numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
+            cp2 = [3,2,3] * cp0
+            #np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+            #np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
             self.assertTrue(False)
         except ValueError as ve:
             self.assertTrue(True)
         cp2 *= cp1
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0 , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , +6., decimal = 5)
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0 , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , +6., decimal = 5)
+
         cp2 *= 1
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , +6., decimal = 5)
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , +6., decimal = 5)
+
         cp2 *= [-2,-1]
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -6., decimal = 5)
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -6., decimal = 5)
+
         try:
             cp2 *= [2,3,5]
             self.assertTrue(False)
         except ValueError as ve:
             self.assertTrue(True)
-        
+
         cp2 = cp0.divide(cp1)
         assert (cp2.get_item(0).as_array()[0][0][0] == 0.)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0], 1./3., decimal=4)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0], 1./3., decimal=4)
         cp2 = cp0/cp1
         assert (cp2.get_item(0).as_array()[0][0][0] == 0.)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0], 1./3., decimal=4)
-        
-        cp2 = cp0 / 2 
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 0.5, decimal = 5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0], 1./3., decimal=4)
+
+        cp2 = cp0 / 2
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 0.5, decimal = 5)
         cp2 = cp0 / [3 ,2]
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 0.5, decimal = 5)
-        cp2 = cp0 / numpy.asarray([3 ,2])
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 0.5, decimal = 5)
-        cp3 = numpy.asarray([3 ,2]) / (cp0+1)
-        numpy.testing.assert_almost_equal(cp3.get_item(0).as_array()[0][0][0] , 3. , decimal=5)
-        numpy.testing.assert_almost_equal(cp3.get_item(1).as_array()[0][0][0] , 1, decimal = 5)
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 0.5, decimal = 5)
+        cp2 = cp0 / np.asarray([3 ,2])
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 0.5, decimal = 5)
+        cp3 = np.asarray([3 ,2]) / (cp0+1)
+        np.testing.assert_almost_equal(cp3.get_item(0).as_array()[0][0][0] , 3. , decimal=5)
+        np.testing.assert_almost_equal(cp3.get_item(1).as_array()[0][0][0] , 1, decimal = 5)
+
         cp2 += 1
         cp2 /= cp1
         # TODO fix inplace division
-         
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 1./2 , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 1.5/3., decimal = 5)
-        
+
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 1./2 , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 1.5/3., decimal = 5)
+
         cp2 /= 1
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0.5 , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 0.5, decimal = 5)
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0.5 , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 0.5, decimal = 5)
+
         cp2 /= [-2,-1]
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , -0.5/2. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -0.5, decimal = 5)
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , -0.5/2. , decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -0.5, decimal = 5)
         ####
-        
+
         cp2 = cp0.power(cp1)
         assert (cp2.get_item(0).as_array()[0][0][0] == 0.)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0], 1., decimal=4)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0], 1., decimal=4)
         cp2 = cp0**cp1
         assert (cp2.get_item(0).as_array()[0][0][0] == 0.)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0], 1., decimal=4)
-        
-        cp2 = cp0 ** 2 
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0., decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 1., decimal = 5)
-        
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0], 1., decimal=4)
+
+        cp2 = cp0 ** 2
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0., decimal=5)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 1., decimal = 5)
+
         cp2 = cp0.maximum(cp1)
         assert (cp2.get_item(0).as_array()[0][0][0] == cp1.get_item(0).as_array()[0][0][0])
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0], cp2.get_item(1).as_array()[0][0][0], decimal=4)
-        
-        
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0], cp2.get_item(1).as_array()[0][0][0], decimal=4)
+
+
         cp2 = cp0.abs()
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0], 0., decimal=4)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0], 1., decimal=4)
-        
+        np.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0], 0., decimal=4)
+        np.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0], 1., decimal=4)
+
         cp2 = cp0.subtract(cp1)
         s = cp2.sign()
-        numpy.testing.assert_almost_equal(s.get_item(0).as_array()[0][0][0], -1., decimal=4)
-        numpy.testing.assert_almost_equal(s.get_item(1).as_array()[0][0][0], -1., decimal=4)
-        
+        np.testing.assert_almost_equal(s.get_item(0).as_array()[0][0][0], -1., decimal=4)
+        np.testing.assert_almost_equal(s.get_item(1).as_array()[0][0][0], -1., decimal=4)
+
         cp2 = cp0.add(cp1)
         s = cp2.sqrt()
-        numpy.testing.assert_almost_equal(s.get_item(0).as_array()[0][0][0], numpy.sqrt(2), decimal=4)
-        numpy.testing.assert_almost_equal(s.get_item(1).as_array()[0][0][0], numpy.sqrt(4), decimal=4)
-        
+        np.testing.assert_almost_equal(s.get_item(0).as_array()[0][0][0], np.sqrt(2), decimal=4)
+        np.testing.assert_almost_equal(s.get_item(1).as_array()[0][0][0], np.sqrt(4), decimal=4)
+
         s = cp0.sum()
         size = functools.reduce(lambda x,y: x*y, data1.shape, 1)
-        numpy.testing.assert_almost_equal(s, 0 + size, decimal=4)
+        np.testing.assert_almost_equal(s, 0 + size, decimal=4)
         s0 = 1
         s1 = 1
         for i in cp0.get_item(0).shape:
             s0 *= i
         for i in cp0.get_item(1).shape:
             s1 *= i
-            
-        #numpy.testing.assert_almost_equal(s[1], cp0.get_item(0,0).as_array()[0][0][0]*s0 +cp0.get_item(1,0).as_array()[0][0][0]*s1, decimal=4)
+
+        #np.testing.assert_almost_equal(s[1], cp0.get_item(0,0).as_array()[0][0][0]*s0 +cp0.get_item(1,0).as_array()[0][0][0]*s1, decimal=4)
     def test_Nested_BlockDataContainer(self):
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,4)
-        
+
         # data0 = ImageData(geometry=ig0)
         # data1 = ImageData(geometry=ig1) + 1
-        
+
         # data2 = ImageData(geometry=ig0) + 2
         # data3 = ImageData(geometry=ig1) + 3
         data0 = ig0.allocate(0.)
         data1 = ig1.allocate(1.)
-        
+
         data2 = ig0.allocate(2.)
         data3 = ig1.allocate(3.)
 
@@ -343,36 +347,36 @@ class TestBlockDataContainer(BDCUnittest):
         cp1 = BlockDataContainer(data2,data3)
 
         nbdc = BlockDataContainer(cp0, cp1)
-        nbdc2 = nbdc + 2 
-        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 2. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , 3. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 4. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 5. , decimal=5)
+        nbdc2 = nbdc + 2
+        np.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 2. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , 3. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 4. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 5. , decimal=5)
 
         nbdc2 = 2 + nbdc
-        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 2. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , 3. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 4. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 5. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 2. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , 3. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 4. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 5. , decimal=5)
 
 
-        nbdc2 = nbdc * 2 
-        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , 2. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 4. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 6. , decimal=5)
+        nbdc2 = nbdc * 2
+        np.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , 2. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 4. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 6. , decimal=5)
 
         nbdc2 = 2 * nbdc
-        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , 2. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 4. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 6. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , 2. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 4. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 6. , decimal=5)
 
-        nbdc2 = nbdc / 2 
-        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , .5 , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 1. , decimal=5)
-        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 3./2 , decimal=5)
+        nbdc2 = nbdc / 2
+        np.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , .5 , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 1. , decimal=5)
+        np.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 3./2 , decimal=5)
 
         c5 = nbdc.get_item(0).power(2).sum()
         c5a = nbdc.power(2).sum()
@@ -381,17 +385,17 @@ class TestBlockDataContainer(BDCUnittest):
         a = cp0 * data2
         b = data2 * cp0
         self.assertBlockDataContainerEqual(a,b)
-        
+
 
     def test_NestedBlockDataContainer2(self):
         M, N = 2, 3
-        ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N) 
+        ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N)
         ag = ig
         u = ig.allocate(1)
         op1 = GradientOperator(ig)
         op2 = IdentityOperator(ig, ag)
 
-        operator = BlockOperator(op1, op2, shape=(2,1)) 
+        operator = BlockOperator(op1, op2, shape=(2,1))
 
         d1 = op1.direct(u)
         d2 = op2.direct(u)
@@ -415,20 +419,20 @@ class TestBlockDataContainer(BDCUnittest):
 
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
-        
+
         data0 = ImageData(geometry=ig0)
         data1 = ImageData(geometry=ig1) + 1
-        
+
         data2 = ImageData(geometry=ig0) + 2
         data3 = ImageData(geometry=ig1) + 3
-        
+
         cp0 = BlockDataContainer(data0,data1)
         #cp1 = BlockDataContainer(data2,data3)
 
         cp2 = BlockDataContainer(data0+1, data1+1)
 
         data0.fill(data2)
-        self.assertNumpyArrayEqual(data0.as_array(), data2.as_array())
+        np.testing.assert_array_equal(data0.as_array(), data2.as_array())
         data0 = ImageData(geometry=ig0)
 
         cp0.fill(cp2)
@@ -438,10 +442,10 @@ class TestBlockDataContainer(BDCUnittest):
     def test_NestedBlockDataContainer(self):
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
-        
+
         data0 = ig0.allocate(0)
         data2 = ig0.allocate(1)
-        
+
         cp0 = BlockDataContainer(data0,data2)
         #cp1 = BlockDataContainer(data2,data3)
 
@@ -451,127 +455,238 @@ class TestBlockDataContainer(BDCUnittest):
         self.assertBlockDataContainerEqual(out, nested)
 
 
-    
+    def test_sapyb_a_b_scalar(self):
+        # test axpby between BlockDataContainers, with a as a blockdatacontainer
 
-    def test_sapyb(self):
-        # test axpby between BlockDataContainers
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
-        
+
         data0 = ig0.allocate(-1)
         data2 = ig0.allocate(1)
 
         data1 = ig0.allocate(2)
         data3 = ig0.allocate(3)
-        
+
+
+
         cp0 = BlockDataContainer(data0,data2)
         cp1 = BlockDataContainer(data1,data3)
-        
+    
+
         out = cp0 * 0. - 10
 
-        cp0.sapyb(3,cp1, -2,out, num_threads=4)
+        # cp0.axpby(a,-2,cp1,out, num_threads=4)
+        cp0.sapyb(3, cp1,-2,out, num_threads=1)
 
-        # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-2) * 3 ] 
-        # output should be [ -7 , -3 ]
+        # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-2) * 3 ]
+        # output should be [ -7 , -4 ]
         res0 = ig0.allocate(-7)
         res2 = ig0.allocate(-3)
         res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
-
-    def test_sapyb2(self):
-        # test axpby with BlockDataContainer and DataContainer
-        ig0 = ImageGeometry(2,3,4)
-        # ig1 = ImageGeometry(2,3,5)
         
+        #With out is None
+        out = cp0.sapyb(3,cp1,-2, num_threads=4)
+        
+        self.assertBlockDataContainerEqual(out, res)
+
+    def test_sapyb_a_blockdc(self):
+        # test axpby between BlockDataContainers, with a as a blockdatacontainer
+
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,5)
+
         data0 = ig0.allocate(-1)
         data2 = ig0.allocate(1)
 
         data1 = ig0.allocate(2)
-        # data3 = ig1.allocate(3)
-        
+        data3 = ig0.allocate(3)
+
+        a1 = ig0.allocate(3)
+        a2 = ig0.allocate(2)
+
         cp0 = BlockDataContainer(data0,data2)
-        # cp1 = BlockDataContainer(data1,data3)
-        
+        cp1 = BlockDataContainer(data1,data3)
+        a = BlockDataContainer(a1,a2)
+
         out = cp0 * 0. - 10
 
-        cp0.sapyb(3,data1,-2,out)
+        # cp0.axpby(a,-2,cp1,out, num_threads=4)
+        cp0.sapyb(a, cp1,-2,out, num_threads=1)
 
-        # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-2) * 2 ] 
-        # output should be [ -7 , -1 ]
+        # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-2) * 3 ]
+        # output should be [ -7 , -4 ]
         res0 = ig0.allocate(-7)
-        res2 = ig0.allocate(-1)
+        res2 = ig0.allocate(-4)
         res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
+        
+        #With out is None
+        out = cp0.sapyb(a,cp1,-2, num_threads=4)
+        
+        self.assertBlockDataContainerEqual(out, res)
 
 
-    def test_sapyb3(self):
-        # test axpby with nested BlockDataContainer
+    def test_sapyb_b_blockdc(self):
+        # test axpby between BlockDataContainers, with b as a blockdatacontainer
+
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
-        
+
         data0 = ig0.allocate(-1)
         data2 = ig0.allocate(1)
 
-        # data1 = ig0.allocate(2)
-        data3 = ig1.allocate(3)
-        
+        data1 = ig0.allocate(2)
+        data3 = ig0.allocate(3)
+
+        b1 = ig0.allocate(-2)
+        b2 = ig0.allocate(-3)
+
         cp0 = BlockDataContainer(data0,data2)
-        cp1 = BlockDataContainer(cp0 *0. +  [2, -2], data3)  
+        cp1 = BlockDataContainer(data1,data3)
+        b = BlockDataContainer(b1,b2)
 
-        out = cp1 * 0. 
-        cp2 = out + [1,3]
+        out = cp0 * 0. - 10
 
-        cp2.sapyb(3,cp1, -2 ,out)
+        cp0.sapyb(3,cp1, b,out, num_threads=4)
 
-        # output should be [ [ -1 , 7 ] , 3]
-        res0 = ig0.allocate(-1)
-        res2 = ig0.allocate(7)
-        res3 = ig1.allocate(3)
-        res = BlockDataContainer(BlockDataContainer(res0, res2), res3)
+        # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-3) * 3 ]
+        # output should be [ -7 , -3 ]
+        res0 = ig0.allocate(-7)
+        res2 = ig0.allocate(-6)
+        res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
+        
+        #With out is None
+        out = cp0.sapyb(3,cp1, b, num_threads=4)
+        
+        self.assertBlockDataContainerEqual(out, res)
 
-    def test_sapyb4(self):
-        # test axpby with nested BlockDataContainer
+    def test_sapyb_ab_blockdc(self):
+        # test axpby between BlockDataContainers, with a and b as a blockdatacontainer
+
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
-        
+
         data0 = ig0.allocate(-1)
         data2 = ig0.allocate(1)
 
-        # data1 = ig0.allocate(2)
-        data3 = ig1.allocate(3)
-        
+        data1 = ig0.allocate(2)
+        data3 = ig0.allocate(3)
+
+        a1 = ig0.allocate(3)
+        a2 = ig0.allocate(2)
+
+        b1 = ig0.allocate(-2)
+        b2 = ig0.allocate(-3)
+
         cp0 = BlockDataContainer(data0,data2)
-        cp1 = BlockDataContainer(cp0 *0. +  [2, -2], data3)
+        cp1 = BlockDataContainer(data1,data3)
+        a = BlockDataContainer(a1,a2)
+        b = BlockDataContainer(b1,b2)
 
-        out = cp1 * 0. 
-        cp2 = out + [1,3]
+        out = cp0 * 0. - 10
 
-        cp2.axpby(3,-2, cp1 ,out, num_threads=4)
+        cp0.sapyb(a,cp1,b,out, num_threads=4)
 
-        # output should be [ [ -1 , 7 ] , 3]
-        res0 = ig0.allocate(-1)
-        res2 = ig0.allocate(7)
-        res3 = ig1.allocate(3)
-        res = BlockDataContainer(BlockDataContainer(res0, res2), res3)
+        # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-3) * 3 ]
+        # output should be [ -7 , -7 ]
+        res0 = ig0.allocate(-7)
+        res2 = ig0.allocate(-7)
+        res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
+        
+        #With out is None
+        out = cp0.sapyb(a,cp1,b, num_threads=4)
+        
+        self.assertBlockDataContainerEqual(out, res)
+
+
+    def test_sapyb_ab_blockdc_y_dc(self):
+        # test axpby between BlockDataContainers, with a and b as a blockdatacontainer, and y as a dc
+
+        ig0 = ImageGeometry(2,3,4)
+
+        data0 = ig0.allocate(-1)
+        data2 = ig0.allocate(1)
+
+        data1 = ig0.allocate(2)
+
+        a1 = ig0.allocate(3)
+        a2 = ig0.allocate(2)
+
+        b1 = ig0.allocate(-2)
+        b2 = ig0.allocate(-3)
+
+        cp0 = BlockDataContainer(data0,data2)
+
+        a = BlockDataContainer(a1,a2)
+        b = BlockDataContainer(b1,b2)
+
+        out = cp0 * 0. - 10
+
+        cp0.sapyb(a,data1,b,out, num_threads=4)
+
+        # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-3) * 2 ]
+        # output should be [ -7 , -4 ]
+        res0 = ig0.allocate(-7)
+        res2 = ig0.allocate(-4)
+        res = BlockDataContainer(res0, res2)
+
+        self.assertBlockDataContainerEqual(out, res)
+        
+        #With out is None
+        out = cp0.sapyb(a,data1,b, num_threads=4)
+        
+        self.assertBlockDataContainerEqual(out, res)
+
+    def test_BlockDataContainer_mixed_arithmetic(self):
+        a = numpy.ones([2, 2], dtype=numpy.float32) * 2
+        b = numpy.ones([2, 2], dtype=numpy.float32) * 4
+        c = numpy.ones([2, 2], dtype=numpy.float32) * 3
+
+        bdc = BlockDataContainer(DataContainer(a))
+        bdc2 = BlockDataContainer(DataContainer(a), DataContainer(b))
+        dc = DataContainer(b)
+        dc2 = DataContainer(c)
+
+        sub1 = bdc - dc # 2 - 4
+        self.assertIsInstance(sub1, BlockDataContainer)
+        np.testing.assert_almost_equal(sub1.get_item(0).as_array(), -2, decimal=5)
+
+        sub2 = dc - bdc # 4 - 2
+        self.assertIsInstance(sub2, BlockDataContainer)
+        np.testing.assert_almost_equal(sub2.get_item(0).as_array(), 2, decimal=5)
+
+        sub3 = dc2 - bdc2 # 3 - (2, 4)
+        self.assertIsInstance(sub3, BlockDataContainer)
+        np.testing.assert_almost_equal(sub3.get_item(0).as_array(), 1, decimal=5)
+        np.testing.assert_almost_equal(sub3.get_item(1).as_array(), -1, decimal=5)
+
+        div1 = bdc / dc # 2 / 4
+        self.assertIsInstance(div1, BlockDataContainer)
+        np.testing.assert_almost_equal(div1.get_item(0).as_array(), 0.5, decimal=5)
+
+        div2 = dc / bdc # 4 / 2
+        self.assertIsInstance(div2, BlockDataContainer)
+        np.testing.assert_almost_equal(div2.get_item(0).as_array(), 2, decimal=5)
 
 
 class TestOutParameter(BDCUnittest):
     def setUp(self):
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
-        
+
         data0 = ig0.allocate(-1)
         data2 = ig1.allocate(1)
 
         # data1 = ig0.allocate(2)
         # data3 = ig1.allocate(3)
-        
+
         cp0 = BlockDataContainer(data0,data2)
         self.ig0 = ig0
         self.ig1 = ig1
@@ -596,7 +711,7 @@ class TestOutParameter(BDCUnittest):
         res = BlockDataContainer(self.ig0.allocate(-1-1), self.ig1.allocate(1-1))
         self.assertBlockDataContainerEqual(cp1, res)
 
-        
+
     def test_binary_multiply(self):
         # test axpby with nested BlockDataContainer
         cp0 = self.cp0
@@ -663,10 +778,10 @@ class TestOutParameter(BDCUnittest):
 
         # data1 = ig0.allocate(2)
         # data3 = ig1.allocate(3)
-        
+
         cp0 = BlockDataContainer(data0,data2)
         cp1 = cp0.sqrt()
-        res = BlockDataContainer(self.ig0.allocate(numpy.sqrt(4)), self.ig1.allocate(numpy.sqrt(8)))
+        res = BlockDataContainer(self.ig0.allocate(np.sqrt(4)), self.ig1.allocate(np.sqrt(8)))
         self.assertBlockDataContainerAlmostEqual(res, cp1)
     def test_unary_sqrt2(self):
         # test axpby with nested BlockDataContainer
@@ -675,35 +790,35 @@ class TestOutParameter(BDCUnittest):
 
         # data1 = ig0.allocate(2)
         # data3 = ig1.allocate(3)
-        
+
         cp0 = BlockDataContainer(data0,data2)
         cp0.sqrt(out=cp0)
-        res = BlockDataContainer(self.ig0.allocate(numpy.sqrt(4)), self.ig1.allocate(numpy.sqrt(8)))
+        res = BlockDataContainer(self.ig0.allocate(np.sqrt(4)), self.ig1.allocate(np.sqrt(8)))
         self.assertBlockDataContainerAlmostEqual(res, cp0)
 
     def test_unary_conjugate(self):
         # test axpby with nested BlockDataContainer
-        data0 = self.ig0.allocate(4+3j, dtype=numpy.complex64)
-        data2 = self.ig1.allocate(1-1j, dtype=numpy.complex64)
+        data0 = self.ig0.allocate(4+3j, dtype=np.complex64)
+        data2 = self.ig1.allocate(1-1j, dtype=np.complex64)
 
         # data1 = ig0.allocate(2)
         # data3 = ig1.allocate(3)
-        
+
         cp0 = BlockDataContainer(data0,data2)
         cp1 = cp0.conjugate()
-        res = BlockDataContainer(self.ig0.allocate(4-3j, dtype=numpy.complex64), self.ig1.allocate(1+1j, dtype=numpy.complex64))
+        res = BlockDataContainer(self.ig0.allocate(4-3j, dtype=np.complex64), self.ig1.allocate(1+1j, dtype=np.complex64))
         self.assertBlockDataContainerAlmostEqual(res, cp1)
     def test_unary_conjugate2(self):
         # test axpby with nested BlockDataContainer
-        data0 = self.ig0.allocate(4+3j, dtype=numpy.complex64)
-        data2 = self.ig1.allocate(1-1j, dtype=numpy.complex64)
+        data0 = self.ig0.allocate(4+3j, dtype=np.complex64)
+        data2 = self.ig1.allocate(1-1j, dtype=np.complex64)
 
         # data1 = ig0.allocate(2)
         # data3 = ig1.allocate(3)
-        
+
         cp0 = BlockDataContainer(data0,data2)
         cp0.conjugate(out=cp0)
-        res = BlockDataContainer(self.ig0.allocate(4-3j, dtype=numpy.complex64), self.ig1.allocate(1+1j, dtype=numpy.complex64))
+        res = BlockDataContainer(self.ig0.allocate(4-3j, dtype=np.complex64), self.ig1.allocate(1+1j, dtype=np.complex64))
         self.assertBlockDataContainerAlmostEqual(res, cp0)
 
     def test_unary_abs1(self):
@@ -713,135 +828,194 @@ class TestOutParameter(BDCUnittest):
         res = BlockDataContainer(self.ig0.allocate(1), self.ig1.allocate(1))
         self.assertBlockDataContainerAlmostEqual(res, cp1)
 
-    def test_sapyb_a_blockdc(self):
-        # test axpby between BlockDataContainers, with a as a blockdatacontainer
 
+    def test_iterator(self):
+        ig0 = VectorGeometry(5)
+        data0=ig0.allocate(0)
+        data1=ig0.allocate(1)
+        data2=ig0.allocate(2)
+        container=BlockDataContainer(data0,data1,data2)
+        a=[]
+        for data in container:
+            a.append(list(data.array))
+        self.assertListEqual(a, [[0.,0.,0.,0.,0.],[1.,1.,1.,1.,1.],[2,2,2,2,2]])
+
+        a=[] #check it works a second time!
+        for data in container:
+            a.append(list(data.array))
+        self.assertListEqual(a, [[0.,0.,0.,0.,0.],[1.,1.,1.,1.,1.],[2,2,2,2,2]])
+
+
+class TestBlockGeometry(unittest.TestCase):
+    def setUp(self):
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(0,360, 9))
+
+        self.ig = BlockGeometry( *[ AG.copy() for i in range(9) ] )
+
+    def test_block_geometry(self):
+        for ig in self.ig:
+            assert type(ig) == AcquisitionGeometry
+
+
+class TestAcquisitionDataPartition(unittest.TestCase):
+    def setUp(self):
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10])\
+            .set_panel(num_pixels=10)\
+            .set_angles(angles=range(9))
+
+        data = AG.allocate(None)
+        for i in range(AG.num_projections):
+            data.array[i] = i
+        self.data = data
+
+    def test_partition(self):
+        # data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        # self.data = data.get_slice(vertical='centre')
+        # split in num_batches
+        num_batches = 4
+
+        #Testing sequential partitioning
+        data = self.data.partition(num_batches, 'sequential')
+        idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=False)
+        assert len(data.containers) == num_batches
+        self.assertDataIsTheSame(data, idxs)
+
+        #Testing staggered partitioning
+        data = self.data.partition(num_batches, Partitioner.STAGGERED)
+        idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=True)
+        assert len(data.containers) == num_batches
+        self.assertDataIsTheSame(data, idxs)
+
+    def test_partition_diff_num_batches(self):
+
+        #Check what happens when the number of batches is equal to the number of projection angles
+        num_batches=9
+        data = self.data.partition(num_batches, 'sequential')
+        idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=False)
+        assert len(data.containers) == num_batches
+        self.assertDataIsTheSame(data, idxs, msg='Failed when num_batches=number of projections')
+
+        #Check what happens when the number of batches is one, the whole set of projection angles
+        num_batches=1
+        data = self.data.partition(num_batches, 'sequential')
+        idxs = self.data._partition_indices(num_batches, indices=self.data.geometry.num_projections, stagger=False)
+        assert len(data.containers) == num_batches
+        self.assertDataIsTheSame(data, idxs, msg="Failed when num_batches=1")
+
+        #Check what happens when the number of batches is zero
+        num_batches=0
+        with self.assertRaises(ZeroDivisionError):
+            data = self.data.partition(num_batches, 'sequential')
+
+       #Check what happens when the number of batches is greater than the number of projection angles
+        num_batches=10
+        with self.assertRaises(ValueError):
+            data = self.data.partition(num_batches, 'sequential')
+
+    def assertDataIsTheSame(self, data, idxs, msg=None):
+        # let's check that the data is the same
+        k = 0
+        wrong = 0
+        for i, el in enumerate(data):
+            if len(el.shape)>1:
+                j_range=el.shape[0]
+            else:
+                j_range=1
+            for j in range(j_range):
+                idx = idxs[i][j]
+                try:
+                    np.testing.assert_array_equal(el.as_array()[j], self.data.as_array()[idx], err_msg=msg)
+                except AssertionError:
+                    wrong += 1
+                k += 1
+
+        assert wrong == 0
+
+class TestBlockDataContainerGeometry(BDCUnittest):
+
+    def setUp(self):
+        self.pnorm_error_msg = 'pnorm: Incompatible shapes - each container in the BlockDataContainer must have the same shape in order to calculate the pnorm'
+
+    def test_allocate(self):
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
-        
-        data0 = ig0.allocate(-1)
+
+        data0 = ig0.allocate(0)
         data2 = ig0.allocate(1)
 
-        data1 = ig0.allocate(2)
-        data3 = ig0.allocate(3)
-        
-        a1 = ig0.allocate(3)
-        a2 = ig0.allocate(2)
-
         cp0 = BlockDataContainer(data0,data2)
-        cp1 = BlockDataContainer(data1,data3)
-        a = BlockDataContainer(a1,a2)
 
-        out = cp0 * 0. - 10
-
-        # cp0.axpby(a,-2,cp1,out, num_threads=4)
-        cp0.sapyb(a, cp1,-2,out, num_threads=1)
-
-        # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-2) * 3 ] 
-        # output should be [ -7 , -4 ]
-        res0 = ig0.allocate(-7)
-        res2 = ig0.allocate(-4)
-        res = BlockDataContainer(res0, res2)
-
-        self.assertBlockDataContainerEqual(out, res)
-
-
-    def test_sapyb_b_blockdc(self):
-        # test axpby between BlockDataContainers, with b as a blockdatacontainer
-
+        assert cp0.geometry == BlockGeometry(ig0, ig0)
+        assert cp0.geometry != BlockGeometry(ig0, ig1)
+        data1=ig1.allocate(0)
+        cp1 = BlockDataContainer(data0, data1)
+        bg = BlockGeometry(ig0, ig1)
+        self.assertBlockDataContainerAlmostEqual(bg.allocate(0), cp1)
+        self.assertBlockDataContainerAlmostEqual(cp1.geometry.allocate(0), cp1)
+        
+    def test_pnorm2(self):
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
-        
-        data0 = ig0.allocate(-1)
-        data2 = ig0.allocate(1)
 
-        data1 = ig0.allocate(2)
-        data3 = ig0.allocate(3)
-        
-        b1 = ig0.allocate(-2)
-        b2 = ig0.allocate(-3)
+        data0 = ig0.allocate(0)
+        data2 = ig1.allocate(1)
 
         cp0 = BlockDataContainer(data0,data2)
-        cp1 = BlockDataContainer(data1,data3)
-        b = BlockDataContainer(b1,b2)
 
-        out = cp0 * 0. - 10
+        with self.assertRaisesRegex(ValueError, self.pnorm_error_msg):
+            cp0.pnorm(2)
 
-        cp0.sapyb(3,cp1, b,out, num_threads=4)
+        cp0 = BlockDataContainer(data2,data2)
+        np.testing.assert_allclose(cp0.pnorm(2).as_array(), np.sqrt(1**2 + 1**2)*data2.as_array())
 
-        # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-3) * 3 ] 
-        # output should be [ -7 , -3 ]
-        res0 = ig0.allocate(-7)
-        res2 = ig0.allocate(-6)
-        res = BlockDataContainer(res0, res2)
-
-        self.assertBlockDataContainerEqual(out, res)
-
-    def test_sapyb_ab_blockdc(self):
-        # test axpby between BlockDataContainers, with a and b as a blockdatacontainer
-
+    def test_pnorm1(self):
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
-        
-        data0 = ig0.allocate(-1)
-        data2 = ig0.allocate(1)
 
-        data1 = ig0.allocate(2)
-        data3 = ig0.allocate(3)
-        
-        a1 = ig0.allocate(3)
-        a2 = ig0.allocate(2)
-
-        b1 = ig0.allocate(-2)
-        b2 = ig0.allocate(-3)
+        data0 = ig0.allocate(0)
+        data2 = ig1.allocate(1)
 
         cp0 = BlockDataContainer(data0,data2)
-        cp1 = BlockDataContainer(data1,data3)
-        a = BlockDataContainer(a1,a2)
-        b = BlockDataContainer(b1,b2)
 
-        out = cp0 * 0. - 10
+        with self.assertRaisesRegex(ValueError, self.pnorm_error_msg):
+            cp0.pnorm(1)
 
-        cp0.sapyb(a,cp1,b,out, num_threads=4)
-
-        # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-3) * 3 ] 
-        # output should be [ -7 , -7 ]
-        res0 = ig0.allocate(-7)
-        res2 = ig0.allocate(-7)
-        res = BlockDataContainer(res0, res2)
-
-        self.assertBlockDataContainerEqual(out, res)
+        cp0 = BlockDataContainer(data2,data2)
+        np.testing.assert_allclose(cp0.pnorm(1).array, np.ones_like(data2.array)*2)
 
 
-    def test_sapyb_ab_blockdc_y_dc(self):
-        # test axpby between BlockDataContainers, with a and b as a blockdatacontainer, and y as a dc
-
+    def test_equals(self):
         ig0 = ImageGeometry(2,3,4)
-
-        data0 = ig0.allocate(-1)
+        
+        data0 = ig0.allocate(0)
         data2 = ig0.allocate(1)
 
-        data1 = ig0.allocate(2)
-        
-        a1 = ig0.allocate(3)
-        a2 = ig0.allocate(2)
-
-        b1 = ig0.allocate(-2)
-        b2 = ig0.allocate(-3)
-
         cp0 = BlockDataContainer(data0,data2)
+        cp1 = BlockDataContainer(data0,data2)
 
-        a = BlockDataContainer(a1,a2)
-        b = BlockDataContainer(b1,b2)
+        assert cp0.geometry == cp1.geometry
 
-        out = cp0 * 0. - 10
+        cp1 = BlockDataContainer(data2,data2)
 
-        cp0.sapyb(a,data1,b,out, num_threads=4)
+        assert cp0 != cp1
 
-        # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-3) * 2 ] 
-        # output should be [ -7 , -4 ]
-        res0 = ig0.allocate(-7)
-        res2 = ig0.allocate(-4)
-        res = BlockDataContainer(res0, res2)
+        cp1 = BlockDataContainer(data2,data2,data2)
 
-        self.assertBlockDataContainerEqual(out, res)
+        assert cp0 != cp1
+
+    def test_geometry_None(self):
+        ig0 = ImageGeometry(2,3,4)
+        
+        data0 = ig0.allocate(0)
+        
+        from cil.framework import DataContainer
+        X, Y, Z = 2, 12, 5
+        
+        a = numpy.ones((X, Y, Z), dtype='float32')
+        ds = DataContainer(a, False, ['X', 'Y', 'Z'])
+
+        cp0 = BlockDataContainer(data0,ds)
+
+        assert cp0.geometry is None

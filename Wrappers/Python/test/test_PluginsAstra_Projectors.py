@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2022 United Kingdom Research and Innovation
+#  Copyright 2022 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,19 +12,28 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
 from cil.framework import AcquisitionGeometry
 import numpy as np
 from utils import has_astra, has_nvidia, initialise_tests
+from utils_projectors import TestCommon_ProjectionOperatorBlockOperator
+from cil.utilities import dataexample
+from unittest_parametrize import param, parametrize, ParametrizedTestCase
 
 initialise_tests()
 
 if has_astra:
     from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
+    from cil.plugins.astra.operators import ProjectionOperator
 
-class TestAstraProjectors(unittest.TestCase):
-    def setUp(self): 
+
+@unittest.skipUnless(has_astra, "Requires ASTRA")
+class TestAstraProjectors(ParametrizedTestCase, unittest.TestCase):
+    def setUp(self):
 
         N = 128
         angles = np.linspace(0, np.pi, 180, dtype='float32')
@@ -34,10 +42,10 @@ class TestAstraProjectors(unittest.TestCase):
                                 .set_angles(angles, angle_unit='radian')\
                                 .set_panel(N, 0.1)\
                                 .set_labels(['angle', 'horizontal'])
-        
+
         self.ig = self.ag.get_ImageGeometry()
 
-        
+
         self.ag3 = AcquisitionGeometry.create_Parallel3D()\
                                 .set_angles(angles, angle_unit='radian')\
                                 .set_panel((N, N), (0.1, 0.1))\
@@ -51,10 +59,10 @@ class TestAstraProjectors(unittest.TestCase):
                                 .set_labels(['channel','angle', 'horizontal'])\
                                 .set_channels(5)
 
-        
+
         self.ig_channel = self.ag_channel.get_ImageGeometry()
 
-        
+
         self.ag3_channel = AcquisitionGeometry.create_Parallel3D()\
                                 .set_angles(angles, angle_unit='radian')\
                                 .set_panel((N, N), (0.1, 0.1))\
@@ -64,6 +72,43 @@ class TestAstraProjectors(unittest.TestCase):
         self.ig3_channel = self.ag3_channel.get_ImageGeometry()
 
         self.norm = 14.85
+
+    def test_ProjectionOperator_img_geom_default(self):
+        K = ProjectionOperator(image_geometry=None, acquisition_geometry=self.ag, device='cpu')
+        assert(K.volume_geometry == self.ag.get_ImageGeometry())
+
+    def test_ProjectionOperator_acq_geom_default(self):
+        with self.assertRaises(TypeError):
+            ProjectionOperator(image_geometry=self.ig, acquisition_geometry=None, device='cpu')
+
+    def test_ProjectionOperator_all_default(self):
+        with self.assertRaises(TypeError):
+            ProjectionOperator(image_geometry=None, acquisition_geometry=None, device='cpu')
+
+    @parametrize("device, raise_error, err_type",
+        [param('cpu', False, None, id="cpu_NoError"),
+         param('CPU', False, None, id="CPU_NoError"),
+         param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")])
+    def test_ProjectionOperator_2Ddata(self, device, raise_error: bool, err_type):
+        if raise_error:
+            with self.assertRaises(err_type):
+                ProjectionOperator(self.ig, self.ag, device)
+        else:
+            assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
+
+    @parametrize("device, raise_error, err_type",
+        [param('gpu', False, None, id="gpu_NoError"),
+         param('GPU', False, None, id="GPU_NoError"),
+         param('cpu', True, NotImplementedError, id="cpu_NotImplementedError"),
+         param('CPU', True, NotImplementedError, id="CPU_NotImplementedError"),
+         param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")])
+    @unittest.skipUnless(has_nvidia, "Requires GPU")
+    def test_ProjectionOperator_3Ddata(self, device, raise_error: bool, err_type):
+        if raise_error:
+            with self.assertRaises(err_type):
+                ProjectionOperator(self.ig3, self.ag3, device)
+        else:
+            assert isinstance(ProjectionOperator(self.ig3, self.ag3, device), object)
 
 
     def foward_projection(self, A, ig, ag):
@@ -79,7 +124,6 @@ class TestAstraProjectors(unittest.TestCase):
         self.assertEqual(id_1,id_2)
         self.assertAlmostEqual(acq_data_0.array.item(0), 12.800, places=3) #check not zeros
         np.testing.assert_allclose(acq_data_0.as_array(),acq_data_1.as_array())
-
 
     def backward_projection(self, A, ig, ag):
         acq_data = ag.allocate(None)
@@ -99,8 +143,6 @@ class TestAstraProjectors(unittest.TestCase):
         n = A.norm()
         self.assertAlmostEqual(n, self.norm, places=2)
 
-
-    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_AstraProjector2D_cpu(self):
 
         A = AstraProjector2D(self.ig, self.ag, device = 'cpu')
@@ -109,8 +151,7 @@ class TestAstraProjectors(unittest.TestCase):
         self.backward_projection(A,self.ig, self.ag)
         self.projector_norm(A)
 
-
-    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_nvidia, "Requires GPU")
     def test_AstraProjector2D_gpu(self):
 
         A = AstraProjector2D(self.ig, self.ag, device = 'gpu')
@@ -119,8 +160,7 @@ class TestAstraProjectors(unittest.TestCase):
         self.backward_projection(A,self.ig, self.ag)
         self.projector_norm(A)
 
-
-    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_nvidia, "Requires GPU")
     def test_AstraProjector3D_2Ddata(self):
 
         A = AstraProjector3D(self.ig, self.ag)
@@ -139,8 +179,7 @@ class TestAstraProjectors(unittest.TestCase):
         with self.assertRaises(ValueError):
             A = AstraProjector3D(ig_2, self.ag)
 
-
-    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_nvidia, "Requires GPU")
     def test_AstraProjector3D_3Ddata(self):
         # test exists
         A = AstraProjector3D(self.ig3, self.ag3)
@@ -159,3 +198,18 @@ class TestAstraProjectors(unittest.TestCase):
         with self.assertRaises(ValueError):
             A3 = AstraProjector3D(ig3_2, self.ag3)
 
+
+@unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA and a GPU")
+class TestASTRA_BlockOperator(unittest.TestCase, TestCommon_ProjectionOperatorBlockOperator):
+    def setUp(self):
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.data = data.get_slice(vertical='centre')
+        ig = self.data.geometry.get_ImageGeometry()
+        self.datasplit = self.data.partition(10, 'sequential')
+
+        K = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.datasplit.geometry)
+        A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)
+        self.projectionOperator = (A, K)
+
+    def test_partition(self):
+        self.partition_test()

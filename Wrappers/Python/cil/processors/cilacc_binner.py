@@ -1,3 +1,21 @@
+#  Copyright 2023 United Kingdom Research and Innovation
+#  Copyright 2023 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+
 from cil.framework import cilacc
 
 import numpy as np
@@ -10,7 +28,7 @@ class Binner_IPP(object):
 
    def __init__(self, shape_in, shape_out, start_index, binning):
       """This constructs a configured cilacc Binner object used by cil.processors.Binner. This class should not be used directly.
-        
+
       This performs no checks on the inputs. Expects input for 4 dimensions.
 
       Parameters
@@ -52,13 +70,13 @@ class Binner_IPP(object):
       for i in range(4):
          if shape_out_p[i] * binning_p[i] + ind_start_p[i] > shape_in_p[i]:
             raise ValueError("Input dimension mismatch on dimension {0}".format(i))
-   
+
       self.obj = cilacc.Binner_new(shape_in_p, shape_out_p, ind_start_p, binning_p)
 
 
    def bin(self, array_in, array_binned):
       """This bins the input array and writes the result in array_binned.
-      
+
       This  performs no checks on the inputs.
 
       Parameters
@@ -76,7 +94,7 @@ class Binner_IPP(object):
       return cilacc.Binner_bin(self.obj, data_p, data_out_p)
 
    def __del__(self):
-      """This deletes the cilacc Binner object 
+      """This deletes the cilacc Binner object
       """
 
       if hasattr(self,'obj'):

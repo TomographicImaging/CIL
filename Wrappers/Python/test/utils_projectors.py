@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2022 United Kingdom Research and Innovation
+#  Copyright 2022 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,12 +12,41 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import numpy as np
 from cil.optimisation.operators import LinearOperator
 from cil.utilities import dataexample
-from cil.framework import AcquisitionGeometry
-from cil.framework import DataOrder
+from cil.framework import AcquisitionGeometry, ImageGeometry
+from cil.framework.labels import AcquisitionDimension, AcquisitionType
+
+def create_cone_flex_default_ig(ag):
+    '''
+    Create a default ImageGeometry for Cone3D_Flex geometries.
+    This makes use of the mean magnification value to scale the pixel size when determining the voxel size.
+
+    Parameters
+    ----------
+    ag: AcquisitionGeometry
+        Must be a Cone3D_Flex AcquisitionGeometry
+    
+    Returns
+    -------
+    ImageGeometry
+    '''
+    mag = ag.config.system.calculate_magnification()[2]
+    mean_mag = np.mean(mag)
+    num_voxel_xy = int(np.ceil(ag.config.panel.num_pixels[0]))
+    voxel_size_xy = ag.config.panel.pixel_size[0] / mean_mag
+
+    num_voxel_z = int(np.ceil(ag.config.panel.num_pixels[1]))
+    voxel_size_z = ag.config.panel.pixel_size[1] / mean_mag
+    ig = ImageGeometry(num_voxel_xy, num_voxel_xy, num_voxel_z, voxel_size_xy, voxel_size_xy, voxel_size_z)
+    return ig
+
+
 
 class SimData(object):
 
@@ -41,6 +69,15 @@ class SimData(object):
             index_roi[i] = (ind0, ind1)
 
         self.gold_roi = self.img_data.array[index_roi[0][0]:index_roi[0][1],index_roi[1][0]:index_roi[1][1],index_roi[2][0]:index_roi[2][1]]
+
+        # single slice roi
+        self.ig_single_slice = self.ig.copy()
+        slice_index = 20
+        slice_offset = -(self.ig.voxel_num_z-1)/2 + slice_index
+        self.ig_single_slice.voxel_num_z = 1
+        self.ig_single_slice.center_z = slice_offset*self.ig_roi.voxel_size_z
+
+        self.gold_roi_single_slice = self.img_data.array[slice_index,:,:]
 
 
     def _get_roi_2D(self):
@@ -65,7 +102,7 @@ class SimData(object):
     def Cone3D(self):
         self.acq_data = dataexample.SIMULATED_CONE_BEAM_DATA.get()
         self.acq_data.reorder(self.backend)
-        
+
         self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get()
 
         self.acq_data=np.log(self.acq_data)
@@ -77,10 +114,61 @@ class SimData(object):
         self._get_roi_3D()
 
 
+    def Cone3DFlex(self):
+
+        self.acq_data = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        self.acq_data.reorder(self.backend)
+
+        self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+
+        self.acq_data=np.log(self.acq_data)
+        self.acq_data*=-1.0
+
+        self.ig = self.img_data.geometry
+
+        # convert geometry to Flex
+        system = self.acq_data.geometry.config.system
+        src = system.source.position
+        det_pos = system.detector.position
+        det_dir_x = system.detector.direction_x
+        det_dir_y = system.detector.direction_y
+        obj_pos = system.rotation_axis.position
+        obj_dir = system.rotation_axis.direction
+        angles = self.acq_data.geometry.config.angles.angle_data
+
+        src_pos_set = [None]*len(angles)
+        det_pos_set = [None]*len(angles)
+        det_dir_x_set = [None]*len(angles)
+        det_dir_y_set = [None]*len(angles)
+
+        for i, ang in enumerate(angles):
+            ang_rad = -np.deg2rad(ang)
+            # rotation matrix
+            RotationMatrix = np.eye(3)
+            RotationMatrix[0,0] = RotationMatrix[1,1] = np.cos(ang_rad)
+            RotationMatrix[0,1] = -np.sin(ang_rad)
+            RotationMatrix[1,0] = np.sin(ang_rad)
+            
+            src_pos_set[i] = RotationMatrix.dot(src - obj_pos) + obj_pos
+            det_pos_set[i] = RotationMatrix.dot(det_pos - obj_pos) + obj_pos
+            det_dir_x_set[i] = RotationMatrix.dot(det_dir_x)
+            det_dir_y_set[i] = RotationMatrix.dot(det_dir_y)
+
+        ag_new = AcquisitionGeometry.create_Cone3D_Flex(src_pos_set, det_pos_set, det_dir_x_set, det_dir_y_set)
+        ag_new.set_panel([self.acq_data.geometry.pixel_num_h, self.acq_data.geometry.pixel_num_v], [self.acq_data.geometry.pixel_size_h, self.acq_data.geometry.pixel_size_v], origin='bottom-left')
+        # Flex geometry has the same labels except uses PROJECTION instead of ANGLE:
+        new_labels = list(self.acq_data.dimension_labels)
+        new_labels[1] = AcquisitionDimension.PROJECTION
+        ag_new.set_labels(new_labels)
+
+        self.ag = ag_new
+        self._get_roi_3D()
+
+
     def Parallel3D(self):
         self.acq_data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
         self.acq_data.reorder(self.backend)
-        
+
         self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get()
 
         self.acq_data=np.log(self.acq_data)
@@ -96,7 +184,7 @@ class SimData(object):
 
         self.acq_data = dataexample.SIMULATED_CONE_BEAM_DATA.get().get_slice(vertical='centre')
         self.acq_data.reorder(self.backend)
-        
+
         self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get().get_slice(vertical='centre')
 
         self.acq_data=np.log(self.acq_data)
@@ -112,7 +200,7 @@ class SimData(object):
 
         self.acq_data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().get_slice(vertical='centre')
         self.acq_data.reorder(self.backend)
-        
+
         self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get().get_slice(vertical='centre')
 
         self.acq_data=np.log(self.acq_data)
@@ -137,9 +225,9 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_1 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,0,0])\
                                             .set_panel([16,16],[1,1])\
                                             .set_angles([0])
-        ag_test_1.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_1))
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
-        
+
         ig_test_1 = ag_test_1.get_ImageGeometry()
         norm_1 = 4
         self.test_geometries.append((ag_test_1, ig_test_1, 4))
@@ -148,7 +236,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_2 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,0,0])\
                                             .set_panel([16,16],[2,2])\
                                             .set_angles([0])
-        ag_test_2.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_2))
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
         ig_test_2 = ag_test_2.get_ImageGeometry()
         norm_2 = 8
@@ -158,7 +246,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_3 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,0,0])\
                                             .set_panel([16,16],[0.5,0.5])\
                                             .set_angles([0])
-        ag_test_3.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_3))
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
         ig_test_3 = ag_test_3.get_ImageGeometry()
 
         norm_3 = 2
@@ -168,7 +256,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_4 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,1000,0])\
                                             .set_panel([16,16],[0.5,0.5])\
                                             .set_angles([0])
-        ag_test_4.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_4))
+        ag_test_4.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_4))
         ig_test_4 = ag_test_4.get_ImageGeometry()
 
         norm_4 = 1
@@ -184,9 +272,9 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_1 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,0])\
                                             .set_panel(16,1)\
                                             .set_angles([0])
-        ag_test_1.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_1))
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
-        
+
         ig_test_1 = ag_test_1.get_ImageGeometry()
         norm_1 = 4
         self.test_geometries.append((ag_test_1, ig_test_1, 4))
@@ -195,7 +283,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_2 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,0])\
                                             .set_panel(16,2)\
                                             .set_angles([0])
-        ag_test_2.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_2))
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
         ig_test_2 = ag_test_2.get_ImageGeometry()
         norm_2 = 8
@@ -205,7 +293,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_3 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,0])\
                                             .set_panel(16,0.5)\
                                             .set_angles([0])
-        ag_test_3.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_3))
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
         ig_test_3 = ag_test_3.get_ImageGeometry()
 
         norm_3 = 2
@@ -215,7 +303,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_4 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,1000])\
                                             .set_panel(16,0.5)\
                                             .set_angles([0])
-        ag_test_4.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_4))
+        ag_test_4.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_4))
         ig_test_4 = ag_test_4.get_ImageGeometry()
 
         norm_4 = 1
@@ -231,9 +319,9 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_1 = AcquisitionGeometry.create_Parallel3D()\
                                             .set_panel([16,16],[1,1])\
                                             .set_angles([0])
-        ag_test_1.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_1))
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
-        
+
         ig_test_1 = ag_test_1.get_ImageGeometry()
         norm_1 = 4
         self.test_geometries.append((ag_test_1, ig_test_1, norm_1))
@@ -241,7 +329,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_2 = AcquisitionGeometry.create_Parallel3D()\
                                             .set_panel([16,16],[2,2])\
                                             .set_angles([0])
-        ag_test_2.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_2))
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
 
         ig_test_2 = ag_test_2.get_ImageGeometry()
@@ -252,7 +340,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_3 = AcquisitionGeometry.create_Parallel3D()\
                                             .set_panel([16,16],[0.5,0.5])\
                                             .set_angles([0])
-        ag_test_3.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_3))
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
 
 
         ig_test_3 = ag_test_3.get_ImageGeometry()
@@ -270,7 +358,7 @@ class TestCommon_ProjectionOperator_TOY(object):
                                             .set_panel(16,1)\
                                             .set_angles([0])
 
-        ag_test_1.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_1))
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
 
         ig_test_1 = ag_test_1.get_ImageGeometry()
         norm_1 = 4
@@ -279,7 +367,7 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_2 = AcquisitionGeometry.create_Parallel2D()\
                                             .set_panel(16,2)\
                                             .set_angles([0])
-        ag_test_2.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_2))
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
 
 
         ig_test_2 = ag_test_2.get_ImageGeometry()
@@ -290,12 +378,50 @@ class TestCommon_ProjectionOperator_TOY(object):
         ag_test_3 = AcquisitionGeometry.create_Parallel2D()\
                                             .set_panel(16,0.5)\
                                             .set_angles([0])
-        ag_test_3.set_labels(DataOrder.get_order_for_engine(self.backend, ag_test_3))
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
 
         ig_test_3 = ag_test_3.get_ImageGeometry()
         norm_3 = 2
         self.test_geometries.append((ag_test_3, ig_test_3, norm_3))
 
+    def Cone3DFlex(self):
+        '''
+            These are all single cone beam projection geometries. Pixels of  1, 2, 0.5, 0.5, Voxels of 1, 2, 0.5, 0.25
+        '''
+
+        self.test_geometries=[]
+        ag_test_1 = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+                                            .set_panel([16,16],[1,1])
+        ag_test_1.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_1))
+
+        ig_test_1 = create_cone_flex_default_ig(ag_test_1)
+        norm_1 = 4
+        self.test_geometries.append((ag_test_1, ig_test_1, 4))
+
+
+        ag_test_2 = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+                                            .set_panel([16,16],[2,2])
+        ag_test_2.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_2))
+
+        ig_test_2 = create_cone_flex_default_ig(ag_test_2)
+        norm_2 = 8
+        self.test_geometries.append((ag_test_2, ig_test_2, norm_2))
+
+        ag_test_3 = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-1000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+                                            .set_panel([16,16],[0.5,0.5])
+        ag_test_3.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_3))
+        ig_test_3 = create_cone_flex_default_ig(ag_test_3)
+
+        norm_3 = 2
+        self.test_geometries.append((ag_test_3, ig_test_3, norm_3))
+
+        ag_test_4 = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-1000,0]],detector_position_set=[[0,1000,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+                                            .set_panel([16,16],[0.5,0.5])
+        ag_test_4.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag_test_4))
+        ig_test_4 = create_cone_flex_default_ig(ag_test_4)
+
+        norm_4 = 1
+        self.test_geometries.append((ag_test_4, ig_test_4, norm_4))
 
     def test_norm(self):
         count = 1
@@ -316,7 +442,6 @@ class TestCommon_ProjectionOperator_TOY(object):
             count +=1
 
 
-
 class TestCommon_ProjectionOperator(object):
 
     '''
@@ -324,7 +449,7 @@ class TestCommon_ProjectionOperator(object):
     '''
 
     def Cone3D(self):
-        self.ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-100000,0],detector_position=[0,0,0])\
+        self.ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-100000,0],detector_position=[0,0,0],)\
                                             .set_panel([16,16],[1,1])\
                                             .set_angles([0])\
                                             .set_labels(['vertical','horizontal'])
@@ -347,6 +472,11 @@ class TestCommon_ProjectionOperator(object):
                                             .set_angles([0])\
                                             .set_labels(['horizontal'])
 
+    def Cone3DFlex(self):
+        self.ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=[[0,-100000,0]],detector_position_set=[[0,0,0]], detector_direction_x_set=[[1, 0, 0]],detector_direction_y_set=[[0, 0, 1]], volume_centre_position=[0,0,0])\
+                                            .set_panel([16,16],[1,1])\
+                                            .set_labels(['vertical','horizontal'])
+        
     def test_forward_projector(self):
 
         #create checker-board image
@@ -354,7 +484,7 @@ class TestCommon_ProjectionOperator(object):
         ones = np.ones((4,16,4))
         for k in range(4):
             for i in range(4):
-                if (i + k)% 2 == 0: 
+                if (i + k)% 2 == 0:
                     res[k*4:(k+1)*4,:,i*4:(i+1)*4] = ones
 
         #create checker-board forward projection for parallel rays
@@ -362,14 +492,18 @@ class TestCommon_ProjectionOperator(object):
         ones = np.ones((4,4))
         for j in range(4):
             for i in range(4):
-                if (i + j)% 2 == 0: 
+                if (i + j)% 2 == 0:
                     checker[j*4:(j+1)*4,i*4:(i+1)*4] = ones * 16
 
-        if self.ag.dimension == '2D':
+        if AcquisitionType.DIM2 & self.ag.dimension:
             checker = checker[0]
             res = res[0]
 
-        ig = self.ag.get_ImageGeometry()
+        if self.ag.geom_type & AcquisitionType.CONE_FLEX:
+            ig = create_cone_flex_default_ig(self.ag)
+        else:
+            ig = self.ag.get_ImageGeometry()
+        
         volume = ig.allocate(0)
 
         volume.fill(res)
@@ -379,7 +513,6 @@ class TestCommon_ProjectionOperator(object):
 
         np.testing.assert_allclose(fp.array, checker, atol = self.tolerance_fp)
 
-
     def test_backward_projector(self):
 
         #create checker-board projection
@@ -387,7 +520,7 @@ class TestCommon_ProjectionOperator(object):
         ones = np.ones((4,4))
         for j in range(4):
             for i in range(4):
-                if (i + j)% 2 == 0: 
+                if (i + j)% 2 == 0:
                     checker[j*4:(j+1)*4,i*4:(i+1)*4] = ones
 
         #create backprojection of checker-board
@@ -395,14 +528,18 @@ class TestCommon_ProjectionOperator(object):
         ones = np.ones((4,16,4))
         for k in range(4):
             for i in range(4):
-                if (i + k)% 2 == 0: 
+                if (i + k)% 2 == 0:
                     res[k*4:(k+1)*4,:,i*4:(i+1)*4] = ones
 
-        if self.ag.dimension == '2D':
+        if AcquisitionType.DIM2 & self.ag.dimension:
             checker = checker[0]
             res = res[0]
 
-        ig = self.ag.get_ImageGeometry()
+        if self.ag.geom_type & AcquisitionType.CONE_FLEX:
+            ig = create_cone_flex_default_ig(self.ag)
+        else:
+            ig = self.ag.get_ImageGeometry()
+        
         data = self.ag.allocate(0)
 
         data.fill(checker)
@@ -410,7 +547,7 @@ class TestCommon_ProjectionOperator(object):
         Op = self.ProjectionOperator(ig, self.ag, **self.PO_args)
         bp = Op.adjoint(data)
 
-        if self.ag.geom_type == 'cone':
+        if self.ag.geom_type == 'cone' or self.ag.geom_type == 'cone_flex':
             #as cone beam res is not perfect grid
             np.testing.assert_allclose(bp.array, res, atol=1e-3)
         else:
@@ -421,15 +558,37 @@ class TestCommon_ProjectionOperator_SIM(SimData):
     '''
     Tests forward and backward operators function with and without 'out'
     '''
+
     def test_forward_projector(self):
         Op = self.ProjectionOperator(self.ig, self.ag, **self.PO_args)
         fp = Op.direct(self.img_data)
-        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)        
+        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)
+
+        fp2 = fp.copy()
+        fp2.fill(0)
+        fp3 = Op.direct(self.img_data,out=fp2)
+        np.testing.assert_allclose(fp.as_array(), fp2.as_array(),1e-8)
+        np.testing.assert_equal(id(fp2), id(fp3))
+
+
+    def test_forward_projector_flipped(self):
+        ag = self.ag.copy()
+        ag.set_panel([self.ag.pixel_num_h,self.ag.pixel_num_v],[self.ag.pixel_size_h,self.ag.pixel_size_v],origin='top-right')
+        Op = self.ProjectionOperator(self.ig, ag, **self.PO_args)
+        fp = Op.direct(self.img_data)
+
+        axes = [i for i, label in enumerate(self.acq_data.dimension_labels) if label != 'angle']
+        gold = self.acq_data.copy()
+        gold.fill(np.flip(self.acq_data.as_array(), axis=axes))
+
+       # show2D([self.acq_data, fp, gold],title=['self.acq_data', 'fp', 'gold']).save('test0.png')
+        np.testing.assert_allclose(fp.as_array(), gold.as_array(),atol=self.tolerance_fp)
 
         fp2 = fp.copy()
         fp2.fill(0)
         Op.direct(self.img_data,out=fp2)
-        np.testing.assert_allclose(fp.as_array(), fp2.as_array(),1e-8)    
+
+        np.testing.assert_allclose(fp.as_array(), fp2.as_array(),1e-8)
 
 
     def test_backward_projectors_functionality(self):
@@ -439,16 +598,18 @@ class TestCommon_ProjectionOperator_SIM(SimData):
 
         bp2 = bp.copy()
         bp2.fill(0)
-        Op.adjoint(self.acq_data,out=bp2)
-        np.testing.assert_allclose(bp.as_array(), bp2.as_array(), 1e-8)    
+        bp3 = Op.adjoint(self.acq_data,out=bp2)
+        np.testing.assert_allclose(bp.as_array(), bp2.as_array(), 1e-8)
+        np.testing.assert_equal(id(bp2), id(bp3))
 
 
     def test_input_arguments(self):
 
         #default image_geometry, named parameter acquisition_geometry
-        Op = self.ProjectionOperator(acquisition_geometry=self.ag, **self.PO_args)
-        fp = Op.direct(self.img_data)
-        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)        
+        if not (self.ag.geom_type & AcquisitionType.CONE_FLEX):
+            Op = self.ProjectionOperator(acquisition_geometry=self.ag, **self.PO_args)
+            fp = Op.direct(self.img_data)
+            np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)
 
 
 class TestCommon_FBP_SIM(SimData):
@@ -457,26 +618,120 @@ class TestCommon_FBP_SIM(SimData):
     '''
     def test_FBP(self):
 
-        self.FBP = self.FBP(self.ig, self.ag, **self.FBP_args)
-        reco = self.FBP(self.acq_data)
-        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)    
+        FBP = self.FBP(self.ig, self.ag, **self.FBP_args)
+        reco = FBP(self.acq_data)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)
 
         reco2 = reco.copy()
         reco2.fill(0)
-        self.FBP(self.acq_data,out=reco2)
-        np.testing.assert_allclose(reco.as_array(), reco2.as_array(),atol=1e-8)   
+        FBP(self.acq_data,out=reco2)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(),atol=1e-8)
+
+    def test_FBP_flipped(self):
+
+        data = self.acq_data.copy()
+        data.geometry.set_panel([self.ag.pixel_num_h,self.ag.pixel_num_v],[self.ag.pixel_size_h,self.ag.pixel_size_v],origin='top-right')
+
+        axes = [i for i, label in enumerate(self.acq_data.dimension_labels) if label != 'angle']
+        data.fill(np.flip(self.acq_data.as_array(), axis=axes))
+
+        FBP = self.FBP(self.ig, data.geometry, **self.FBP_args)
+        reco = FBP(data)
+
+        #show2D([self.img_data, reco],title=['self.img_data', 'reco']).save('test4.png')
+
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(), atol=self.tolerance_fbp)
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        FBP(data,out=reco2)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(),atol=1e-8)
 
 
     def test_FBP_roi(self):
-        self.FBP = self.FBP(self.ig_roi, self.ag, **self.FBP_args)
-        reco = self.FBP(self.acq_data)
-        np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi) 
+        FBP = self.FBP(self.ig_roi, self.ag, **self.FBP_args)
+        reco = FBP(self.acq_data)
 
-    
+        #show2D([reco, self.gold_roi]).save('test0_Flex.png')
+        np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi)
+
+        if AcquisitionType.DIM3 & self.ag.dimension:
+            FBP = self.FBP(self.ig_single_slice, self.ag, **self.FBP_args)
+            reco = FBP(self.acq_data)
+            np.testing.assert_allclose(reco.as_array(), self.gold_roi_single_slice, atol=self.tolerance_fbp_roi)
+
+
     def test_input_arguments(self):
+        # default image_geometry, named parameter acquisition_geometry
+        # No default ig for cone_flex so we skip this test in this case
+        if not (self.ag.geom_type & AcquisitionType.CONE_FLEX): 
+            FBP = self.FBP(acquisition_geometry = self.ag, **self.FBP_args)
+            reco = FBP(self.acq_data)
+            np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)
 
-        #default image_geometry, named parameter acquisition_geometry
-        self.FBP = self.FBP(acquisition_geometry = self.ag, **self.FBP_args)
-        reco = self.FBP(self.acq_data)
-        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)    
 
+class TestCommon_ProjectionOperatorBlockOperator(object):
+    # def setUp(self):
+    #     data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+    #     self.data = data.get_slice(vertical='centre')
+    #     K = ProjectionOperator(image_geometry=ig, acquisition_geometry=data.geometry)
+    #     A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)
+    #     self.projectionOperator = (A, K)
+    def partition_test(self):
+
+        A, K = self.projectionOperator
+
+        u = A.adjoint(self.data)
+        v = K.adjoint(self.datasplit)
+
+        # the images are not entirely the same as the BlockOperator's requires to
+        # add all the data of the adjoint operator, which may result in a slightly
+        # different image
+        np.testing.assert_allclose(u.as_array(), v.as_array(), rtol=1.2e-6, atol=1.6e-4)
+
+        # test if using data output
+
+        v.fill(0)
+        v2 = K.adjoint(self.datasplit, out=v)
+        np.testing.assert_allclose(u.as_array(), v.as_array(), rtol=1.2e-6, atol=1.6e-4)
+        np.testing.assert_equal(id(v), id(v2))
+
+
+
+        x = A.direct(u)
+        y = K.direct(v)
+
+        # let's check that the data is the same
+        def check_data_is_the_same(x,y):
+            k = 0
+            wrong = 0
+            for el in y.containers:
+                for j in range(el.shape[0]):
+                    try:
+                        np.testing.assert_allclose(el.as_array()[j], x.as_array()[k], atol=7e-2, rtol=1e-6)
+                    except AssertionError as ae:
+                        print(ae)
+                        wrong += 1
+                    # show2D([el.as_array()[j], x.as_array()[k]], cmap=['inferno', 'inferno'])
+                    k += 1
+
+            assert wrong == 0
+
+            # reassemlbe the data
+            out = x * 0
+            k = 0
+            for i, el in enumerate(y.containers):
+                # print (i, el.shape)
+                for j in range(el.shape[0]):
+                    out.array[k] = el.as_array()[j]
+                    k += 1
+
+            # show2D([out, x, out-x], cmap=['inferno', 'inferno', 'seismic'], title=['out', 'x', 'diff'], \
+            #     num_cols=3)
+            np.testing.assert_allclose(out.as_array(), x.as_array(), atol=1e-2, rtol=1e-6)
+
+        check_data_is_the_same(x,y)
+        y.fill(0)
+        y2 = K.direct(v, out=y)
+        check_data_is_the_same(x,y)
+        np.testing.assert_equal(id(y), id(y2))

@@ -1,0 +1,16 @@
+# https://github.com/Phlow/feeling-responsive/blob/gh-pages/_data/services.yml
+- menu_name: Contact
+- name: Discord
+  url: "https://discord.gg/9NTWu9MEGq"
+- name: Member List
+  title: Member Mailing List
+  url: "https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=CCPI-MEMBERS"
+- name: Developer List
+  title: Developer Mailing List
+  url: "https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=CCPI-DEVEL"
+- name: Zenodo
+  title: Zenodo Community
+  url: "https://zenodo.org/communities/ccpi/about"
+- name: LinkedIn
+  title: LinkedIn Group
+  url: "https://www.linkedin.com/groups/9090791/"

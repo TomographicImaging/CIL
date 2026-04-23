@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2019 United Kingdom Research and Innovation
+#  Copyright 2019 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,7 +12,9 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import unittest
 from utils import initialise_tests
 import os
@@ -26,7 +27,7 @@ import shutil
 initialise_tests()
 
 class TestNexusReaderWriter(unittest.TestCase):
-    
+
     def setUp(self):
         self.data_dir = os.path.join(os.getcwd(), 'test_nxs')
         if not os.path.exists(self.data_dir):
@@ -68,7 +69,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'),
                       data = self.ad2d)
         writer.write()
-        
+
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad3d.nxs'),
                       data = self.ad3d)
@@ -76,6 +77,23 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         self.readAcquisitionDataAndTest()
 
+    def test_write_Cone3D_Flex(self):
+        source_position_set = [[0,-1,0], [0,-1.3,1]]
+        detector_position_set = [[0,2,1], [0,2,2]]
+        detector_direction_x_set = [[1,0.0, 0.0], [1,0.02, 0.0]]
+        detector_direction_y_set = [[0.,0.,1], [0,0.0,1]]
+
+        ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set=source_position_set, \
+                                                    detector_position_set=detector_position_set, \
+                                                    detector_direction_x_set=detector_direction_x_set, \
+                                                    detector_direction_y_set=detector_direction_y_set)\
+                                     .set_panel(num_pixels=[10, 20])
+        ad = ag.allocate('random_int')
+        with self.assertRaises(NotImplementedError):
+            writer = NEXUSDataWriter(file_name = os.path.join(self.data_dir, 'test_nexus_ad3d_flex.nxs'),
+                                     data = ad)
+            writer.write()
+                                   
 
     def test_writeImageData_compressed(self):
         im_size = 5
@@ -85,11 +103,11 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im'),
-                      data = im, compression=16)
+                      data = im, compression='uint16')
         writer.write()
 
         self.assertTrue(writer.dtype == numpy.uint16)
-        self.assertTrue(writer.compression == 16)
+        self.assertTrue(writer.compression == 'uint16')
 
         self.readImageDataAndTest(atol=1e-4)
 
@@ -116,12 +134,12 @@ class TestNexusReaderWriter(unittest.TestCase):
             writer.write()
 
 
-    def readImageDataAndTest(self,atol=0):        
+    def readImageDataAndTest(self,atol=0):
         im_size = 5
         ig_test = ImageGeometry(voxel_num_x = im_size,
                                 voxel_num_y = im_size)
         im_test = ig_test.allocate('random',seed=9)
-        
+
         reader = NEXUSDataReader()
         reader.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im.nxs'))
         im = reader.read()
@@ -131,7 +149,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         numpy.testing.assert_allclose(im.as_array(), im_test.as_array(),atol=atol, err_msg='Loaded image is not correct')
         self.assertEqual(ig.voxel_num_x, ig_test.voxel_num_x, 'ImageGeometry is not correct')
         self.assertEqual(ig.voxel_num_y, ig_test.voxel_num_y, 'ImageGeometry is not correct')
-        
+
 
     def readAcquisitionDataAndTest(self):
         reader2d = NEXUSDataReader()
@@ -153,7 +171,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         reader3d.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad3d.nxs'))
         ad3d = reader3d.read()
         ag3d = reader3d.get_geometry()
-        
+
         numpy.testing.assert_array_equal(ad3d.as_array(), self.ad3d.as_array(), 'Loaded image is not correct')
         numpy.testing.assert_array_equal(ag3d.angles, self.ag3d.angles, 'AcquisitionGeometry.angles is not correct')
         self.assertEqual(ag3d.geom_type, self.ag3d.geom_type, 'AcquisitionGeometry.geom_type is not correct')
@@ -165,5 +183,3 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ag3d.channels, self.ag3d.channels, 'AcquisitionGeometry.channels is not correct')
 
         assert ag3d == self.ag3d
-
-

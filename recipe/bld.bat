@@ -1,11 +1,8 @@
-
 ROBOCOPY /E "%RECIPE_DIR%\.." "%SRC_DIR%" /XD .git /XD Wrappers\Python\build
 
-mkdir "%SRC_DIR%\build_framework"
-
-cd "%SRC_DIR%\build_framework"
-cmake -G "NMake Makefiles" %RECIPE_DIR%\..\ -DCONDA_BUILD=ON -DCMAKE_BUILD_TYPE="Release" -DLIBRARY_LIB=%CONDA_PREFIX%\lib -DLIBRARY_INC=%CONDA_PREFIX% -DCMAKE_INSTALL_PREFIX=%PREFIX%
-if errorlevel 1 exit 1
-
-cmake --build . --target install --config Release
+set SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL=%PKG_VERSION%
+if not "%GIT_DESCRIBE_NUMBER%"=="0" (
+    set SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CIL=%PKG_VERSION%.dev%GIT_DESCRIBE_NUMBER%+%GIT_DESCRIBE_HASH%
+)
+pip install . --no-deps
 if errorlevel 1 exit 1

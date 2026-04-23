@@ -1,96 +1,85 @@
-# Copyright 2022 United Kingdom Research and Innovation
-# Copyright 2022 The University of Manchester
+#  Copyright 2023 United Kingdom Research and Innovation
+#  Copyright 2023 The University of Manchester
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-# Author(s): Edoardo Pasca
-
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-
-#     http://www.apache.org/licenses/LICENSE-2.0
-
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 import numpy as np
 import json
-import logging
 import h5py
+from warnings import warn
 
-logger = logging.getLogger(__name__)
 
 def get_compress(compression=None):
     '''Returns whether the data needs to be compressed and to which numpy type
-    
+
     Parameters:
     -----------
-    compression : string, int. Default is None, no compression.
-        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16' and deprecated 0, 8, 16. 
-    
+    compression : string. Default is None, no compression.
+        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16'.
+
     Returns:
     --------
     compress : bool, True if compression is required, False otherwise
 
-    Note:
-    -----
-
-    The use of int is deprecated and will be removed in the future. Use string instead.
-    
     '''
-    if isinstance(compression, int):
-        logger.warning("get_compress: The use of int is deprecated and will be removed in the future. Use string instead.")
-
-    if compression is None or compression == 0:
+    if compression is None:
         compress = False
-    elif compression in [ 8, 'uint8']:
-        compress = True
-    elif compression in [ 16, 'uint16']:
+    elif compression in ['uint8', 'uint16']:
         compress = True
     else:
-        raise ValueError('Compression bits not valid. Got {0} expected value in {1}'.format(compression, [0,8,16, None, 'uint8', 'uint16']))
+        raise ValueError('Compression bits not valid. Got {0} expected value in {1}'.format(compression, [None, 'uint8', 'uint16']))
 
     return compress
 
 def get_compressed_dtype(data, compression=None):
     '''Returns whether the data needs to be compressed and to which numpy type
-    
+
     Given the data and the compression level, returns the numpy type to be used for compression.
 
     Parameters:
     -----------
     data : DataContainer, numpy array
         the data to be compressed
-    compression : string, int. Default is None, no compression.
-        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16' and deprecated 0, 8, 16. 
+    compression : string. Default is None, no compression.
+        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16'.
 
     Returns:
     --------
     dtype : numpy type, the numpy type to be used for compression
     '''
-    if isinstance(compression, int):
-        logger.warning("get_compressed_dtype: The use of int is deprecated and will be removed in the future. Use string instead.")
-    if compression is None or compression == 0:
+    if compression is None:
         dtype = data.dtype
-    elif compression in [ 8, 'uint8']:
+    elif compression == 'uint8':
         dtype = np.uint8
-    elif compression in [ 16, 'uint16']:
+    elif compression == 'uint16':
         dtype = np.uint16
     else:
-        raise ValueError('Compression bits not valid. Got {0} expected value in {1}'.format(compression, [0,8,16]))
+        raise ValueError('Compression bits not valid. Got {0} expected value in {1}'.format(compression, [None, 'uint8', 'uint16']))
 
     return dtype
 
 def get_compression_scale_offset(data, compression=0):
     '''Returns the scale and offset to be applied to the data to compress it
-    
+
     Parameters:
     -----------
     data : DataContainer, numpy array
         The data to be compressed
-    compression : string, int. Default is None, no compression.
-        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16' and deprecated 0, 8, 16. 
+    compression : string. Default is None, no compression.
+        It specifies the number of bits to use for compression, allowed values are None, 'uint8', 'uint16'.
 
     Returns:
     --------
@@ -98,10 +87,7 @@ def get_compression_scale_offset(data, compression=0):
     offset : float, the offset to be applied to the data for compression to the specified number of bits
     '''
 
-    if isinstance(compression, int):
-        logger.warning("get_compression_scale_offset: The use of int is deprecated and will be removed in the future. Use string instead.")
-
-    if compression is None or compression == 0:
+    if compression is None:
         # no compression
         # return scale 1.0 and offset 0.0
         return 1.0, 0.0
@@ -122,7 +108,7 @@ def get_compression_scale_offset(data, compression=0):
 
 def save_dict_to_file(fname, dictionary):
     '''Save scale and offset to file
-    
+
     Parameters
     ----------
     fname : string
@@ -133,15 +119,37 @@ def save_dict_to_file(fname, dictionary):
     with open(fname, 'w') as configfile:
         json.dump(dictionary, configfile)
 
+def compress_data(data, scale, offset, dtype):
+    '''Compress data to dtype using scale and offset
 
-class HDF5_utilities(object): 
+    Parameters
+    ----------
+    data : numpy array
+    scale : float
+    offset : float
+    dtype : numpy dtype
+
+    returns compressed casted data'''
+    if dtype == data.dtype:
+        return data
+    if data.ndim > 2:
+        # compress each slice
+        tmp = np.empty(data.shape, dtype=dtype)
+        for i in range(data.shape[0]):
+            tmp[i] = compress_data(data[i], scale, offset, dtype)
+    else:
+        tmp = data * scale + offset
+        tmp = tmp.astype(dtype)
+    return tmp
+
+class HDF5_utilities(object):
 
     """
     Utility methods to read in from a generic HDF5 file and extract the relevant data
     """
     def __init__(self):
         pass
-        
+
 
     @staticmethod
     def _descend_obj(obj, sep='\t', depth=-1):
@@ -204,14 +212,14 @@ class HDF5_utilities(object):
                 dset = f.get(dset_path, )
 
                 attribs = {
-                    'ndim':None, 
+                    'ndim':None,
                     'shape':None,
                     'size':None,
                     'dtype':None,
-                    'compression':None, 
-                    'chunks':None, 
+                    'compression':None,
+                    'chunks':None,
                     'is_virtual':None}
-                
+
                 for x in attribs.keys():
                     try:
                         attribs[x] = getattr(dset, x)
@@ -237,8 +245,8 @@ class HDF5_utilities(object):
             The selection of slices in each source dimension to return
         dtype: numpy type, default np.float32
             the numpy data type for the returned array
-    
-            
+
+
         Returns
         -------
         numpy.ndarray
@@ -250,7 +258,7 @@ class HDF5_utilities(object):
 
         This can be constructed using numpy indexing, i.e. the following lines are equivalent.
 
-        >>> source_sel = (slice(2, 4, None), slice(2, 10, 2)) 
+        >>> source_sel = (slice(2, 4, None), slice(2, 10, 2))
 
         >>> source_sel = np.s_[2:4,2:10:2]
         """
@@ -263,7 +271,7 @@ class HDF5_utilities(object):
 
             arr = np.asarray(dset[source_sel],dtype=dtype, order='C')
 
-        return arr 
+        return arr
 
 
     @staticmethod
@@ -291,7 +299,7 @@ class HDF5_utilities(object):
 
         This can be constructed using numpy indexing, i.e. the following lines are equivalent.
 
-        >>> source_sel = (slice(2, 4, None), slice(2, 10, 2)) 
+        >>> source_sel = (slice(2, 4, None), slice(2, 10, 2))
 
         >>> source_sel = np.s_[2:4,2:10:2]
         """

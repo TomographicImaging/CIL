@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright 2018 - 2022 United Kingdom Research and Innovation
-#  Copyright 2018 - 2022 The University of Manchester
+#  Copyright 2020 United Kingdom Research and Innovation
+#  Copyright 2020 The University of Manchester
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,26 +12,33 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
+#
+# Authors:
+# CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+import sys
 import unittest
 from unittest.mock import patch
 from utils import initialise_tests
-from cil.framework import AcquisitionGeometry
+
 import numpy as np
 import os
 from cil.framework import ImageGeometry
-from cil.io import TXRMDataReader, NEXUSDataReader
+from cil.framework.labels import AngleUnit
+from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
 from cil.io.utilities import HDF5_utilities
 from cil.processors import Slicer
 from utils import has_astra, has_nvidia
-from cil.utilities.dataexample import data_dir
 from cil.utilities.quality_measures import mse
 from cil.utilities import dataexample
-import shutil
 import logging
 import glob
 import json
+from cil.io import utilities
+from cil.io import RAWFileWriter
+import configparser
+import tempfile
+
 
 initialise_tests()
 
@@ -55,133 +61,196 @@ if has_astra:
     from cil.plugins.astra import FBP
 
 
-# change basedir to point to the location of the walnut dataset which can
-# be downloaded from https://zenodo.org/record/4822516
-# basedir = os.path.abspath('/home/edo/scratch/Data/Walnut/valnut_2014-03-21_643_28/tomo-A/')
-basedir = data_dir
-filename = os.path.join(basedir, "valnut_tomo-A.txrm")
-has_file = os.path.isfile(filename)
+has_file = False
+has_recon_file = False
+basedir = dataexample.REMOTEDATA.CIL_DATA_DIR
+if basedir is not None:
+    dataexample.WALNUT.download_data(data_dir=basedir, prompt=False)
 
+    test_txrm_file = os.path.join(basedir, "walnut/valnut/valnut_2014-03-21_643_28/tomo-A/", "valnut_tomo-A.txrm")
+    # strip double quotes if they exist
+    test_txrm_file = test_txrm_file.strip('"')
+    test_txrm_file = os.path.abspath(test_txrm_file)
+    has_file = os.path.isfile(test_txrm_file)
+    
+    test_3d_recon_file = os.path.join(basedir, "walnut/valnut/valnut_2014-03-21_643_28/tomo-A/", "valnut_tomo-A_recon.txm")
+    # strip double quotes if they exist
+    test_3d_recon_file = test_3d_recon_file.strip('"')
+    test_3d_recon_file = os.path.abspath(test_3d_recon_file)
+    has_recon_file = os.path.isfile(test_3d_recon_file)
 
-has_prerequisites = has_olefile and has_dxchange and has_astra and has_nvidia and has_file \
-    and has_wget
 
 # Change the level of the logger to WARNING (or whichever you want) to see more information
-# logging.basicConfig(level=logging.WARNING)
-
-logging.info ("has_astra {}".format(has_astra))
-logging.info ("has_wget {}".format(has_wget))
-logging.info ("has_olefile {}".format(has_olefile))
-logging.info ("has_dxchange {}".format(has_dxchange))
-logging.info ("has_file {}".format(has_file))
-
+logging.basicConfig(level=logging.WARNING)
+log = logging.getLogger(__name__)
+log.info("has_astra %s", has_astra)
+log.info("has_wget %s", has_wget)
+log.info("has_olefile %s", has_olefile)
+log.info("has_dxchange %s", has_dxchange)
+log.info("has_file %s", has_file)
 if not has_file:
-    logging.info("This unittest requires the walnut Zeiss dataset saved in {}".format(data_dir))
+    log.info("This unittest requires the walnut Zeiss dataset saved in %s", basedir)
+
+  
+
+class TestZeissDataReader(unittest.TestCase):
+    @unittest.skipIf(not (has_file and has_olefile and has_dxchange), 
+                     f"Missing prerequisites: has_file {has_file}, has_olefile {has_olefile} has_dxchange {has_dxchange}")
+    def test_roi(self):
+        # want to pass an roi
+        reader = ZEISSDataReader(file_name=test_txrm_file)
+        metadata = reader.get_metadata()
+        horizontal_max = metadata['image_width']
+        vertical_max = metadata['image_height']
+        angles_max = len(metadata['thetas'])
+        valid_roi = {'angle': (0,1000, 1), 'vertical': (0,500), 'horizontal': (0, 400)}
+        reader.set_up(file_name=test_txrm_file, roi=valid_roi)
+        data3d = reader.read()
+
+        expected_shape=[1000,500, 400]
+        # angle, vertical, horizontal
+
+        self.assertEqual(data3d.shape, tuple(expected_shape))
+
+        valid_roi_negative_endpoint = {'angle': (0,-(angles_max-1000), 1), 'vertical': (0,-(vertical_max-500)), 'horizontal': (0, -(horizontal_max-400))}
+
+        reader.set_up(file_name=test_txrm_file, roi=valid_roi_negative_endpoint)
+        data3d = reader.read()
+        self.assertEqual(data3d.shape, tuple(expected_shape))
+
+        valid_roi_negative_startpoint = {'angle': (-1000, None, 1), 'vertical': (-500, None), 'horizontal': (-400, None)}
+        reader.set_up(file_name=test_txrm_file, roi=valid_roi_negative_startpoint)
+        data3d = reader.read()
+        self.assertEqual(data3d.shape, tuple(expected_shape))
 
 
-class TestTXRMDataReader(unittest.TestCase):
-    
+        invalid_rois_negative_startpoint = [{'angle': (-10000, None, 1), 'vertical': (-500, None), 'horizontal': (-400, None)},
+                                            {'angle': (-1000, None, 1), 'vertical': (-5000, None), 'horizontal': (-400, None)},
+                                            {'angle': (-1000, None, 1), 'vertical': (-500, None), 'horizontal': (-4000, None)}]
+        for invalid_roi in invalid_rois_negative_startpoint:
+            with self.assertRaises(ValueError):
+                reader.set_up(file_name=test_txrm_file, roi=invalid_roi)
 
-    def setUp(self):
-        logging.info ("has_astra {}".format(has_astra))
-        logging.info ("has_wget {}".format(has_wget))
-        logging.info ("has_olefile {}".format(has_olefile))
-        logging.info ("has_dxchange {}".format(has_dxchange))
-        logging.info ("has_file {}".format(has_file))
-        if has_file:
-            self.reader = TXRMDataReader()
-            angle_unit = AcquisitionGeometry.RADIAN
-            
-            self.reader.set_up(file_name=filename, 
-                               angle_unit=angle_unit)
-            data = self.reader.read()
-            if data.geometry is None:
-                raise AssertionError("WTF")
-            # Choose the number of voxels to reconstruct onto as number of detector pixels
-            N = data.geometry.pixel_num_h
-            
-            # Geometric magnification
-            mag = (np.abs(data.geometry.dist_center_detector) + \
-                np.abs(data.geometry.dist_source_center)) / \
-                np.abs(data.geometry.dist_source_center)
-                
-            # Voxel size is detector pixel size divided by mag
-            voxel_size_h = data.geometry.pixel_size_h / mag
-            voxel_size_v = data.geometry.pixel_size_v / mag
+        invalid_rois_negative_endpoint = [{'angle': (0,-10000, 1), 'vertical': (0,-(vertical_max-500)), 'horizontal': (0, -(horizontal_max-400))},
+                                            {'angle': (0,-(angles_max-1000), 1), 'vertical': (0,-5000), 'horizontal': (0, -(horizontal_max-400))},
+                                            {'angle': (0,-(angles_max-1000), 1), 'vertical': (0,-(vertical_max-500)), 'horizontal': (0, -4000)}]
+        for invalid_roi in invalid_rois_negative_endpoint:
+            with self.assertRaises(ValueError):
+                reader.set_up(file_name=test_txrm_file, roi=invalid_roi)
 
-            self.mag = mag
-            self.N = N
-            self.voxel_size_h = voxel_size_h
-            self.voxel_size_v = voxel_size_v
-
-            self.data = data
-
-
-    def tearDown(self):
-        pass
-
-
-    def test_run_test(self):
-        print("run test Zeiss Reader")
-        self.assertTrue(True)
-    
-
-    @unittest.skipIf(not has_prerequisites, "Prerequisites not met")
-    def test_read_and_reconstruct_2D(self):
+        invalid_rois_positive_endpoints = [{'angle': (0,10000, 1), 'vertical': (0,500), 'horizontal': (0, 400)},
+                                            {'angle': (0,1000, 1), 'vertical': (0,5000), 'horizontal': (0, 400)},
+                                            {'angle': (0,1000, 1), 'vertical': (0,500), 'horizontal': (0, 4000)}]
+        for invalid_roi in invalid_rois_positive_endpoints:
+            with self.assertRaises(ValueError):
+                reader.set_up(file_name=test_txrm_file, roi=invalid_roi)
         
+        invalid_rois_positive_startpoints = [{'angle': (10000, None, 1), 'vertical': (-500, None), 'horizontal': (-400, None)},
+                                            {'angle': (1000, None, 1), 'vertical': (5000, None), 'horizontal': (-400, None)},
+                                            {'angle': (1000, None, 1), 'vertical': (-500, None), 'horizontal': (4000, None)}]
+        for invalid_roi in invalid_rois_positive_startpoints:
+            with self.assertRaises(ValueError):
+                reader.set_up(file_name=test_txrm_file, roi=invalid_roi)
+
+
+    
+    @unittest.skipIf(not (has_file and has_olefile and has_dxchange), 
+                     f"Missing prerequisites: has_file {has_file}, has_olefile {has_olefile} has_dxchange {has_dxchange}")
+    def test_geometry_gpu(self):
+        
+        reader = ZEISSDataReader()           
+        reader.set_up(file_name=test_txrm_file)
+
+        geometry = reader.get_geometry()
+        # print (geometry)
+        assert geometry is not None
+        assert geometry.geom_type == 'CONE'
+        assert geometry.dimension == '3D'
+        
+        from cil.framework import AcquisitionGeometry
+        metadata = reader.get_metadata()
+        _geometry = AcquisitionGeometry.create_Cone3D(
+                [0,-metadata['dist_source_center'],0],[0,metadata['dist_center_detector'],0] \
+                ) \
+                    .set_panel([metadata['image_width'], metadata['image_height']],\
+                        pixel_size=[metadata['detector_pixel_size']/1000,metadata['detector_pixel_size']/1000])\
+                    .set_angles(metadata['thetas'],angle_unit=AngleUnit.RADIAN)
+        
+        assert _geometry == geometry
+
+
+    @unittest.skipIf(not (has_file and has_olefile and has_dxchange and has_recon_file), 
+                     f"Missing prerequisites: has_file {has_file}, has_recon_file {has_recon_file} has_olefile {has_olefile} has_dxchange {has_dxchange}, has_astra {has_astra} has_wget {has_wget}")
+    def test_read_txm_recon_file_gpu(self):
+        zreader = ZEISSDataReader()           
+        zreader.set_up(file_name=test_3d_recon_file)
+
+        metadata = zreader.get_metadata()
+        
+        _geometry = ImageGeometry(voxel_num_x=metadata['image_width'], 
+                                  voxel_num_y=metadata['image_height'],
+                                  voxel_num_z=metadata['number_of_images'],
+                                  voxel_size_x=metadata['pixel_size'],
+                                  voxel_size_y=metadata['pixel_size'],
+                                  voxel_size_z=metadata['pixel_size'],
+                                 )
+        data3d = zreader.read()
+
+        assert _geometry == data3d.geometry
+
+
+    @unittest.skipIf(not (has_file and has_olefile and has_dxchange ), 
+                     f"Missing prerequisites: has_file {has_file}, has_olefile {has_olefile} has_dxchange {has_dxchange}, has_astra {has_astra} has_wget {has_wget}")
+    def test_read_and_reconstruct_2D_gpu(self):
+
+        # Here we may read the TXM file that comes with the Walnut Zeiss dataset, extract
+        # the central slice and compare it with the FBP reconstruction from the data.
+        # However, https://github.com/TomographicImaging/CIL/issues/2175        
+        # So at the moment we just read the file and reconstruct it.
+        
+        zreader = ZEISSDataReader()           
+        zreader.set_up(file_name=test_txrm_file)
+        data = zreader.read()
+
         # get central slice
-        data2d = self.data.subset(vertical='centre')
-        # d512 = self.data.subset(vertical=512)
-        # data2d.fill(d512.as_array())
+        data2d = data.get_slice(vertical='centre')
         # neg log
         data2d.log(out=data2d)
         data2d *= -1
 
         ig2d = data2d.geometry.get_ImageGeometry()
-        # Construct the appropriate ImageGeometry
-        ig2d = ImageGeometry(voxel_num_x=self.N,
-                            voxel_num_y=self.N,
-                            voxel_size_x=self.voxel_size_h, 
-                            voxel_size_y=self.voxel_size_h)
-        if data2d.geometry is None:
-            raise AssertionError('What? None?')
+        assert data2d.geometry is not None, "data2d geometry is None"
         fbpalg = FBP(ig2d,data2d.geometry)
         fbpalg.set_input(data2d)
-        
+
         recfbp = fbpalg.get_output()
+
+    def test_file_not_found_error(self):
+        reader = ZEISSDataReader()           
         
-        wget.download('https://www.ccpi.ac.uk/sites/www.ccpi.ac.uk/files/walnut_slice512.nxs',
-                      out=data_dir)
-        fname = os.path.join(data_dir, 'walnut_slice512.nxs')
-        reader = NEXUSDataReader()
-        reader.set_up(file_name=fname)
-        gt = reader.read()
+        with self.assertRaises(FileNotFoundError):
+            reader.set_up(file_name='no-file')
 
-        qm = mse(gt, recfbp)
-        logging.info ("MSE {}".format(qm) )
-
-        np.testing.assert_almost_equal(qm, 0, decimal=3)
-        fname = os.path.join(data_dir, 'walnut_slice512.nxs')
-        os.remove(fname)
-
+    @unittest.skipIf(has_dxchange, f"This unit test runs only if dxchange is not installed: has_dxchange {has_dxchange}")
+    def test_import_error(self):
+        reader = ZEISSDataReader()
+        with self.assertRaises(ImportError):
+            reader.set_up(file_name=test_txrm_file)
 
 class TestTIFF(unittest.TestCase):
     def setUp(self) -> None:
-        # self.logger = logging.getLogger('cil.io')
-        # self.logger.setLevel(logging.DEBUG)
-        self.cwd = os.path.join(os.getcwd(), 'tifftest')
-        os.mkdir(self.cwd)
+        self.TMP = tempfile.TemporaryDirectory()
+        self.cwd = os.path.join(self.TMP.name, 'rawtest')
 
     def tearDown(self) -> None:
-        shutil.rmtree(self.cwd)
-        
+        self.TMP.cleanup()
 
     def get_slice_imagedata(self, data):
         '''Returns only 2 slices of data'''
         # data = dataexample.SIMULATED_SPHERE_VOLUME.get()
         data.dimension_labels[0]
-        roi = {data.dimension_labels[0]: (0,2,1), 
-               data.dimension_labels[1]: (None, None, None), 
+        roi = {data.dimension_labels[0]: (0,2,1),
+               data.dimension_labels[1]: (None, None, None),
                data.dimension_labels[2]: (None, None, None)}
         return Slicer(roi=roi)(data)
 
@@ -191,7 +260,7 @@ class TestTIFF(unittest.TestCase):
         data = self.get_slice_imagedata(
             dataexample.SIMULATED_SPHERE_VOLUME.get()
         )
-        
+
         fname = os.path.join(self.cwd, "unittest")
 
         writer = TIFFWriter(data=data, file_name=fname)
@@ -211,8 +280,8 @@ class TestTIFF(unittest.TestCase):
         data = self.get_slice_imagedata(
             dataexample.SIMULATED_CONE_BEAM_DATA.get()
         )
-        
-        
+
+
         fname = os.path.join(self.cwd, "unittest")
 
         writer = TIFFWriter(data=data, file_name=fname)
@@ -226,10 +295,59 @@ class TestTIFF(unittest.TestCase):
         read = reader.read_as_AcquisitionData(data.geometry)
         np.testing.assert_allclose(data.as_array(), read.as_array())
 
+    def test_tiff_stack_file_prefix(self):
+
+        # save two files with different names to test file_prefix arg
+        data1 = self.get_slice_imagedata(
+            dataexample.SIMULATED_SPHERE_VOLUME.get()
+        )
+
+        fname = os.path.join(self.cwd, "name1")
+
+        writer = TIFFWriter(data=data1, file_name=fname)
+        writer.write()
+
+        data2 = self.get_slice_imagedata(
+            dataexample.SIMULATED_SPHERE_VOLUME.get()
+        )+10
+
+        fname = os.path.join(self.cwd, "name2")
+        writer = TIFFWriter(data=data2, file_name=fname)
+        writer.write()
+
+        # test all files are loaded without file_prefix arg
+        reader = TIFFStackReader(file_name=self.cwd)
+        read_array = reader.read()
+
+        np.testing.assert_allclose(data1.as_array(), read_array[0:2, :, :])
+        np.testing.assert_allclose(data2.as_array(), read_array[2:4, :, :])
+
+        # test file_prefix arg
+        reader = TIFFStackReader(file_name=self.cwd, file_prefix="name2")
+        read_array = reader.read()
+
+        np.testing.assert_allclose(data2.as_array(), read_array)
+
+        # try to load a specific file with correct file_prefix arg
+        fname = os.path.join(self.cwd, "name2_idx_0000.tiff")
+        with np.testing.assert_warns(UserWarning):
+            reader = TIFFStackReader(file_name=fname, file_prefix="name2")
+        read_array = reader.read()
+        np.testing.assert_allclose(data2.as_array()[0,:,:], read_array)
+
+        # try to load a specific file with incorect file_prefix arg
+        with np.testing.assert_warns(UserWarning):
+            reader = TIFFStackReader(file_name=fname, file_prefix="name1")
+        read_array = reader.read()
+        np.testing.assert_allclose(data2.as_array()[0,:,:], read_array)
+
+        # try to load from a directory with incorrect file_prefix arg
+        with np.testing.assert_raises(Exception):
+            reader = TIFFStackReader(file_name=self.cwd, file_prefix="wrongname")
 
     def test_tiff_stack_ImageDataSlice(self):
         data = dataexample.SIMULATED_SPHERE_VOLUME.get()
-        
+
         fname = os.path.join(self.cwd, "unittest")
 
         writer = TIFFWriter(data=data, file_name=fname)
@@ -244,7 +362,7 @@ class TestTIFF(unittest.TestCase):
         shape[2] /= 2
 
         np.testing.assert_allclose(shape, read_array.shape )
-        
+
         roi = {'axis_0': (0, 2, None), 'axis_1': -1, 'axis_2': -1}
 
         reader = TIFFStackReader(file_name=self.cwd, roi=roi, mode='slice')
@@ -258,7 +376,7 @@ class TestTIFF(unittest.TestCase):
         data = self.get_slice_imagedata(
             dataexample.SIMULATED_SPHERE_VOLUME.get()
         )
-        
+
         fname = os.path.join(self.cwd, "unittest")
 
         writer = TIFFWriter(data=data, file_name=fname)
@@ -269,7 +387,7 @@ class TestTIFF(unittest.TestCase):
             with open(el, 'w') as f:
                 f.write('BOOM')
             break
-                
+
         reader = TIFFStackReader(file_name=self.cwd)
         try:
             read_array = reader.read()
@@ -279,7 +397,7 @@ class TestTIFF(unittest.TestCase):
 
     def test_TIFF_compression3D_0(self):
         self.TIFF_compression_test(None)
-    
+
     def test_TIFF_compression3D_1(self):
         self.TIFF_compression_test('uint8')
 
@@ -289,16 +407,16 @@ class TestTIFF(unittest.TestCase):
     def test_TIFF_compression3D_3(self):
         with self.assertRaises(ValueError) as context:
             self.TIFF_compression_test('whatever_compression')
-            
+
     def test_TIFF_compression4D_0(self):
         self.TIFF_compression_test(None,2)
-        
+
     def test_TIFF_compression4D_1(self):
         self.TIFF_compression_test('uint8',2)
 
     def test_TIFF_compression4D_2(self):
         self.TIFF_compression_test('uint16',2)
-    
+
     def test_TIFF_compression4D_3(self):
         with self.assertRaises(ValueError) as context:
             self.TIFF_compression_test('whatever_compression',2)
@@ -315,7 +433,6 @@ class TestTIFF(unittest.TestCase):
         data = ig.allocate(0)
         data.fill(np.arange(X*Y*Z*C).reshape(ig.shape))
 
-        from cil.io import utilities
         compress = utilities.get_compress(compression)
         dtype = utilities.get_compressed_dtype(data.array, compression)
         scale, offset = utilities.get_compression_scale_offset(data.array, compression)
@@ -330,7 +447,7 @@ class TestTIFF(unittest.TestCase):
         if C > 1:
             read_array = reader.read_as_ImageData(ig).array
 
-        
+
         if compress:
             tmp = data.array * scale + offset
             tmp = np.asarray(tmp, dtype=dtype)
@@ -343,7 +460,7 @@ class TestTIFF(unittest.TestCase):
             sc, of = reader.read_scale_offset()
             assert sc == scale
             assert of == offset
-            
+
             recovered_data = (read_array - of)/sc
             np.testing.assert_allclose(recovered_data, data.array, rtol=1e-1, atol=1e-2)
 
@@ -358,32 +475,117 @@ class TestTIFF(unittest.TestCase):
             # if the compression is None, the scale and offset should not be written to the json file
             with self.assertRaises(OSError) as context:
                 sc, of = reader.read_scale_offset()
-        
+
         assert tmp.dtype == read_array.dtype
-        
+
         np.testing.assert_array_equal(tmp, read_array)
 
-        
+class TestRAW(unittest.TestCase):
+    def setUp(self) -> None:
+        self.TMP = tempfile.TemporaryDirectory()
+        self.cwd = os.path.join(self.TMP.name, 'rawtest')
+
+    def tearDown(self) -> None:
+        self.TMP.cleanup()
+        # pass
+
+    def test_raw_nocompression_0(self):
+        self.RAW_compression_test(None,1)
+
+    def test_raw_compression_0(self):
+        self.RAW_compression_test('uint8',1)
+
+    def test_raw_compression_1(self):
+        self.RAW_compression_test('uint16',1)
+
+    def test_raw_nocompression_1(self):
+        self.RAW_compression_test(None,1)
+
+    def test_raw_compression_2(self):
+        with self.assertRaises(ValueError) as context:
+            self.RAW_compression_test(12,1)
+
+    def RAW_compression_test(self, compression, channels=1):
+        X=4
+        Y=5
+        Z=6
+        C=channels
+        if C == 1:
+            ig = ImageGeometry(voxel_num_x=4, voxel_num_y=5, voxel_num_z=6)
+        else:
+            ig = ImageGeometry(voxel_num_x=4, voxel_num_y=5, voxel_num_z=6, channels=C)
+        data = ig.allocate(0)
+        data.fill(np.arange(X*Y*Z*C).reshape(ig.shape))
+
+        compress = utilities.get_compress(compression)
+        dtype = utilities.get_compressed_dtype(data.array, compression)
+        scale, offset = utilities.get_compression_scale_offset(data.array, compression)
+        if C > 1:
+            assert data.ndim == 4
+        raw = "unittest.raw"
+        fname = os.path.join(self.cwd, raw)
+
+        writer = RAWFileWriter(data=data, file_name=fname, compression=compression)
+        writer.write()
+
+        # read the data from the ini file
+        ini = "unittest.ini"
+        config = configparser.ConfigParser()
+        inifname = os.path.join(self.cwd, ini)
+        config.read(inifname)
+
+
+        assert raw == config['MINIMAL INFO']['file_name']
+
+        # read how to read the data from the ini file
+        read_dtype = config['MINIMAL INFO']['data_type']
+        read_array = np.fromfile(fname, dtype=read_dtype)
+        read_shape = eval(config['MINIMAL INFO']['shape'])
+
+        # reshape read in array
+        read_array = read_array.reshape(read_shape)
+
+        if compress:
+            # rescale the dataset to the original data
+            sc = float(config['COMPRESSION']['scale'])
+            of = float(config['COMPRESSION']['offset'])
+            assert sc == scale
+            assert of == offset
+
+            recovered_data = (read_array - of)/sc
+            np.testing.assert_allclose(recovered_data, data.array, rtol=1e-1, atol=1e-2)
+
+            # rescale the original data with scale and offset and compare with what saved
+            tmp = data.array * scale + offset
+            tmp = np.asarray(tmp, dtype=dtype)
+        else:
+            tmp = data.array
+
+        assert tmp.dtype == read_array.dtype
+
+        np.testing.assert_array_equal(tmp, read_array)
 
 class Test_HDF5_utilities(unittest.TestCase):
     def setUp(self) -> None:
+        data_dir = dataexample.CILDATA.data_dir
+        
         self.path = os.path.join(os.path.abspath(data_dir), '24737_fd_normalised.nxs')
 
-        
+
         self.dset_path ='/entry1/tomo_entry/data/data'
 
 
     def test_print_metadata(self):
         devnull = open(os.devnull, 'w') #suppress stdout
         with patch('sys.stdout', devnull):
-            HDF5_utilities.print_metadata(self.path)    
+            HDF5_utilities.print_metadata(self.path)
 
 
     def test_get_dataset_metadata(self):
         dset_dict = HDF5_utilities.get_dataset_metadata(self.path, self.dset_path)
 
         dict_by_hand  ={'ndim': 3, 'shape': (91, 135, 160), 'size': 1965600, 'dtype': np.float32, 'compression': None, 'chunks': None, 'is_virtual': False}
-        self.assertDictContainsSubset(dict_by_hand,dset_dict)
+        self.assertEqual(dset_dict, dict_by_hand | dset_dict)
 
 
     def test_read(self):
@@ -435,3 +637,26 @@ class Test_HDF5_utilities(unittest.TestCase):
 
         HDF5_utilities.read_to(self.path, self.dset_path, data_partial, source_sel=subset, dest_sel=subset)
         np.testing.assert_allclose(data_partial_by_hand,data_partial)
+
+
+class TestNikonReader(unittest.TestCase):
+
+    def test_setup(self):
+
+        reader = NikonDataReader()
+        self.assertEqual(reader.file_name, None)
+        self.assertEqual(reader.roi, None)
+        self.assertTrue(reader.normalise)
+        self.assertEqual(reader.mode, 'bin')
+        self.assertFalse(reader.fliplr)
+
+        roi = {'vertical':(1,-1),'horizontal':(1,-1),'angle':(1,-1)}
+        reader = NikonDataReader(file_name=None, roi=roi, normalise=False, mode='slice', fliplr=True)
+        self.assertEqual(reader.file_name, None)
+        self.assertEqual(reader.roi, roi)
+        self.assertFalse(reader.normalise)
+        self.assertEqual(reader.mode, 'slice')
+        self.assertTrue(reader.fliplr)
+
+        with self.assertRaises(FileNotFoundError):
+            reader = NikonDataReader(file_name='no-file')

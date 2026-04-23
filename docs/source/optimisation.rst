@@ -331,6 +331,9 @@ A :code:`ScaledOperator` represents the multiplication of any operator with a sc
 .. autoclass:: cil.optimisation.operators.SumOperator
    :members:
 
+.. autoclass:: cil.optimisation.operators.AdjointOperator
+   :members:   
+
 
 Trivial operators
 -----------------

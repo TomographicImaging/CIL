@@ -87,7 +87,6 @@ class CGLS(Algorithm):
         self.norms = self.s.norm()
 
         self.gamma = self.norms0**2
-        self.normx = self.x.norm()
 
         self.configured = True
         log.info("%s configured", self.__class__.__name__)
@@ -114,10 +113,13 @@ class CGLS(Algorithm):
         #self.p = self.s + self.beta * self.p
         self.p.sapyb(self.beta, self.s, 1, out=self.p)
 
+        if self.norms == 0:
+            self.update_objective()
+
 
     def update_objective(self):
         a = self.r.squared_norm()
-        if a is numpy.nan:
+        if a is numpy.nan or a==0:
             raise StopIteration()
         self.loss.append(a)
 

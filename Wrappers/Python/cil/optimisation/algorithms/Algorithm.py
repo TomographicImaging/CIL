@@ -57,6 +57,12 @@ class Algorithm:
     def update(self):
         '''A single iteration of the algorithm'''
         raise NotImplementedError
+    
+    def should_stop(self):
+        '''default stopping criterion: number of iterations
+
+        The user can change this in concrete implementation of iterative algorithms.'''
+        return self.iteration > self.max_iteration
 
     def __iter__(self):
         '''Algorithm is an iterable'''

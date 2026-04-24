@@ -188,6 +188,6 @@ class CGLSEarlyStopping(Callback):
             print('The norm of the residual is less than {} times the norm of the initial residual and so the algorithm is terminated'.format(self.epsilon))
             raise StopIteration
         self.normx = algorithm.x.norm()
-        if algorithm.normx >= self.omega:
+        if self.normx >= self.omega:
             print('The norm of the solution is greater than {} and so the algorithm is terminated'.format(self.omega))
             raise StopIteration

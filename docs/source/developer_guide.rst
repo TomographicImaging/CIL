@@ -52,17 +52,25 @@ We suggest creating a conda environment with all the dependencies for building C
      - Command
      - Status
    * - Linux
-     - ``conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml``
+     - ``conda env create -f ./scripts/cil_development.yml``
      - Tested
    * - Windows
-     - ``conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml``
+     - ``conda env create -f ./scripts/cil_development.yml``
      - Tested
    * - MacOS (ARM)
-     - ``conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development_osx.yml``
+     - ``conda env create -f ./scripts/cil_development_osx.yml``
      - Experimental
 
 .. note::
    Currently only Linux and Windows are tested and supported. The support on MacOS (ARM) is experimental and certain features are not available and not working, such as FFT filtering for FDK.
+
+This will create an environment called `cil_dev`.
+
+Activate the environment with:
+
+.. code:: sh
+
+   conda activate cil_dev
 
 Build CIL
 """"""""
@@ -104,7 +112,7 @@ If you are developing on Windows with conda, you need to have access to both the
 
 You can achieve this in two ways:
 
-1. by opening a "Developer Command Prompt for Visual Studio" and activating the conda environment from there. This requires you 
+1. by opening "x64 Native Tools Command Prompt for VS" and activating the conda environment from there. This requires you 
    to know the path to the ``conda.bat`` file, which is typically located in the ``condabin`` subdirectory of your conda installation. 
    Once located you need to run ``<path_to>\conda.bat activate <env_name>`` to activate the conda environment, and then you can run the build command from there.
 2. by opening the conda prompt and running the ``vcvarsall.bat x64`` file from the Visual Studio installation (with ``x64`` argument), and then running the build command.

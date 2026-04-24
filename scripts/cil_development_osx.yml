@@ -1,0 +1,26 @@
+name: cil_dev
+channels:
+  - conda-forge
+  - https://software.repos.intel.com/python/conda
+dependencies:
+  - python=3.12
+  - pip
+  - numpy=1.26
+  - numba
+  - llvm-openmp
+  - matplotlib-base >=3.3.0
+  - astra-toolbox=2.1=py*
+  - scikit-image
+  - dxchange >=0.2.1
+  - olefile >=0.46
+  - cvxpy!=1.8.2
+  - zenodo_get >=1.6
+  - h5py
+  - pillow
+  - pywavelets
+  - ccpi::cil-data >=22
+  - tqdm
+  - python-wget
+  - pip:
+    - unittest-parametrize
+    

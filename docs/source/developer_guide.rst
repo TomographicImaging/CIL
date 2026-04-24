@@ -261,7 +261,7 @@ Example:
 ::
   git clone git@github.com:TomographicImaging/CIL
   cd CIL
-  conda env create -f https://tomography.stfc.ac.uk/scripts/env/cil_development.yml
+  conda env create -f ./scripts/cil_development.yml
   conda activate ENVIRONMENT_NAME
   pip install -e .
   cd docs

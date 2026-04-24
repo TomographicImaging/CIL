@@ -24,7 +24,7 @@ dependencies:
   - pywavelets
   - ccpi::cil-data >=22
   - ccpi::ccpi-regulariser=24.0.1
-  - ccpi::tomophantom=2.0.0
+  - ccpi::tomophantom=3.0.3
   - ccpi::tigre=2.6
   - tqdm
   - python-wget

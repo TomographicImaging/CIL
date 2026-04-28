@@ -283,8 +283,8 @@ class TestGD(CCPiTestClass):
         gd = GD(initial=self.initial, f=self.f, step_size=armj,
                 update_objective_interval=500)
         gd.run(4000, verbose=0)
-        self.assertAlmostEqual(gd.solution.array[0], scipy_opt_high.x[0], places=3)
-        self.assertAlmostEqual(gd.solution.array[1], scipy_opt_high.x[1], places=3)
+        self.assertAlmostEqual(gd.solution.array[0], self.scipy_opt_high.x[0], places=3)
+        self.assertAlmostEqual(gd.solution.array[1], self.scipy_opt_high.x[1], places=3)
 
     def test_bb_step_size_gd_converge(self):
         np.random.seed(2)

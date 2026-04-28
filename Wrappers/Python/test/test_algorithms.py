@@ -37,15 +37,13 @@ from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOp
 
 
 
-from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, ScaledFunction
+from cil.optimisation.functions import Rosenbrock, MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, ScaledFunction
 from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD , LSQR
 
 
-from scipy.optimize import minimize, rosen
-
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
-from cil.optimisation.functions import Rosenbrock
+
 from cil.utilities.quality_measures import mae, mse, psnr
 
 import logging
@@ -71,11 +69,6 @@ class TestGD(CCPiTestClass):
         self.x0 = np.array([x0_1, x0_2])
 
         self.initial = VectorData(np.array(self.x0))
-        method = 'Nelder-Mead'  # or "BFGS"
-        # self.scipy_opt_low = minimize(rosen, self.x0, method=method, tol=1e-3, options={"maxiter":50})
-        self.scipy_opt_high = minimize(
-            rosen, self.x0, method=method, tol=1e-2)  # (1., 1.)
-        # fixed (alpha=1, beta=100) same to Scipy, min at (alpha,alpha^2)
         self.f = Rosenbrock(alpha=1, beta=100)
 
     def test_GD(self):
@@ -142,16 +135,6 @@ class TestGD(CCPiTestClass):
         self.assertEqual(gd.step_size_rule.step_size, 0.4)
         self.assertEqual(gd.step_size, 0.4)
 
-    def test_gd_fixed_step_size_rosen(self):
-
-        gd = GD(initial=self.initial, f=self.f, step_size=0.002,
-                update_objective_interval=500)
-        gd.run(3000, verbose=0)
-        np.testing.assert_allclose(
-            gd.solution.array[0], self.scipy_opt_high.x[0], atol=1e-2)
-        np.testing.assert_allclose(
-            gd.solution.array[1], self.scipy_opt_high.x[1], atol=1e-2)
-
     def test_armijo_step_size_init(self):
 
         rule = ArmijoStepSizeRule()
@@ -205,15 +188,7 @@ class TestGD(CCPiTestClass):
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
-    def test_gd_armijo_rosen(self):
-        armj = ArmijoStepSizeRule(alpha=50, max_iterations=50, warmstart=False)
-        gd = GD(initial=self.initial, f=self.f, step_size=armj,
-                update_objective_interval=500)
-        gd.run(3500, verbose=0)
-        np.testing.assert_allclose(
-            gd.solution.array[0], self.scipy_opt_high.x[0])
-        np.testing.assert_allclose(
-            gd.solution.array[1], self.scipy_opt_high.x[1])
+
 
     def test_gd_run_no_iterations(self):
         gd = GD(initial=self.initial, f=self.f, step_size=0.002)

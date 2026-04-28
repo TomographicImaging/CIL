@@ -114,12 +114,14 @@ class CGLS(Algorithm):
         self.p.sapyb(self.beta, self.s, 1, out=self.p)
 
         if self.norms == 0:
-            self.update_objective()
+            log.info('The norm of the backprojected residual is zero and so the algorithm is terminated')
+            raise StopIteration 
 
 
     def update_objective(self):
         a = self.r.squared_norm()
-        if a is numpy.nan or a==0:
+        if a is numpy.nan:
+            log.info('The objective value is NaN and so the algorithm is terminated')
             raise StopIteration()
         self.loss.append(a)
 

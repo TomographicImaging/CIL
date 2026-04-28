@@ -43,7 +43,7 @@ class Algorithm:
     def __init__(self, update_objective_interval=1):
 
         self.iteration = -1
-        self.__max_iteration = 1
+        self._total_iterations = 1
         self.__loss = []
         self.memopt = False
         self.configured = False
@@ -57,12 +57,6 @@ class Algorithm:
     def update(self):
         '''A single iteration of the algorithm'''
         raise NotImplementedError
-    
-    def should_stop(self):
-        '''default stopping criterion: number of iterations
-
-        The user can change this in concrete implementation of iterative algorithms.'''
-        return self.iteration > self.max_iteration
 
     def __iter__(self):
         '''Algorithm is an iterable'''
@@ -185,16 +179,6 @@ class Algorithm:
 
     objective = loss # alias
 
-    @property
-    def max_iteration(self):
-        '''gets the maximum number of iterations'''
-        return self.__max_iteration
-
-    @max_iteration.setter
-    def max_iteration(self, value):
-        '''sets the maximum number of iterations'''
-        assert isinstance(value, Integral) or np.isposinf(value)
-        self.__max_iteration = value
 
     @property
     def update_objective_interval(self):
@@ -238,11 +222,11 @@ class Algorithm:
         if self.iteration == -1 and self.update_objective_interval>0:
             iterations+=1
 
-        self.max_iteration = self.iteration + iterations
+        self._total_iterations = self.iteration + iterations
 
-        # call `__next__` upto `iterations` times or until `StopIteration` is raised
-        iters = (count(self.iteration) if np.isposinf(self.max_iteration)
-                 else range(self.iteration, self.max_iteration))
+        # call `__next__` up to `iterations` times or until `StopIteration` is raised
+        iters = (count(self.iteration) if np.isposinf(self._total_iterations)
+                 else range(self.iteration, self._total_iterations))
         for _ in iters:
             try:
                 self.__next__()
@@ -259,5 +243,4 @@ class Algorithm:
                 return {'primal': obj[0], 'dual': obj[1], 'primal_dual': obj[2]}
             obj = obj[0]
         return {'objective': obj}
-
 

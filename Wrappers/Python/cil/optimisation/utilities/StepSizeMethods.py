@@ -763,7 +763,7 @@ class PDHGBayesOptimisationStepSize(StepSizeRule):
         This is a computationally expensive step size rule, as it requires running the PDHG algorithm for a number of iterations for each evaluation of the objective function in the Bayesian optimisation. It is recommended to use this step size rule where you are memory constrained but less time constrained. For the opposite case, where you are more time constrained, not memory constrained, we recommend using the :class:`PDHGAdaptiveStepSize2013` or :class:`PDHGAdaptiveStepSize2015` step size rules, which are adaptive step size rules that update the step sizes at each iteration based on the observed behaviour of the algorithm.
         """
 
-    def __init__(self, gamma_bounds=None, n_initial_points=11, n_calls=30, n_iterations=10):
+    def __init__(self, gamma_bounds=None, n_initial_points=11, n_calls=30, n_iterations=10, restart = True):
         '''Initialises the step size rule'''
 
         self.gamma_bounds = gamma_bounds
@@ -790,10 +790,8 @@ class PDHGBayesOptimisationStepSize(StepSizeRule):
             self.gamma_bounds = (1e-5/ratio, 1e5/ratio)
             log.debug(
                 "gamma_bounds not provided, set to (1e-5/ratio, 1e5/ratio) = {}".format(self.gamma_bounds))
-            x0 = [[np.log((1/ratio)*10**i)] for i in range(-5, 5, 1)]
             log.debug("Initial points are {}".format(x0))
-        else:
-            x0 = None
+
         log_gamma_bounds = (
             np.log(self.gamma_bounds[0]), np.log(self.gamma_bounds[1]))
         update_objective_interval = algorithm.update_objective_interval
@@ -817,7 +815,7 @@ class PDHGBayesOptimisationStepSize(StepSizeRule):
             return algorithm.objective[-1]
 
         gp_result = gp_minimize(objective_function, [
-                                log_gamma_bounds], acq_optimizer='sampling', x0=x0, n_random_starts=self.n_initial_points, n_calls=self.n_calls, )
+                                log_gamma_bounds], n_random_starts=self.n_initial_points, n_calls=self.n_calls, )
         algorithm.set_up(initial=algorithm.initial, f=algorithm.f, g=algorithm.g, operator=algorithm.operator, step_size=[
                          1.0 / (gp_result.x[0] * algorithm.operator.norm()), 1.0*gp_result.x[0] / (algorithm.operator.norm())])
         algorithm.update_objective_interval = update_objective_interval
@@ -843,7 +841,207 @@ class PDHGBayesOptimisationStepSize(StepSizeRule):
     def get_step_size(self, algorithm):
         return self.tau, self.sigma
 
+class PDHGBayesOptimisationStepSize(StepSizeRule):
+    """The ratio between the primal and dual step sizes (gamma) in the PDHG algorithm is chosen using a guassian process Bayesian optimisation, choosing the gamma that gives the best performance after a small number of iterations. The step sizes are chosen at the beginning of the algorithm and then kept constant throughout the iterations.
+        Parameters
+        -------------
+        gamma_bounds : list or tuple of length two, optional, the default is an approximation of [1e-5, 1e6]*norm(A)/norm(b) where A is the operator and b is the data, which is a good initial guess for the ratio between the primal and dual step sizes in the PDHG algorithm.
+            Bounds for the ratio between the primal and dual step sizes (gamma) in the Bayesian optimisation. The gamma that gives the best performance after a small number of iterations is chosen as the ratio between the primal and dual step sizes for the PDHG algorithm. The default bounds are (1e-5, 1e5).
+        n_initial_points : int, optional, default=5
+            Number of initial random evaluations of the objective function in the Bayesian optimisation.
+        n_calls : int, optional, default=20
+            Total number of evaluations of the objective function in the Bayesian optimisation, including the initial random evaluations.
+        n_iterations : int, optional, default=10
+            Number of iterations to run the PDHG algorithm for each evaluation of the objective function in the Bayesian optimisation. The gamma that gives the best performance after this number of iterations is chosen as the ratio between the primal and dual step sizes for the PDHG algorithm.
 
+        Notes
+        -----
+        This is a computationally expensive step size rule, as it requires running the PDHG algorithm for a number of iterations for each evaluation of the objective function in the Bayesian optimisation. It is recommended to use this step size rule where you are memory constrained but less time constrained. For the opposite case, where you are more time constrained, not memory constrained, we recommend using the :class:`PDHGAdaptiveStepSize2013` or :class:`PDHGAdaptiveStepSize2015` step size rules, which are adaptive step size rules that update the step sizes at each iteration based on the observed behaviour of the algorithm.
+        """
+
+    def __init__(self, gamma_bounds=None, n_initial_points=5, n_calls=20, n_iterations=10, restart = True):
+        '''Initialises the step size rule'''
+
+        self.gamma_bounds = gamma_bounds
+        if gamma_bounds is not None:
+            if len(gamma_bounds) != 2:
+                raise ValueError(
+                    "gamma_bounds should be a list or tuple of length two, gamma_bounds = {}".format(gamma_bounds))
+
+        self.n_initial_points = n_initial_points
+        self.n_calls = n_calls
+        self.n_iterations = n_iterations
+
+    def get_initial_step_size(self, algorithm):
+        try:
+            from skopt import gp_minimize
+        except ImportError:
+            raise ImportError(
+                "skopt is required for the PDHGBayesOptimisationStepSize rule. Please install scikit-optimize to use this step size rule.")
+
+        if self.gamma_bounds is None:
+            ratio = np.sqrt(algorithm.f(algorithm.operator.direct(
+                0*algorithm.x)))/algorithm.operator.norm()
+            log.debug("ratio: {}".format(ratio))
+            self.gamma_bounds = (1e-5/ratio, 1e5/ratio)
+            log.debug(
+                "gamma_bounds not provided, set to (1e-5/ratio, 1e5/ratio) = {}".format(self.gamma_bounds))
+
+
+        log_gamma_bounds = (
+            np.log(self.gamma_bounds[0]), np.log(self.gamma_bounds[1]))
+        update_objective_interval = algorithm.update_objective_interval
+        algorithm.update_objective_interval = self.n_iterations-1
+
+        def objective_function(log_gamma):
+            gamma = np.exp(log_gamma[0])
+            log.debug(
+                "Evaluating objective function for gamma = {}".format(gamma))
+            # Set the step sizes based on the current gamma
+            tau = 1.0 / (gamma * algorithm.operator.norm())
+            sigma = 1.0*gamma / (algorithm.operator.norm())
+
+            algorithm.set_up(initial=algorithm.initial, f=algorithm.f,
+                             g=algorithm.g, operator=algorithm.operator, step_size=[tau, sigma])
+            algorithm.iteration = -1
+
+            algorithm.run(self.n_iterations, callbacks=[])
+            log.debug("Objective function value for gamma = {}: {}".format(
+                gamma, algorithm.objective[-1]))
+            return algorithm.objective[-1]
+
+        gp_result = gp_minimize(objective_function, [
+                                log_gamma_bounds], n_random_starts=self.n_initial_points, n_calls=self.n_calls, )
+        algorithm.set_up(initial=algorithm.initial, f=algorithm.f, g=algorithm.g, operator=algorithm.operator, step_size=[
+                         1.0 / (gp_result.x[0] * algorithm.operator.norm()), 1.0*gp_result.x[0] / (algorithm.operator.norm())])
+        algorithm.update_objective_interval = update_objective_interval
+        algorithm.iteration = -1
+        log.debug("Best gamma found: {}, with objective function value: {}".format(
+            np.exp(gp_result.x[0]), gp_result.fun))
+        if log.isEnabledFor(logging.DEBUG):
+            from matplotlib import pyplot as plt
+            from skopt.plots import plot_convergence, plot_gaussian_process
+            plot_convergence(gp_result)
+            plt.show()
+            plot_gaussian_process(gp_result)
+            plt.yscale('log')
+            plt.xlabel('log gamma')
+            plt.title("Best gamma found: {}, with objective function value: {}".format(
+                np.exp(gp_result.x[0]), gp_result.fun))
+            plt.show()
+
+        self.tau = 1.0 / (np.exp(gp_result.x[0]) * algorithm.operator.norm())
+        self.sigma = 1.0*np.exp(gp_result.x[0]) / (algorithm.operator.norm())
+        return self.tau, self.sigma
+
+    def get_step_size(self, algorithm):
+        return self.tau, self.sigma
+    
+
+class PDHGExperimentalBayesOptimisationStepSize(StepSizeRule):
+    """The ratio between the primal and dual step sizes (gamma) in the PDHG algorithm is chosen semi-adaptively using a guassian process Bayesian optimisation, a range of gamma values are tested one after the other, not restarting the algorithm, and the gamma value that reduces the objective value by the largest percentage amount will be chosen to continue. 
+        Parameters
+        -------------
+        gamma_bounds : list or tuple of length two, optional, the default is an approximation of [1e-5, 1e6]*norm(A)/norm(b) where A is the operator and b is the data, which is a good initial guess for the ratio between the primal and dual step sizes in the PDHG algorithm.
+            Bounds for the ratio between the primal and dual step sizes (gamma) in the Bayesian optimisation. The gamma that gives the best performance after a small number of iterations is chosen as the ratio between the primal and dual step sizes for the PDHG algorithm. The default bounds are (1e-5, 1e5).
+        n_initial_points : int, optional, default=5
+            Number of initial random evaluations of the objective function in the Bayesian optimisation.
+        n_calls : int, optional, default=20
+            Total number of evaluations of the objective function in the Bayesian optimisation, including the initial random evaluations.
+        n_iterations : int, optional, default=10
+            Number of iterations to run the PDHG algorithm for each evaluation of the objective function in the Bayesian optimisation. The gamma that gives the best performance after this number of iterations is chosen as the ratio between the primal and dual step sizes for the PDHG algorithm.
+
+        Notes
+        -----
+        This is a computationally expensive step size rule, as it requires running the PDHG algorithm for a number of iterations for each evaluation of the objective function in the Bayesian optimisation. It is recommended to use this step size rule where you are memory constrained but less time constrained. For the opposite case, where you are more time constrained, not memory constrained, we recommend using the :class:`PDHGAdaptiveStepSize2013` or :class:`PDHGAdaptiveStepSize2015` step size rules, which are adaptive step size rules that update the step sizes at each iteration based on the observed behaviour of the algorithm.
+        """
+
+    def __init__(self, gamma_bounds=None, n_initial_points=5, n_calls=20, n_iterations=10, restart = True):
+        '''Initialises the step size rule'''
+
+        self.gamma_bounds = gamma_bounds
+        if gamma_bounds is not None:
+            if len(gamma_bounds) != 2:
+                raise ValueError(
+                    "gamma_bounds should be a list or tuple of length two, gamma_bounds = {}".format(gamma_bounds))
+
+        self.n_initial_points = n_initial_points
+        self.n_calls = n_calls
+        self.n_iterations = n_iterations
+
+    def get_initial_step_size(self, algorithm):
+        try:
+            from skopt import gp_minimize
+        except ImportError:
+            raise ImportError(
+                "skopt is required for the PDHGBayesOptimisationStepSize rule. Please install scikit-optimize to use this step size rule.")
+
+        if self.gamma_bounds is None:
+            ratio = np.sqrt(algorithm.f(algorithm.operator.direct(
+                0*algorithm.x)))/algorithm.operator.norm()
+            log.debug("ratio: {}".format(ratio))
+            self.gamma_bounds = (1e-5/ratio, 1e5/ratio)
+            log.debug(
+                "gamma_bounds not provided, set to (1e-5/ratio, 1e5/ratio) = {}".format(self.gamma_bounds))
+   
+
+        log_gamma_bounds = (
+            np.log(self.gamma_bounds[0]), np.log(self.gamma_bounds[1]))
+        algorithm.configured = True
+        update_objective_interval = algorithm.update_objective_interval
+        algorithm.update_objective_interval = self.n_iterations-1
+        algorithm.operator.direct(algorithm.x, out=algorithm.y_tmp)
+     
+
+        def objective_function(log_gamma):
+            try:
+                initial_objective = algorithm.objective[-1]
+            except:
+                initial_objective = f_eval_p = algorithm.f(algorithm.y_tmp) + algorithm.g(algorithm.x)
+            gamma = np.exp(log_gamma[0])
+            log.debug(
+                "Evaluating objective function for gamma = {}".format(gamma))
+            # Set the step sizes based on the current gamma
+            tau = 1.0 / (gamma * algorithm.operator.norm())
+            sigma = 1.0*gamma / (algorithm.operator.norm())
+            algorithm._sigma = sigma
+            algorithm._tau = tau 
+            algorithm.step_size_rule = PDHGConstantStepSize(step_size=(tau, sigma))
+            algorithm.run(self.n_iterations, callbacks=[])
+            
+            final_objective = algorithm.objective[-1]
+            percentage_change = (initial_objective-final_objective)/initial_objective
+
+            log.debug("Objective function value for gamma = {}: {}".format(gamma, percentage_change))
+            return percentage_change
+
+        gp_result = gp_minimize(objective_function, [
+                                log_gamma_bounds], n_random_starts=self.n_initial_points, n_calls=self.n_calls, )
+        algorithm.update_objective_interval = update_objective_interval
+        algorithm.step_size_rule = self
+        
+        log.debug("Best gamma found: {}, with objective function value: {}".format(
+            np.exp(gp_result.x[0]), gp_result.fun))
+        if log.isEnabledFor(logging.DEBUG):
+            from matplotlib import pyplot as plt
+            from skopt.plots import plot_convergence, plot_gaussian_process
+            plot_convergence(gp_result)
+            plt.show()
+            plot_gaussian_process(gp_result)
+            plt.xlabel('log gamma')
+            plt.title("Best gamma found: {}, with objective function value: {}".format(
+                np.exp(gp_result.x[0]), gp_result.fun))
+            plt.show()
+
+        self.tau = algorithm._tau = 1.0 / (np.exp(gp_result.x[0]) * algorithm.operator.norm())
+        self.sigma = algorithm._sigma = 1.0*np.exp(gp_result.x[0]) / (algorithm.operator.norm())
+        return self.tau, self.sigma
+
+    def get_step_size(self, algorithm):
+        return self.tau, self.sigma
+    
+    
+      
 class PDHGConstantStepSize(StepSizeRule):
     """
     Step-size rule that always returns a constant step-size.

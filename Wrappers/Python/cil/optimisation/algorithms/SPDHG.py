@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient (SPDHG) solves separable optimisation problems of the type: 
-    
+
       .. math:: \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
 
     where :math:`f_i` and the regulariser :math:`g` need to be proper, convex and lower semi-continuous.
@@ -159,22 +159,23 @@ class SPDHG(Algorithm):
             raise TypeError("operator should be a BlockOperator")
 
         self._ndual_subsets = len(self.operator)
-        
-        self._prob_weights = getattr(sampler, 'prob_weights', prob_weights) 
-        
-        if self._prob_weights is None: 
+
+        self._prob_weights = getattr(sampler, 'prob_weights', prob_weights)
+
+        if self._prob_weights is None:
             self._prob_weights = [1/self._ndual_subsets]*self._ndual_subsets
-        
-        if  prob_weights is not None and self._prob_weights != prob_weights:
-                    raise ValueError(' You passed a `prob_weights` argument and a sampler with a different attribute `prob_weights`, please remove the `prob_weights` argument.')
+
+        if prob_weights is not None and self._prob_weights != prob_weights:
+            raise ValueError(
+                ' You passed a `prob_weights` argument and a sampler with a different attribute `prob_weights`, please remove the `prob_weights` argument.')
 
         if sampler is None:
             self._sampler = Sampler.random_with_replacement(
                 len(operator), prob=self._prob_weights)
         else:
             self._sampler = sampler
-        
-        #Set the norms of the operators
+
+        # Set the norms of the operators
         self._norms = operator.get_norms_as_list()
 
         self.set_step_sizes(sigma=sigma, tau=tau)
@@ -189,8 +190,9 @@ class SPDHG(Algorithm):
 
         # initialize dual variable to 0
         self._y_old = operator.range_geometry().allocate(0)
-        if not isinstance(self._y_old, BlockDataContainer): #This can be removed once #1863 is fixed
-            self._y_old =BlockDataContainer(self._y_old)
+        # This can be removed once #1863 is fixed
+        if not isinstance(self._y_old, BlockDataContainer):
+            self._y_old = BlockDataContainer(self._y_old)
 
         # initialize variable z corresponding to back-projected dual variable
         self._z = operator.domain_geometry().allocate(0)
@@ -201,7 +203,6 @@ class SPDHG(Algorithm):
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
 
-        
     @property
     def sigma(self):
         return self._sigma
@@ -309,7 +310,7 @@ class SPDHG(Algorithm):
             self._tau = min([value for value in values if value > 1e-8])
 
         else:
-            if not ( isinstance(tau, Number) and tau > 0):
+            if not (isinstance(tau, Number) and tau > 0):
                 raise ValueError(
                     "The step-sizes of SPDHG must be positive, passed tau = {}".format(tau))
 
@@ -338,7 +339,8 @@ class SPDHG(Algorithm):
                     return False
                 return True
             else:
-                raise ValueError('Convergence criterion currently can only be checked for scalar values of tau and sigma[i].')
+                raise ValueError(
+                    'Convergence criterion currently can only be checked for scalar values of tau and sigma[i].')
 
     def update(self):
         """  Runs one iteration of SPDHG 
@@ -346,8 +348,8 @@ class SPDHG(Algorithm):
         """
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar
-        self._zbar.sapyb(self._tau,  self.x, -1., out=self._x_tmp )
-        self._x_tmp*=-1
+        self._zbar.sapyb(self._tau,  self.x, -1., out=self._x_tmp)
+        self._x_tmp *= -1
 
         self.g.proximal(self._x_tmp, self._tau, out=self.x)
 

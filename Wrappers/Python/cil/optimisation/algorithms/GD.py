@@ -40,14 +40,13 @@ class GD(Algorithm):
 
     """
 
-
     def __init__(self, initial=None, f=None, step_size=None, preconditioner=None, **kwargs):
 
- 
         super().__init__(**kwargs)
-        
+
         if initial is not None and f is not None:
-            self.set_up(initial=initial, f=f, step_size=step_size,  preconditioner=preconditioner)
+            self.set_up(initial=initial, f=f, step_size=step_size,
+                        preconditioner=preconditioner)
 
     def set_up(self, initial, f, step_size, preconditioner):
         '''initialisation of the algorithm
@@ -107,25 +106,24 @@ class GD(Algorithm):
         '''
         Returns the most recently used step size. Note, if the step-size is set by a non-constant step size rule, you must use the algorithm run or update method before this getter will return the most recently used step size. 
         '''
-        
+
         if isinstance(self.step_size_rule, ConstantStepSize):
             return self.step_size_rule.step_size
         else:
-            try: 
+            try:
                 return self._step_size
             except AttributeError:
-                raise NotImplementedError("Note the step-size is set by a step-size rule and could change with each iteration. Call the algorithm run or update method first and then this function will give the most recently used step size.")
-
+                raise NotImplementedError(
+                    "Note the step-size is set by a step-size rule and could change with each iteration. Call the algorithm run or update method first and then this function will give the most recently used step size.")
 
     def calculate_objective_function_at_point(self, x):
         """ Calculates the objective at a given point x
 
         .. math:: f(x)
-        
+
         Parameters
         ----------
         x : DataContainer
-        
+
         """
         return self._objective_function(x)
-    

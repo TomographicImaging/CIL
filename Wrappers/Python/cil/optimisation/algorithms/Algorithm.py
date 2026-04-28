@@ -29,11 +29,11 @@ class Algorithm:
     r"""Base class providing minimal infrastructure for iterative algorithms.
 
    An iterative algorithm is designed to solve an optimization problem by repeatedly refining a solution. In CIL, we use iterative algorithms to minimize an objective function, often referred to as a loss. The process begins with an initial guess, and with each iteration, the algorithm updates the current solution based on the results of previous iterations (previous iterates). Iterative algorithms typically continue until a stopping criterion is met, indicating that an optimal or sufficiently good solution has been found. In CIL, stopping criteria can be implemented using a callback function (`cil.optimisation.utilities.callbacks`).
-     
+
     The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and :code:`update_objective` methods.
 
     The method :code:`run` is available to run :code:`n` iterations. The method accepts :code:`callbacks`: a list of callables, each of which receive the current Algorithm object (which in turn contains the iteration number and the actual objective value) and can be used to trigger print to screens and other user interactions. The :code:`run` method will stop when the stopping criterion is met or `StopIteration` is raised.
-    
+
     Parameters
     ----------
     update_objective_interval: int, optional, default 1
@@ -54,6 +54,7 @@ class Algorithm:
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
         raise NotImplementedError
+
     def update(self):
         '''A single iteration of the algorithm'''
         raise NotImplementedError
@@ -73,14 +74,15 @@ class Algorithm:
             self.iteration += 1
             return self.iteration
         if not self.configured:
-            raise ValueError('Algorithm not configured correctly. Please run set_up.')
+            raise ValueError(
+                'Algorithm not configured correctly. Please run set_up.')
         self.update()
         self.iteration += 1
 
         self._update_previous_solution()
 
         if self.iteration >= 0 and self.update_objective_interval > 0 and\
-            self.iteration % self.update_objective_interval == 0:
+                self.iteration % self.update_objective_interval == 0:
 
             self._iteration.append(self.iteration)
             self.update_objective()
@@ -102,32 +104,33 @@ class Algorithm:
 
     def get_output(self):
         r""" Returns the current solution. 
-        
+
         Returns
         -------
         DataContainer
             The current solution 
-             
+
         """
         return self.x
 
     def _provable_convergence_condition(self):
         r""" Checks if the algorithm set-up (e.g. chosen step-sizes or other parameters) meets a mathematical convergence criterion.
-        
+
         Returns
         -------
         bool: Outcome of the convergence check  
         """
-        raise NotImplementedError(" Convergence criterion is not implemented for this algorithm. ")
+        raise NotImplementedError(
+            " Convergence criterion is not implemented for this algorithm. ")
 
     def is_provably_convergent(self):
         r""" Check if the algorithm is convergent based on the provable convergence criterion.
-        
+
         Returns
         -------
         Boolean
             Outcome of the convergence check  
-        
+
         """
         return self._provable_convergence_condition()
 
@@ -138,17 +141,17 @@ class Algorithm:
 
     def get_last_loss(self, return_all=False):
         r'''Returns the last stored value of the loss function. "Loss" is an alias for "objective value". If `update_objective_interval` is 1 it is the value of the objective at the current iteration. If update_objective_interval > 1 it is the last stored value.
-        
+
         Parameters
         ----------
         return_all: Boolean, default is False
             If True, returns all the stored loss functions 
-        
+
         Returns
         -------
         Float
             Last stored value of the loss function 
-        
+
         '''
         try:
             objective = self.__loss[-1]
@@ -158,7 +161,7 @@ class Algorithm:
             return objective if return_all else objective[0]
         return [objective, np.nan, np.nan] if return_all else objective
 
-    get_last_objective = get_last_loss # alias
+    get_last_objective = get_last_loss  # alias
 
     def update_objective(self):
         '''calculates the objective with the current solution'''
@@ -168,7 +171,7 @@ class Algorithm:
     def iterations(self):
         '''returns the iterations at which the objective has been evaluated'''
         return self._iteration
-    
+
     @property
     def loss(self):
         '''returns a list of the values of the objective (alias of loss) during the iteration
@@ -177,8 +180,7 @@ class Algorithm:
         '''
         return self.__loss
 
-    objective = loss # alias
-
+    objective = loss  # alias
 
     @property
     def update_objective_interval(self):
@@ -192,9 +194,9 @@ class Algorithm:
             raise ValueError('interval must be an integer >= 0')
         self.__update_objective_interval = value
 
-    def run(self, iterations=None, callbacks: Optional[List[Callback]]=None, verbose=1):
+    def run(self, iterations=None, callbacks: Optional[List[Callback]] = None, verbose=1):
         r"""run upto :code:`iterations` with callbacks/logging.
-        
+
         For a demonstration of callbacks see https://github.com/TomographicImaging/CIL-Demos/blob/main/misc/callback_demonstration.ipynb
 
         Parameters
@@ -206,21 +208,23 @@ class Algorithm:
         verbose: 0=quiet, 1=info, 2=debug
             Passed to the default callback to determine the verbosity of the printed output. 
         """
-        
+
         if iterations is None:
             raise ValueError("`run()` missing number of `iterations`")
-        
+
         if np.isposinf(iterations):
             if callbacks is None:
-                raise ValueError("Infinite iterations require a callback with a stopping criterion that raises `StopIteration`")
+                raise ValueError(
+                    "Infinite iterations require a callback with a stopping criterion that raises `StopIteration`")
             else:
-                warn("Infinite iterations require a callback with a stopping criterion that raises `StopIteration`", UserWarning, stacklevel=2)
+                warn("Infinite iterations require a callback with a stopping criterion that raises `StopIteration`",
+                     UserWarning, stacklevel=2)
 
         if callbacks is None:
             callbacks = [ProgressCallback(verbose=verbose)]
-            
-        if self.iteration == -1 and self.update_objective_interval>0:
-            iterations+=1
+
+        if self.iteration == -1 and self.update_objective_interval > 0:
+            iterations += 1
 
         self._total_iterations = self.iteration + iterations
 
@@ -243,4 +247,3 @@ class Algorithm:
                 return {'primal': obj[0], 'dual': obj[1], 'primal_dual': obj[2]}
             obj = obj[0]
         return {'objective': obj}
-

@@ -22,9 +22,9 @@ dependencies:
   - ccpi::cil-data >=22
   - ccpi::tigre 2.6
   - ccpi::ccpi-regulariser 24.0.1
-  - ccpi::tomophantom 2.0.0
   - astra-toolbox 2.1 cuda*
-  - cvxpy
+  - cvxpy!=1.8.2
+  - ccpi::tomophantom 3.0.3
   - python-wget
   - scikit-image
   - packaging

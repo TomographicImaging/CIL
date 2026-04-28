@@ -1,20 +1,36 @@
 * XX.X.X
   - New features:
     - LSQR algorithm added to the CIL algorithm class (#1975)
+    - Add `VolumeShrinker` tool to reduce the size of the reconstruction volume from an `AcquisitionData` (#2221)
+    - LaminographyGeometryCorrector tool added to processors (#2259)
   - Bug fixes:
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)
     - `cilacc` path lookup no longer broken for editable installations (#2257)
     - update `version.py` to use `importlib` & fix tagless installation #2255 (#2269)
+    - Fixed behaviour of `ZeissDataReader` when negative values are passed in the ROI (#2244)
   - Dependencies:
     - olefile and dxchange are optional dependencies, instead of required (#2209)
     - dxchange minimum version set to 0.2.1 to fix #2256 (#2268)
     - improve `tqdm` notebook support (#2241)
+    - cvxpy version set to !=1.8.2 to fix #2303 (#2306)
+    - Update to TomoPhantom v3.0 (#2287)
+    - Handle regularisation toolkit CPU only package error message (#2302)
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
   - Enhancements:
     - Add prefix argument to TIFFStackReader to load a subset of TIFF files in
     a folder (#2239)
+    - Update ASTRA interface to `direct_FP3D/BP3D` removing copies for GPU `ProjectionOperator` calls (#2134)
+  - Removes the following code which had been deprecated since v24.3.0 or earlier:
+    - Removes `max_iteration` and `log_file` input parameters to `Algorithm`s. 
+    - Removes `max_iteration_stop_criterion`, `objective_to_string`, `verbose_output` and `verbose_header` methods from `Algorithm`s.
+    - Removes `print_interval` and `callback` kwargs from `Algorithm.run` (note: `callbacks` kwarg remains)
+    - Removes `tolerance` input parameter to `CGLS`.
+    - Removes `should_stop` and `flag` methods from `CGLS`.
+    - Removes `alpha`, `beta`, `rtol` and `atol` kwargs from `GD`.
+    - Removes `should_stop` and `objective_function` methods from `GD`.
+    - Removes `sampler`, `norms` and `prob` kwargs from `SPDHG`.
 
 * 25.0.0
   - New features:

@@ -2,7 +2,7 @@
 from cil.optimisation.algorithms import SPDHG, PDHG, LSQR, FISTA, APGD, GD, PD3O
 from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction, LeastSquares, TotalVariation, MixedL21Norm, L1Norm
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
-from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule
+from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule, ArmijoStepSizeRule
 from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData, ImageGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
@@ -10,6 +10,9 @@ from cil.utilities import noise as applynoise
 import numpy as np
 import unittest
 from testclass import CCPiTestClass
+
+from scipy.optimize import minimize, rosen
+from cil.optimisation.functions import Rosenbrock
 
 try:
     import cvxpy
@@ -27,10 +30,11 @@ except ImportError:
 import logging 
 log = logging.getLogger(__name__)
 
-class TestSPDHGConvergence(CCPiTestClass):
-    
+
+class TestSPDHG(CCPiTestClass):
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_num_subsets_1_astra(self):
+        
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(10, 10))
 
         subsets = 1
@@ -141,7 +145,7 @@ class TestLSQR(CCPiTestClass):
 
  
 
-
+class TestFISTA(CCPiTestClass):
     def test_FISTA_Denoising(self):
         # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
         data = dataexample.SHAPES.get()
@@ -219,6 +223,7 @@ class TestLSQR(CCPiTestClass):
         np.testing.assert_allclose(fista_dc.solution.array, u_cvxpy.value, atol=1e-3)
         np.testing.assert_allclose(fista_dc.solution.array, u_cvxpy.value, atol=1e-3)
 
+class TestPD3O(CCPiTestClass):
     def test_pd3o_convergence(self):
         data = dataexample.CAMERA.get(size=(32, 32))
         # pd30 convergence test using TV denoising
@@ -250,6 +255,26 @@ class TestLSQR(CCPiTestClass):
             tv_cil.array, pd3O_with_f.solution.array, atol=1e-2)
 
 
+class TestGD(CCPiTestClass):
+    
+        
+    def test_gd_armijo_rosen(self):
+        x0_1 = 1.1
+        x0_2 = 1.1
+        x0 = np.array([x0_1, x0_2])
+
+        initial = VectorData(np.array(x0))
+        method = 'Nelder-Mead' 
+        scipy_opt_high = minimize(
+            rosen, x0, method=method, tol=1e-2)  # (1., 1.)
+        f = Rosenbrock(alpha=1, beta=100)
+        
+        armj = ArmijoStepSizeRule(alpha=50, max_iterations=50, warmstart=False)
+        gd = GD(initial=initial, f=f, step_size=armj,
+                update_objective_interval=500)
+        gd.run(4000, verbose=0)
+        self.assertAlmostEqual(gd.solution.array[0], scipy_opt_high.x[0], places=3)
+        self.assertAlmostEqual(gd.solution.array[1], scipy_opt_high.x[1], places=3)
 
     def test_bb_step_size_gd_converge(self):
         np.random.seed(2)

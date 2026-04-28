@@ -123,6 +123,7 @@ class PDHG(Algorithm):
 
     For reference, see Li, Y. and Yan, M., 2022. On the improved conditions for some primal-dual algorithms. arXiv preprint arXiv:2201.00139.
 
+
     - By default, the step sizes :math:`\sigma` and :math:`\tau` are positive scalars and defined as below:
 
       * If ``sigma`` is ``None`` and ``tau`` is ``None``:
@@ -273,6 +274,7 @@ class PDHG(Algorithm):
             else:
                 self.x_old = self.operator.domain_geometry().allocate(0)
 
+
             if len(initial) > 1 and initial[1] is not None:
                 self.y = initial[1].copy()
             else:
@@ -284,6 +286,7 @@ class PDHG(Algorithm):
                 self.x_old = self.operator.domain_geometry().allocate(0)
             else:
                 self.x_old = initial.copy()
+
 
         self.x = self.x_old.copy()
         self.x_tmp = self.operator.domain_geometry().allocate(0)
@@ -344,9 +347,11 @@ class PDHG(Algorithm):
         Boolean
             True if convergence criterion is satisfied. False if not satisfied or convergence is unknown.
 
+
         Reference
         ----------
         Li, Y. and Yan, M., 2022. On the improved conditions for some primal-dual algorithms. arXiv preprint arXiv:2201.00139.
+
 
         """
         if isinstance(self.tau, Number) and isinstance(self.sigma, Number):

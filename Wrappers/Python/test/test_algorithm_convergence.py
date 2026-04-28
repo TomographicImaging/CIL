@@ -255,20 +255,32 @@ class TestPD3O(CCPiTestClass):
 
 class TestGD(CCPiTestClass):
     
-        
-    def test_gd_armijo_rosen(self):
+    def setUp(self):
         x0_1 = 1.1
         x0_2 = 1.1
         x0 = np.array([x0_1, x0_2])
 
-        initial = VectorData(np.array(x0))
+        self.initial = VectorData(np.array(x0))
         method = 'Nelder-Mead' 
-        scipy_opt_high = minimize(
+        self.scipy_opt_high = minimize(
             rosen, x0, method=method, tol=1e-2)  # (1., 1.)
-        f = Rosenbrock(alpha=1, beta=100)
+        self.f = Rosenbrock(alpha=1, beta=100)
+        
+    def test_gd_fixed_step_size_rosen(self):
+
+        gd = GD(initial=self.initial, f=self.f, step_size=0.002,
+                update_objective_interval=500)
+        gd.run(3000, verbose=0)
+        np.testing.assert_allclose(
+            gd.solution.array[0], self.scipy_opt_high.x[0], atol=1e-2)
+        np.testing.assert_allclose(
+            gd.solution.array[1], self.scipy_opt_high.x[1], atol=1e-2)
+        
+    def test_gd_armijo_rosen(self):
+        
         
         armj = ArmijoStepSizeRule(alpha=50, max_iterations=50, warmstart=False)
-        gd = GD(initial=initial, f=f, step_size=armj,
+        gd = GD(initial=self.initial, f=self.f, step_size=armj,
                 update_objective_interval=500)
         gd.run(4000, verbose=0)
         self.assertAlmostEqual(gd.solution.array[0], scipy_opt_high.x[0], places=3)

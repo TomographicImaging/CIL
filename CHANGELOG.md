@@ -16,6 +16,7 @@
     - cvxpy version set to !=1.8.2 to fix #2303 (#2306)
     - Update to TomoPhantom v3.0 (#2287)
     - Handle regularisation toolkit CPU only package error message (#2302)
+    - Update to TIGRE v3.1.3
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
   - Enhancements:

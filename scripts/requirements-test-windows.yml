@@ -20,7 +20,7 @@ dependencies:
   - python >=3.10
   - numpy >=1.23,<2
   - ccpi::cil-data >=22
-  - ccpi::tigre 3.1.3  
+  - ccpi/label/dev::tigre 3.1.3  
   - ccpi::ccpi-regulariser 24.0.1
   - astra-toolbox 2.1 cuda*
   - cvxpy!=1.8.2

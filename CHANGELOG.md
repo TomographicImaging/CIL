@@ -30,7 +30,7 @@
     - Removes `should_stop` and `flag` methods from `CGLS`.
     - Removes `alpha`, `beta`, `rtol` and `atol` kwargs from `GD`.
     - Removes `should_stop` and `objective_function` methods from `GD`.
-    - Removes `sampler`, `norms` and `prob` kwargs from `SPDHG`.
+    - Removes `norms` and `prob` kwargs from `SPDHG`.
 
 * 25.0.0
   - New features:

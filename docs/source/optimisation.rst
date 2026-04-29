@@ -44,11 +44,10 @@ and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 An algorithm is designed for a particular generic optimisation problem accepts and number of
 instances of :code:`Function` derived classes and/or :code:`Operator` derived classes as input to
 define a specific instance of the generic optimisation problem to be solved.
-They are iterable objects which can be run in a for loop.
-The user can provide a stopping criterion different than the default.
+They are iterable objects which can be run in a :code:`for` loop.
 
 New algorithms can be easily created by extending the :code:`Algorithm` class.
-The user is required to implement only 4 methods: set_up, __init__, update and update_objective.
+The user is required to implement only 4 methods: :code:`set_up`, :code:`__init__`, :code:`update` and :code:`update_objective`.
 
 + :code:`set_up` and :code:`__init__` are used to configure the algorithm
 + :code:`update` is the actual iteration updating the solution
@@ -60,9 +59,9 @@ algorithm to minimise a Function will only be:
 .. code-block :: python
 
     def update(self):
-        self.x += -self.rate * self.objective_function.gradient(self.x)
+        self.x += -self.rate * self._objective_function.gradient(self.x)
     def update_objective(self):
-        self.loss.append(self.objective_function(self.x))
+        self.loss.append(self._objective_function(self.x))
 
 The :code:`Algorithm` provides the infrastructure to continue iteration, to access the values of the
 objective function in subsequent iterations, the time for each iteration, and to provide a nice
@@ -266,7 +265,7 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
    f = SGFunction(list_of_functions, sampler=sampler)  
    
    #set up and run the gradient descent algorithm 
-   alg = GD(initial=ig.allocate(0), objective_function=f, step_size=1/f.L)
+   alg = GD(initial=ig.allocate(0), f=f, step_size=1/f.L)
    alg.run(300)
 
 

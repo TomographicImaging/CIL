@@ -35,7 +35,7 @@ The fundamental components are:
 Algorithms (Deterministic)
 ==========================
 
-A number of deterministic algorithms are available in CIL that act on CIL :code:`Function`s and :code:`Operator`s. 
+A number of deterministic algorithms are available in CIL that act on CIL :code:`Function` s and :code:`Operator` s. 
 
 For a particular optimisation objective, one or more algorithms may be suitable. As a summary, the main deterministic algorithms in CIL are:
 - Gradient Descent (GD) can be used when your objective is convex and differentiable.

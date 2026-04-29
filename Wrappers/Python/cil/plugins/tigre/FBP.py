@@ -98,9 +98,9 @@ class FBP(DataProcessor):
             if self.acquisition_geometry.geom_type == 'cone':
                 # suppress print statements from TIGRE https://github.com/CERN/TIGRE/issues/532
                 with contextlib.redirect_stdout(io.StringIO()):
-                    arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles, dowang=False)
+                    arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles)
             else:
-                arr_out = fbp(data_temp, self.tigre_geom, self.tigre_angles, dowang=False)
+                arr_out = fbp(data_temp, self.tigre_geom, self.tigre_angles)
             arr_out = np.squeeze(arr_out, axis=0)
         else:
             if self.acquisition_geometry.geom_type == 'cone':

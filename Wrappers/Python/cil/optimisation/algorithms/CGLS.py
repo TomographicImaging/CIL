@@ -19,7 +19,7 @@
 from cil.optimisation.algorithms import Algorithm
 import numpy
 import logging
-import warnings 
+import warnings
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 class CGLS(Algorithm):
 
     r'''Conjugate Gradient Least Squares (CGLS) algorithm
-    
+
     The Conjugate Gradient Least Squares (CGLS) algorithm is commonly used for solving large systems of linear equations, due to its fast convergence.
 
     Problem:
@@ -35,8 +35,8 @@ class CGLS(Algorithm):
     .. math::
 
       \min_x || A x - b ||^2_2
-      
-      
+
+
     Parameters
     ------------
     operator : Operator
@@ -45,11 +45,12 @@ class CGLS(Algorithm):
         Initial guess 
     data : DataContainer in the range of the operator 
         Acquired data to reconstruct
-    
+
     Reference
     ---------
     https://web.stanford.edu/group/SOL/software/cgls/
     '''
+
     def __init__(self, initial=None, operator=None, data=None, **kwargs):
         '''initialisation of the algorithm
         '''
@@ -58,7 +59,7 @@ class CGLS(Algorithm):
         if initial is None and operator is not None:
             initial = operator.domain_geometry().allocate(0)
         if initial is not None and operator is not None and data is not None:
-            self.set_up(initial=initial, operator=operator, data=data) 
+            self.set_up(initial=initial, operator=operator, data=data)
 
     def set_up(self, initial, operator, data):
         r'''Initialisation of the algorithm
@@ -72,7 +73,7 @@ class CGLS(Algorithm):
             Acquired data to reconstruct
 
         '''
-        
+
         log.info("%s setting up", self.__class__.__name__)
         self.x = initial.copy()
         self.operator = operator
@@ -91,7 +92,6 @@ class CGLS(Algorithm):
         self.configured = True
         log.info("%s configured", self.__class__.__name__)
 
-
     def update(self):
         '''single iteration'''
 
@@ -100,9 +100,9 @@ class CGLS(Algorithm):
         alpha = self.gamma/delta
 
         self.x.sapyb(1, self.p, alpha, out=self.x)
-        #self.x += alpha * self.p
+        # self.x += alpha * self.p
         self.r.sapyb(1, self.q, -alpha, out=self.r)
-        #self.r -= alpha * self.q
+        # self.r -= alpha * self.q
 
         self.operator.adjoint(self.r, out=self.s)
 
@@ -110,16 +110,18 @@ class CGLS(Algorithm):
         self.gamma1 = self.gamma
         self.gamma = self.norms**2
         self.beta = self.gamma/self.gamma1
-        #self.p = self.s + self.beta * self.p
+        # self.p = self.s + self.beta * self.p
         self.p.sapyb(self.beta, self.s, 1, out=self.p)
 
         if self.norms == 0:
-            self.update_objective()
-
+            log.info(
+                'The norm of the backprojected residual is zero and so the algorithm is terminated')
+            raise StopIteration
 
     def update_objective(self):
         a = self.r.squared_norm()
-        if a is numpy.nan or a==0:
+        if a is numpy.nan:
+            log.info(
+                'The objective value is NaN and so the algorithm is terminated')
             raise StopIteration()
         self.loss.append(a)
-

@@ -61,7 +61,7 @@ class ProgressCallback(Callback):
     def __call__(self, algorithm):
         if not hasattr(self, 'pbar'):
             tqdm_kwargs = self.tqdm_kwargs
-            tqdm_kwargs.setdefault('total', algorithm.max_iteration)
+            tqdm_kwargs.setdefault('total', algorithm._total_iterations)
             tqdm_kwargs.setdefault('disable', not self.verbose)
             tqdm_kwargs.setdefault('initial', max(0, algorithm.iteration))
             self.pbar = self.tqdm_class(**tqdm_kwargs)

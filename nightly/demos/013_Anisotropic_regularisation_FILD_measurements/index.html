@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL &#8212; CIL 25.0.1.dev34+ga4e2b29ea documentation</title>
+    <title>CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL &#8212; CIL 25.0.1.dev36+g9695dd3c7 documentation</title>
   
   
   
@@ -32,7 +32,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=bca5fdc3"></script>
+    <script src="../../_static/documentation_options.js?v=6cdc2ad9"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,9 +52,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/013_Anisotropic_regularisation_FILD_measurements';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.17.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev34+ga4e2b29ea';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev36+g9695dd3c7';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Controlled Wavelet Sparsity using callbacks (3D data)" href="../controlledWaveletSparsity_3d/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev34+ga4e2b29ea" />
+  <meta name="docsearch:version" content="25.0.1.dev36+g9695dd3c7" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -624,7 +624,7 @@
 <h2>Data Availability<a class="headerlink" href="#Data-Availability" title="Link to this heading">#</a></h2>
 <div class="line-block">
 <div class="line">The datasets used in this notebook are publicly available at the git repository:</div>
-<div class="line"><a class="reference external" href="https://github.com/bosschmidt/AniReg_FILD">https://github.com/bosschmidt/AniReg_FILD</a></div>
+<div class="line"><a class="github reference external" href="https://github.com/bosschmidt/AniReg_FILD">bosschmidt/AniReg_FILD</a></div>
 </div>
 <p>Additional custom files required can also be found and downloaded from this git repository:</p>
 <ul class="simple">
@@ -788,7 +788,7 @@
 </section>
 <section id="Supporting-Operators:-WaveletOperator">
 <h3>Supporting Operators: WaveletOperator<a class="headerlink" href="#Supporting-Operators:-WaveletOperator" title="Link to this heading">#</a></h3>
-<p>In addition to our custom FILD operator, we use the <code class="docutils literal notranslate"><span class="pre">`WaveletOperator</span></code> &lt;<a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/operators/WaveletOperator.py">https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/operators/WaveletOperator.py</a>&gt;`__ from CIL’s library for wavelet transformations. This operator implements discrete wavelet transforms for signal processing, supports various wavelet types (e.g., Haar, Daubechies), and handles both forward (analysis) and adjoint (synthesis) operations. The <code class="docutils literal notranslate"><span class="pre">WaveletOperator</span></code> is useful in our FILD
+<p>In addition to our custom FILD operator, we use the <code class="docutils literal notranslate"><span class="pre">`WaveletOperator</span></code> &lt;<a class="github reference external" href="https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/operators/WaveletOperator.py">TomographicImaging/CIL</a>&gt;`__ from CIL’s library for wavelet transformations. This operator implements discrete wavelet transforms for signal processing, supports various wavelet types (e.g., Haar, Daubechies), and handles both forward (analysis) and adjoint (synthesis) operations. The <code class="docutils literal notranslate"><span class="pre">WaveletOperator</span></code> is useful in our FILD
 analysis for implementing Besov-space prior regularization.</p>
 <p>## 5. Loading FILD Weight Functions</p>
 <p>The weight functions describe how the FILD system maps fast ions with specific velocities to measurements on the detector. These are essential for:</p>
@@ -1008,9 +1008,9 @@ Text(0.5, 1.0, &#39;Measurement&#39;)
 <h3>Implementation in CIL<a class="headerlink" href="#Implementation-in-CIL" title="Link to this heading">#</a></h3>
 <p>We implement our anisotropic regularization framework using CIL’s optimization tools, specifically:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">`BlockOperator</span></code> &lt;<a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/operators/BlockOperator.py">https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/operators/BlockOperator.py</a>&gt;`__ for combining multiple operators</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">`BlockFunction</span></code> &lt;<a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/functions/BlockFunction.py">https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/functions/BlockFunction.py</a>&gt;`__ for combining multiple functionals</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">`PDHG</span></code> &lt;<a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/algorithms/PDHG.py">https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/algorithms/PDHG.py</a>&gt;`__ algorithm for solving the optimization problem</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">`BlockOperator</span></code> &lt;<a class="github reference external" href="https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/operators/BlockOperator.py">TomographicImaging/CIL</a>&gt;`__ for combining multiple operators</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">`BlockFunction</span></code> &lt;<a class="github reference external" href="https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/functions/BlockFunction.py">TomographicImaging/CIL</a>&gt;`__ for combining multiple functionals</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">`PDHG</span></code> &lt;<a class="github reference external" href="https://github.com/TomographicImaging/CIL/blob/master/Wrappers/Python/cil/optimisation/algorithms/PDHG.py">TomographicImaging/CIL</a>&gt;`__ algorithm for solving the optimization problem</p></li>
 </ul>
 <p>The implementation for Besov-space priors follows these steps:</p>
 <ol class="arabic simple">

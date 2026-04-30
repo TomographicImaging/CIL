@@ -1,0 +1,36 @@
+name: cil_dev
+channels:
+  - conda-forge
+  - https://software.repos.intel.com/python/conda
+dependencies:
+  - python=3.12
+  - pip
+  - numpy=1.26
+  - scipy
+  - numba
+  - llvm-openmp
+  - ipp-include 2021.12
+  - ipp-devel 2021.12
+  - ipp 2021.12
+  - matplotlib-base >=3.3.0
+  - astra-toolbox=2.1=cuda*
+  - scikit-image
+  - dxchange >=0.2.1
+  - olefile >=0.46
+  - cvxpy!=1.8.2
+  - zenodo_get >=1.6
+  - h5py
+  - pillow
+  - pywavelets
+  - ccpi::cil-data >=22
+  - ccpi::ccpi-regulariser=24.0.1
+  - ccpi::tomophantom=3.0.3
+  - ccpi::tigre=2.6
+  - tqdm
+  - python-wget
+  - zenodo_get >=1.6
+  - packaging
+  - ipywidgets
+  - pip:
+    - unittest-parametrize
+    

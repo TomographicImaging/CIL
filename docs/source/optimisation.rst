@@ -49,8 +49,8 @@ For a particular optimisation objective, one or more algorithms may be suitable.
 
 - Linearized Alternating Direction Method of Multipliers (LADMM) solves problems of the form :math:`min_x f(Ax)+g(x)` where both f and g have a "simple" proximal.
 
-After initialising the algorithms, they are called using the :code:`run` method. The algorithms are also iterators that can be called using :code:`next` or in a :code:`for` loop.
 
+After initialising the algorithms, they are called using the :code:`run` method. The algorithms are also iterators that can be called using :code:`next` or in a :code:`for` loop.
 
 New algorithms can be easily created by extending the :code:`Algorithm` class.
 The user is required to implement only 4 methods: :code:`set_up`, :code:`__init__`, :code:`update` and :code:`update_objective`.

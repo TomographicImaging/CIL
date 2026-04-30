@@ -3,12 +3,12 @@ from cil.optimisation.functions import LeastSquares, IndicatorBox, ZeroFunction,
 from cil.framework import ImageGeometry, VectorGeometry, VectorData
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, LinearOperator
 
-from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015
+from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015, PDHGBayesOptimisationStepSize
 import numpy as np
 
 from testclass import CCPiTestClass
 from unittest.mock import MagicMock
-
+from numbers import Number
 import warnings
 
 
@@ -391,7 +391,11 @@ class TestPDHGConstantStepSize(CCPiTestClass):
         sigma = 1/operator.norm()
         tau = 1/3
         with warnings.catch_warnings(record=True) as warnings_log:
+            warnings.simplefilter("always")
             pdhg = PDHG(f=f, g=g, operator=operator, step_size=[tau, sigma])
+        self.assertTrue(pdhg.sigma * pdhg.tau * pdhg.operator.norm()**2 < 4/3)
+        self.assertTrue(isinstance(pdhg.sigma, Number))
+        self.assertTrue(isinstance(pdhg.tau, Number))
         self.assertEqual(warnings_log, [])
 
 
@@ -503,18 +507,27 @@ class TestPDHGAdaptive2013(CCPiTestClass):
             PDHGAdaptiveStepSize2013(initial_step_size=[1.0])
 
     def test_initial_step_size_defaults(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+        
         rule = PDHGAdaptiveStepSize2013(initial_step_size=[None, None])
-        tau, sigma = rule.get_initial_step_size(None)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        tau, sigma = rule.get_initial_step_size(pdhg)
         self.assertEqual(tau, 1e5)
         self.assertEqual(sigma, 1e5)
 
         rule = PDHGAdaptiveStepSize2013(initial_step_size=[3.2, None])
-        tau, sigma = rule.get_initial_step_size(None)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        tau, sigma = rule.get_initial_step_size(pdhg)
         self.assertEqual(tau, 3.2)
         self.assertEqual(sigma, 1e5)
 
         rule = PDHGAdaptiveStepSize2013(initial_step_size=[None, 3.2])
-        tau, sigma = rule.get_initial_step_size(None)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        tau, sigma = rule.get_initial_step_size(pdhg)
         self.assertEqual(tau, 1e5)
         self.assertEqual(sigma, 3.2)
 
@@ -533,6 +546,7 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         pdhg.y_old = operator.range.allocate(0)
         pdhg.x = operator.domain.allocate(1)
         pdhg.y = operator.range.allocate(1)
+        pdhg.y_tmp = operator.range.allocate(0)
         self.assertEqual(rule.gamma, 1)
         self.assertEqual(pdhg.sigma, 1)
         self.assertEqual(pdhg.tau, 1)
@@ -547,7 +561,7 @@ class TestPDHGAdaptive2013(CCPiTestClass):
     def test_backtracking(self):  # TODO:
         pass
 
-    def test_changing_ration(self):  # TODO:
+    def test_changing_ratio(self):  # TODO:
         pass
 
     def test_stopping_criterion(self):  # TODO:
@@ -555,21 +569,64 @@ class TestPDHGAdaptive2013(CCPiTestClass):
 
 
 class TestPDHGBayesOpt(CCPiTestClass):
+    
     def test_init(self):
         rule = PDHGBayesOptimisationStepSize(
-            gamma_bounds=[0, 2], n_initial_points=5, n_calls=5,  n_iterations=10)
-        self.assertEqual(rule.gamma_bounds, [0, 2])
+            gamma_bounds=[0.1, 2], n_initial_points=5, n_calls=5,  n_iterations=10, seed = 42)
+        self.assertEqual(rule.gamma_bounds, [0.1, 2])
         self.assertEqual(rule.n_initial_points, 5)
         self.assertEqual(rule.n_calls, 5)
         self.assertEqual(rule.n_iterations, 10)
+        self.assertEqual(rule.seed, 42)
         
     def test_init_default(self):
         rule = PDHGBayesOptimisationStepSize()
-        self.assertEqual(rule.gamma_bounds, [1e-5, 1e5])
         self.assertEqual(rule.n_initial_points, 5)
         self.assertEqual(rule.n_calls, 20)
         self.assertEqual(rule.n_iterations, 10)
+        self.assertEqual(rule.seed, None)
+        
     def test_init_invalid(self):
         with self.assertRaises(ValueError):
             PDHGBayesOptimisationStepSize( gamma_bounds=[
                                           (0.1, 10)], n_initial_points=5)
+            
+        with self.assertRaises(ValueError):
+            PDHGBayesOptimisationStepSize( gamma_bounds=[
+                                            -0,1.1], n_calls=-5)
+            
+    
+    def test_get_gamma_bounded(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGBayesOptimisationStepSize(
+            gamma_bounds=[5, 100], n_initial_points=5, n_calls=5,  n_iterations=10, seed = 42)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule, update_objective_interval=4)
+        
+        gamma = np.sqrt(pdhg.sigma / pdhg.tau)
+        self.assertTrue(5<= gamma <= 5.5)
+        
+        self.assertEqual(pdhg.iteration, -1)
+        self.assertEqual(pdhg.update_objective_interval, 4)
+        self.assertEqual(pdhg.objective, [])
+        
+
+    def test_get_gamma(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGBayesOptimisationStepSize(
+            gamma_bounds=None, n_initial_points=5, n_calls= 10,  n_iterations=10, seed = 42)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        gamma = np.sqrt(pdhg.sigma / pdhg.tau)
+        self.assertAlmostEqual(gamma, 1.7, places=1)       
+

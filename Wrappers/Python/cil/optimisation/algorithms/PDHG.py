@@ -19,7 +19,7 @@
 
 from cil.framework import DataContainer, BlockDataContainer
 from cil.optimisation.algorithms import Algorithm
-from cil.optimisation.utilities import StepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize
+from cil.optimisation.utilities import StepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015
 import warnings
 import numpy as np
 from numbers import Number
@@ -265,8 +265,7 @@ class PDHG(Algorithm):
         else:
             raise ValueError("The `step_size` argument must be either None, a PDHG compatible step size rule or a tuple of (sigma, tau) where sigma is the step size for the dual problem and tau is the step size for the primal problem.")
 
-        if self._check_convergence:
-            self.check_convergence()
+
 
         if isinstance(initial, (tuple, list)):
             if initial[0] is not None:
@@ -295,6 +294,9 @@ class PDHG(Algorithm):
         self._tau, self._sigma = self.step_size_rule.get_initial_step_size(
             self)
 
+        if self._check_convergence:
+            self.check_convergence()
+            
         self.configured = True
         log.info("%s configured", self.__class__.__name__)
 
@@ -354,17 +356,23 @@ class PDHG(Algorithm):
 
 
         """
-        if isinstance(self.tau, Number) and isinstance(self.sigma, Number):
-            if self.sigma * self.tau * self.operator.norm()**2 > 4/3:
+        if isinstance(self.step_size_rule, PDHGConstantStepSize):
+            if isinstance(self.tau, Number) and isinstance(self.sigma, Number):
+                if self.sigma * self.tau * self.operator.norm()**2 > 4/3:
+                    warnings.warn(
+                        "Convergence criterion of PDHG for scalar step-sizes is not satisfied.")
+                    return False
+                return True
+            else:
                 warnings.warn(
-                    "Convergence criterion of PDHG for scalar step-sizes is not satisfied.")
-                return False
+                    "Convergence criterion can only be checked for scalar values of tau and sigma, tau={0}, sigma={1}".format(self.tau, self.sigma))
+        elif isinstance(self.step_size_rule, PDHGAdaptiveStepSize2013) or isinstance(self.step_size_rule, PDHGAdaptiveStepSize2015):
             return True
-        warnings.warn(
-            "Convergence criterion can only be checked for scalar values of tau and sigma.")
+        else:
+            warnings.warn(
+                "Convergence checks not currently implemented for this type of step size rule.")
         return False
 
-        self.loss.append([p1, -d1, p1+d1])
 
     def update_objective(self):
         """Evaluates the primal objective, the dual objective and the primal-dual gap."""

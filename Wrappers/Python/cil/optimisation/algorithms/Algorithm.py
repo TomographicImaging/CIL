@@ -44,7 +44,7 @@ class Algorithm:
 
         self.iteration = -1
         self._total_iterations = 1
-        self.__loss = []
+        self._loss = []
         self.memopt = False
         self.configured = False
         self._iteration = []
@@ -154,7 +154,7 @@ class Algorithm:
 
         '''
         try:
-            objective = self.__loss[-1]
+            objective = self._loss[-1]
         except IndexError:
             objective = np.nan
         if isinstance(objective, list):
@@ -178,21 +178,21 @@ class Algorithm:
 
         The length of this list may be shorter than the number of iterations run when the `update_objective_interval` > 1
         '''
-        return self.__loss
+        return self._loss
 
     objective = loss  # alias
 
     @property
     def update_objective_interval(self):
         '''gets the update_objective_interval'''
-        return self.__update_objective_interval
+        return self._update_objective_interval
 
     @update_objective_interval.setter
     def update_objective_interval(self, value):
         '''sets the update_objective_interval'''
         if not isinstance(value, Integral) or value < 0:
             raise ValueError('interval must be an integer >= 0')
-        self.__update_objective_interval = value
+        self._update_objective_interval = value
 
     def run(self, iterations=None, callbacks: Optional[List[Callback]] = None, verbose=1):
         r"""run upto :code:`iterations` with callbacks/logging.

@@ -853,7 +853,7 @@ class PDHGBayesOptimisationStepSize(StepSizeRule):
             Total number of evaluations of the objective function in the Bayesian optimisation, including the initial random evaluations.
         n_iterations : int, optional, default=10
             Number of iterations to run the PDHG algorithm for each evaluation of the objective function in the Bayesian optimisation. The gamma that gives the best performance after this number of iterations is chosen as the ratio between the primal and dual step sizes for the PDHG algorithm.
-        seed : int, optional, default=1
+        seed : int, optional, default= None
             Random seed for the Bayesian optimisation. This is used to ensure reproducibility of the results.
             
         Notes
@@ -861,7 +861,7 @@ class PDHGBayesOptimisationStepSize(StepSizeRule):
         This is a computationally expensive step size rule, as it requires running the PDHG algorithm for a number of iterations for each evaluation of the objective function in the Bayesian optimisation. It is recommended to use this step size rule where you are memory constrained but less time constrained. For the opposite case, where you are more time constrained, not memory constrained, we recommend using the :class:`PDHGAdaptiveStepSize2013` or :class:`PDHGAdaptiveStepSize2015` step size rules, which are adaptive step size rules that update the step sizes at each iteration based on the observed behaviour of the algorithm.
         """
 
-    def __init__(self, gamma_bounds=None, n_initial_points=5, n_calls=20, n_iterations=10,  seed = 1):
+    def __init__(self, gamma_bounds=None, n_initial_points=5, n_calls=20, n_iterations=10,  seed =  None):
         '''Initialises the step size rule'''
 
         self.gamma_bounds = gamma_bounds
@@ -869,10 +869,14 @@ class PDHGBayesOptimisationStepSize(StepSizeRule):
             if len(gamma_bounds) != 2:
                 raise ValueError(
                     "gamma_bounds should be a list or tuple of length two, gamma_bounds = {}".format(gamma_bounds))
+            if gamma_bounds[0] <= 0 or gamma_bounds[1] <= 0:
+                raise ValueError(
+                    "gamma_bounds should be positive and strictly greater than zero, gamma_bounds = {}".format(gamma_bounds))
 
         self.n_initial_points = n_initial_points
         self.n_calls = n_calls
         self.n_iterations = n_iterations
+        self.seed = seed
 
     def get_initial_step_size(self, algorithm):
         try:
@@ -913,11 +917,16 @@ class PDHGBayesOptimisationStepSize(StepSizeRule):
             return algorithm.objective[-1]
 
         gp_result = gp_minimize(objective_function, [
-                                log_gamma_bounds], n_random_starts=self.n_initial_points, n_calls=self.n_calls, initial_point_generator="lhs" , seed = 1)
-        algorithm.set_up(initial=algorithm.initial, f=algorithm.f, g=algorithm.g, operator=algorithm.operator, step_size=[
-                         1.0 / (gp_result.x[0] * algorithm.operator.norm()), 1.0*gp_result.x[0] / (algorithm.operator.norm())])
+                                log_gamma_bounds], n_random_starts=self.n_initial_points, n_calls=self.n_calls, initial_point_generator="lhs" , random_state = self.seed)
+       
         algorithm.update_objective_interval = update_objective_interval
         algorithm.iteration = -1
+        algorithm._loss = []
+        algorithm._iteration = []
+        algorithm._total_iterations = 1
+        algorithm.set_up(initial=algorithm.initial, f=algorithm.f, g=algorithm.g, operator=algorithm.operator, step_size=[
+                         1.0 / (gp_result.x[0] * algorithm.operator.norm()), 1.0*gp_result.x[0] / (algorithm.operator.norm())])
+         
         log.debug("Best gamma found: {}, with objective function value: {}".format(
             np.exp(gp_result.x[0]), gp_result.fun))
         if log.isEnabledFor(logging.DEBUG):

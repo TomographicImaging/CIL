@@ -38,10 +38,15 @@ Algorithms (Deterministic)
 A number of deterministic algorithms are available in CIL that act on CIL :code:`Function` s and :code:`Operator` s. 
 
 For a particular optimisation objective, one or more algorithms may be suitable. As a summary, the main deterministic algorithms in CIL are:
+
 - Gradient Descent (GD) can be used when your objective is convex and differentiable.
+
 - Conjugate gradient Least Squares (CGLS), Least Squares and QR-factorisation (LSQR) and SIRT solve problems of the form :math:`Ax=b`.
+
 - Iterative Shrinkage-Thresholding Algorithm (ISTA) and Fast ISTA (FISTA) both solve problems of the form :math:`min_x f(x)+g(x)` where f is convex and differentiable and g is convex with a simple proximal operator.
+
 - Primal Dual Hybrid Gradient (PDHG) solves problems of the form :math:`min_x f(Ax)+g(x)` where f  is convex and has a “simple” proximal method of its conjugate and g is convex with a “simple” proximal. Primal-Dual 3 Operator (PD3O) solves a similar problem to PDHG but with an additional convex differentiable term.
+
 - Linearized Alternating Direction Method of Multipliers (LADMM) solves problems of the form :math:`min_x f(Ax)+g(x)` where both f and g have a "simple" proximal.
 
 After initialising the algorithms, they are called using the :code:`run` method. The algorithms are also iterators that can be called using :code:`next` or in a :code:`for` loop.

@@ -103,13 +103,8 @@ class ArmijoStepSizeRule(StepSizeRule):
         '''
         
         self.alpha_orig = alpha
-        if self.alpha_orig is None: # Can be removed when alpha and beta are deprecated in GD
-            self.alpha_orig = 1e6 
-        self.alpha = self.alpha_orig
+        self.alpha = alpha
         self.beta = beta 
-        if self.beta is None:  # Can be removed when alpha and beta are deprecated in GD
-            self.beta = 0.5
-            
         self.max_iterations = max_iterations
         if self.max_iterations is None:
             self.max_iterations = numpy.ceil(2 * numpy.log10(self.alpha_orig) / numpy.log10(2))

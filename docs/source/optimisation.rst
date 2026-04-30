@@ -20,7 +20,7 @@ Optimisation framework
 **********************
 This package allows rapid prototyping of optimisation-based reconstruction problems, i.e. defining and solving different optimization problems to enforce different properties on the reconstructed image.
 
-Firstly, it provides an object-oriented framework for defining mathematical operators and functions as well a collection of useful example operators and functions. Both smooth and non-smooth functions can be used.
+Firstly, it provides an object-oriented framework for defining mathematical operators and functions as well as a collection of useful example operators and functions. Both smooth and non-smooth functions can be used.
 
 Further, it provides a number of high-level generic implementations of optimisation algorithms to solve generically formulated optimisation problems constructed from operator and function objects.
 
@@ -35,20 +35,25 @@ The fundamental components are:
 Algorithms (Deterministic)
 ==========================
 
-A number of generic algorithm implementations are provided including
-Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS),
-Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid
-Gradient (PDHG), Primal dual three-operator (PD3O),  Iterative Shrinkage Thresholding Algorithm (ISTA),
-and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
+A number of deterministic algorithms are available in CIL that act on CIL :code:`Function` s and :code:`Operator` s. 
 
-An algorithm is designed for a particular generic optimisation problem accepts and number of
-instances of :code:`Function` derived classes and/or :code:`Operator` derived classes as input to
-define a specific instance of the generic optimisation problem to be solved.
-They are iterable objects which can be run in a for loop.
-The user can provide a stopping criterion different than the default.
+For a particular optimisation objective, one or more algorithms may be suitable. As a summary, the main deterministic algorithms in CIL are:
+
+- Gradient Descent (GD) can be used when your objective is convex and differentiable.
+
+- Conjugate gradient Least Squares (CGLS), Least Squares and QR-factorisation (LSQR) and SIRT solve problems of the form :math:`Ax=b`.
+
+- Iterative Shrinkage-Thresholding Algorithm (ISTA) and Fast ISTA (FISTA) both solve problems of the form :math:`min_x f(x)+g(x)` where f is convex and differentiable and g is convex with a simple proximal operator.
+
+- Primal Dual Hybrid Gradient (PDHG) solves problems of the form :math:`min_x f(Ax)+g(x)` where f  is convex and has a “simple” proximal method of its conjugate and g is convex with a “simple” proximal. Primal-Dual 3 Operator (PD3O) solves a similar problem to PDHG but with an additional convex differentiable term.
+
+- Linearized Alternating Direction Method of Multipliers (LADMM) solves problems of the form :math:`min_x f(Ax)+g(x)` where both f and g have a "simple" proximal.
+
+
+After initialising the algorithms, they are called using the :code:`run` method. The algorithms are also iterators that can be called using :code:`next` or in a :code:`for` loop.
 
 New algorithms can be easily created by extending the :code:`Algorithm` class.
-The user is required to implement only 4 methods: set_up, __init__, update and update_objective.
+The user is required to implement only 4 methods: :code:`set_up`, :code:`__init__`, :code:`update` and :code:`update_objective`.
 
 + :code:`set_up` and :code:`__init__` are used to configure the algorithm
 + :code:`update` is the actual iteration updating the solution
@@ -60,9 +65,9 @@ algorithm to minimise a Function will only be:
 .. code-block :: python
 
     def update(self):
-        self.x += -self.rate * self.objective_function.gradient(self.x)
+        self.x += -self.rate * self._objective_function.gradient(self.x)
     def update_objective(self):
-        self.loss.append(self.objective_function(self.x))
+        self.loss.append(self._objective_function(self.x))
 
 The :code:`Algorithm` provides the infrastructure to continue iteration, to access the values of the
 objective function in subsequent iterations, the time for each iteration, and to provide a nice
@@ -120,7 +125,7 @@ The Fast Iterative Soft Thresholding Algorithm (FISTA).
 
 APGD
 -----
-The Accelerated Proximal Gradient Descent Algorithm (APGD). This is an extension of the PGD/ISTA algorithm allowing you to either use a constant momemtum or a momentum that is updated at each iteration. 
+The Accelerated Proximal Gradient Descent Algorithm (APGD). This is an extension of the PGD/ISTA algorithm allowing you to either use a constant momentum or a momentum that is updated at each iteration. 
 
 .. autoclass:: cil.optimisation.algorithms.APGD
    :members:
@@ -266,7 +271,7 @@ The below is an example of Stochastic Gradient Descent built of the SGFunction a
    f = SGFunction(list_of_functions, sampler=sampler)  
    
    #set up and run the gradient descent algorithm 
-   alg = GD(initial=ig.allocate(0), objective_function=f, step_size=1/f.L)
+   alg = GD(initial=ig.allocate(0), f=f, step_size=1/f.L)
    alg.run(300)
 
 

@@ -9,6 +9,7 @@
     - `cilacc` path lookup no longer broken for editable installations (#2257)
     - update `version.py` to use `importlib` & fix tagless installation #2255 (#2269)
     - Fixed behaviour of `ZeissDataReader` when negative values are passed in the ROI (#2244)
+    - Fix `show2D` truncating plots when count is not a multiple of `num_cols` (#2315)
   - Dependencies:
     - olefile and dxchange are optional dependencies, instead of required (#2209)
     - dxchange minimum version set to 0.2.1 to fix #2256 (#2268)

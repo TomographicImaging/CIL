@@ -23,26 +23,12 @@ from tomophantom import TomoP2D, TomoP3D
 import os
 import numpy as np
 
-import ctypes, platform
-from ctypes import util
-# check for the extension
-if platform.system() == 'Linux':
-    dll = 'libctomophantom.so'
-elif platform.system() == 'Windows':
-    dll_file = 'ctomophantom.dll'
-    dll = util.find_library(dll_file)
-elif platform.system() == 'Darwin':
-    dll = 'libctomophantom.dylib'
-else:
-    raise ValueError('Not supported platform, ', platform.system())
-
-libtomophantom = ctypes.cdll.LoadLibrary(dll)
-
-
+import ctypes
+import tomophantom.ctypes.external as external
 
 path = os.path.dirname(tomophantom.__file__)
-path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
-path_library3D = os.path.join(path, "Phantom3DLibrary.dat")
+path_library2D = os.path.join(path, "phantomlib", "Phantom2DLibrary.dat")
+path_library3D = os.path.join(path, "phantomlib", "Phantom3DLibrary.dat")
 
 def is_model_temporal(num_model, num_dims=2):
     '''Returns whether a model in the TomoPhantom library is temporal
@@ -89,24 +75,20 @@ def check_model_params(num_model, num_dims=2):
     :type num_dims: int, default 2
     '''
     if num_dims == 2:
-        libtomophantom.checkParams2D.argtypes = [ctypes.POINTER(ctypes.c_int),  # pointer to the params array
+        external.c_checkParams2D.argtypes = [ctypes.POINTER(ctypes.c_int),  # pointer to the params array
                                   ctypes.c_int,                                   # model number selector (int)
                                   ctypes.c_char_p]                  # string to the library file
         params = np.zeros([10], dtype=np.int32)
-        params_p = params.ctypes.data_as(ctypes.POINTER(ctypes.c_int))
-        lib2d_p = str(path_library2D).encode('utf-8')
-        libtomophantom.checkParams2D(params_p, num_model, lib2d_p)
+        external.c_checkParams2D(params, num_model, str(path_library2D))
 
         return params
 
     elif num_dims == 3:
-        libtomophantom.checkParams3D.argtypes = [ctypes.POINTER(ctypes.c_int),  # pointer to the params array
+        external.c_checkParams3D.argtypes = [ctypes.POINTER(ctypes.c_int),  # pointer to the params array
                                   ctypes.c_int,                                   # model number selector (int)
                                   ctypes.c_char_p]                  # string to the library file
         params = np.zeros([11], dtype=np.int32)
-        params_p = params.ctypes.data_as(ctypes.POINTER(ctypes.c_int))
-        lib2d_p = str(path_library3D).encode('utf-8')
-        libtomophantom.checkParams3D(params_p, num_model, lib2d_p)
+        external.c_checkParams3D(params, num_model, str(path_library3D))
 
         return params
 

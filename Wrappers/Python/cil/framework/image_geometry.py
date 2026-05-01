@@ -64,7 +64,7 @@ class ImageGeometry(metaclass=BackwardCompat):
                       ImageDimension.VERTICAL: self.voxel_num_z,
                       ImageDimension.HORIZONTAL_Y: self.voxel_num_y,
                       ImageDimension.HORIZONTAL_X: self.voxel_num_x}
-        return tuple(shape_dict[label] for label in self.dimension_labels)
+        return tuple(int(shape_dict[label]) for label in self.dimension_labels)
 
     @property
     def spacing(self):

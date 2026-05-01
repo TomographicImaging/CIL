@@ -535,6 +535,12 @@ Mixed L11 norm
    :members:
    :inherited-members:
 
+Huber Loss
+---------------
+.. autoclass:: cil.optimisation.functions.HuberLoss
+   :members:
+   :inherited-members:
+
 Total variation
 ---------------
 

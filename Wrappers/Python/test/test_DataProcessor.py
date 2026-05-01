@@ -1313,8 +1313,8 @@ class TestSlicer(unittest.TestCase):
         PO = AstraProjectionOperator(phantom.geometry, ag)
         fp_full = PO.direct(phantom)
 
+        roi = {'angle':(None,None,42),'vertical':(5,50,2),'horizontal':(30,-40,2)}
 
-        roi = {'angle':(25,30,2),'vertical':(5,50,2),'horizontal':(-50,0,2)}
         slicer = Slicer(roi)
 
         slicer.set_input(ag)
@@ -1323,7 +1323,7 @@ class TestSlicer(unittest.TestCase):
         slicer.set_input(fp_full)
         fp_sliced = slicer.get_output()
 
-        numpy.testing.assert_allclose(fp_sliced.array, fp_full.array[5:50:2,25:30:2,-50::2])
+        numpy.testing.assert_allclose(fp_sliced.array, fp_full.array[5:50:2,:150:42,30:-40:2])
 
         self.assertEqual(ag_roi, fp_sliced.geometry, msg="Sliced geometries not equal")
 

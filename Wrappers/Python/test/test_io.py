@@ -399,6 +399,7 @@ class TestTIFF(unittest.TestCase):
         self.TIFF_compression_test(None)
 
     def test_TIFF_compression3D_1(self):
+        
         self.TIFF_compression_test('uint8')
 
     def test_TIFF_compression3D_2(self):

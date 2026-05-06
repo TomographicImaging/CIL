@@ -149,7 +149,6 @@ class TIFFWriter(object):
             for sliceno in range(self.data_container.shape[0]):
                 # save single slice
                 # pattern = self.file_name.split('.')
-                dimension = self.data_container.dimension_labels[0]
                 fname = "{}_idx_{:04d}.tiff".format(
                     os.path.join(self.dir_name, self.file_name),
                     sliceno + self.counter_offset)

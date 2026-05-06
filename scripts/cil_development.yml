@@ -14,26 +14,29 @@
 name: cil_dev
 channels:
   - conda-forge
+  - nvidia
   - https://software.repos.intel.com/python/conda
 dependencies:
-  - python=3.12
-  - numpy=1.26
+  - python >=3.10
+  - numpy >=1.23,<2
   - llvm-openmp
-  - ccpi::cil-data >=22 
-  - ccpi::tigre=2.6 
-  - ccpi::ccpi-regulariser=24.0.1
-  - ccpi::tomophantom=3.0.3
-  - astra-toolbox=2.1=cuda*
+  - ccpi::cil-data >=22
+  - ccpi::tigre 2.6
+  - ccpi::ccpi-regulariser 24.0.1
+  - ccpi::tomophantom 3.0.3
+  - astra-toolbox 2.1 cuda*
   - cvxpy!=1.8.2
   - python-wget
   - scikit-image
   - packaging
+  - cmake >=3.16
+  - setuptools >=64
   - ipp-include 2021.12
   - ipp-devel 2021.12
   - ipp 2021.12
   - ipywidgets
-  - scipy
-  - matplotlib-base >=3.3.0  
+  - scipy >=1.4
+  - matplotlib-base >=3.3
   - h5py
   - pillow
   - dxchange >=0.2.1
@@ -45,4 +48,3 @@ dependencies:
   - pip
   - pip:
     - unittest-parametrize
-    

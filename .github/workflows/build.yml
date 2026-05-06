@@ -37,11 +37,11 @@ jobs:
       run: |
         envname="${GITHUB_REPOSITORY##*/}-${GITHUB_RUN_ID}.${GITHUB_RUN_NUMBER}"
         echo "envname=$envname" >> $GITHUB_OUTPUT
-        sed -ri -e 's/^(name: ).*/\1$envname/' -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' scripts/requirements-test.yml
+        sed -ri -e 's/^(name: ).*/\1$envname/' -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' scripts/cil_development.yml
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
-        environment-file: scripts/requirements-test.yml
+        environment-file: scripts/cil_development.yml
         activate-environment: ${{ steps.reqs.outputs.envname }}
         run-post: false
     - id: build
@@ -72,11 +72,11 @@ jobs:
     - uses: actions/checkout@v4
       with: {fetch-depth: 0, submodules: recursive}
     - name: set requirements
-      run: sed -ri -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' -e 's/=cuda*//' -e '/tigre/d' scripts/requirements-test.yml
+      run: sed -ri -e '/ python /d' -e 's/(.* numpy) .*/\1=${{ matrix.numpy-version }}/' -e 's/=cuda*//' -e '/tigre/d' scripts/cil_development.yml
     - uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
-        environment-file: scripts/requirements-test.yml
+        environment-file: scripts/cil_development.yml
         activate-environment: cil_dev
     - run: pip install .
     - name: test
@@ -224,7 +224,7 @@ jobs:
     - name: install dependencies
       run: |
         mamba install -c conda-forge -yq conda-merge
-        conda-merge ../scripts/requirements-test.yml docs_environment.yml > environment.yml
+        conda-merge ../scripts/cil_development.yml docs_environment.yml > environment.yml
         mamba env update -n test --file environment.yml
         conda list
     - run: pip install ..

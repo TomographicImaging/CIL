@@ -43,7 +43,7 @@ A number of additional dependencies are required for specific functionality in C
 
 
 #### Binary packages and dependencies
-While building the CIL package we test with specific versions of dependencies. These are listed in the [build.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml) GitHub workflow and [environment-test.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/requirements-test.yml). The following table tries to resume the tested versions of CIL and its required and optional dependencies. If you use these packages as a backend please remember to cite them in addition to CIL.
+While building the CIL package we test with specific versions of dependencies. These are listed in the [build.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml) GitHub workflow and [cil_development.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/cil_development.yml). The following table tries to resume the tested versions of CIL and its required and optional dependencies. If you use these packages as a backend please remember to cite them in addition to CIL.
 
 | Package | Tested Version |  Conda install command | Description | License |
 |----|----|--------|--------|----|

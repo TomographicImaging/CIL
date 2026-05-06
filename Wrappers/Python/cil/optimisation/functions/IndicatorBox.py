@@ -21,6 +21,7 @@ import numpy as np
 import numba
 from cil.utilities import multiprocessing as cil_mp
 import logging
+from array_api_compat import array_namespace
 
 log = logging.getLogger(__name__)
 
@@ -278,11 +279,12 @@ class IndicatorBox_numpy(IndicatorBox):
     def evaluate(self, x):
         '''Evaluates IndicatorBox at x'''
 
-        if (np.all(x.as_array() >= self.lower)
-                and np.all(x.as_array() <= self.upper)):
+        xp = array_namespace(x.as_array())
+        if (xp.all(x.as_array() >= self.lower)
+                and xp.all(x.as_array() <= self.upper)):
             val = 0
         else:
-            val = np.inf
+            val = xp.inf
         return val
 
     def convex_conjugate(self, x):
@@ -290,7 +292,8 @@ class IndicatorBox_numpy(IndicatorBox):
         return x.maximum(0).sum()
 
     def _proximal(self, outarr):
-        np.clip(outarr,
+        xp = array_namespace(outarr)
+        xp.clip(outarr,
                 None if self.orig_lower is None else self.lower,
                 None if self.orig_upper is None else self.upper,
                 out=outarr)

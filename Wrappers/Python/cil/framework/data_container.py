@@ -27,7 +27,9 @@ import numpy
 
 from .cilacc import cilacc
 from cil.utilities.multiprocessing import NUM_THREADS
-
+from .array_api_compat import squeeze as cil_squeeze
+from .array_api_compat import expand_dims as cil_expand_dims
+from array_api_compat import array_namespace
 
 class DataContainer(object):
     '''Generic class to hold data
@@ -91,15 +93,12 @@ class DataContainer(object):
     __container_priority__ = 1
     def __init__ (self, array, deep_copy=True, dimension_labels=None,
                   **kwargs):
-        if type(array) == numpy.ndarray:
-            if deep_copy:
-                self.array = array.copy()
-            else:
-                self.array = array
+        if deep_copy:
+            # self.array = array.copy()
+            xp = array_namespace(array)
+            self.array = xp.asarray(array, copy=True)
         else:
-            raise TypeError('Array must be NumpyArray, passed {0}'\
-                            .format(type(array)))
-
+            self.array = array
         #Don't set for derived classes
         if type(self) is DataContainer:
             self.dimension_labels = dimension_labels
@@ -155,6 +154,11 @@ class DataContainer(object):
         '''
         return self.array
 
+    def asarray(self):
+        '''
+        Alias to as_array to be compatible with array API. Returns the pointer to the array.
+        '''
+        return self.as_array()
 
     def get_slice(self, **kw):
         '''
@@ -177,7 +181,7 @@ class DataContainer(object):
                 if new_array is None:
                     new_array = self.as_array()
                 new_array = new_array.take(indices=value, axis=axis)
-
+                
         if new_array.ndim > 1:
             return DataContainer(new_array, False, dimension_labels_list)
         from .vector_data import VectorData
@@ -210,7 +214,8 @@ class DataContainer(object):
         for i, axis in enumerate(order):
             new_order[i] = self.dimension_labels.index(axis)
             dimension_labels_new[i] = axis
-
+        
+        # FIXME: works only with NumPy arrays
         self.array = numpy.ascontiguousarray(numpy.transpose(self.array, new_order))
 
         if self.geometry is None:
@@ -261,6 +266,11 @@ class DataContainer(object):
             required it should be passed directly as a kwarg.
             To fill random numbers using the earlier behaviour use `array='random_deprecated'` 
             or `array='random_int_deprecated'` 
+
+        dc.fill(some_data, vertical=1, horizontal_x=32)
+        will copy the data in `some_data` into the `dc` data container.
+        https://data-apis.org/array-api/latest/design_topics/copies_views_and_mutation.html
+        https://data-apis.org/array-api/latest/API_specification/generated/array_api.array.__setitem__.html#array_api.array.__setitem__
         
         Example
         -------
@@ -271,6 +281,7 @@ class DataContainer(object):
         will copy the data in new_data into the data container.
         '''
         from cil.framework.labels import FillType
+        import warnings
         dimension = {}
 
         try:
@@ -293,29 +304,17 @@ class DataContainer(object):
         else:
             index = (slice(None),) * self.array.ndim
 
+
         if id(array) == id(self.array):
             return
         
-        if isinstance(array, numpy.ndarray):
-            numpy.copyto(self.array[index], array)
+        # if isinstance(array, numpy.ndarray):
+        #     numpy.copyto(self.array[index], array)
         
-        elif isinstance(array, Number):
-            self.array[index] = array
+        # elif isinstance(array, Number):
+        #     self.array[index] = array
         
-        elif issubclass(array.__class__ , DataContainer):
-            if dimension_labels is not None:
-                indexed_dimension_labels = [label for label in self.dimension_labels if label not in dimension]
-                if tuple(indexed_dimension_labels) != array.dimension_labels:
-                    raise ValueError('Input array is not in the same order as destination array. Use "array.reorder()"')
-            
-            if self.array[index].shape == array.shape:
-                numpy.copyto(self.array[index], array.array)
-            else:
-                raise ValueError('Cannot fill with the provided array.' + \
-                                    'Expecting shape {0} got {1}'.format(
-                                    self.array[index].shape, array.shape))
-            
-        elif array in FillType:
+        if array in FillType:
 
             seed = kwargs.pop("seed", None)
             
@@ -362,10 +361,55 @@ class DataContainer(object):
                 else:
                     r = rng.integers(min_value, max_value, size=self.array[index].shape, dtype=numpy.int32).astype(self.dtype)
                 self.array[index] = r
+            return self
 
+        # else:
+        #     raise TypeError('Can fill only with random method, number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
+        if issubclass(array.__class__ , DataContainer):
+            if dimension_labels is not None:
+                indexed_dimension_labels = [label for label in self.dimension_labels if label not in dimension]
+                if tuple(indexed_dimension_labels) != array.dimension_labels:
+                    raise ValueError('Input array is not in the same order as destination array. Use "array.reorder()"')
+            # slice dimensions parameters have been stripped out of kwargs,
+            # Put them back for fill to use.
+            for k,v in dimension.items():
+                kwargs[k] = v
+            return self.fill(array.as_array(), **kwargs)
+
+
+        if dimension == {}:
+            import warnings
+            warnings.filterwarnings('error')
+            self.array.__setitem__(slice(None, None, None), array)
+            warnings.resetwarnings()
         else:
-            raise TypeError('Can fill only with random method, number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
 
+            slices = [slice(None, None, None)] * self.number_of_dimensions
+            where = []
+            for i,el in enumerate(self.dimension_labels):
+                for k,v in dimension.items():
+                    if el == k:
+                        slices[i] = slice(v,v+1,None)
+                        where.append(i)
+
+            try:
+                # if it's an array try to fill, otherwise catch the error and try to set the item directly (e.g. for numbers)
+                if self.array[index].shape == array.shape:
+                    # numpy.copyto(self.array[index], array.array)     
+                    array = cil_expand_dims(array, axis=where)
+                    self.array.__setitem__(tuple(slices), array)
+                    array = cil_squeeze(array, axis=where)
+                else:
+                    raise ValueError('Cannot fill with the provided array.' + \
+                                    'Expecting shape {0} got {1}'.format(
+                                    self.array[index].shape, array.shape))   
+        
+            except AttributeError as ae:
+                self.array.__setitem__(tuple(slices), array)
+                    
+            except TypeError as ae:
+                self.array.__setitem__(tuple(slices), array)
+            
         if kwargs:
             warnings.warn(f"Unused keyword arguments: {kwargs}", stacklevel=2)
 
@@ -488,76 +532,60 @@ class DataContainer(object):
     ## binary operations
 
     def pixel_wise_binary(self, pwop, x2, *args,  **kwargs):
-        out = kwargs.get('out', None)
+        out = kwargs.pop('out', None)
 
         if out is None:
             if isinstance(x2, Number):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
             elif issubclass(x2.__class__ , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
-            elif isinstance(x2, numpy.ndarray):
-                out = pwop(self.as_array() , x2 , *args, **kwargs )
             else:
-                raise TypeError('Expected x2 type as number or DataContainer, got {}'.format(type(x2)))
+                out = pwop(self.as_array() , x2 , *args, **kwargs )
             
-            if self.geometry is None:
-                return type(self)(out,
-                    deep_copy=False,
-                    dimension_labels=self.dimension_labels)
-            
+            geom = self.geometry
+            if geom is not None:
+                geom = self.geometry.copy()
             return type(self)(out,
-                deep_copy=False,
-                geometry=self.geometry)
-
-
-        elif issubclass(type(out), DataContainer) and issubclass(type(x2), DataContainer):
-            if self.check_dimensions(out) and self.check_dimensions(x2):
-                kwargs['out'] = out.as_array()
-                pwop(self.as_array(), x2.as_array(), *args, **kwargs )
-                #return type(self)(out.as_array(),
-                #       deep_copy=False,
-                #       dimension_labels=self.dimension_labels,
-                #       geometry=self.geometry)
-                return out
-            raise ValueError(f"Wrong size for data memory: out {out.shape} x2 {x2.shape} expected {self.shape}")
-        elif issubclass(type(out), DataContainer) and \
-             isinstance(x2, (Number, numpy.ndarray)):
-            if self.check_dimensions(out):
-                if isinstance(x2, numpy.ndarray) and\
-                    not (x2.shape == self.shape and x2.dtype == self.dtype):
-                    raise ValueError(f"Wrong size for data memory: out {out.shape} x2 {x2.shape} expected {self.shape}")
-                kwargs['out']=out.as_array()
-                pwop(self.as_array(), x2, *args, **kwargs )
-                return out
-            raise ValueError(f"Wrong size for data memory: {out.shape} {self.shape}")
-        elif issubclass(type(out), numpy.ndarray):
-            if self.array.shape == out.shape and self.array.dtype == out.dtype:
-                kwargs['out'] = out
-                pwop(self.as_array(), x2, *args, **kwargs)
-                #return type(self)(out,
-                #       deep_copy=False,
-                #       dimension_labels=self.dimension_labels,
-                #       geometry=self.geometry)
+                   deep_copy=False,
+                   dimension_labels=self.dimension_labels,
+                   geometry= None if self.geometry is None else self.geometry.copy(),
+                   suppress_warning=True)
         else:
-            raise ValueError(f"incompatible class: {pwop.__name__} {type(out)}")
+            # assuming it is a CIL DataContainer we extract the actual data structure
+            outarr = out.as_array() 
+            kwargs['out'] = outarr
+                        
+            if isinstance(x2, Number):
+                    pwop(self.as_array() , x2 , *args, **kwargs )
+            else:
+                if issubclass(x2.__class__ , DataContainer):
+                    pwop(self.as_array() , x2.as_array() , *args, **kwargs )
+                else:
+                    pwop(self.as_array() , x2 , *args, **kwargs )
+                
+            out.fill(outarr)
+            return out
 
     def add(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
             return other.add(self, *args, **kwargs)
-        return self.pixel_wise_binary(numpy.add, other, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.add, other, *args, **kwargs)
 
     def subtract(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
             return other.sapyb(-1,self,1, out=kwargs.get('out', None))
-        return self.pixel_wise_binary(numpy.subtract, other, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.subtract, other, *args, **kwargs)
 
     def multiply(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
             return other.multiply(self, *args, **kwargs)
-        return self.pixel_wise_binary(numpy.multiply, other, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.multiply, other, *args, **kwargs)
 
     def divide(self, other, *args, **kwargs):
         if hasattr(other, '__container_priority__') and \
@@ -565,16 +593,24 @@ class DataContainer(object):
             _out = other.divide(self, *args, **kwargs)
             _out.power(-1, out=_out)
             return _out
-        return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.divide, other, *args, **kwargs)
 
     def power(self, other, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.power, other, *args, **kwargs)
 
     def maximum(self, x2, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.maximum, x2, *args, **kwargs)
+        xp = array_namespace(self.array)
+        try:
+            return self.pixel_wise_binary(xp.maximum, x2, *args, **kwargs)
+        except TypeError as te:
+            tmp = xp.ones_like(self.as_array()) * x2
+            return self.pixel_wise_binary(xp.maximum, tmp, *args, **kwargs)
 
     def minimum(self,x2, out=None, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_binary(xp.minimum, x2=x2, out=out, *args, **kwargs)
 
 
     def sapyb(self, a, y, b, out=None, num_threads=NUM_THREADS):
@@ -611,9 +647,9 @@ class DataContainer(object):
                 self._axpby(a, b, y, out, out.dtype, num_threads)
                 return out
             except RuntimeError as rte:
-                warnings.warn("sapyb defaulting to Python due to: {}".format(rte))
+                warnings.warn("RuntimeError in sapyb, defaulting to Python due to: {}".format(rte))
             except TypeError as te:
-                warnings.warn("sapyb defaulting to Python due to: {}".format(te))
+                warnings.warn("TypeError in sapyb, defaulting to Python due to: {}".format(te))
             finally:
                 pass
 
@@ -744,44 +780,78 @@ class DataContainer(object):
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
                 kwargs['out'] = out.as_array()
-                pwop(self.as_array(), *args, **kwargs )
+                try:
+                    pwop(self.as_array(), *args, **kwargs )
+                except TypeError as te:
+                    import inspect
+                    txt = inspect.getmembers(pwop)
+                    msg = "Error out parameter not supported: "
+                    for el in txt:
+                        if el[0] in ['__name__', '__module__']:
+                            msg += f"{el[0]}: {el[1]} "
+                    import warnings
+                    warnings.warn(msg)
+                    kwargs.pop('out')
+                    out.fill(pwop(self.as_array(), *args, **kwargs ))
+                    return out
             else:
                 raise ValueError(f"Wrong size for data memory: {out.shape} {self.shape}")
-        elif issubclass(type(out), numpy.ndarray):
-            if self.array.shape == out.shape and self.array.dtype == out.dtype:
-                kwargs['out'] = out
-                pwop(self.as_array(), *args, **kwargs)
+        
+        # elif issubclass(type(out), numpy.ndarray):
         else:
-            raise ValueError("incompatible class: {pwop.__name__} {type(out)}")
-
+            # check the size and dimension of out
+            whatswrong = {}
+            if not self.check_dimensions(out):
+                whatswrong['out shape'] = out.shape
+            if not out.dtype == self.dtype:
+                whatswrong['out dtype'] = out.dtype
+            if not whatswrong == {}:
+                # report to the user what's wrong
+                msg = "Wrong size for data memory:\n"
+                for k,v in whatswrong.items():
+                    msg += f"{k} {v}\n"
+                raise ValueError(msg)
+            
+            # FIXME is this necessary? Can one pass a numpy array in out?
+            kwargs['out'] = out
+            pwop(self.as_array(), *args, **kwargs)
+            
     def abs(self, *args,  **kwargs):
-        return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_unary(xp.abs, *args,  **kwargs)
 
     def sign(self, *args,  **kwargs):
-        return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_unary(xp.sign, *args,  **kwargs)
 
     def sqrt(self, *args,  **kwargs):
-        return self.pixel_wise_unary(numpy.sqrt, *args,  **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_unary(xp.sqrt, *args,  **kwargs)
 
     def conjugate(self, *args,  **kwargs):
-        return self.pixel_wise_unary(numpy.conjugate, *args,  **kwargs)
-
+        xp = array_namespace(self.array)
+        try:
+            return self.pixel_wise_unary(xp.conjugate, *args,  **kwargs)
+        except AttributeError:
+            # torch has conj instead
+            import torch
+            return torch.conj(self.as_array())
+        
     def exp(self, *args, **kwargs):
         '''Applies exp pixel-wise to the DataContainer'''
-        return self.pixel_wise_unary(numpy.exp, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_unary(xp.exp, *args, **kwargs)
 
     def log(self, *args, **kwargs):
         '''Applies log pixel-wise to the DataContainer'''
-        return self.pixel_wise_unary(numpy.log, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self.pixel_wise_unary(xp.log, *args, **kwargs)
 
     ## reductions
     def squared_norm(self, **kwargs):
         '''return the squared euclidean norm of the DataContainer viewed as a vector'''
-        #shape = self.shape
-        #size = reduce(lambda x,y:x*y, shape, 1)
-        #y = numpy.reshape(self.as_array(), (size, ))
         return self.dot(self)
-        #return self.dot(self)
+        
     def norm(self, **kwargs):
         '''return the euclidean norm of the DataContainer viewed as a vector'''
         return numpy.sqrt(self.squared_norm(**kwargs))
@@ -796,6 +866,7 @@ class DataContainer(object):
                     method))
 
         if self.shape == other.shape:
+            # FIXME this seems not to have been addressed
             if method == 'numpy':
                 return numpy.dot(self.as_array().ravel(), other.as_array().ravel().conjugate())
             elif method == 'reduce':
@@ -833,6 +904,7 @@ class DataContainer(object):
         scalar or ndarray
             The result of the unary function
         """
+        # FIXME Address this
         if axis is not None:
             axis = self.get_dimension_axis(axis)
 

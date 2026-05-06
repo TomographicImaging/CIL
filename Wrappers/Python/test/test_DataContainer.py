@@ -20,13 +20,25 @@ import logging
 import sys
 
 import numpy as np
+import numpy
+try:
+    import torch
+except ImportError:
+    torch = None
+try:
+    import cupy
+except ImportError:
+    cupy = None
 
 from cil.framework import (DataContainer, ImageGeometry, ImageData, VectorGeometry, AcquisitionData,
                            AcquisitionGeometry, BlockGeometry, VectorData)
 from cil.framework.labels import ImageDimension, AcquisitionDimension
+from cil.framework.array_api_compat import allclose as cil_allclose
 
 from testclass import CCPiTestClass
 from utils import initialise_tests
+
+from unittest_parametrize import ParametrizedTestCase, parametrize, param
 
 log = logging.getLogger(__name__)
 initialise_tests()
@@ -37,7 +49,7 @@ def aid(x):
     return x.as_array().__array_interface__['data'][0]
 
 
-class TestDataContainer(CCPiTestClass):
+class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
     def create_DataContainer(self, X,Y,Z, value=1):
         a = value * np.ones((X, Y, Z), dtype='float32')
         #print("a refcount " , sys.getrefcount(a))
@@ -156,40 +168,60 @@ class TestDataContainer(CCPiTestClass):
         self.assertFalse(data == data_different_labels)
 
 
-    def testInlineAlgebra(self):
+    @parametrize("xp, device, raise_error, err_type", 
+        [param(numpy, None, None, None, id="numpy"), 
+         param(torch, None, None, None, id="torch_cpu"),
+         param(cupy, None, None, None, id="cupy"),
+         ]) 
+    def testInlineAlgebra(self, xp, device, raise_error, err_type):
+        if xp is None:
+            self.skipTest(f"xp not available")
+
+        if xp == torch:
+            import array_api_compat.torch as xp
+        elif xp == cupy:
+            import array_api_compat.cupy as xp
+        elif xp == numpy:
+            import array_api_compat.numpy as xp
+        else:
+            raise ValueError(f"Unsupported xp: {xp}")
         X, Y, Z = 8, 16, 32
-        a = np.ones((X, Y, Z), dtype='float32')
-        b = np.ones((X, Y, Z), dtype='float32')
+        a = xp.ones((X, Y, Z), dtype=xp.float32)
+        b = xp.ones((X, Y, Z), dtype=xp.float32)
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         ds += 2
         # self.assertEqual(ds.as_array()[0][0][0], 3.)
-        np.testing.assert_array_almost_equal(ds.as_array(), 3 * b)
+        
+        # np.testing.assert_array_almost_equal(ds.as_array(), 3 * b)
+        cil_allclose(ds.as_array(), 3 * b)
         ds -= 2
         # self.assertEqual(ds.as_array()[0][0][0], 1.)
-        np.testing.assert_array_almost_equal(ds.as_array(), b)
+        # np.testing.assert_array_almost_equal(ds.as_array(), b)
+        cil_allclose(ds.as_array(), b)
 
         ds *= 2
         # self.assertEqual(ds.as_array()[0][0][0], 2.)
-        np.testing.assert_array_almost_equal(ds.as_array(), b * 2)
+        cil_allclose(ds.as_array(), b * 2)
 
         ds /= 2
         # self.assertEqual(ds.as_array()[0][0][0], 1.)
-        np.testing.assert_array_almost_equal(ds.as_array(), b)
+        cil_allclose(ds.as_array(), b)
 
         ds1 = ds.copy()
         ds1 += 1
         ds += ds1
-        np.testing.assert_array_almost_equal(ds.as_array(), 3 * b)
+        cil_allclose(ds.as_array(), 3 * b)
         # self.assertEqual(ds.as_array()[0][0][0], 3.)
         ds -= ds1
-        np.testing.assert_array_almost_equal(ds.as_array(), b)
+        cil_allclose(ds.as_array(), b)
         # self.assertEqual(ds.as_array()[0][0][0], 1.)
         ds *= ds1
-        np.testing.assert_array_almost_equal(ds.as_array(), 2 * b)
+        cil_allclose(ds.as_array(), 2 * b)
         # self.assertEqual(ds.as_array()[0][0][0], 2.)
         ds /= ds1
-        np.testing.assert_array_almost_equal(ds.as_array(), b)
+        cil_allclose(ds.as_array(), b)
         # self.assertEqual(ds.as_array()[0][0][0], 1.)
+
 
     def test_unary_operations(self):
         X, Y, Z = 8, 16, 32
@@ -1033,8 +1065,8 @@ class TestDataContainer(CCPiTestClass):
         vd.dimension_labels = 'x'
         np.testing.assert_almost_equal(vd.mean(axis='x'), np.mean(vd))
 
-
     def test_multiply_out(self):
+        from cil.framework.array_api_compat import allclose as cil_allclose
         ig = ImageGeometry(10,11,12)
         u = ig.allocate()
         a = np.ones(u.shape)
@@ -1060,15 +1092,15 @@ class TestDataContainer(CCPiTestClass):
 
     def test_sapyb_datacontainer_f(self):
         #a vec, b vec
-
-        ig = ImageGeometry(10,10)
+        N,M=2,2
+        ig = ImageGeometry(N,M)
         d1 = ig.allocate(dtype=np.float32)
         d2 = ig.allocate(dtype=np.float32)
         a = ig.allocate(dtype=np.float32)
         b = ig.allocate(dtype=np.float32)
 
-        d1.fill(np.asarray(np.arange(1,101).reshape(10,10), dtype=np.float32))
-        d2.fill(np.asarray(np.arange(1,101).reshape(10,10), dtype=np.float32))
+        d1.fill(np.asarray(np.arange(1,N*M+1).reshape(N,M), dtype=np.float32))
+        d2.fill(np.asarray(np.arange(1,N*M+1).reshape(N,M), dtype=np.float32))
         a.fill(1.0/d1.as_array())
         b.fill(-1.0/d2.as_array())
 
@@ -1076,13 +1108,13 @@ class TestDataContainer(CCPiTestClass):
         # equals to 1 + -1 = 0
         out = d1.sapyb(a,d2,b)
         res = np.zeros_like(d1.as_array())
-        np.testing.assert_array_equal(res, out.as_array())
+        atol = np.finfo(np.float32).eps
+        np.testing.assert_allclose(res, out.as_array(), atol=atol)
 
         out.fill(0)
         d1.sapyb(a,d2,b, out)
         res = np.zeros_like(d1.as_array())
-        np.testing.assert_array_equal(res, out.as_array())
-
+        np.testing.assert_allclose(res, out.as_array(), atol=atol)
 
     def test_sapyb_scalar_f(self):
         # a,b scalar

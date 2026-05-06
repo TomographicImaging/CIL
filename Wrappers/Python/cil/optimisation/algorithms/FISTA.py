@@ -196,8 +196,7 @@ class ISTA(Algorithm):
             raise NameError(
                 msg='`step_size` must be `None`, a real float or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`')
 
-        self.x_old.sapyb(1., self.gradient_update, -
-                         self._step_size, out=self.x_old)
+        self.x_old.sapyb(1., self.gradient_update, -self._step_size, out=self.x_old)
 
         # proximal step
         self.g.proximal(self.x_old, self._step_size, out=self.x)

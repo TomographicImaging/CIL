@@ -19,13 +19,13 @@ channels:
 dependencies:
   - python >=3.10
   - numpy >=1.23,<2
-  - libgomp      # [linux]
+  - llvm-openmp
   - ccpi::cil-data >=22
   - ccpi::tigre 2.6
   - ccpi::ccpi-regulariser 24.0.1
-  - ccpi::tomophantom 2.0.0
+  - ccpi::tomophantom 3.0.3
   - astra-toolbox 2.1 cuda*
-  - cvxpy
+  - cvxpy!=1.8.2
   - python-wget
   - scikit-image
   - packaging
@@ -39,7 +39,7 @@ dependencies:
   - matplotlib-base >=3.3
   - h5py
   - pillow
-  - dxchange
+  - dxchange >=0.2.1
   - olefile >=0.46
   - pywavelets
   - numba

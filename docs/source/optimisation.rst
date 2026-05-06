@@ -86,6 +86,13 @@ CGLS
    :members:
    :inherited-members: run, update_objective_interval
 
+LSQR
+----
+.. autoclass:: cil.optimisation.algorithms.LSQR
+   :members:
+   :inherited-members: run, update_objective_interval
+
+
 SIRT
 ----
 .. autoclass:: cil.optimisation.algorithms.SIRT

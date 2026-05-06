@@ -13,15 +13,17 @@ test:
   requires:
     - pip
     - python-wget
-    - cvxpy                   # [linux]
+    - cvxpy!=1.8.2                   # [linux]
     - scikit-image
-    - tomophantom 2.0.0       # [linux]
+    - tomophantom 3.0.3
     - tigre 2.6
     - packaging
     - ccpi-regulariser 24.0.1 # [not osx]
     - astra-toolbox 2.1 {{ 'cuda*' if environ.get('TESTS_FORCE_GPU', '') else 'py*' }}
     - matplotlib-base >=3.3
     - zenodo_get >=1.6
+    - dxchange >= 0.2.1
+    - olefile >=0.46
 
   source_files:
     - ./Wrappers/Python/test
@@ -56,8 +58,6 @@ requirements:
     - scipy >=1.4
     - h5py
     - pillow
-    - dxchange
-    - olefile >=0.46
     - pywavelets
     - cil-data >=22
     - tqdm
@@ -65,10 +65,12 @@ requirements:
 
   # version constraints of optional dependencies
   run_constrained:
-    - tomophantom >=2
+    - tomophantom >=3.0.3
     - astra-toolbox >=1.9.9.dev5
     - tigre >=2.4
     - ccpi-regulariser >=24.0.1
+    - olefile >=0.46
+    - zenodo_get >=1.6
 
 about:
   home: https://TomographicImaging.github.io/CIL

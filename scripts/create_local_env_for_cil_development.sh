@@ -84,7 +84,7 @@ else
     astra-toolbox::astra-toolbox=2.*
     ccpi-regulariser=*=cuda*
     cil-data
-    cvxpy<=1.7.5
+    cvxpy!=1.8.2
     ipywidgets
     packaging
     python-wget

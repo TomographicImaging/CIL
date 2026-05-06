@@ -9,11 +9,12 @@
     - `cilacc` path lookup no longer broken for editable installations (#2257)
     - update `version.py` to use `importlib` & fix tagless installation #2255 (#2269)
     - Fixed behaviour of `ZeissDataReader` when negative values are passed in the ROI (#2244)
+    - Fix `show2D` truncating plots when count is not a multiple of `num_cols` (#2315)
   - Dependencies:
     - olefile and dxchange are optional dependencies, instead of required (#2209)
     - dxchange minimum version set to 0.2.1 to fix #2256 (#2268)
     - improve `tqdm` notebook support (#2241)
-    - cvxpy maximum version set to 1.7.5 to fix #2303 (#2304)
+    - cvxpy version set to !=1.8.2 to fix #2303 (#2306)
     - Update to TomoPhantom v3.0 (#2287)
     - Handle regularisation toolkit CPU only package error message (#2302)
     - Added support for numpy 2

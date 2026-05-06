@@ -25,7 +25,6 @@ dependencies:
   - ccpi::tomophantom 3.0.3
   - astra-toolbox::astra-toolbox 2.*
   - cvxpy!=1.8.2
-  - astra-toolbox 2.1 cuda*
   - python-wget
   - scikit-image
   - packaging

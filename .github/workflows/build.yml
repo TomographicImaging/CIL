@@ -172,7 +172,7 @@ jobs:
         path: dist
     - name: conda test
       run: >
-        conda mambabuild -c conda-forge  -c https://software.repos.intel.com/python/conda -c ccpi --override-channels --python=${{ matrix.python-version }}
+        conda mambabuild -c conda-forge  -c https://software.repos.intel.com/python/conda -c ccpi -c - ccpi/label/dev --override-channels --python=${{ matrix.python-version }}
         --test dist/*/cil-*.tar.bz2 --extra-deps numpy=${{ matrix.numpy-version }}
   conda-upload:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')

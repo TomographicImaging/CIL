@@ -165,7 +165,6 @@ class TIFFWriter(object):
             for sliceno1 in range(self.data_container.shape[0]):
                 # save single slice
                 # pattern = self.file_name.split('.')
-                dimension = [ self.data_container.dimension_labels[0] ]
                 for sliceno2 in range(self.data_container.shape[1]):
                     fname = format_string.format(os.path.join(self.dir_name, self.file_name),
                         self.data_container.shape[0], self.data_container.shape[1], self.data_container.shape[2],

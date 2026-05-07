@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.LSQR &#8212; CIL 25.0.1.dev38+ga5e16649e documentation</title>
+    <title>cil.optimisation.algorithms.LSQR &#8212; CIL 25.0.1.dev39+g1862c8eb6 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=739ce2861cd7594a90a5" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=739ce2861cd7594a90a5" />
 
-    <script src="../../../../../_static/documentation_options.js?v=5942a4c0"></script>
+    <script src="../../../../../_static/documentation_options.js?v=8dc62f8a"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev38+ga5e16649e';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev39+g1862c8eb6';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev38+ga5e16649e" />
+  <meta name="docsearch:version" content="25.0.1.dev39+g1862c8eb6" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -619,8 +619,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">regalphasq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regalpha</span><span class="o">**</span><span class="mi">2</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c1">#3 domain </span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_range</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="c1">#2 range</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="c1">#4 domain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_range</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="c1">#2 range</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_domain</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="c1">#4 domain</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">res2</span> <span class="o">=</span> <span class="mi">0</span>
 

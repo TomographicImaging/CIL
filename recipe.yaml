@@ -53,6 +53,7 @@ requirements:
     - scikit-build-core >=0.10
   run:
     - python >=${{ python_min }}
+    - packaging
     - if: x86_64
       then: ipp ${{ ipp_version }}
     - numpy >=1.23,<2
@@ -93,7 +94,6 @@ tests:
         - if: linux
           then: cvxpy !=1.8.2
         - scikit-image
-        - packaging
         - tomophantom 3.0.3.*
         - if: not osx
           then: ccpi-regulariser 24.0.1.*

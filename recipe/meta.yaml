@@ -16,7 +16,7 @@ test:
     - cvxpy!=1.8.2                   # [linux]
     - scikit-image
     - tomophantom 3.0.3
-    - tigre 2.6
+    - tigre 3.1.3
     - packaging
     - ccpi-regulariser 24.0.1 # [not osx]
     - astra-toolbox 2.1 {{ 'cuda*' if environ.get('TESTS_FORCE_GPU', '') else 'py*' }}

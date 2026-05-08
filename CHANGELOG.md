@@ -17,9 +17,11 @@
     - cvxpy version set to !=1.8.2 to fix #2303 (#2306)
     - Update to TomoPhantom v3.0 (#2287)
     - Handle regularisation toolkit CPU only package error message (#2302)
-    - Update to TIGRE v3.1.3
+    - Update FindIPP.cmake to find IPP libraries in conda environments (#2286)
+    - Update to TIGRE v3.1.3 (#2317)
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
+    - Update on build instructions in README and developer guide for all OS (#2286)
   - Enhancements:
     - Add prefix argument to TIFFStackReader to load a subset of TIFF files in
     a folder (#2239)

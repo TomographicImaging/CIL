@@ -52,7 +52,7 @@ This github action builds and optionally publishes the documentation located in 
 
 The [docs](./build.yml#L124) job:
 
-- creates a `miniconda` environment from [requirements-test.yml](../../scripts/requirements-test.yml) and [docs_environment.yml](../../docs/docs_environment.yml)
+- creates a `miniconda` environment from [cil_development.yml](../../scripts/cil_development.yml) and [docs_environment.yml](../../docs/docs_environment.yml)
 - `cmake` builds & installs CIL into the `miniconda` environment
   + builds the HTML documentation with `sphinx`
 - installs ruby dependencies from [`Gemfile`](../../docs/Gemfile)
@@ -73,7 +73,8 @@ The [docs](./build.yml#L124) job:
 > python -m http.server
 > ```
 >
-> Then open a browser and navigate to <http://localhost:8000/CIL/> to view the documentation.
+> Then open a browser and navigate to <http://localhost:8000/CIL/{PR_NUMBER}_merge/> to view the documentation,
+> where `{PR_NUMBER}` is the number of the PR that was built (e.g. `1234`).
 
 ## [skip.yml](./skip.yml)
 

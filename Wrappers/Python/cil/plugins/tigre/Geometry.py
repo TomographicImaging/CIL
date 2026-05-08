@@ -18,12 +18,12 @@
 
 from cil.framework.labels import AcquisitionType, AngleUnit
 import numpy as np
-
 try:
     from tigre.utilities.geometry import Geometry
 except ModuleNotFoundError:
-    raise ModuleNotFoundError("This plugin requires the additional package TIGRE\n" +
-            "Please install it via conda as tigre from the ccpi channel")
+    # Create dummy object and raise error upon use.
+    Geometry = object
+
 
 class CIL2TIGREGeometry(object):
     @staticmethod
@@ -52,11 +52,13 @@ class CIL2TIGREGeometry(object):
 class TIGREGeometry(Geometry):
 
     def __init__(self, ig, ag):
+        try:
+            from tigre.utilities.geometry import Geometry
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError("This plugin requires the additional package TIGRE\n" +
+        "Please install it via conda as tigre from the ccpi channel")
 
         Geometry.__init__(self)
-
-        if ag.geom_type not in ['cone', 'parallel']:
-            raise ValueError(f"CIL cannot use TIGRE to process geometries of type {ag.geom_type}.")
 
         ag_in = ag.copy()
         system = ag_in.config.system

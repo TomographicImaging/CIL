@@ -22,13 +22,7 @@ import numpy as np
 
 from cil.framework import DataProcessor, ImageData
 from cil.framework.labels import AcquisitionDimension, ImageDimension
-from cil.plugins.tigre import CIL2TIGREGeometry
 
-try:
-    from tigre.algorithms import fdk, fbp
-except ModuleNotFoundError:
-    raise ModuleNotFoundError("This plugin requires the additional package TIGRE\n" +
-            "Please install it via conda as tigre from the ccpi channel")
 
 class FBP(DataProcessor):
 
@@ -67,6 +61,12 @@ class FBP(DataProcessor):
         AcquisitionDimension.check_order_for_engine('tigre', acquisition_geometry)
         ImageDimension.check_order_for_engine('tigre', image_geometry)
 
+        try:
+            from cil.plugins.tigre import CIL2TIGREGeometry
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError("This plugin requires the additional package TIGRE\n" +
+                    "Please install it via conda as tigre from the ccpi channel")
+
 
         tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(image_geometry,acquisition_geometry)
 
@@ -91,6 +91,12 @@ class FBP(DataProcessor):
         self._shape_out = self.image_geometry.shape
 
     def process(self, out=None):
+
+        try:
+            from tigre.algorithms import fdk, fbp
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError("This plugin requires the additional package TIGRE\n" +
+                    "Please install it via conda as tigre from the ccpi channel")
 
         if self.tigre_geom.is2D:
             data_temp = np.expand_dims(self.get_input().as_array(), axis=1)

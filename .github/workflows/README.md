@@ -12,7 +12,7 @@ The jobs are:
   + uses default (GitHub-hosted) runners to run tests on the min & max supported Python & NumPy versions
   + `python -m unittest discover -v ./Wrappers/Python/test`
 - `conda`
-  + uses `mambabuild` to build the conda package (saved as a build artifact named `cil-py3.m-OS`)
+  + uses `conda-build` to build the conda package (saved as a build artifact named `cil-py3.m-OS`)
 - `docs`
   + uses `docs/docs_environment.yml` plus `make -C docs` to build the documentation (saved as a build artifact named `DocumentationHTML`)
   + renders to the `gh-pages` branch on `master` (nightly) pushes or on tag (release) pushes

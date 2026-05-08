@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Developers’ Guide &#8212; CIL 25.0.1.dev40+g26882d8e4 documentation</title>
+    <title>Developers’ Guide &#8212; CIL 25.0.1.dev41+g56d7468d1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=739ce2861cd7594a90a5" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=739ce2861cd7594a90a5" />
 
-    <script src="../_static/documentation_options.js?v=44a83e66"></script>
+    <script src="../_static/documentation_options.js?v=fbd22b00"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev40+g26882d8e4';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev41+g56d7468d1';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="CIL Plugins" href="../plugins/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev40+g26882d8e4" />
+  <meta name="docsearch:version" content="25.0.1.dev41+g56d7468d1" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -433,24 +433,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../utilities/">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../plugins/">CIL Plugins</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Developers’ Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#conventions-on-new-cil-objects">Conventions on new CIL objects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#creator">Creator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#setter-methods-and-properties">Setter methods and properties</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#other-methods">Other methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-cil-from-source-code">Building CIL from source code</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#getting-the-code">Getting the code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-with-pip">Building with <code class="docutils literal notranslate"><span class="pre">pip</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-with-docker">Building with Docker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing">Testing</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#conventions-on-new-cil-objects">Conventions on new CIL objects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#logging-and-warning">Logging and warning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#docstrings">Docstrings</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#building-documentation-locally">Building documentation locally</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#notebooks-gallery">Notebooks gallery</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-from-cil">Example from <code class="docutils literal notranslate"><span class="pre">cil</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#parametrized-tests">Parametrized Tests</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#github-actions-ci">GitHub Actions CI</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Testing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#contributions-guidelines">Contributions guidelines</a></li>
 </ul>
 </li>
@@ -523,7 +519,116 @@
   <section id="developers-guide">
 <h1>Developers’ Guide<a class="headerlink" href="#developers-guide" title="Link to this heading">#</a></h1>
 <p>CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adhere to the following conventions. New additions must comply with
-the following.</p>
+the conventions and documentation guidelines described in this section.</p>
+<section id="building-cil-from-source-code">
+<h2>Building CIL from source code<a class="headerlink" href="#building-cil-from-source-code" title="Link to this heading">#</a></h2>
+<section id="getting-the-code">
+<h3>Getting the code<a class="headerlink" href="#getting-the-code" title="Link to this heading">#</a></h3>
+<p>In case of local development and testing it is useful to be able to build the software directly.
+You should first clone this repository as:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:TomographicImaging/CIL
+</pre></div>
+</div>
+<p>The parameter <code class="docutils literal notranslate"><span class="pre">--depth</span> <span class="pre">1</span></code> can be added to create a shallow clone with a history truncated to the specified number of commits reducing the size of the clone.
+See <a class="reference external" href="https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---depthdepth">git documentation</a></p>
+</section>
+<section id="building-with-pip">
+<h3>Building with <code class="docutils literal notranslate"><span class="pre">pip</span></code><a class="headerlink" href="#building-with-pip" title="Link to this heading">#</a></h3>
+<section id="install-dependencies">
+<h4>Install Dependencies<a class="headerlink" href="#install-dependencies" title="Link to this heading">#</a></h4>
+<p>We suggest creating a conda environment with all the dependencies for building CIL using the appropriate command for your operating system:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 65.0%" />
+<col style="width: 15.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>OS</p></th>
+<th class="head"><p>Command</p></th>
+<th class="head"><p>Status</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Linux</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">create</span> <span class="pre">-f</span> <span class="pre">./scripts/cil_development.yml</span></code></p></td>
+<td><p>Tested</p></td>
+</tr>
+<tr class="row-odd"><td><p>Windows</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">create</span> <span class="pre">-f</span> <span class="pre">./scripts/cil_development.yml</span></code></p></td>
+<td><p>Tested</p></td>
+</tr>
+<tr class="row-even"><td><p>MacOS (ARM)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">env</span> <span class="pre">create</span> <span class="pre">-f</span> <span class="pre">./scripts/cil_development_osx.yml</span></code></p></td>
+<td><p>Experimental</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently only Linux and Windows are tested and supported. The support on MacOS (ARM) is experimental and certain features are not available and not working, such as FFT filtering for FDK.</p>
+</div>
+<p>This will create an environment called <cite>cil_dev</cite>.</p>
+<p>Activate the environment with:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>cil_dev
+</pre></div>
+</div>
+</section>
+<section id="build-cil">
+<h4>Build CIL<a class="headerlink" href="#build-cil" title="Link to this heading">#</a></h4>
+<p>A C++ compiler is required to build the source code. Let’s suppose that the user is in the source directory, then the following commands should work:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You need to have a <strong>working compiler</strong> on your system, such as Visual Studio on Windows, GCC on Linux and XCode on MacOS.</p>
+</div>
+<p>If not installing inside a conda environment, then the user might need to set the locations of optional libraries:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>-Ccmake.define.IPP_ROOT<span class="o">=</span><span class="s2">&quot;&lt;path_to_ipp&gt;&quot;</span><span class="w"> </span>-Ccmake.define.OpenMP_ROOT<span class="o">=</span><span class="s2">&quot;&lt;path_to_openmp&gt;&quot;</span><span class="w"> </span>-Ccmake.define.CMAKE_BUILD_TYPE<span class="o">=</span>RelWithDebInfo
+</pre></div>
+</div>
+</section>
+<section id="notes-for-windows-users">
+<h4>Notes for Windows users<a class="headerlink" href="#notes-for-windows-users" title="Link to this heading">#</a></h4>
+<p>One option for development on Windows is using <a class="reference external" href="https://learn.microsoft.com/en-us/windows/wsl/install#change-the-default-linux-distribution-installed">Windows Subsystem for Linux (WSL)</a>
+Launch WSL and install build-essential using:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>apt<span class="w"> </span>install<span class="w"> </span>build-essential
+</pre></div>
+</div>
+<p>This will enable you to then follow the linux instructions for creating the environment and building CIL.</p>
+<p>To build for windows you can install Visual Studio Community (or higher) and select the <strong>Desktop development with C++</strong> workload.</p>
+<p>If you are developing on Windows with conda, you need to have access to both the Visual Studio compiler and have created the conda environment using the command for Windows above.</p>
+<p>You can achieve this in two ways:</p>
+<ol class="arabic simple">
+<li><p>by opening “x64 Native Tools Command Prompt for VS” and activating the conda environment from there. This requires you
+to know the path to the <code class="docutils literal notranslate"><span class="pre">conda.bat</span></code> file, which is typically located in the <code class="docutils literal notranslate"><span class="pre">condabin</span></code> subdirectory of your conda installation.
+Once located you need to run <code class="docutils literal notranslate"><span class="pre">&lt;path_to&gt;\conda.bat</span> <span class="pre">activate</span> <span class="pre">&lt;env_name&gt;</span></code> to activate the conda environment, and then you can run the build command from there.</p></li>
+<li><p>by opening the conda prompt and running the <code class="docutils literal notranslate"><span class="pre">vcvarsall.bat</span> <span class="pre">x64</span></code> file from the Visual Studio installation (with <code class="docutils literal notranslate"><span class="pre">x64</span></code> argument), and then running the build command.
+This requires you to know the path to the <code class="docutils literal notranslate"><span class="pre">vcvarsall.bat</span></code> file,
+which is typically located in the <code class="docutils literal notranslate"><span class="pre">VC/Auxiliary/Build</span></code> subdirectory of your Visual Studio installation.</p></li>
+</ol>
+<p>Note: we tested these instructions with Visual Studio 2026 version 18.1.1</p>
+</section>
+</section>
+<section id="building-with-docker">
+<h3>Building with Docker<a class="headerlink" href="#building-with-docker" title="Link to this heading">#</a></h3>
+<p>In the repository root, simply update submodules and run <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">build</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w"> </span>--init<span class="w"> </span>--recursive
+docker<span class="w"> </span>build<span class="w"> </span>.<span class="w"> </span>-t<span class="w"> </span>ghcr.io/tomographicimaging/cil
+</pre></div>
+</div>
+</section>
+<section id="testing">
+<h3>Testing<a class="headerlink" href="#testing" title="Link to this heading">#</a></h3>
+<p>Once installed, CIL functionality can be tested using the following command:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">TESTS_FORCE_GPU</span><span class="o">=</span><span class="m">1</span><span class="w">  </span><span class="c1"># optional, makes GPU test failures noisy</span>
+python<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>discover<span class="w"> </span>-v<span class="w"> </span>./Wrappers/Python/test
+</pre></div>
+</div>
+</section>
+</section>
 <section id="conventions-on-new-cil-objects">
 <h2>Conventions on new CIL objects<a class="headerlink" href="#conventions-on-new-cil-objects" title="Link to this heading">#</a></h2>
 <p>For each class there are <strong>essential</strong>, and <strong>non-essential</strong> parameters. The non-essential can be further be divided in <strong>often configured</strong> and <strong>advanced</strong> parameters:</p>
@@ -537,29 +642,20 @@ the following.</p>
 </li>
 </ul>
 <p>The definition of what are the essential, often-configured and advanced parameters depends on the actual class.</p>
-<section id="creator">
-<h3>Creator<a class="headerlink" href="#creator" title="Link to this heading">#</a></h3>
 <p>To create an instance of a class, the creator of a class should require the <strong>essential</strong> and <strong>often-configured</strong> parameters as named parameters.</p>
 <p>It should not accept positional arguments <cite>*args</cite> or key-worded arguments <cite>**kwargs</cite> so that the user can clearly understand what parameters are necessary to
 create the instance.</p>
-</section>
-<section id="setter-methods-and-properties">
-<h3>Setter methods and properties<a class="headerlink" href="#setter-methods-and-properties" title="Link to this heading">#</a></h3>
 <p>Use of <cite>property</cite> is favoured instead of class members to store parameters so that the parameters can be protected.</p>
 <p>The class should provide setter methods to change all the parameters at any time. Setter methods to set multiple parameters at the same time is also accepted.
 Setter methods should be named <cite>set_&lt;parameter&gt;</cite>. The use of <cite>set_</cite> helps IDEs and user to find what they should change in an instance of a class.</p>
-</section>
-<section id="other-methods">
-<h3>Other methods<a class="headerlink" href="#other-methods" title="Link to this heading">#</a></h3>
 <p>Methods that are not meant to be used by the user should have a <cite>_</cite> (underscore) at the beginning of the name.
 All methods should follow the convention of small caps underscore separated words.</p>
-</section>
 </section>
 <section id="logging-and-warning">
 <h2>Logging and warning<a class="headerlink" href="#logging-and-warning" title="Link to this heading">#</a></h2>
 <p>We follow pythons convention on logging (see e.g. <a class="reference external" href="https://docs.python.org/3/howto/logging.html">https://docs.python.org/3/howto/logging.html</a>). In particular:</p>
-<div class="pst-scrollable-table-container"><table class="table" id="id2">
-<caption><span class="caption-text">Logging and warning guidelines</span><a class="headerlink" href="#id2" title="Link to this table">#</a></caption>
+<div class="pst-scrollable-table-container"><table class="table" id="id3">
+<caption><span class="caption-text">Logging and warning guidelines</span><a class="headerlink" href="#id3" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 40.0%" />
 <col style="width: 60.0%" />
@@ -593,19 +689,17 @@ the situation, but the event should still be noted</p>
 </section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
-<section id="docstrings">
-<h3>Docstrings<a class="headerlink" href="#docstrings" title="Link to this heading">#</a></h3>
 <p>The Core Imaging Library (CIL) follows the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">NumpyDoc</a>
 style with the <a class="reference external" href="https://pydata-sphinx-theme.readthedocs.io/en/latest/">PyData Sphinx HTML theme</a>.
 When contributing your code please refer to <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">this</a> link
 for docstring formatting and this rendered <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/example.html#example">example</a>.</p>
 <section id="example-from-cil">
-<h4>Example from <code class="docutils literal notranslate"><span class="pre">cil</span></code><a class="headerlink" href="#example-from-cil" title="Link to this heading">#</a></h4>
+<h3>Example from <code class="docutils literal notranslate"><span class="pre">cil</span></code><a class="headerlink" href="#example-from-cil" title="Link to this heading">#</a></h3>
 <p>The following provides an example of the docstring format used within <code class="docutils literal notranslate"><span class="pre">cil</span></code>, and the rendered documentation generated from it.</p>
 <section id="source">
-<h5>Source<a class="headerlink" href="#source" title="Link to this heading">#</a></h5>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text"><cite>FBP.run method from cil.io.recon.FBP</cite></span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<h4>Source<a class="headerlink" href="#source" title="Link to this heading">#</a></h4>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text"><cite>FBP.run method from cil.io.recon.FBP</cite></span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Runs the configured FBP recon and returns the reconstruction</span>
@@ -707,7 +801,7 @@ for docstring formatting and this rendered <a class="reference external" href="h
 </div>
 </section>
 <section id="rendered">
-<h5>Rendered<a class="headerlink" href="#rendered" title="Link to this heading">#</a></h5>
+<h4>Rendered<a class="headerlink" href="#rendered" title="Link to this heading">#</a></h4>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.recon.FBP.FBP.run">
 <span class="sig-prename descclassname"><span class="pre">FBP.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/recon/FBP/#FBP.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP.FBP.run" title="Link to this definition">#</a></dt>
@@ -728,11 +822,8 @@ for docstring formatting and this rendered <a class="reference external" href="h
 </dl>
 </dd></dl>
 
-</section>
-</section>
-</section>
 <section id="building-documentation-locally">
-<h3>Building documentation locally<a class="headerlink" href="#building-documentation-locally" title="Link to this heading">#</a></h3>
+<h5>Building documentation locally<a class="headerlink" href="#building-documentation-locally" title="Link to this heading">#</a></h5>
 <p>The easiest way to test documentation changes is to open a pull request and <a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md">download the rendered documentation from the CI</a>.</p>
 <p>Alternatively, to build the docs locally, you will need a working <code class="docutils literal notranslate"><span class="pre">cil</span></code> installation.
 For development of the documentation embedded within the source code itself (e.g. docstrings), you should build <code class="docutils literal notranslate"><span class="pre">cil</span></code> from source.</p>
@@ -750,11 +841,11 @@ a HTTP server to view the documentation.</p>
 <li><p>Start an HTTP server with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">serve</span></code> to access the docs via <a class="reference external" href="http://localhost:8000">localhost:8000</a>.</p></li>
 </ol>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="o">--</span><span class="n">recurse</span><span class="o">-</span><span class="n">submodule</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">TomographicImaging</span><span class="o">/</span><span class="n">CIL</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">TomographicImaging</span><span class="o">/</span><span class="n">CIL</span>
 <span class="n">cd</span> <span class="n">CIL</span>
-<span class="n">sh</span> <span class="n">scripts</span><span class="o">/</span><span class="n">create_local_env_for_cil_development_tests</span><span class="o">.</span><span class="n">sh</span> <span class="o">-</span><span class="n">n</span> <span class="n">NUMPY_VERSION</span> <span class="o">-</span><span class="n">p</span> <span class="n">PYTHON_VERSION</span> <span class="o">-</span><span class="n">e</span> <span class="n">ENVIRONMENT_NAME</span>
+<span class="n">conda</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">f</span> <span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">cil_development</span><span class="o">.</span><span class="n">yml</span>
 <span class="n">conda</span> <span class="n">activate</span> <span class="n">ENVIRONMENT_NAME</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>
 <span class="n">cd</span> <span class="n">docs</span>
 <span class="n">conda</span> <span class="n">update</span> <span class="o">-</span><span class="n">n</span> <span class="n">base</span> <span class="o">-</span><span class="n">c</span> <span class="n">defaults</span> <span class="n">conda</span>
 <span class="n">conda</span> <span class="n">env</span> <span class="n">update</span> <span class="o">-</span><span class="n">f</span> <span class="n">docs_environment</span><span class="o">.</span><span class="n">yml</span> <span class="c1"># with the name field set to ENVIRONMENT_NAME</span>
@@ -764,7 +855,7 @@ a HTTP server to view the documentation.</p>
 </div>
 </section>
 <section id="notebooks-gallery">
-<h3>Notebooks gallery<a class="headerlink" href="#notebooks-gallery" title="Link to this heading">#</a></h3>
+<h5>Notebooks gallery<a class="headerlink" href="#notebooks-gallery" title="Link to this heading">#</a></h5>
 <p>The <code class="docutils literal notranslate"><span class="pre">mkdemos.py</span></code> script (called by <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">dirhtml</span></code>):</p>
 <ul class="simple">
 <li><p>downloads notebooks from external URLs to <code class="docutils literal notranslate"><span class="pre">source/demos/*.ipynb</span></code></p></li>
@@ -773,10 +864,10 @@ a HTTP server to view the documentation.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">nbsphinx</span></code> extension will convert the <code class="docutils literal notranslate"><span class="pre">*.ipynb</span></code> files to HTML.</p>
 </section>
 </section>
-<section id="testing">
-<h2>Testing<a class="headerlink" href="#testing" title="Link to this heading">#</a></h2>
-<section id="parametrized-tests">
-<h3>Parametrized Tests<a class="headerlink" href="#parametrized-tests" title="Link to this heading">#</a></h3>
+</section>
+</section>
+<section id="id1">
+<h2>Testing<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <p>Methods are tested using Python’s <a class="reference external" href="https://docs.python.org/3/library/unittest.html">unittest</a> library. Please see the documentation <a class="reference external" href="https://docs.python.org/3/library/unittest.html#basic-example">here</a>  for information and usage examples.
 The <a class="reference external" href="https://github.com/adamchainz/unittest-parametrize">unittest-parametrize</a> library is used to generate parametrized test cases.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">&#64;parametrize</span></code> decorator allows you to define multiple sets of input parameters for a single test method, treating each combination as a separate test case.
@@ -793,12 +884,8 @@ There are 3 sets of parameters:</p>
 </ul>
 <p>Each parameter set has a unique id which can also be customised for easier identification in test outputs (e.g., <code class="docutils literal notranslate"><span class="pre">cpu_NoError</span></code>, <code class="docutils literal notranslate"><span class="pre">InvalidInput_ValueError</span></code>)</p>
 <p>When running the test, each parameterized case is shown as a distinct result:</p>
-</section>
-<section id="github-actions-ci">
-<h3>GitHub Actions CI<a class="headerlink" href="#github-actions-ci" title="Link to this heading">#</a></h3>
 <p>If you open a pull request, continuous integration &amp; deployment (CI/CD) via GitHub Actions (GHA) will run automatically. The CI will run the tests and build the documentation. Note that the <code class="docutils literal notranslate"><span class="pre">test-cuda</span></code> job uses <a class="reference external" href="https://docs.python.org/3/library/unittest.html#cmdoption-unittest-k">unittest -k</a> flags to detect GPU test names.</p>
 <p>For more information please see the <a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md">GHA README</a>.</p>
-</section>
 </section>
 <section id="contributions-guidelines">
 <h2>Contributions guidelines<a class="headerlink" href="#contributions-guidelines" title="Link to this heading">#</a></h2>

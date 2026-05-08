@@ -18,7 +18,7 @@ channels:
   - ccpi
   - defaults
 dependencies:
-  # in addition to CIL deps (see ../scripts/requirements-test.yml)
+  # in addition to CIL deps (see ../scripts/cil_development.yml)
   - jinja2
   # - pydata-sphinx-theme
   - recommonmark

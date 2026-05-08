@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.plugins.tigre.FBP &#8212; CIL 25.0.1.dev41+g56d7468d1 documentation</title>
+    <title>cil.plugins.tigre.FBP &#8212; CIL 25.0.1.dev42+g5ecdd836b.d20260508 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=739ce2861cd7594a90a5" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=739ce2861cd7594a90a5" />
 
-    <script src="../../../../../_static/documentation_options.js?v=fbd22b00"></script>
+    <script src="../../../../../_static/documentation_options.js?v=a03001f3"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev41+g56d7468d1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev42+g5ecdd836b.d20260508';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev41+g56d7468d1" />
+  <meta name="docsearch:version" content="25.0.1.dev42+g5ecdd836b.d20260508" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -513,12 +513,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework.labels</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionDimension</span><span class="p">,</span> <span class="n">ImageDimension</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.plugins.tigre</span><span class="w"> </span><span class="kn">import</span> <span class="n">CIL2TIGREGeometry</span>
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">tigre.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">fdk</span><span class="p">,</span> <span class="n">fbp</span>
-<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="s2">&quot;This plugin requires the additional package TIGRE</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
-            <span class="s2">&quot;Please install it via conda as tigre from the ccpi channel&quot;</span><span class="p">)</span>
-
 <div class="viewcode-block" id="FBP">
 <a class="viewcode-back" href="../../../../../plugins/#cil.plugins.tigre.FBP">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FBP</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
@@ -573,7 +567,7 @@
 
         <span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
-    
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Configure processor attributes that require the data to setup</span>
@@ -582,7 +576,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="o">.</span><span class="n">shape</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">tigre.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">fdk</span><span class="p">,</span> <span class="n">fbp</span>
+        <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span>
+                <span class="s2">&quot;This plugin requires the additional package TIGRE</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Please install it via conda as tigre from the ccpi channel&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">is2D</span><span class="p">:</span>
             <span class="n">data_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 

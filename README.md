@@ -43,7 +43,7 @@ A number of additional dependencies are required for specific functionality in C
 
 
 #### Binary packages and dependencies
-While building the CIL package we test with specific versions of dependencies. These are listed in the [build.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml) GitHub workflow and [environment-test.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/requirements-test.yml). The following table tries to resume the tested versions of CIL and its required and optional dependencies. If you use these packages as a backend please remember to cite them in addition to CIL.
+While building the CIL package we test with specific versions of dependencies. These are listed in the [build.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml) GitHub workflow and [cil_development.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/cil_development.yml). The following table tries to resume the tested versions of CIL and its required and optional dependencies. If you use these packages as a backend please remember to cite them in addition to CIL.
 
 | Package | Tested Version |  Conda install command | Description | License |
 |----|----|--------|--------|----|
@@ -51,7 +51,7 @@ While building the CIL package we test with specific versions of dependencies. T
 | [Numpy](https://github.com/numpy/numpy) | 2.0 - 2.4 | `"numpy>=2,<=2.4"` || [BSD-3-Clause](https://numpy.org/doc/stable/license.html) |
 | [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `-c https://tomography.stfc.ac.uk/conda ipp=2021.12` | The Intel Integrated Performance Primitives Library (required for the CIL recon class). | [ISSL](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
 |--|--| **Optional dependencies** |--|--|
-| [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 - 2.4 | `astra-toolbox::astra-toolbox=2.4` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
+| [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1-2.4 | CPU: `conda-forge::astra-toolbox=2.4=py*` <br> GPU: `conda-forge::astra-toolbox=2.4=cuda*` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
 | [TIGRE](https://github.com/CERN/TIGRE) | 3.1 | `ccpi/label/dev::tigre=3.1.*` | CT projectors, FBP and FDK. | [BSD-3-Clause](https://github.com/CERN/TIGRE/blob/master/LICENSE.txt) |
 | [CCPi Regularisation Toolkit](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit) | 25.0.0 | CPU: `ccpi::ccpi-regulariser=25.0.0=cpu*` <br> GPU: `ccpi::ccpi-regulariser=25.0.0=cuda*` | Toolbox of regularisation methods. | [Apache-2.0](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit/blob/master/LICENSE) |
 | [TomoPhantom](https://github.com/dkazanc/TomoPhantom) | [3.0.3](https://github.com/dkazanc/TomoPhantom/releases/tag/v3.0) | `ccpi::tomophantom=3.0.3` | Generates phantoms to use as test data. | [Apache-2.0](https://github.com/dkazanc/TomoPhantom/blob/master/LICENSE) |

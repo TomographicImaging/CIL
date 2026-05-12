@@ -405,7 +405,7 @@ class TestTIFF(unittest.TestCase):
         self.TIFF_compression_test('uint16')
 
     def test_TIFF_compression3D_3(self):
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(ValueError):
             self.TIFF_compression_test('whatever_compression')
 
     def test_TIFF_compression4D_0(self):
@@ -418,7 +418,7 @@ class TestTIFF(unittest.TestCase):
         self.TIFF_compression_test('uint16',2)
 
     def test_TIFF_compression4D_3(self):
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(ValueError):
             self.TIFF_compression_test('whatever_compression',2)
 
     def TIFF_compression_test(self, compression, channels=1):

@@ -126,8 +126,8 @@ class LSQR(Algorithm):
         self.regalphasq = self.regalpha**2
 
         self.d = self.v.copy() #3 domain 
-        self.tmp_range = data.geometry.allocate(None) #2 range
-        self.tmp_domain = self.x.geometry.allocate(None) #4 domain
+        self.tmp_range = operator.range_geometry().allocate(None) #2 range
+        self.tmp_domain = operator.domain_geometry().allocate(None) #4 domain
         
         self.res2 = 0
 

@@ -118,7 +118,7 @@ class TestLSQR(CCPiTestClass):
         self.m = 70
 
         A = np.random.uniform(0, 1, (self.m, self.n)).astype('float32')
-        x = np.array(range(self.n))/self.n
+        x = (np.array(range(self.n))/self.n).astype('float32')
         b = A.dot(x)
 
         self.Aop = MatrixOperator(A)
@@ -129,15 +129,13 @@ class TestLSQR(CCPiTestClass):
 
         self.initial = self.ig.allocate(None)
         self.initial.fill(np.ones(self.n)/self.n)
-        
+
 
     def test_convergence(self):
         lsqr = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0)
         lsqr.run(200)
         self.assertNumpyArrayAlmostEqual(lsqr.solution.as_array(), self.x.as_array(), 3)
         self.assertAlmostEqual(lsqr.objective[-1], (self.Aop.direct(self.x)-self.bop).norm()**2, 1)
-
- 
 
 
     def test_FISTA_Denoising(self):

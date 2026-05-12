@@ -51,7 +51,7 @@ While building the CIL package we test with specific versions of dependencies. T
 | [Numpy](https://github.com/numpy/numpy) | 2.0 - 2.4 | `"numpy>=2,<=2.4"` || [BSD-3-Clause](https://numpy.org/doc/stable/license.html) |
 | [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `-c https://tomography.stfc.ac.uk/conda ipp=2021.12` | The Intel Integrated Performance Primitives Library (required for the CIL recon class). | [ISSL](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
 |--|--| **Optional dependencies** |--|--|
-| [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 - 2.4 | `astra-toolbox::astra-toolbox=2.4` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
+| [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1-2.4 | CPU: `conda-forge::astra-toolbox=2.4=py*` <br> GPU: `conda-forge::astra-toolbox=2.4=cuda*` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
 | [TIGRE](https://github.com/CERN/TIGRE) | 3.1 | `ccpi/label/dev::tigre=3.1.*` | CT projectors, FBP and FDK. | [BSD-3-Clause](https://github.com/CERN/TIGRE/blob/master/LICENSE.txt) |
 | [CCPi Regularisation Toolkit](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit) | 25.0.0 | CPU: `ccpi::ccpi-regulariser=25.0.0=cpu*` <br> GPU: `ccpi::ccpi-regulariser=25.0.0=cuda*` | Toolbox of regularisation methods. | [Apache-2.0](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit/blob/master/LICENSE) |
 | [TomoPhantom](https://github.com/dkazanc/TomoPhantom) | [3.0.3](https://github.com/dkazanc/TomoPhantom/releases/tag/v3.0) | `ccpi::tomophantom=3.0.3` | Generates phantoms to use as test data. | [Apache-2.0](https://github.com/dkazanc/TomoPhantom/blob/master/LICENSE) |
@@ -119,7 +119,80 @@ Jupyter Notebooks usage examples without any local installation are provided in 
 
 ## Building CIL from source code
 
-For instructions on how to build CIL from source code, please see our [Developers' Guide](https://tomographicimaging.github.io/CIL/nightly/developer_guide/)
+### Getting the code
+
+In case of development it is useful to be able to build the software directly. You should clone this repository as
+
+```sh
+git clone --recurse-submodule git@github.com:TomographicImaging/CIL
+```
+
+The use of `--recurse-submodule` is necessary if the user wants the examples data to be fetched (they are needed by the unit tests). We have moved such data, previously hosted in this repo at `Wrappers/Python/data` to the [CIL-data](https://github.com/TomographicImaging/CIL-Data) repository and linked it to this one as submodule. If the data is not available it can be fetched in an already cloned repository as
+
+```sh
+git submodule update --init --recursive
+```
+
+### Building with `pip`
+
+#### Install Dependencies
+
+To create a conda environment with all the dependencies for building CIL run the following shell script:
+
+```sh
+bash ./scripts/create_local_env_for_cil_development.sh
+```
+
+Or with the CIL build and test dependencies:
+
+```sh
+bash ./scripts/create_local_env_for_cil_development.sh -t
+```
+
+And then install CIL in to this environment using `pip`.
+
+Alternatively, one can use the `scripts/requirements-test.yml` to create a conda environment with all the
+appropriate dependencies, using the following command:
+
+```sh
+conda env create -f ./scripts/requirements-test.yml
+```
+or, on windows:
+```sh
+conda env create -f ./scripts/requirements-test-windows.yml
+```
+
+#### Build CIL
+
+A C++ compiler is required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
+
+```sh
+pip install --no-deps .
+```
+
+If not installing inside a conda environment, then the user might need to set the locations of optional libraries:
+
+```sh
+pip install . -Ccmake.define.IPP_ROOT="<path_to_ipp>" -Ccmake.define.OpenMP_ROOT="<path_to_openmp>"
+```
+
+### Building with Docker
+
+In the repository root, simply update submodules and run `docker build`:
+
+```sh
+git submodule update --init --recursive
+docker build . -t ghcr.io/tomographicimaging/cil
+```
+
+### Testing
+
+One installed, CIL functionality can be tested using the following command:
+
+```sh
+export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy
+python -m unittest discover -v ./Wrappers/Python/test
+```
 
 ## Citing CIL
 

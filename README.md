@@ -43,7 +43,7 @@ A number of additional dependencies are required for specific functionality in C
 
 
 #### Binary packages and dependencies
-While building the CIL package we test with specific versions of dependencies. These are listed in the [build.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml) GitHub workflow and [environment-test.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/requirements-test.yml). The following table tries to resume the tested versions of CIL and its required and optional dependencies. If you use these packages as a backend please remember to cite them in addition to CIL.
+While building the CIL package we test with specific versions of dependencies. These are listed in the [build.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml) GitHub workflow and [cil_development.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/cil_development.yml). The following table tries to resume the tested versions of CIL and its required and optional dependencies. If you use these packages as a backend please remember to cite them in addition to CIL.
 
 | Package | Tested Version |  Conda install command | Description | License |
 |----|----|--------|--------|----|
@@ -54,7 +54,7 @@ While building the CIL package we test with specific versions of dependencies. T
 | [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 | CPU: `conda-forge::astra-toolbox=2.1=py*` <br> GPU: `conda-forge::astra-toolbox=2.1=cuda*` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
 | [TIGRE](https://github.com/CERN/TIGRE) | 2.6 | `ccpi::tigre=2.6` | CT projectors, FBP and FDK. | [BSD-3-Clause](https://github.com/CERN/TIGRE/blob/master/LICENSE.txt) |
 | [CCPi Regularisation Toolkit](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit) | 24.0.1 | `ccpi::ccpi-regulariser=24.0.1` | Toolbox of regularisation methods. | [Apache-2.0](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit/blob/master/LICENSE) |
-| [TomoPhantom](https://github.com/dkazanc/TomoPhantom) | [2.0.0](https://github.com/dkazanc/TomoPhantom/releases/tag/v2.0.0) | `ccpi::tomophantom=2.0.0` | Generates phantoms to use as test data. | [Apache-2.0](https://github.com/dkazanc/TomoPhantom/blob/master/LICENSE) |
+| [TomoPhantom](https://github.com/dkazanc/TomoPhantom) | [3.0.3](https://github.com/dkazanc/TomoPhantom/releases/tag/v3.0) | `ccpi::tomophantom=3.0.3` | Generates phantoms to use as test data. | [Apache-2.0](https://github.com/dkazanc/TomoPhantom/blob/master/LICENSE) |
 | [ipykernel](https://github.com/ipython/ipykernel) || `ipykernel` | Provides the IPython kernel to run Jupyter notebooks. | [BSD-3-Clause](https://github.com/ipython/ipykernel/blob/main/LICENSE) |
 | [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) || `ipywidgets` | Enables visualisation tools within jupyter noteboooks. | [BSD-3-Clause](https://github.com/jupyter-widgets/ipywidgets/blob/main/LICENSE) |
 |[zenodo_get](https://github.com/dvolgyes/zenodo_get)|>= 1.6|`zenodo_get>=1.6`| Downloads datasets from Zenodo, is used by `dataexample` to get data used in CIL-Demos |[AGPL-3.0](https://github.com/dvolgyes/zenodo_get?tab=AGPL-3.0-1-ov-file)|
@@ -120,80 +120,7 @@ Jupyter Notebooks usage examples without any local installation are provided in 
 
 ## Building CIL from source code
 
-### Getting the code
-
-In case of development it is useful to be able to build the software directly. You should clone this repository as
-
-```sh
-git clone --recurse-submodule git@github.com:TomographicImaging/CIL
-```
-
-The use of `--recurse-submodule` is necessary if the user wants the examples data to be fetched (they are needed by the unit tests). We have moved such data, previously hosted in this repo at `Wrappers/Python/data` to the [CIL-data](https://github.com/TomographicImaging/CIL-Data) repository and linked it to this one as submodule. If the data is not available it can be fetched in an already cloned repository as
-
-```sh
-git submodule update --init --recursive
-```
-
-### Building with `pip`
-
-#### Install Dependencies
-
-To create a conda environment with all the dependencies for building CIL run the following shell script:
-
-```sh
-bash ./scripts/create_local_env_for_cil_development.sh
-```
-
-Or with the CIL build and test dependencies:
-
-```sh
-bash ./scripts/create_local_env_for_cil_development.sh -t
-```
-
-And then install CIL in to this environment using `pip`.
-
-Alternatively, one can use the `scripts/requirements-test.yml` to create a conda environment with all the
-appropriate dependencies, using the following command:
-
-```sh
-conda env create -f ./scripts/requirements-test.yml
-```
-or, on windows:
-```sh
-conda env create -f ./scripts/requirements-test-windows.yml
-```
-
-#### Build CIL
-
-A C++ compiler is required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
-
-```sh
-pip install --no-deps .
-```
-
-If not installing inside a conda environment, then the user might need to set the locations of optional libraries:
-
-```sh
-pip install . -Ccmake.define.IPP_ROOT="<path_to_ipp>" -Ccmake.define.OpenMP_ROOT="<path_to_openmp>"
-```
-
-### Building with Docker
-
-In the repository root, simply update submodules and run `docker build`:
-
-```sh
-git submodule update --init --recursive
-docker build . -t ghcr.io/tomographicimaging/cil
-```
-
-### Testing
-
-One installed, CIL functionality can be tested using the following command:
-
-```sh
-export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy
-python -m unittest discover -v ./Wrappers/Python/test
-```
+For instructions on how to build CIL from source code, please see our [Developers' Guide](https://tomographicimaging.github.io/CIL/nightly/developer_guide/)
 
 ## Citing CIL
 

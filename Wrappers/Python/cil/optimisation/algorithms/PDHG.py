@@ -126,7 +126,7 @@ class PDHG(Algorithm):
         \tau \sigma \|K\|^2 < 4/3
 
     For reference, see Li, Y. and Yan, M., 2022. On the improved conditions for some primal-dual algorithms. arXiv preprint arXiv:2201.00139.
-    
+
     - By default, the step sizes :math:`\sigma` and :math:`\tau` are positive scalars and defined as below:
 
       * If ``sigma`` is ``None`` and ``tau`` is ``None``:
@@ -326,11 +326,10 @@ class PDHG(Algorithm):
             Step size for the primal problem.
         initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
             Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
-     
-        """   
+
+        """
         log.info("%s setting up", self.__class__.__name__)
-        
-        
+
         # Triplet (f, g, K)
         self.f = f
         self.g = g
@@ -346,19 +345,19 @@ class PDHG(Algorithm):
                 self.x_old = initial[0].copy()
             else:
                 self.x_old = self.operator.domain_geometry().allocate(0)
-            
+
             if len(initial) > 1 and initial[1] is not None:
                 self.y = initial[1].copy()
             else:
                 self.y = self.operator.range_geometry().allocate(0)
 
-        else: 
+        else:
             self.y = self.operator.range_geometry().allocate(0)
             if initial is None:
                 self.x_old = self.operator.domain_geometry().allocate(0)
             else:
                 self.x_old = initial.copy()
-              
+
         self.x = self.x_old.copy()
         self.x_tmp = self.operator.domain_geometry().allocate(0)
         self.y_tmp = self.operator.range_geometry().allocate(0)
@@ -418,11 +417,11 @@ class PDHG(Algorithm):
         -------
         Boolean
             True if convergence criterion is satisfied. False if not satisfied or convergence is unknown.
-            
+
         Reference
         ----------
         Li, Y. and Yan, M., 2022. On the improved conditions for some primal-dual algorithms. arXiv preprint arXiv:2201.00139.
-        
+
         """
         if isinstance(self.tau, Number) and isinstance(self.sigma, Number):
             if self.sigma * self.tau * self.operator.norm()**2 > 4/3:

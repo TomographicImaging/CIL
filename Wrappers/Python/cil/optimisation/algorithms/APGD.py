@@ -34,9 +34,9 @@ class ScalarMomentumCoefficient(ABC):
     The call method of the ScalarMomentumCoefficient returns a scalar value. Given access to the algorithm object, the momentum coefficient can be a function of the algorithm state.
 
     The `apply_momentum_in_APGD` function,  updates the solution in the APGD algorithm as 
-    
+
     .. math:: y_{k+1}=x_{k+1}+M(x_{k+1}-x_{k}),
-    
+
     where :math:`M` is the calculated scalar momentum value. 
 
 
@@ -61,7 +61,7 @@ class ScalarMomentumCoefficient(ABC):
 
     def apply_momentum_in_APGD(self, algorithm, out=None):
         r'''Calculates the momentum cofficient, applies a scalar momentum update in the APGD algorithm and returns the next iterate.
-        
+
         Uses the calculation, :math:`y_{k+1}=x_{k+1}+M(x_{k+1}-x_{k})`, where :math:`M` is the calculated scalar momentum value. 
 
         Parameters
@@ -98,7 +98,7 @@ class NesterovMomentum(ScalarMomentumCoefficient):
     Starting with :math:`t=1`, the Nesterov algorithm updates with each iteration:
 
     .. math:: t_{k+1}=\dfrac{1}{2}(1+\sqrt{1+4t_{k}^2})
-    
+
     The momentum coefficient is then returned as :math:`\dfrac{t_{k}-1}{t_{k}}`.
     '''
 
@@ -126,7 +126,7 @@ class APGD(Algorithm):
     where :math:`\alpha` is the :code:`step_size`.
 
     Then, :math:`y_{k+1}`, is then calculated from :math:`x_{k+1}`, based on a momentum rule. Note that :math:`y_0=x_0`. Users have flexibility to do this however they wish by passing to `momentum` a class that has an `apply_montemum_in_APGD` function which takes an intialised algorithm and returns the next iterate. 
-    
+
 
     Currently, we have implemented options for a scalar momentum coefficient (see :class:`cil.optimisation.algorithms.APGD.ScalarMomentumCoefficient` class.). In this case, the momentum term is added as follows:
 
@@ -233,9 +233,9 @@ class APGD(Algorithm):
         r"""Performs a single iteration of APGD. For :math:`k\geq 1`:
 
         .. math::
-        
+
                 x_{k+1} = \mathrm{prox}_{\alpha g}(y_{k} - \alpha\nabla f(y_{k}))\\
-            
+
 
         where :math:`\alpha` is the step size. From :math:`x_{k+1}` (and any other information available in the algorithm class) the momentum function then calculates :math:`y_{k+1}`. 
         """
@@ -293,14 +293,15 @@ class APGD(Algorithm):
         '''
         Returns the most recently used step size. Note, if the step-size is set by a non-constant step size rule, you must use the algorithm run or update method before this getter will return the most recently used step size. 
         '''
-        
+
         if isinstance(self.step_size_rule, ConstantStepSize):
             return self.step_size_rule.step_size
         else:
-            try: 
+            try:
                 return self._step_size
             except AttributeError:
-                raise NotImplementedError("Note the step-size is set by a step-size rule and could change with each iteration. Call the algorithm run or update method first and then this function will give the most recently used step size.")
+                raise NotImplementedError(
+                    "Note the step-size is set by a step-size rule and could change with each iteration. Call the algorithm run or update method first and then this function will give the most recently used step size.")
 
     @property
     def momentum(self):

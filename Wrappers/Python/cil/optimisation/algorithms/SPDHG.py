@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient (SPDHG) solves separable optimisation problems of the type: 
-    
+
       .. math:: \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)
 
     where :math:`f_i` and the regulariser :math:`g` need to be proper, convex and lower semi-continuous.
@@ -142,10 +142,10 @@ class SPDHG(Algorithm):
             update_objective_interval=update_objective_interval)
 
         self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                    initial=initial,  sampler=sampler, prob_weights=prob_weights,  **kwargs)
+                    initial=initial,  sampler=sampler, prob_weights=prob_weights)
 
     def set_up(self, f, g, operator, sigma=None, tau=None,
-               initial=None,   sampler=None, prob_weights=None, **deprecated_kwargs):
+               initial=None,   sampler=None, prob_weights=None):
         '''set-up of the algorithm
         '''
         log.info("%s setting up", self.__class__.__name__)
@@ -159,29 +159,24 @@ class SPDHG(Algorithm):
             raise TypeError("operator should be a BlockOperator")
 
         self._ndual_subsets = len(self.operator)
-        
-        self._prob_weights = getattr(sampler, 'prob_weights', prob_weights) 
-        
-        self._deprecated_set_prob(deprecated_kwargs, sampler) 
-        
-        if self._prob_weights is None: 
+
+        self._prob_weights = getattr(sampler, 'prob_weights', prob_weights)
+
+        if self._prob_weights is None:
             self._prob_weights = [1/self._ndual_subsets]*self._ndual_subsets
-        
-        if  prob_weights is not None and self._prob_weights != prob_weights:
-                    raise ValueError(' You passed a `prob_weights` argument and a sampler with a different attribute `prob_weights`, please remove the `prob_weights` argument.')
+
+        if prob_weights is not None and self._prob_weights != prob_weights:
+            raise ValueError(
+                ' You passed a `prob_weights` argument and a sampler with a different attribute `prob_weights`, please remove the `prob_weights` argument.')
 
         if sampler is None:
             self._sampler = Sampler.random_with_replacement(
                 len(operator), prob=self._prob_weights)
         else:
             self._sampler = sampler
-        
-        #Set the norms of the operators
-        self._deprecated_set_norms(deprecated_kwargs) 
+
+        # Set the norms of the operators
         self._norms = operator.get_norms_as_list()
-        #Check for other kwargs
-        if deprecated_kwargs:
-            raise ValueError("Additional keyword arguments passed but not used: {}".format(deprecated_kwargs))
 
         self.set_step_sizes(sigma=sigma, tau=tau)
 
@@ -195,8 +190,9 @@ class SPDHG(Algorithm):
 
         # initialize dual variable to 0
         self._y_old = operator.range_geometry().allocate(0)
-        if not isinstance(self._y_old, BlockDataContainer): #This can be removed once #1863 is fixed
-            self._y_old =BlockDataContainer(self._y_old)
+        # This can be removed once #1863 is fixed
+        if not isinstance(self._y_old, BlockDataContainer):
+            self._y_old = BlockDataContainer(self._y_old)
 
         # initialize variable z corresponding to back-projected dual variable
         self._z = operator.domain_geometry().allocate(0)
@@ -207,57 +203,6 @@ class SPDHG(Algorithm):
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
 
-    def _deprecated_set_prob(self, deprecated_kwargs, sampler):
-        """
-        Handle deprecated keyword arguments for backward compatibility.
-
-        Parameters
-        ----------
-        deprecated_kwargs : dict
-            Dictionary of keyword arguments.
-        sampler : Sampler           
-            Sampler class for selecting the next index for the SPDHG update.
-
-        Notes
-        -----
-        This method is called by the set_up method.
-        """
-        
-        prob = deprecated_kwargs.pop('prob', None)
-
-        if prob is not None:
-            if (self._prob_weights is None) and (sampler is None):
-                warnings.warn('`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. To randomly sample with replacement use "sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). To pass probabilities to the calculation for `sigma` and `tau` please use `prob_weights`. ', DeprecationWarning, stacklevel=2)
-                self._prob_weights = prob
-            else:
-
-                raise ValueError(
-                    '`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. You passed  a `prob` argument, and either a `prob_weights` argument or a sampler. Please remove the `prob` argument.')
-
-
-
-    def _deprecated_set_norms(self, deprecated_kwargs):
-        """
-        Handle deprecated keyword arguments for backward compatibility.
-
-        Parameters
-        ----------
-        deprecated_kwargs : dict
-            Dictionary of keyword arguments.
-
-        Notes
-        -----
-        This method is called by the set_up method.
-        """
-        norms = deprecated_kwargs.pop('norms', None)
-        
-        if norms is not None:
-            self.operator.set_norms(norms)
-            warnings.warn(
-                ' `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`', DeprecationWarning, stacklevel=2)
-
-
-        
     @property
     def sigma(self):
         return self._sigma
@@ -365,7 +310,7 @@ class SPDHG(Algorithm):
             self._tau = min([value for value in values if value > 1e-8])
 
         else:
-            if not ( isinstance(tau, Number) and tau > 0):
+            if not (isinstance(tau, Number) and tau > 0):
                 raise ValueError(
                     "The step-sizes of SPDHG must be positive, passed tau = {}".format(tau))
 
@@ -394,7 +339,8 @@ class SPDHG(Algorithm):
                     return False
                 return True
             else:
-                raise ValueError('Convergence criterion currently can only be checked for scalar values of tau and sigma[i].')
+                raise ValueError(
+                    'Convergence criterion currently can only be checked for scalar values of tau and sigma[i].')
 
     def update(self):
         """  Runs one iteration of SPDHG 
@@ -402,8 +348,8 @@ class SPDHG(Algorithm):
         """
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar
-        self._zbar.sapyb(self._tau,  self.x, -1., out=self._x_tmp )
-        self._x_tmp*=-1
+        self._zbar.sapyb(self._tau,  self.x, -1., out=self._x_tmp)
+        self._x_tmp *= -1
 
         self.g.proximal(self._x_tmp, self._tau, out=self.x)
 

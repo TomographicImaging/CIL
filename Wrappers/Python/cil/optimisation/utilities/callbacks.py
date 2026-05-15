@@ -43,22 +43,6 @@ class Callback(ABC):
         pass
 
 
-class _OldCallback(Callback):
-    '''Converts an old-style :code:`def callback` to a new-style :code:`class Callback`.
-
-    Parameters
-    ----------
-    callback: :code:`callable(iteration, objective, x)`
-    '''
-    def __init__(self, callback, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.func = callback
-
-    def __call__(self, algorithm):
-        if algorithm.update_objective_interval > 0 and algorithm.iteration % algorithm.update_objective_interval == 0:
-            self.func(algorithm.iteration, algorithm.get_last_objective(return_all=self.verbose>=2), algorithm.x)
-
-
 class ProgressCallback(Callback):
     ''':code:`tqdm`-based progress bar.
 
@@ -77,7 +61,7 @@ class ProgressCallback(Callback):
     def __call__(self, algorithm):
         if not hasattr(self, 'pbar'):
             tqdm_kwargs = self.tqdm_kwargs
-            tqdm_kwargs.setdefault('total', algorithm.max_iteration)
+            tqdm_kwargs.setdefault('total', algorithm._total_iterations)
             tqdm_kwargs.setdefault('disable', not self.verbose)
             tqdm_kwargs.setdefault('initial', max(0, algorithm.iteration))
             self.pbar = self.tqdm_class(**tqdm_kwargs)
@@ -204,6 +188,6 @@ class CGLSEarlyStopping(Callback):
             print('The norm of the residual is less than {} times the norm of the initial residual and so the algorithm is terminated'.format(self.epsilon))
             raise StopIteration
         self.normx = algorithm.x.norm()
-        if algorithm.normx >= self.omega:
+        if self.normx >= self.omega:
             print('The norm of the solution is greater than {} and so the algorithm is terminated'.format(self.omega))
             raise StopIteration

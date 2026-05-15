@@ -194,7 +194,7 @@ class CofR_image_sharpness(Processor):
                 new_point = sample_points[-1]- step_c
 
             else:
-                raise ValueError("The centre of rotation could not be located to the requested tolerance. Try increasing the search tolerance.")
+                raise ValueError(f"The centre of rotation could not be located to the requested tolerance ({tolerance:.6f} pixels). Try increasing the search tolerance.")
 
             if interval < tolerance:
                 break

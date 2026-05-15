@@ -627,8 +627,11 @@ class show2D(show_base):
             num_cols = num_plots
 
         num_rows = num_plots // num_cols + (num_plots % num_cols > 0)
-        fig, (ax) = plt.subplots(num_rows, num_cols, figsize=size)
-        axes = ax.flatten()
+        fig, ax = plt.subplots(num_rows, num_cols, figsize=size)
+        if type(ax) is np.ndarray:
+            axes = ax.flatten()
+        else:
+            axes = np.array([ax])
 
         #set up plots
         for i in range(num_rows*num_cols):

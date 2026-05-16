@@ -1,0 +1,109 @@
+schema_version: 1
+
+context:
+  name: ${{ load_from_file("pyproject.toml").project.name }} # ratter-build --experimental
+  build_number: 0
+  version: ${{ git.latest_tag(".") | replace("v", "") }} # .dev${{ build_number }}+g${{ git.head_rev(".") }} # ratter-build --experimental
+  test_gpu: ${{ env.get("TESTS_FORCE_GPU", default="") | bool }}
+  # used multiple times, so defined once here to avoid repetition
+  ipp_version: '2021.12.*'
+  astra_version: '2.1.*'
+
+package:
+  name: ${{ name }}
+  version: ${{ version }}
+
+source:
+  path: .
+
+build:
+  number: ${{ build_number }}
+  script:
+    content:
+      - if: win
+        then: pip install . -vv --prefix=%PREFIX%
+      - if: osx
+        then: pip install . -vv --prefix=$PREFIX -Ccmake.args="-DOPENMP_LIBRARIES=${CONDA_PREFIX}/lib -DOPENMP_INCLUDES=${CONDA_PREFIX}/include"
+      - if: linux
+        then: pip install . -vv --prefix=$PREFIX
+    env:
+      CMAKE_BUILD_TYPE: Release
+      CMAKE_GENERATOR: Ninja
+
+requirements:
+  build:
+    - cmake >=3.16
+    - ninja
+    - ${{ compiler('cxx') }}
+  host:
+    - if: linux
+      then: libgomp
+    - if: osx
+      then: llvm-openmp
+    - if: x86_64
+      then:
+      - ipp-include ${{ ipp_version }}
+      - ipp-devel ${{ ipp_version }}
+    - python
+    - pip
+    - setuptools >=64
+    - setuptools_scm >=8
+    - scikit-build-core >=0.10
+  run:
+    - python
+    - packaging
+    - if: x86_64
+      then: ipp ${{ ipp_version }}
+    - numpy >=1.23,<2
+    - scipy >=1.4
+    - h5py
+    - pillow
+    - pywavelets
+    - cil-data >=22
+    - tqdm
+    - numba
+  # version constraints of optional dependencies
+  run_constraints:
+    - tomophantom >=3.0.3
+    - astra-toolbox >=1.9.9.dev5
+    - tigre >=2.4
+    - ccpi-regulariser >=24.0.1
+    - olefile >=0.46
+    - zenodo_get >=1.6
+
+tests:
+  - python:
+      imports:
+        - cil
+        - cil.framework
+        - cil.version
+  - script:
+      - pip install unittest-parametrize
+      - python -m unittest discover -v -s Wrappers/Python/test
+    files:
+      source:
+        - ./Wrappers/Python/test
+    requirements:
+      run:
+        - pip
+        - python-wget
+        - if: linux
+          then: cvxpy !=1.8.2
+        - scikit-image
+        - tomophantom 3.0.3.*
+        - if: not osx
+          then: ccpi-regulariser 24.0.1.*
+        - if: test_gpu
+          then:
+          - tigre 2.6.*
+          - astra-toolbox ${{ astra_version }} cuda*
+          else: astra-toolbox ${{ astra_version }} py*
+        - matplotlib-base >=3.3
+        - zenodo_get >=1.6
+        - dxchange >=0.2.1
+        - olefile >=0.46
+
+about:
+  license: Apache-2.0
+  summary: CCPi Core Imaging Library
+  homepage: https://TomographicImaging.github.io/CIL

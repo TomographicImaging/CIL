@@ -34,15 +34,15 @@ class PDHG(Algorithm):
     Parameters
     ----------
     f : Function
-        A convex function with a "simple" proximal method of its conjugate.
+        A convex function with a "simple" proximal method of its conjugate. This function must map from the operator range to the Reals, as :math: `f(Kx)` or :math: `f^{*}(x)` will be the contribution to the total objective. See below for details.
     g : Function
-        A convex function with a "simple" proximal.
+        A convex function with a "simple" proximal. This function must map from the operator domain to the Reals. See below for details.
     operator : LinearOperator
         A Linear Operator.
     sigma : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided
-        Step size for the dual problem.
+        Step size for the dual problem. Needs to obey constraints with tau and operator norm to be valid, see below for details.
     tau : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided
-        Step size for the primal problem.
+        Step size for the primal problem. Needs to obey constraints with sigma and operator's norm to be valid, see below for details.
     initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
         Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
     gamma_g : positive :obj:`float`, optional, default=None

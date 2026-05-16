@@ -1,5 +1,5 @@
 
-from cil.optimisation.algorithms import SPDHG, PDHG, LSQR, FISTA, APGD, GD, PD3O
+from cil.optimisation.algorithms import SPDHG, PDHG, LSQR, FISTA, APGD, GD, PD3O, LADMM
 from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction, LeastSquares, TotalVariation, MixedL21Norm
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
 from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule
@@ -164,6 +164,45 @@ class TestLSQR(CCPiTestClass):
         rmse = (fista.get_output() - data).norm() / data.as_array().size
         self.assertLess(rmse, 4.2e-4)
 
+    def test_Adaptive_LADMM(self):
+        data = dataexample.SHAPES.get()
+        ig = data.geometry
+        ag = ig
+        # Create Noisy data with Gaussian noise
+        snr = 0.1
+        std = snr*(data**2).mean()**(1/2)
+        noisy_data = applynoise.gaussian(data, var = std)
+
+        alpha = 1
+        K = alpha*GradientOperator(ig)
+        G = MixedL21Norm()
+        F = L2NormSquared(b = noisy_data)
+        num_iters = 100
+
+        admm_0 = LADMM(f = F, g = G, operator = K, rho = 1e0, mode = 'adaptive')
+        admm_0.run(num_iters)
+        admm_1 = LADMM(f = F, g = G, operator = K, rho = 1e1, mode = 'adaptive')
+        admm_1.run(num_iters)
+        admm_n1 = LADMM(f = F, g = G, operator = K, rho = 1e-1, mode = 'adaptive')
+        admm_n1.run(num_iters)
+        admm_2 = LADMM(f = F, g = G, operator = K, rho = 1e2,  mode = 'adaptive')
+        admm_2.run(num_iters)
+        admm_n2 = LADMM(f = F, g = G, operator = K, rho = 1e-2, mode = 'adaptive')
+        admm_n2.run(num_iters)
+
+
+        rmse_0 = (admm_0.get_output() - data).norm() / data.norm()
+        rmse_1 = (admm_1.get_output() - data).norm() / data.norm()
+        rmse_n1 = (admm_n1.get_output() - data).norm() / data.norm()
+        rmse_2 = (admm_2.get_output() - data).norm() / data.norm()
+        rmse_n2 = (admm_n2.get_output() - data).norm() / data.norm()
+
+        self.assertLess(rmse_0, 0.16)
+        self.assertLess(rmse_1, 0.16)
+        self.assertLess(rmse_n1, 0.16)
+        self.assertLess(rmse_2, 0.16)
+        self.assertLess(rmse_n2, 0.16)
+        
     def test_APGD(self):
         ig = ImageGeometry(41, 43, 47)
         initial = ig.allocate(0)

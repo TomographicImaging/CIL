@@ -35,18 +35,104 @@ class CIL2TIGREGeometry(object):
         if ag.config.angles.angle_unit == AngleUnit.DEGREE:
             angles *= (np.pi/180.)
 
-        #convert CIL to TIGRE angles s
-        angles = -(angles + np.pi/2 +tg.theta )
+        if ag.geom_type == 'parallel' and ag.system_description == 'advanced':
+            angles = calculate_euler_angles(angles, tg)
+            # reset the detector rotation to 0 as the rotation is now included in the Euler angles
+            tg.rotDetector = np.array((0.0, 0.0, 0.0))
+        
+        else:
+            # don't do this if using Euler angles because the tigre conversion
+            # is applied in calculate_euler_angles
 
-        #angles in range -pi->pi
-        for i, a in enumerate(angles):
-            while a < -np.pi:
-                a += 2 * np.pi
-            while a >= np.pi:
-                a -= 2 * np.pi
-            angles[i] = a
+            #convert CIL to TIGRE angles s
+            angles = -(angles + np.pi/2 +tg.theta )
+            
+            #angles in range -pi->pi
+            for i, a in enumerate(angles):
+                while a < -np.pi:
+                    a += 2 * np.pi
+                while a >= np.pi:
+                    a -= 2 * np.pi
+                angles[i] = a
 
         return tg, angles
+    
+def calculate_euler_angles(angles, tg):
+    roll, pitch, yaw = tg.rotDetector
+    
+    R_detector = rot_z(yaw) @ rot_y(pitch) @ rot_x(roll)
+
+    euler_angles = []
+    for angle in angles:
+        R_combined = R_detector @ rot_z(angle)
+        # convert to tigre angles
+        R_tigre = rot_z(-np.pi/2 - tg.theta) @ R_combined
+        euler_angles.append(euler_from_matrix_zyz(R_tigre))
+    euler_angles = np.array(euler_angles, dtype=np.float32)
+    
+    return euler_angles
+    
+def rotation_matrix_from_vec(rotvec):   
+    rotvec = np.asarray(rotvec, dtype=float)
+    theta = np.linalg.norm(rotvec)
+
+    diag = np.array([[1., 0., 0.],
+                    [0., 1., 0.],
+                    [0., 0., 1.]])
+    
+    if theta == 0.0:
+        return diag
+
+    axis = rotvec / theta
+    x, y, z = axis
+    K = np.array([[ 0, -z,  y],
+                    [ z,  0, -x],
+                    [-y,  x,  0]
+    ])
+
+    R = (diag 
+        + np.sin(theta) * K
+        + (1 - np.cos(theta)) * (K @ K)
+    )
+
+    return R
+
+def rot_x(angle):
+    c, s = np.cos(angle), np.sin(angle)
+    return np.array([[1, 0, 0],
+                     [0, c, -s],
+                     [0, s,  c]])
+
+
+def rot_y(angle):
+    c, s = np.cos(angle), np.sin(angle)
+    return np.array([[ c, 0, s],
+                     [ 0, 1, 0],
+                     [-s, 0, c]])
+
+def rot_z(angle):
+    c, s = np.cos(angle), np.sin(angle)
+    return np.array([[c, -s, 0],
+                     [s,  c, 0],
+                     [0,  0, 1]])
+
+def euler_from_matrix_zyz(R, eps=1e-12):
+
+    R = np.asarray(R, dtype=float)
+
+    beta = np.arccos(np.clip(R[2, 2], -1.0, 1.0))
+
+    if abs(np.sin(beta)) > eps:
+            alpha = np.arctan2(R[1, 2], R[0, 2])
+            gamma = np.arctan2(R[2, 1], -R[2, 0])
+    else:
+            alpha = np.arctan2(R[0, 1], R[0, 0])
+            gamma = 0.0
+    
+    alpha = (alpha + np.pi) % (2*np.pi) - np.pi
+    gamma = (gamma + np.pi) % (2*np.pi) - np.pi
+
+    return np.array([alpha, beta, gamma])
 
 class TIGREGeometry(Geometry):
     def __init__(self, ig, ag):
@@ -93,8 +179,6 @@ class TIGREGeometry(Geometry):
             self.mode = 'cone'
 
         else:
-            if ag_in.system_description == 'advanced':
-                raise NotImplementedError ("CIL cannot use TIGRE to process parallel geometries with tilted axes")
 
             self.DSO = clearance_len
             self.DSD = 2*clearance_len

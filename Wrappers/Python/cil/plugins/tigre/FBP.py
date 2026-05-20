@@ -24,12 +24,6 @@ from cil.framework import DataProcessor, ImageData
 from cil.framework.labels import AcquisitionDimension, ImageDimension
 from cil.plugins.tigre import CIL2TIGREGeometry
 
-try:
-    from tigre.algorithms import fdk, fbp
-except ModuleNotFoundError:
-    raise ModuleNotFoundError("This plugin requires the additional package TIGRE\n" +
-            "Please install it via conda as tigre from the ccpi channel")
-
 class FBP(DataProcessor):
 
     '''FBP Filtered Back Projection is a reconstructor for 2D and 3D parallel and cone-beam geometries.
@@ -82,7 +76,7 @@ class FBP(DataProcessor):
 
         AcquisitionDimension.check_order_for_engine('tigre', dataset.geometry)
         return True
-    
+
     def _set_up(self):
         """
         Configure processor attributes that require the data to setup
@@ -91,7 +85,12 @@ class FBP(DataProcessor):
         self._shape_out = self.image_geometry.shape
 
     def process(self, out=None):
-
+        try:
+            from tigre.algorithms import fdk, fbp
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError(
+                "This plugin requires the additional package TIGRE\n"
+                "Please install it via conda as tigre from the ccpi channel")
         if self.tigre_geom.is2D:
             data_temp = np.expand_dims(self.get_input().as_array(), axis=1)
 

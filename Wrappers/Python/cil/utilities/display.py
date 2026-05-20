@@ -626,7 +626,7 @@ class show2D(show_base):
         if num_plots < num_cols:
             num_cols = num_plots
 
-        num_rows = int(round((num_plots+0.5)/num_cols))
+        num_rows = num_plots // num_cols + (num_plots % num_cols > 0)
         fig, (ax) = plt.subplots(num_rows, num_cols, figsize=size)
         axes = ax.flatten()
 

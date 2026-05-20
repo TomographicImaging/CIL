@@ -21,7 +21,7 @@ from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.operators import BlockOperator
 import numpy as np
 import logging
-from cil.optimisation.utilities import Sampler
+from cil.optimisation.utilities import Sampler, StepSizeRule, SPDHGConstantStepSize, SPDHGConstantStepSize, SPDHG_constant_sizes_from_ratio
 from numbers import Number
 import warnings
 from cil.framework import BlockDataContainer
@@ -44,12 +44,10 @@ class SPDHG(Algorithm):
         A convex function with a "simple" proximal
     operator : BlockOperator
         BlockOperator must contain Linear Operators
-    tau : positive float, optional
-        Step size parameter for the primal problem. If `None` will be computed by algorithm, see note for details. 
-    sigma : list of positive float, optional
-        List of Step size parameters for dual problem.  If `None` will be computed by algorithm, see note for details. 
-    initial : DataContainer, optional
-        Initial point for the SPDHG algorithm. The default value is a zero DataContainer in the range of the `operator`.
+    step_size : tuple of (tau, sigma), optional
+        A tuple containing the step size parameters for the primal and dual problems. If `None` will be computed by algorithm, see note for details.
+    initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
+        Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
     gamma : float, optional
             Parameter controlling the trade-off between the primal and dual step sizes
     sampler: `cil.optimisation.utilities.Sampler`, optional 
@@ -134,17 +132,30 @@ class SPDHG(Algorithm):
     Physics in Medicine & Biology, Volume 64, Number 22, 2019. https://doi.org/10.1088/1361-6560/ab3d07
     '''
 
-    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
+    def __init__(self, f=None, g=None, operator=None, step_size=None,
                  initial=None, sampler=None, prob_weights=None,   **kwargs):
 
+
+        self._sigma = kwargs.pop('sigma', None)  # To be deprecated
+        self._tau = kwargs.pop('tau', None)  # To be deprecated
+    
+        if step_size is not None:  # To be deprecated
+            if self._sigma is not None or self._tau is not None:  # To be deprecated
+                raise ValueError("The parameters `sigma` and `tau` are being deprecated in favour of `step_size`. You have passed both. Instead please pass these as part of the `step_size` argument, either as a tuple of (sigma, tau) or using a compatible step size rule.", DeprecationWarning)
+
+        if self._sigma is not None or self._tau is not None:  # To be deprecated
+            warnings.warn("The parameters `sigma` and `tau` are being deprecated. In the future, please pass these as part of the `step_size` argument, either as a tuple of (sigma, tau) or using a compatible step size rule.", DeprecationWarning)
+            step_size = (self._tau, self._sigma)
+            
+            
         update_objective_interval = kwargs.pop('update_objective_interval', 1)
         super(SPDHG, self).__init__(
             update_objective_interval=update_objective_interval)
 
-        self.set_up(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
+        self.set_up(f=f, g=g, operator=operator, step_size=step_size,
                     initial=initial,  sampler=sampler, prob_weights=prob_weights)
 
-    def set_up(self, f, g, operator, sigma=None, tau=None,
+    def set_up(self, f, g, operator, step_size=None,
                initial=None,   sampler=None, prob_weights=None):
         '''set-up of the algorithm
         '''
@@ -178,18 +189,37 @@ class SPDHG(Algorithm):
         # Set the norms of the operators
         self._norms = operator.get_norms_as_list()
 
-        self.set_step_sizes(sigma=sigma, tau=tau)
-
-        # initialize primal variable
-        if initial is None:
-            self.x = self.operator.domain_geometry().allocate(0)
+        if step_size is None:  # This line can be removed when sigma and tau deprecated
+            step_size = (None, None)
+        if isinstance(step_size, StepSizeRule):
+            self.step_size_rule = step_size
+        elif isinstance(step_size, (tuple, list)):
+            self.step_size_rule = SPDHGConstantStepSize(step_size=step_size)
         else:
-            self.x = initial.copy()
+            raise ValueError("The `step_size` argument must be either None, a SPDHG compatible step size rule or a tuple of (sigma, tau) where sigma is the step size for the dual problem and tau is the step size for the primal problem.")
+
+
+        if isinstance(initial, (tuple, list)):
+            if initial[0] is not None:
+                self.x = initial[0].copy()
+            else:
+                self.x = self.operator.domain_geometry().allocate(0)
+
+
+            if len(initial) > 1 and initial[1] is not None:
+                self._y_old = initial[1].copy()
+            else:
+                self._y_old = self.operator.range_geometry().allocate(0)
+
+        else:
+            self._y_old = self.operator.range_geometry().allocate(0)
+            if initial is None:
+                self.x = self.operator.domain_geometry().allocate(0)
+            else:
+                self.x = initial.copy()
 
         self._x_tmp = self.operator.domain_geometry().allocate(0)
-
-        # initialize dual variable to 0
-        self._y_old = operator.range_geometry().allocate(0)
+        
         # This can be removed once #1863 is fixed
         if not isinstance(self._y_old, BlockDataContainer):
             self._y_old = BlockDataContainer(self._y_old)
@@ -200,6 +230,9 @@ class SPDHG(Algorithm):
         # relaxation parameter
         self._theta = 1
 
+        self._tau, self._sigma = self.step_size_rule.get_initial_step_size(
+            self)
+        
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
 
@@ -211,110 +244,7 @@ class SPDHG(Algorithm):
     def tau(self):
         return self._tau
 
-    def set_step_sizes_from_ratio(self, gamma=1.0, rho=0.99):
-        r""" Sets gamma, the step-size ratio for the SPDHG algorithm. Currently gamma takes a scalar value.
-
-        The step sizes `sigma` and `tau` are set using the equations:
-
-        .. math:: \sigma_i= \frac{\gamma\rho }{\|K_i\|^2}
-
-        .. math::  \tau = \rho\min_i([ \frac{p_i }{\sigma_i  \|K_i\|^2})
-
-
-        Parameters
-        ----------
-            gamma : Positive float
-                parameter controlling the trade-off between the primal and dual step sizes
-            rho : Positive float
-                 parameter controlling the size of the product :math:`\sigma\tau`
-
-
-
-        """
-        if isinstance(gamma, Number):
-            if gamma <= 0:
-                raise ValueError(
-                    "The step-sizes of SPDHG are positive, gamma should also be positive")
-
-        else:
-            raise ValueError(
-                "We currently only support scalar values of gamma")
-        if isinstance(rho, Number):
-            if rho <= 0:
-                raise ValueError(
-                    "The step-sizes of SPDHG are positive, rho should also be positive")
-
-        else:
-            raise ValueError(
-                "We currently only support scalar values of gamma")
-
-        self._sigma = [gamma * rho / ni for ni in self._norms]
-        values = [rho*pi / (si * ni**2) for pi, ni,
-                  si in zip(self._prob_weights, self._norms, self._sigma)]
-        self._tau = min([value for value in values if value > 1e-8])
-
-    def set_step_sizes(self, sigma=None, tau=None):
-        r""" Sets sigma and tau step-sizes for the SPDHG algorithm after the initial set-up. The step sizes can be either scalar or array-objects.
-
-        When setting `sigma` and `tau`, there are 4 possible cases considered by setup function: 
-
-        - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
-
-        .. math:: \sigma_i= \frac{0.99}{\|K_i\|^2}
-
-        and `tau` is set as per case 2
-
-        - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula 
-
-        .. math:: \tau = 0.99\min_i( \frac{p_i}{ (\sigma_i  \|K_i\|^2) })
-
-        - Case 3: If `tau` is provided but not `sigma` then `sigma` is calculated using the formula
-
-        .. math:: \sigma_i= \frac{0.99 p_i}{\tau\|K_i\|^2}
-
-        - Case 4: Both `sigma` and `tau` are provided.
-
-
-        Parameters
-        ----------
-            sigma : list of positive float, optional, default= see docstring
-                List of Step size parameters for dual problem
-            tau : positive float, optional, default= see docstring
-                Step size parameter for primal problem
-
-        """
-        gamma = 1.
-        rho = .99
-        if sigma is not None:
-            if len(sigma) == self._ndual_subsets:
-                if all(isinstance(x, Number) and x > 0 for x in sigma):
-                    pass
-                else:
-                    raise ValueError(
-                        "Sigma expected to be a positive number.")
-
-            else:
-                raise ValueError(
-                    "Please pass a list of floats to sigma with the same number of entries as number of operators")
-            self._sigma = sigma
-
-        elif tau is None:
-            self._sigma = [gamma * rho / ni for ni in self._norms]
-        else:
-            self._sigma = [
-                rho*pi / (tau*ni**2) for ni, pi in zip(self._norms, self._prob_weights)]
-
-        if tau is None:
-            values = [rho*pi / (si * ni**2) for pi, ni,
-                      si in zip(self._prob_weights, self._norms, self._sigma)]
-            self._tau = min([value for value in values if value > 1e-8])
-
-        else:
-            if not (isinstance(tau, Number) and tau > 0):
-                raise ValueError(
-                    "The step-sizes of SPDHG must be positive, passed tau = {}".format(tau))
-
-            self._tau = tau
+    
 
     def check_convergence(self):
         """  Checks whether convergence criterion for SPDHG is satisfied with the current scalar values of tau and sigma
@@ -341,11 +271,8 @@ class SPDHG(Algorithm):
             else:
                 raise ValueError(
                     'Convergence criterion currently can only be checked for scalar values of tau and sigma[i].')
-
-    def update(self):
-        """  Runs one iteration of SPDHG 
-
-        """
+                
+    def _spdhg_update(self, i):
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar
         self._zbar.sapyb(self._tau,  self.x, -1., out=self._x_tmp)
@@ -353,8 +280,7 @@ class SPDHG(Algorithm):
 
         self.g.proximal(self._x_tmp, self._tau, out=self.x)
 
-        # Choose subset
-        i = next(self._sampler)
+        
 
         # Gradient ascent for the dual variable
         # y_k = y_old[i] + sigma[i] * K[i] x
@@ -383,8 +309,20 @@ class SPDHG(Algorithm):
         self._z.sapyb(1., self._x_tmp, self._theta /
                       self._prob_weights[i], out=self._zbar)
 
+        
+
+    def update(self):
+        """  Runs one iteration of SPDHG 
+
+        """
+        # Choose subset
+        i = next(self._sampler)
+        
+        self._spdhg_update(i)
+        
         # save previous iteration
         self._save_previous_iteration(i, y_k)
+        
 
     def update_objective(self):
         # p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)

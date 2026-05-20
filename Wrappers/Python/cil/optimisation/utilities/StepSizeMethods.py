@@ -534,14 +534,14 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
                     algorithm._sigma /= (1 - self.alpha)
                     self.alpha *= self.eta
                     self.count = 0
-                    log.debug('p_norm < (s.delta)*d_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
+                    log.debug('p_norm < (s*delta)*d_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
                         algorithm._tau, algorithm._sigma))
                 elif (self.s*self.delta)*self.d_norm < self.p_norm:
                     algorithm._tau /= (1 - self.alpha)
                     algorithm._sigma *= (1 - self.alpha)
                     self.alpha *= self.eta
                     self.count = 0
-                    log.debug('(s/delta)p_norm < d_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
+                    log.debug('(s*delta)*p_norm < d_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
                         algorithm._tau, algorithm._sigma))
                 else:
                     log.debug('No change from the rebalancing step, step sizes are tau = {}, sigma ={}'.format(
@@ -654,7 +654,7 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
                 self.y_old = algorithm.operator.range_geometry().allocate(0)  # Extra range data 1
                 self.x_resid = algorithm.operator.domain_geometry().allocate(0)  # Extra image 1
                 self.y_resid = algorithm.operator.range_geometry().allocate(0)  # Extra range data 2
-                self.x_store = algorithm.operator.domain_geometry().allocate(0)  # Extra image 2
+                self.x_store = algorithm.x_old.copy()  # Extra image 2
             if self.p_norm > self.tolerance and self.d_norm > self.tolerance:
                 log.debug('Before adaptive step-size step, tau = {}, sigma = {}'.format(
                     algorithm._tau, algorithm._sigma))
@@ -666,10 +666,10 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
                     algorithm._sigma *= 0.5
                     log.debug(' Backtracking step - multiplying primal and dual step sizes by 1/2, new step sizes are tau = {}, sigma ={}'.format(
                         algorithm._tau, algorithm._sigma))
-                    # Swap x and x_store
-                    tmp = algorithm.x
-                    algorithm.x = self.x_store
-                    self.x_store = tmp
+                    # Swap x and x_store #What is this bit for? 
+                    #tmp = algorithm.x
+                    #algorithm.x = self.x_store
+                    #self.x_store = tmp
 
                     algorithm._pdhg_update()
                     b = self._calculate_backtracking(algorithm)

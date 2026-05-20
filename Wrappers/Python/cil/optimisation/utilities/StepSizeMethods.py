@@ -450,6 +450,8 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
             Value of the parameter s used in the adaptive step size method.
         eta : positive :obj:`float`, optional, default=0.95
             Value of the parameter eta used in the adaptive step size method.
+        inner_iterations : :obj:`int`, optional, default=50
+            The maximum number of inner iterations for the backtracking adaptive step size method.
         auto_stop : :obj:`boolean`, optional, default=True
             If True, the adaptive step size method automatically stops updating the step sizes when they have not changed over five consecutive iterations.
 
@@ -460,7 +462,7 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
 
         '''
 
-    def __init__(self, initial_step_size=[None, None], initial_alpha=0.95, beta=0.95, gamma=0.9, delta=1.5, s=None, eta=0.95, auto_stop=True):
+    def __init__(self, initial_step_size=[None, None], initial_alpha=0.95, beta=0.95, gamma=0.9, delta=1.5, s=None, eta=0.95, inner_iterations=50, auto_stop=True):
         '''Initialises the step size rule'''
         self.alpha = initial_alpha
         self.eta = eta
@@ -471,14 +473,13 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
         self.tolerance = 1e-6
         self.p_norm = 100
         self.d_norm = 100
-
+        self.inner_iterations = inner_iterations
         self.auto_stop = auto_stop
         self.count = 0
 
         self.y_old = None
         self.x_resid = None
         self.y_resid = None
-        self.x_store = None
 
         self.adaptive = True
         self.initial_step_size = initial_step_size
@@ -503,28 +504,29 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
                 self.y_old = algorithm.operator.range_geometry().allocate(0)  # Extra range data 1
                 self.x_resid = algorithm.operator.domain_geometry().allocate(0)  # Extra image 1
                 self.y_resid = algorithm.operator.range_geometry().allocate(0)  # Extra range data 2
-                self.x_store = algorithm.operator.domain_geometry().allocate(0)  # Extra image 2
             # adaptive step sizes only when above tolerance
             if self.p_norm > self.tolerance and self.d_norm > self.tolerance:
                 log.debug('Before adaptive step-size step, tau = {}, sigma = {}'.format(
                     algorithm._tau, algorithm._sigma))
                 b = self._calculate_backtracking(algorithm)
-                while b > 1:
+                for k in range(self.inner_iterations):
+                    if b <=1:
+                        log.debug('Finished backtracking step, backtracking value b = {}, step sizes are tau = {}, sigma = {}'.format(
+                            b, algorithm._tau, algorithm._sigma))
+                        break
+
                     algorithm._tau *= self.beta/b
                     algorithm._sigma *= self.beta/b
                     log.debug(' Backtracking step - multiplying primal and dual step sizes by beta/b = {}, new step sizes are tau = {}, sigma ={}'.format(
                         self.beta / b, algorithm._tau, algorithm._sigma))
 
-                    # Swap x and x_store
-                    tmp = algorithm.x
-                    algorithm.x = self.x_store
-                    self.x_store = tmp
                     algorithm._pdhg_update()
                     b = self._calculate_backtracking(algorithm)
-                    count = 0
-
-                log.debug('After backtacking step, tau = {}, sigma = {}'.format(
-                    algorithm._tau, algorithm._sigma))
+                    self.count = 0
+                    
+                if k == self.inner_iterations-1:
+                    log.warning('Backtracking step did not converge after {} iterations, backtracking value b = {}, step sizes are tau = {}, sigma = {}'.format(
+                        self.inner_iterations, b, algorithm._tau, algorithm._sigma))
 
                 self._calculate_pnorm_dnorm(algorithm)
                 log.debug('Started the rebalancing step with p_norm = {}, d_norm = {}'.format(
@@ -560,7 +562,6 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
                     algorithm._tau, algorithm._sigma))
                 del self.x_resid
                 del self.y_resid
-                del self.x_store
                 del self.y_old
 
         return algorithm._tau, algorithm._sigma
@@ -610,6 +611,10 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
             Value of the parameter eta used in the adaptive step size method.
         c : positive :obj:`float`, optional, default=0.9
             Value of the parameter c used in the adaptive step size method.
+        inner_iterations : :obj:`int`, optional, default=50
+            The maximum number of inner iterations for the backtracking adaptive step size method.
+        auto_stop : :obj:`boolean`, optional, default=True
+            If True, the adaptive step size method automatically stops updating the step sizes when they have not
 
 
        Notes
@@ -617,7 +622,7 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
        This method is memory expensive, requiring the storage of 2 extra image copies and 2 extra data copies. The auto-stop option is implemented to stop the adaptive step size updates when the step sizes have not changed for 5 consecutive iterations, releasing the memory used to store the extra images and data and reducing ongoing computational costs. For a more time expensive, but less memory expensive method, see :class:`PDHGBayesOptimisationStepSize` which does not require the storage of extra images and data.
         '''
 
-    def __init__(self, initial_step_size=[None, None],  initial_alpha=0.95, eta=0.95, c=0.9, auto_stop=True):
+    def __init__(self, initial_step_size=[None, None],  initial_alpha=0.95, eta=0.95, c=0.9, inner_iterations=50, auto_stop=True):
         '''Initialises the step size rule'''
 
         self.adaptive = True
@@ -629,11 +634,11 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
         self.d_norm = 100
         self.auto_stop = auto_stop
         self.count = 0
+        self.inner_iterations = inner_iterations
 
         self.y_old = None
         self.x_resid = None
         self.y_resid = None
-        self.x_store = None
         self.initial_step_size = initial_step_size
         if len(initial_step_size) != 2:
             raise ValueError(
@@ -654,38 +659,31 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
                 self.y_old = algorithm.operator.range_geometry().allocate(0)  # Extra range data 1
                 self.x_resid = algorithm.operator.domain_geometry().allocate(0)  # Extra image 1
                 self.y_resid = algorithm.operator.range_geometry().allocate(0)  # Extra range data 2
-                self.x_store = algorithm.x_old.copy()  # Extra image 2
             if self.p_norm > self.tolerance and self.d_norm > self.tolerance:
                 log.debug('Before adaptive step-size step, tau = {}, sigma = {}'.format(
                     algorithm._tau, algorithm._sigma))
 
                 b = self._calculate_backtracking(algorithm)
-                while b < 0:
-
+                for k in range(self.inner_iterations):
+                    if b>=0:
+                        log.debug('Finished backtracking step, backtracking value b = {}, step sizes are tau = {}, sigma = {}'.format(
+                            b, algorithm._tau, algorithm._sigma))
+                        break
                     algorithm._tau *= 0.5
                     algorithm._sigma *= 0.5
                     log.debug(' Backtracking step - multiplying primal and dual step sizes by 1/2, new step sizes are tau = {}, sigma ={}'.format(
                         algorithm._tau, algorithm._sigma))
-                    # Swap x and x_store #What is this bit for? 
-                    #tmp = algorithm.x
-                    #algorithm.x = self.x_store
-                    #self.x_store = tmp
+
 
                     algorithm._pdhg_update()
                     b = self._calculate_backtracking(algorithm)
-                    count = 0
+                    self.count = 0
+                if k == self.inner_iterations-1:
+                    log.warning('Backtracking step did not converge after {} iterations, backtracking value b = {}, step sizes are tau = {}, sigma = {}'.format(
+                        self.inner_iterations, b, algorithm._tau, algorithm._sigma))
 
-                log.debug('After backtacking step, tau = {}, sigma = {}'.format(
-                    algorithm._tau, algorithm._sigma))
 
-                algorithm.operator.adjoint(self.y_resid, out=algorithm.x_tmp)
-                algorithm.operator.direct(self.x_resid, out=algorithm.y_tmp)
-                self.x_resid.sapyb((1/algorithm._tau),
-                                   algorithm.x_tmp, -1.0, out=algorithm.x_tmp)
-                self.y_resid.sapyb((1/algorithm._sigma),
-                                   algorithm.y_tmp, -1.0, out=algorithm.y_tmp)
-                self.p_norm = algorithm.x_tmp.norm()
-                self.d_norm = algorithm.operator.norm()*algorithm.y_tmp.norm()
+                self._calculate_pnorm_dnorm(algorithm)
                 log.debug('Started the rebalancing step with p_norm = {}, d_norm = {}'.format(
                     self.p_norm, self.d_norm))
                 if 2*self.p_norm < self.d_norm:
@@ -700,12 +698,11 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
                     algorithm._sigma *= (1 - self.alpha)
                     self.alpha *= self.eta
                     self.count = 0
-                    log.debug('2*p_norm < d_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
+                    log.debug('2*d_norm < p_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
                         algorithm._tau, algorithm._sigma))
                 else:
                     log.debug('No change from the rebalancing step, step sizes are tau = {}, sigma ={}'.format(
                         algorithm._tau, algorithm._sigma))
-                    self.count += 1
                     self.count += 1
                     pass
             else:
@@ -719,8 +716,8 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
                 log.debug('Automatic stopping of adaptive step size updates, step sizes have not changed for 5 iterations, step sizes are tau = {}, sigma ={}'.format(
                     algorithm._tau, algorithm._sigma))
                 del self.y_resid
-                del self.x_store
                 del self.y_old
+                del self.x_resid
 
         return algorithm._tau, algorithm._sigma
 
@@ -743,6 +740,18 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
             self.c*algorithm._tau*y_change_norm**2 - cross_term
         log.debug('Backtracking value = {}'.format(b))
         return b
+
+    def _calculate_pnorm_dnorm(self, algorithm):
+        """Calculates the primal and dual norms used in the rebalancing step of the adaptive PDHG algorithm.
+        """
+        algorithm.operator.adjoint(self.y_resid, out=algorithm.x_tmp)
+        algorithm.operator.direct(self.x_resid, out=algorithm.y_tmp)
+        self.x_resid.sapyb((1/algorithm._tau),
+                            algorithm.x_tmp, -1.0, out=algorithm.x_tmp)
+        self.y_resid.sapyb((1/algorithm._sigma),
+                            algorithm.y_tmp, -1.0, out=algorithm.y_tmp)
+        self.p_norm = algorithm.x_tmp.norm()
+        self.d_norm = algorithm.operator.norm()*algorithm.y_tmp.norm()
 
 
 class PDHGBayesOptimisationStepSize(StepSizeRule):

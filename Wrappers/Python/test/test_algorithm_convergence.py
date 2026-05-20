@@ -2,7 +2,7 @@
 from cil.optimisation.algorithms import SPDHG, PDHG, LSQR, FISTA, APGD, GD, PD3O
 from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction, LeastSquares, TotalVariation, MixedL21Norm, L1Norm
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
-from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule, ArmijoStepSizeRule
+from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule, ArmijoStepSizeRule, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015, PDHGBayesOptimisationStepSize
 from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData, ImageGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
@@ -436,3 +436,54 @@ class TestPDHGConvergence(CCPiTestClass):
         rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
         log.info("RMSE %f", rmse)
         self.assertLess(rmse, 2e-4)  
+        
+    def test_PDHG_adaptive_bayes(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate(0)
+        data.fill(np.diag([1, 2, 3]))
+        ideal = ig.allocate(0)
+        ideal.fill(np.diag([0.5, 1, 1.5]))  
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGBayesOptimisationStepSize(
+            gamma_bounds=None, n_initial_points=5, n_calls=10,  n_iterations=10, seed = 42)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        gamma = np.sqrt(pdhg.sigma / pdhg.tau)
+        pdhg.run(20, verbose=1)
+        self.assertAlmostEqual((pdhg.x-ideal).norm(), 0, places=4)
+
+  
+    
+    def test_PDHG_adaptive_step_size_2013(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate(0)
+        data.fill(np.diag([1, 2, 3]))
+        ideal = ig.allocate(0)
+        ideal.fill(np.diag([0.5, 1, 1.5]))  
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGAdaptiveStepSize2013()
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        gamma = np.sqrt(pdhg.sigma / pdhg.tau)
+        pdhg.run(20, verbose=1)
+        self.assertAlmostEqual((pdhg.x-ideal).norm(), 0, places=4)
+    
+    def test_PDHG_adaptive_step_size_2015(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate(0)
+        data.fill(np.diag([1, 2, 3]))
+        ideal = ig.allocate(0)
+        ideal.fill(np.diag([0.5, 1, 1.5]))  
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGAdaptiveStepSize2015()
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        gamma = np.sqrt(pdhg.sigma / pdhg.tau)
+        pdhg.run(30, verbose=1)
+        self.assertAlmostEqual((pdhg.x-ideal).norm(), 0, places=4)

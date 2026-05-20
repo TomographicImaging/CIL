@@ -502,6 +502,12 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         rule = PDHGAdaptiveStepSize2013(initial_step_size=[1.0, 2.0])
         self.assertEqual(rule.initial_step_size, [1.0, 2.0])
         self.assertAlmostEqual(rule.alpha, 0.95)
+        self.assertEqual(rule.gamma, 0.9)
+        self.assertEqual(rule.inner_iterations, 50)
+        self.assertEqual(rule.tolerance, 1e-06)
+        self.assertEqual(rule.count, 0)
+        self.assertEqual(rule.beta, 0.95)
+        self.assertEqual(rule.delta, 1.5)
 
     def test_init_invalid(self):
         with self.assertRaises(ValueError):
@@ -513,7 +519,7 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         f = L2NormSquared(b=data)
         g = L2NormSquared()
         operator = IdentityOperator(ig)
-        
+
         rule = PDHGAdaptiveStepSize2013(initial_step_size=[None, None])
         pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
         tau, sigma = rule.get_initial_step_size(pdhg)
@@ -579,40 +585,35 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         pdhg.x = operator.domain.allocate(1)
         pdhg.y = operator.range.allocate(1)
         pdhg.y_tmp = operator.range.allocate(0)
-        
-        
-        from unittest.mock import Mock
 
         mock_func = Mock(side_effect=[2.0, 1.5, 0.5])
 
         rule._calculate_backtracking = mock_func
-        
-        def mock_pnorm_dnorm( algorithm):
+
+        def mock_pnorm_dnorm(algorithm):
             rule.x_resid.fill(1)
             rule.y_resid.fill(1)
             rule.p_norm = 3
             rule.d_norm = 3
         rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
-        
-        
+
     # Capture logs
         with self.assertLogs(level='DEBUG') as log:
             rule.get_step_size(pdhg)
-                
+
         # Combine log messages
         log_output = "\n".join(log.output)
 
         # Assertions
         self.assertIn("Before adaptive step-size step", log_output)
         self.assertIn("Backtracking step", log_output)
-        self.assertIn("After backtacking step", log_output)
+        self.assertIn("Finished backtracking step", log_output)
 
-        self.assertAlmostEqual(pdhg.sigma, 0.95**2 /(2*1.5))
-        self.assertAlmostEqual(pdhg.tau, 0.95**2 /(2*1.5))
+        self.assertAlmostEqual(pdhg.sigma, 0.95**2 / (2*1.5))
+        self.assertAlmostEqual(pdhg.tau, 0.95**2 / (2*1.5))
         self.assertEqual(mock_func.call_count, 3)
-    
-    
-    def test_changing_ratio(self):  
+
+    def test_changing_ratio(self):
         ig = ImageGeometry(3, 3)
         data = ig.allocate('random', seed=3)
 
@@ -628,26 +629,23 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         pdhg.x = operator.domain.allocate(1)
         pdhg.y = operator.range.allocate(1)
         pdhg.y_tmp = operator.range.allocate(0)
-        
 
-        mock_func = Mock(side_effect=[ 0.5, 0.5, 0.5])
+        mock_func = Mock(side_effect=[0.5, 0.5, 0.5])
 
         rule._calculate_backtracking = mock_func
-        
-        def mock_pnorm_dnorm( algorithm):
+
+        def mock_pnorm_dnorm(algorithm):
             rule.x_resid.fill(1)
             rule.y_resid.fill(1)
             rule.p_norm = 1
             rule.d_norm = 4
         rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
         rule.delta = 1
-              
-        
-        
+
     # Capture logs
         with self.assertLogs(level='DEBUG') as log:
             rule.get_step_size(pdhg)
-                
+
         # Combine log messages
         log_output = "\n".join(log.output)
         # Assertions
@@ -657,7 +655,6 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         self.assertAlmostEqual(rule.alpha, 0.95*0.95)
         self.assertEqual(mock_func.call_count, 1)
 
-
         rule = PDHGAdaptiveStepSize2013(
             initial_step_size=[1.0, 1.0], initial_alpha=0.95, gamma=1)
         pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
@@ -666,27 +663,23 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         pdhg.x = operator.domain.allocate(1)
         pdhg.y = operator.range.allocate(1)
         pdhg.y_tmp = operator.range.allocate(0)
-        
 
-
-        mock_func = Mock(side_effect=[ 0.5, 0.5, 0.5])
+        mock_func = Mock(side_effect=[0.5, 0.5, 0.5])
 
         rule._calculate_backtracking = mock_func
-        
-        def mock_pnorm_dnorm( algorithm):
+
+        def mock_pnorm_dnorm(algorithm):
             rule.x_resid.fill(1)
             rule.y_resid.fill(1)
             rule.p_norm = 1
             rule.d_norm = 1
         rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
         rule.delta = 1
-              
-        
-        
+
     # Capture logs
         with self.assertLogs(level='DEBUG') as log:
             rule.get_step_size(pdhg)
-                
+
         # Combine log messages
         log_output = "\n".join(log.output)
 
@@ -696,8 +689,7 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         self.assertAlmostEqual(pdhg.tau, 1)
         self.assertAlmostEqual(rule.alpha, 0.95)
         self.assertEqual(mock_func.call_count, 1)
-        
-        
+
         rule = PDHGAdaptiveStepSize2013(
             initial_step_size=[1.0, 1.0], initial_alpha=0.95, gamma=1)
         pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
@@ -706,28 +698,23 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         pdhg.x = operator.domain.allocate(1)
         pdhg.y = operator.range.allocate(1)
         pdhg.y_tmp = operator.range.allocate(0)
-        
-        
-        from unittest.mock import Mock
 
-        mock_func = Mock(side_effect=[ 0.5, 0.5, 0.5])
+        mock_func = Mock(side_effect=[0.5, 0.5, 0.5])
 
         rule._calculate_backtracking = mock_func
-        
-        def mock_pnorm_dnorm( algorithm):
+
+        def mock_pnorm_dnorm(algorithm):
             rule.x_resid.fill(1)
             rule.y_resid.fill(1)
             rule.p_norm = 4
             rule.d_norm = 1
         rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
         rule.delta = 1
-              
-        
-        
+
     # Capture logs
         with self.assertLogs(level='DEBUG') as log:
             rule.get_step_size(pdhg)
-                
+
         # Combine log messages
         log_output = "\n".join(log.output)
         print(log_output)
@@ -737,42 +724,444 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         self.assertAlmostEqual(pdhg.sigma, 0.05)
         self.assertAlmostEqual(rule.alpha, 0.95*0.95)
         self.assertEqual(mock_func.call_count, 1)
-        
-        
-        
 
-    def test_stopping_criterion(self):  # TODO:
-        pass
+    def test_inner_iteration_stopping_criterion(self):
+
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGAdaptiveStepSize2013(
+            initial_step_size=[1.0, 1.0], initial_alpha=0, gamma=1)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        pdhg.x_old = operator.domain.allocate(0)
+        pdhg.y_old = operator.range.allocate(0)
+        pdhg.x = operator.domain.allocate(1)
+        pdhg.y = operator.range.allocate(1)
+        pdhg.y_tmp = operator.range.allocate(0)
+
+        mock_func = Mock(return_value=1.5)
+
+        rule._calculate_backtracking = mock_func
+
+    # Capture logs
+        with self.assertLogs(level='WARNING') as log:
+            rule.get_step_size(pdhg)
+
+        # Combine log messages
+        log_output = "\n".join(log.output)
+
+        # Assertions
+        self.assertIn("Backtracking step did not converge", log_output)
+
+        self.assertEqual(mock_func.call_count, 51)
+
+    def test_stopping_criterion(self):
+
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+
+        rule = PDHGAdaptiveStepSize2013(
+            initial_step_size=[1.0, 1.0], initial_alpha=0.95, gamma=1, auto_stop=True)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        pdhg.x_old = operator.domain.allocate(0)
+        pdhg.y_old = operator.range.allocate(0)
+        pdhg.x = operator.domain.allocate(1)
+        pdhg.y = operator.range.allocate(1)
+        pdhg.y_tmp = operator.range.allocate(0)
+
+        mock_func = Mock(return_value=0.5)
+
+        rule._calculate_backtracking = mock_func
+
+        def mock_pnorm_dnorm(algorithm):
+            rule.x_resid.fill(1)
+            rule.y_resid.fill(1)
+            rule.p_norm = 1
+            rule.d_norm = 1
+        rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
+        rule.delta = 1
+
+    # Capture logs
+        with self.assertLogs(level='DEBUG') as log:
+            for i in range(15):
+                rule.get_step_size(pdhg)
+
+        # Combine log messages
+        log_output = "\n".join(log.output)
+
+        # Assertions
+        self.assertIn('Finished backtracking step', log_output)
+        self.assertIn("No change", log_output)
+        self.assertAlmostEqual(pdhg.sigma, 1)
+        self.assertAlmostEqual(pdhg.tau, 1)
+        self.assertAlmostEqual(rule.alpha, 0.95)
+        self.assertEqual(rule.count, 11)
+        self.assertEqual(rule.adaptive, False)
+        self.assertEqual(mock_func.call_count, 11)
+        with self.assertRaises(AttributeError):
+            rule.x_resid
+        with self.assertRaises(AttributeError):
+            rule.y_resid
+        with self.assertRaises(AttributeError):
+            rule.y_old
+
+
+class TestPDHGAdaptive2015(CCPiTestClass):
+
+    def test_init(self):
+        rule = PDHGAdaptiveStepSize2015(initial_step_size=[1.0, 2.0])
+        self.assertEqual(rule.initial_step_size, [1.0, 2.0])
+        self.assertAlmostEqual(rule.alpha, 0.95)
+        self.assertEqual(rule.c, 0.9)
+        self.assertEqual(rule.inner_iterations, 50)
+        self.assertEqual(rule.tolerance, 1e-06)
+        self.assertEqual(rule.count, 0)
+        self.assertEqual(rule.eta, 0.95)
+        self.assertTrue(rule.adaptive)
+        self.assertTrue(rule.auto_stop)
+
+    def test_init_invalid(self):
+        with self.assertRaises(ValueError):
+            PDHGAdaptiveStepSize2015(initial_step_size=[1.0])
+
+    def test_initial_step_size_defaults(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGAdaptiveStepSize2015(initial_step_size=[None, None])
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        tau, sigma = rule.get_initial_step_size(pdhg)
+        self.assertEqual(tau, 10)
+        self.assertEqual(sigma, 10)
+
+        rule = PDHGAdaptiveStepSize2015(initial_step_size=[3.2, None])
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        tau, sigma = rule.get_initial_step_size(pdhg)
+        self.assertEqual(tau, 3.2)
+        self.assertEqual(sigma, 10)
+
+        rule = PDHGAdaptiveStepSize2015(initial_step_size=[None, 3.2])
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        tau, sigma = rule.get_initial_step_size(pdhg)
+        self.assertEqual(tau, 10)
+        self.assertEqual(sigma, 3.2)
+
+    def test_backtracking_calculation(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGAdaptiveStepSize2015(
+            initial_step_size=[1.0, 1.0], initial_alpha=0, c=1)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        pdhg.x_old = operator.domain.allocate(0)
+        pdhg.y_old = operator.range.allocate(0)
+        pdhg.x = operator.domain.allocate(1)
+        pdhg.y = operator.range.allocate(1)
+        pdhg.y_tmp = operator.range.allocate(0)
+        rule.x_resid = operator.domain.allocate(0)
+        rule.y_resid = operator.range.allocate(0)
+        rule.x_store = operator.domain.allocate(0)
+        rule.y_old = operator.range.allocate(0)
+        self.assertEqual(rule.c, 1)
+        self.assertEqual(pdhg.sigma, 1)
+        self.assertEqual(pdhg.tau, 1)
+        b = rule._calculate_backtracking(pdhg)
+        self.assertEqual(rule.x_resid.norm(), 3)
+        self.assertEqual(rule.y_resid.norm(), 3)
+        self.assertNumpyArrayAlmostEqual(
+            rule.x_resid.as_array(), pdhg.y_tmp.as_array())
+        self.assertEqual(rule.y_resid.dot(pdhg.y_tmp), 9)
+        self.assertEqual(b, -18)
+
+    def test_backtracking(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGAdaptiveStepSize2015(
+            initial_step_size=[1.0, 1.0], initial_alpha=0)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        pdhg.x_old = operator.domain.allocate(0)
+        pdhg.y_old = operator.range.allocate(0)
+        pdhg.x = operator.domain.allocate(1)
+        pdhg.y = operator.range.allocate(1)
+        pdhg.y_tmp = operator.range.allocate(0)
+
+        mock_func = Mock(side_effect=[-2,  -2, 0.5])
+
+        rule._calculate_backtracking = mock_func
+
+        def mock_pnorm_dnorm(algorithm):
+            rule.x_resid.fill(1)
+            rule.y_resid.fill(1)
+            rule.p_norm = 3
+            rule.d_norm = 3
+        rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
+
+    # Capture logs
+        with self.assertLogs(level='DEBUG') as log:
+            rule.get_step_size(pdhg)
+
+        # Combine log messages
+        log_output = "\n".join(log.output)
+
+        # Assertions
+        self.assertIn("Before adaptive step-size step", log_output)
+        self.assertIn("Backtracking step", log_output)
+        self.assertIn("Finished backtracking step", log_output)
+
+        self.assertAlmostEqual(pdhg.sigma, 0.5**2)
+        self.assertAlmostEqual(pdhg.tau, 0.5**2)
+        self.assertEqual(mock_func.call_count, 3)
+
+    def test_changing_ratio(self):
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGAdaptiveStepSize2015(
+            initial_step_size=[1.0, 1.0], initial_alpha=0.95, c=1)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        pdhg.x_old = operator.domain.allocate(0)
+        pdhg.y_old = operator.range.allocate(0)
+        pdhg.x = operator.domain.allocate(1)
+        pdhg.y = operator.range.allocate(1)
+        pdhg.y_tmp = operator.range.allocate(0)
+
+        mock_func = Mock(side_effect=[0.5, 0.5, 0.5])
+
+        rule._calculate_backtracking = mock_func
+
+        def mock_pnorm_dnorm(algorithm):
+            rule.x_resid.fill(1)
+            rule.y_resid.fill(1)
+            rule.p_norm = 1
+            rule.d_norm = 4
+        rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
+        rule.delta = 1
+
+    # Capture logs
+        with self.assertLogs(level='DEBUG') as log:
+            rule.get_step_size(pdhg)
+
+        # Combine log messages
+        log_output = "\n".join(log.output)
+        # Assertions
+        self.assertIn("< d_norm", log_output)
+        self.assertAlmostEqual(pdhg.sigma, 1/0.05)
+        self.assertAlmostEqual(pdhg.tau, 0.05)
+        self.assertAlmostEqual(rule.alpha, 0.95*0.95)
+        self.assertEqual(mock_func.call_count, 1)
+
+        rule = PDHGAdaptiveStepSize2015(
+            initial_step_size=[1.0, 1.0], initial_alpha=0.95, c=1)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        pdhg.x_old = operator.domain.allocate(0)
+        pdhg.y_old = operator.range.allocate(0)
+        pdhg.x = operator.domain.allocate(1)
+        pdhg.y = operator.range.allocate(1)
+        pdhg.y_tmp = operator.range.allocate(0)
+
+        mock_func = Mock(side_effect=[0.5, 0.5, 0.5])
+
+        rule._calculate_backtracking = mock_func
+
+        def mock_pnorm_dnorm(algorithm):
+            rule.x_resid.fill(1)
+            rule.y_resid.fill(1)
+            rule.p_norm = 1
+            rule.d_norm = 1
+        rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
+        rule.delta = 1
+
+    # Capture logs
+        with self.assertLogs(level='DEBUG') as log:
+            rule.get_step_size(pdhg)
+
+        # Combine log messages
+        log_output = "\n".join(log.output)
+
+        # Assertions
+        self.assertIn("No change", log_output)
+        self.assertAlmostEqual(pdhg.sigma, 1)
+        self.assertAlmostEqual(pdhg.tau, 1)
+        self.assertAlmostEqual(rule.alpha, 0.95)
+        self.assertEqual(mock_func.call_count, 1)
+
+        rule = PDHGAdaptiveStepSize2015(
+            initial_step_size=[1.0, 1.0], initial_alpha=0.95, c=1)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        pdhg.x_old = operator.domain.allocate(0)
+        pdhg.y_old = operator.range.allocate(0)
+        pdhg.x = operator.domain.allocate(1)
+        pdhg.y = operator.range.allocate(1)
+        pdhg.y_tmp = operator.range.allocate(0)
+
+        mock_func = Mock(side_effect=[0.5, 0.5, 0.5])
+
+        rule._calculate_backtracking = mock_func
+
+        def mock_pnorm_dnorm(algorithm):
+            rule.x_resid.fill(1)
+            rule.y_resid.fill(1)
+            rule.p_norm = 4
+            rule.d_norm = 1
+        rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
+        rule.delta = 1
+
+    # Capture logs
+        with self.assertLogs(level='DEBUG') as log:
+            rule.get_step_size(pdhg)
+
+        # Combine log messages
+        log_output = "\n".join(log.output)
+        print(log_output)
+        # Assertions
+        self.assertIn("< p_norm ", log_output)
+        self.assertAlmostEqual(pdhg.tau, 1/0.05)
+        self.assertAlmostEqual(pdhg.sigma, 0.05)
+        self.assertAlmostEqual(rule.alpha, 0.95*0.95)
+        self.assertEqual(mock_func.call_count, 1)
+
+    def test_inner_iteration_stopping_criterion(self):
+
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGAdaptiveStepSize2015(
+            initial_step_size=[1.0, 1.0], initial_alpha=0, c=1)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        pdhg.x_old = operator.domain.allocate(0)
+        pdhg.y_old = operator.range.allocate(0)
+        pdhg.x = operator.domain.allocate(1)
+        pdhg.y = operator.range.allocate(1)
+        pdhg.y_tmp = operator.range.allocate(0)
+
+        mock_func = Mock(return_value=-1)
+
+        rule._calculate_backtracking = mock_func
+
+    # Capture logs
+        with self.assertLogs(level='WARNING') as log:
+            rule.get_step_size(pdhg)
+
+        # Combine log messages
+        log_output = "\n".join(log.output)
+
+        # Assertions
+        self.assertIn("Backtracking step did not converge", log_output)
+
+        self.assertEqual(mock_func.call_count, 51)
+
+    def test_stopping_criterion(self):
+
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+
+        rule = PDHGAdaptiveStepSize2015(
+            initial_step_size=[1.0, 1.0], initial_alpha=0.95, c=1, auto_stop=True)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        pdhg.x_old = operator.domain.allocate(0)
+        pdhg.y_old = operator.range.allocate(0)
+        pdhg.x = operator.domain.allocate(1)
+        pdhg.y = operator.range.allocate(1)
+        pdhg.y_tmp = operator.range.allocate(0)
+
+        mock_func = Mock(return_value=0.5)
+
+        rule._calculate_backtracking = mock_func
+
+        def mock_pnorm_dnorm(algorithm):
+            rule.x_resid.fill(1)
+            rule.y_resid.fill(1)
+            rule.p_norm = 1
+            rule.d_norm = 1
+        rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
+        rule.delta = 1
+
+    # Capture logs
+        with self.assertLogs(level='DEBUG') as log:
+            for i in range(15):
+                rule.get_step_size(pdhg)
+
+        # Combine log messages
+        log_output = "\n".join(log.output)
+
+        # Assertions
+        self.assertIn('Finished backtracking step', log_output)
+        self.assertIn("No change", log_output)
+        self.assertAlmostEqual(pdhg.sigma, 1)
+        self.assertAlmostEqual(pdhg.tau, 1)
+        self.assertAlmostEqual(rule.alpha, 0.95)
+        self.assertEqual(rule.count, 11)
+        self.assertEqual(rule.adaptive, False)
+        self.assertEqual(mock_func.call_count, 11)
+        with self.assertRaises(AttributeError):
+            rule.x_resid
+        with self.assertRaises(AttributeError):
+            rule.y_resid
+        with self.assertRaises(AttributeError):
+            rule.y_old
 
 
 class TestPDHGBayesOpt(CCPiTestClass):
-    
+
     def test_init(self):
         rule = PDHGBayesOptimisationStepSize(
-            gamma_bounds=[0.1, 2], n_initial_points=5, n_calls=5,  n_iterations=10, seed = 42)
+            gamma_bounds=[0.1, 2], n_initial_points=5, n_calls=5,  n_iterations=10, seed=42)
         self.assertEqual(rule.gamma_bounds, [0.1, 2])
         self.assertEqual(rule.n_initial_points, 5)
         self.assertEqual(rule.n_calls, 5)
         self.assertEqual(rule.n_iterations, 10)
         self.assertEqual(rule.seed, 42)
-        
+
     def test_init_default(self):
         rule = PDHGBayesOptimisationStepSize()
         self.assertEqual(rule.n_initial_points, 5)
         self.assertEqual(rule.n_calls, 20)
         self.assertEqual(rule.n_iterations, 10)
         self.assertEqual(rule.seed, None)
-        
+
     def test_init_invalid(self):
         with self.assertRaises(ValueError):
-            PDHGBayesOptimisationStepSize( gamma_bounds=[
-                                          (0.1, 10)], n_initial_points=5)
-            
+            PDHGBayesOptimisationStepSize(gamma_bounds=[
+                (0.1, 10)], n_initial_points=5)
+
         with self.assertRaises(ValueError):
-            PDHGBayesOptimisationStepSize( gamma_bounds=[
-                                            -0,1.1], n_calls=-5)
-            
-    
+            PDHGBayesOptimisationStepSize(gamma_bounds=[
+                -0, 1.1], n_calls=-5)
+
     def test_get_gamma_bounded(self):
         ig = ImageGeometry(3, 3)
         data = ig.allocate('random', seed=3)
@@ -782,16 +1171,16 @@ class TestPDHGBayesOpt(CCPiTestClass):
         operator = IdentityOperator(ig)
 
         rule = PDHGBayesOptimisationStepSize(
-            gamma_bounds=[5, 100], n_initial_points=5, n_calls=5,  n_iterations=10, seed = 42)
-        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule, update_objective_interval=4)
-        
+            gamma_bounds=[5, 100], n_initial_points=5, n_calls=5,  n_iterations=10, seed=42)
+        pdhg = PDHG(f=f, g=g, operator=operator,
+                    step_size=rule, update_objective_interval=4)
+
         gamma = np.sqrt(pdhg.sigma / pdhg.tau)
-        self.assertTrue(5<= gamma <= 5.5)
-        
+        self.assertTrue(5 <= gamma <= 5.5)
+
         self.assertEqual(pdhg.iteration, -1)
         self.assertEqual(pdhg.update_objective_interval, 4)
         self.assertEqual(pdhg.objective, [])
-        
 
     def test_get_gamma(self):
         ig = ImageGeometry(3, 3)
@@ -802,8 +1191,7 @@ class TestPDHGBayesOpt(CCPiTestClass):
         operator = IdentityOperator(ig)
 
         rule = PDHGBayesOptimisationStepSize(
-            gamma_bounds=None, n_initial_points=5, n_calls= 10,  n_iterations=10, seed = 42)
+            gamma_bounds=None, n_initial_points=5, n_calls=10,  n_iterations=10, seed=42)
         pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
         gamma = np.sqrt(pdhg.sigma / pdhg.tau)
-        self.assertAlmostEqual(gamma, 1.7, places=1)       
-
+        self.assertAlmostEqual(gamma, 1.7, places=1)

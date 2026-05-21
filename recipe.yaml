@@ -77,8 +77,11 @@ tests:
         - cil.framework
         - cil.version
   - script:
+      content:
       - pip install unittest-parametrize
       - python -m unittest discover -v -s Wrappers/Python/test
+      env:
+        TESTS_FORCE_GPU: ${{ "1" if test_gpu else "" }}
     files:
       source:
         - ./Wrappers/Python/test

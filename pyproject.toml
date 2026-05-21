@@ -42,12 +42,10 @@ readme = "README.md"
 keywords = ["tomography", "optimisation"]
 dependencies = [
     #"cil-data>=22", # missing from PyPI
-    "dxchange>=0.2.1",  # Minimal release for OLE dtype fix: https://github.com/data-exchange/dxchange/pull/124#issue-3828961474
     "h5py",
     #"ipp==2021.12.*", # PyPI conflicts with conda package
     "numba",
     "numpy>=1.23, <2.0.0",
-    "olefile>=0.46",
     "pillow",
     "pywavelets",
     "scipy>=1.4.0",
@@ -57,6 +55,8 @@ dependencies = [
 [project.optional-dependencies]
 plugins = [
     "ipywidgets",
+    "dxchange>=0.2.1",
+    "olefile>=0.46",
     #"tomophantom==2.0.0", # [linux] # missing from PyPI
 ]
 gpu = [
@@ -68,7 +68,6 @@ test = [
     #"ccpi-regulariser=24.0.1", # [not osx] # missing from PyPI
     "cvxpy",
     "matplotlib-base>=3.3",
-    "packaging",
     "scikit-image",
     "unittest-parametrize",
     "wget",

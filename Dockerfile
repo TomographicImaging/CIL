@@ -15,7 +15,7 @@ COPY --chown="${NB_USER}" scripts/cil_development.yml environment.yml
 # channel_priority: https://stackoverflow.com/q/58555389
 RUN for pkg in 'jupyter-server-proxy>4.1.0' $CIL_EXTRA_PACKAGES; do echo "  - $pkg" >> environment.yml; done \
   && conda config --env --set channel_priority strict \
-  && for ch in defaults nvidia ccpi ccpi/label/dev https://software.repos.intel.com/python/conda conda-forge; do conda config --env --add channels $ch; done \
+  && for ch in defaults nvidia astra-toolbox ccpi/label/dev ccpi conda-forge https://software.repos.intel.com/python/conda; do conda config --env --add channels $ch; done \
   && mamba env update -n base \
   && mamba clean -a -y -f \
   && rm environment.yml \

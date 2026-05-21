@@ -285,18 +285,18 @@ class SPDHG(Algorithm):
         # Gradient ascent for the dual variable
         # y_k = y_old[i] + sigma[i] * K[i] x
         try:
-            y_k = self.operator[i].direct(self.x)
+            self.y_k = self.operator[i].direct(self.x)
         except IndexError:
             raise IndexError(
                 'The sampler has outputted an index larger than the number of operators to sample from. Please ensure your sampler samples from {0,1,...,len(operator)-1} only.')
 
-        y_k.sapyb(self._sigma[i], self._y_old[i], 1., out=y_k)
+        self.y_k.sapyb(self._sigma[i], self._y_old[i], 1., out=self.y_k)
 
-        y_k = self.f[i].proximal_conjugate(y_k, self._sigma[i])
+        self.y_k = self.f[i].proximal_conjugate(self.y_k, self._sigma[i])
 
         # Back-project
         # x_tmp = K[i]^*(y_k - y_old[i])
-        y_k.subtract(self._y_old[i], out=self._y_old[i])
+        self.y_k.subtract(self._y_old[i], out=self._y_old[i])
 
         self.operator[i].adjoint(self._y_old[i], out=self._x_tmp)
         # Update backprojected dual variable and extrapolate
@@ -321,7 +321,7 @@ class SPDHG(Algorithm):
         self._spdhg_update(i)
         
         # save previous iteration
-        self._save_previous_iteration(i, y_k)
+        self._save_previous_iteration(i, self.y_k)
         
 
     def update_objective(self):

@@ -1100,7 +1100,7 @@ class SPDHGConstantStepSize(StepSizeRule):
         rho = .99
         if self.sigma is not None:
             if len(self.sigma) == algorithm._ndual_subsets:
-                if all(isinstance(x, Number) and x > 0 for x in sigma):
+                if all(isinstance(x, Number) and x > 0 for x in self.sigma):
                     pass
                 else:
                     raise ValueError(
@@ -1109,7 +1109,7 @@ class SPDHGConstantStepSize(StepSizeRule):
             else:
                 raise ValueError(
                     "Please pass a list of floats to sigma with the same number of entries as number of operators")
-            self.sigma = sigma
+    
 
         elif self.tau is None:
             self.sigma = [gamma * rho / ni for ni in algorithm._norms]
@@ -1127,7 +1127,7 @@ class SPDHGConstantStepSize(StepSizeRule):
                 raise ValueError(
                     "The step-sizes of SPDHG must be positive, passed tau = {}".format(self.tau))
 
-            self.tau = self.tau
+
 
         return self.tau, self.sigma
     def get_step_size(self, algorithm):

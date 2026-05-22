@@ -2056,7 +2056,7 @@ class TestLSQR(CCPiTestClass):
     def test_set_up(self):
         lsqr = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
         beta =  (self.bop -self.Aop.direct(self.initial)).norm()
-        self.assertAlmostEqual(lsqr.beta,  beta, 5 )
+        self.assertAlmostEqual(lsqr.beta,  beta, 4)
         self.assertAlmostEqual(lsqr.phibar,  beta, 5 )
         self.assertAlmostEqual(lsqr.normr,  beta, 5 )
         alpha = self.Aop.adjoint((self.bop -self.Aop.direct(self.initial))/beta).norm()

@@ -24,7 +24,7 @@ dependencies:
   - ccpi/label/dev::tigre 3.1.3 *_3
   - ccpi::ccpi-regulariser 24.0.1
   - ccpi::tomophantom 3.0.3
-  - astra-toolbox::astra-toolbox 2.4
+  - astra-toolbox 2.1 cuda*
   - cvxpy!=1.8.2
   - python-wget
   - scikit-image

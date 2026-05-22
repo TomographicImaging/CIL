@@ -3,7 +3,7 @@
 # - https://github.com/TomographicImaging/CIL#installation-of-cil
 # consumers:
 # - harbor.stfc.ac.uk/imaging-tomography/cil
-FROM jupyter/tensorflow-notebook:ubuntu-22.04
+FROM quay.io/jupyter/tensorflow-notebook:ubuntu-24.04
 LABEL org.opencontainers.image.source=https://github.com/TomographicImaging/CIL
 # tigre: BSD-3-Clause, astra-toolbox: GPL-3.0
 LABEL org.opencontainers.image.licenses="Apache-2.0 AND BSD-3-Clause AND GPL-3.0"

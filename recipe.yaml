@@ -96,7 +96,7 @@ tests:
         - if: test_gpu
           then:
           - tigre 2.6.*
-        - astra-toolbox 2.4
+        - astra-toolbox 2.4.*
         - matplotlib-base >=3.3
         - zenodo_get >=1.6
         - dxchange >=0.2.1

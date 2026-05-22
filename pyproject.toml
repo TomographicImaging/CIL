@@ -15,6 +15,8 @@ sdist.include = ["Wrappers/Python/cil/version.py"]
 sdist.exclude = ["scripts", "docs", "Wrappers/Python/data", "Wrappers/Python/test", ".*"]
 [tool.scikit-build.wheel.packages]
 cil = "Wrappers/Python/cil"
+[tool.scikit-build.cmake.define]
+CIL_FORCE_IPP = {env="CIL_FORCE_IPP", default="OFF"}
 
 [tool.setuptools]
 package-dir = {"" = "Wrappers/Python"}

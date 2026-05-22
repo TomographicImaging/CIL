@@ -25,5 +25,6 @@ ENV TENSORBOARD_PROXY_URL=/user-redirect/proxy/6006/
 
 # build & install CIL
 COPY --chown="${NB_USER}" . src
+ENV CIL_FORCE_IPP=ON
 RUN pip install ./src && rm -rf src \
   && fix-permissions "${CONDA_DIR}" /home/${NB_USER}

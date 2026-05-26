@@ -1,4 +1,5 @@
 /build*
+/output/
 __pycache__/
 /Wrappers/Python/cil-*.dist-info/
 /Wrappers/Python/cil/include/

@@ -3,15 +3,19 @@
 # - https://github.com/TomographicImaging/CIL#installation-of-cil
 # consumers:
 # - harbor.stfc.ac.uk/imaging-tomography/cil
-FROM quay.io/jupyter/tensorflow-notebook:ubuntu-24.04
+FROM jupyter/tensorflow-notebook:ubuntu-22.04
 LABEL org.opencontainers.image.source=https://github.com/TomographicImaging/CIL
 # tigre: BSD-3-Clause, astra-toolbox: GPL-3.0
 LABEL org.opencontainers.image.licenses="Apache-2.0 AND BSD-3-Clause AND GPL-3.0"
 
 # build & runtime dependencies
-# TODO: sync scripts/cil_development.yml, recipe.yaml
+# TODO: sync scripts/create_local_env_for_cil_development.sh, scripts/cil_development.yml, recipe/meta.yaml (e.g. missing libstdcxx-ng _openmp_mutex pip)?
+# vis. https://github.com/TomographicImaging/CIL/pull/1590
 COPY --chown="${NB_USER}" scripts/cil_development.yml environment.yml
+# channel_priority: https://stackoverflow.com/q/58555389
 RUN for pkg in 'jupyter-server-proxy>4.1.0' $CIL_EXTRA_PACKAGES; do echo "  - $pkg" >> environment.yml; done \
+  && conda config --env --set channel_priority strict \
+  && for ch in defaults nvidia ccpi ccpi/label/dev https://software.repos.intel.com/python/conda astra-toolbox conda-forge; do conda config --env --add channels $ch; done \
   && mamba env update -n base \
   && mamba clean -a -y -f \
   && rm environment.yml \

@@ -142,7 +142,7 @@ jobs:
     - uses: prefix-dev/rattler-build-action@v0.2.37
       with:
         recipe-path: recipe.yaml
-        build-args: --experimental -c nvidia -c ccpi/label/dev -c ccpi -c conda-forge -c https://software.repos.intel.com/python/conda --variant python=${{ matrix.python-version }}
+        build-args: --experimental -c conda-forge -c https://software.repos.intel.com/python/conda -c ccpi -c ccpi/label/dev -c astra-toolbox --variant python=${{ matrix.python-version }}
         artifact-name: conda-py${{ matrix.python-version }}-${{ matrix.os }}
   conda-upload:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')

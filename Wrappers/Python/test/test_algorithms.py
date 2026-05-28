@@ -2019,7 +2019,7 @@ class TestLSQR(CCPiTestClass):
         self.m = 70
 
         A = np.random.uniform(0, 1, (self.m, self.n)).astype('float32')
-        x = np.array(range(self.n))/self.n
+        x = (np.array(range(self.n))/self.n).astype('float32')
         b = A.dot(x)
 
         self.Aop = MatrixOperator(A)

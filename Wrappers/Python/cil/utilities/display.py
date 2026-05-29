@@ -628,7 +628,6 @@ class show2D(show_base):
 
         num_rows = num_plots // num_cols + (num_plots % num_cols > 0)
         fig, axs = plt.subplots(num_rows, num_cols, figsize=size, squeeze=False)
-        print(axs.shape)
 
         for axis in axs.flat[num_plots:]:
             fig.delaxes(axis)

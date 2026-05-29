@@ -20,6 +20,7 @@
     - Handle regularisation toolkit CPU only package error message (#2302)
     - Update FindIPP.cmake to find IPP libraries in conda environments (#2286)
     - Update to ASTRA-TOOLBOX version v2.4 from the `astra-toolbox` channel (#2330)
+    - Update to TIGRE v3.1.3 (#2317)
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
     - Update on build instructions in README and developer guide for all OS (#2286)

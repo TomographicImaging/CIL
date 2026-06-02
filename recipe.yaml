@@ -2,8 +2,8 @@ schema_version: 1
 
 context:
   name: ${{ load_from_file("pyproject.toml").project.name }} # ratter-build --experimental
-  build_number: 0
-  version: ${{ git.latest_tag(".") | replace("v", "") }} # .dev${{ build_number }}+g${{ git.head_rev(".") }} # ratter-build --experimental
+  build_number: ${{ git.latest_tag_distance(".") }} # ratter-build>=0.65 --experimental
+  version: ${{ git.latest_tag(".") | replace("v", "") }} # ratter-build --experimental
   test_gpu: ${{ env.get("TESTS_FORCE_GPU", default="") | bool }}
   # used multiple times, so defined once here to avoid repetition
   ipp_version: '2021.12.*'

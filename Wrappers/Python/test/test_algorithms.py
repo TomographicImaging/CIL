@@ -264,7 +264,7 @@ class Test_APGD(CCPiTestClass):
         self.ig = ImageGeometry(11,12,13)
         self.initial = self.ig.allocate(0)
         self.b = self.ig.allocate(None)
-        self.b.fill(np.array(range(11*12*13)).reshape(13,12,11))
+        self.b.fill(np.arange(11*12*13).reshape(13,12,11))
         self.identity = IdentityOperator(self.ig)
 
         self.f = OperatorCompositionFunction(L2NormSquared(b=self.b), self.identity)
@@ -1587,7 +1587,7 @@ class TestSPDHG(CCPiTestClass):
         sampler = Sampler.sequential(5)
         np.random.seed(5)
         initial = VectorData(np.random.standard_normal(25))
-        b = VectorData(np.array(range(25)))
+        b = VectorData(np.arange(25))
         functions = []
         operators=[]
         for i in range(5):
@@ -1917,7 +1917,7 @@ class Test_PD3O(CCPiTestClass):
     def test_PD3O_stochastic_f(self): 
         sampler=Sampler.sequential(3)
         initial = VectorData(np.zeros(21))
-        b =  VectorData(np.array(range(1,22)))
+        b = VectorData(np.arange(1,22))
         functions=[]
         for i in range(3):
             diagonal=np.zeros(21)
@@ -2019,7 +2019,7 @@ class TestLSQR(CCPiTestClass):
         self.m = 70
 
         A = np.random.uniform(0, 1, (self.m, self.n)).astype('float32')
-        x = (np.array(range(self.n))/self.n).astype('float32')
+        x = np.arange(self.n, dtype=np.float32)/self.n
         b = A.dot(x)
 
         self.Aop = MatrixOperator(A)

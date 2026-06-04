@@ -38,7 +38,7 @@ from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOp
 
 
 from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, ScaledFunction
-from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD , LSQR
+from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD , LSQR, ProxSkip
 
 
 from scipy.optimize import minimize, rosen
@@ -340,8 +340,7 @@ class Test_APGD(CCPiTestClass):
         with self.assertRaises(NotImplementedError):
             alg.is_provably_convergent()
         
-        
-        
+                
         
 
 class TestFISTA(CCPiTestClass):
@@ -532,6 +531,102 @@ class TestFISTA(CCPiTestClass):
         alg.run(1)
         self.assertEqual(alg.step_size, 0.99/2)
         self.assertEqual(alg.step_size, 0.99/2)
+
+
+class TestProxSkip(CCPiTestClass):
+
+    def setUp(self):
+
+        np.random.seed(10)
+        n = 50
+        m = 500
+
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1 *
+             np.random.randn(m)).astype('float32')
+
+        self.Aop = MatrixOperator(A)
+        self.bop = VectorData(b)
+
+        self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
+        self.g = 0.5 * L1Norm()
+        self.step_size = 1.99/self.f.L
+
+        self.ig = self.Aop.domain
+
+        self.initial = self.ig.allocate()
+
+    def tearDown(self):
+        pass
+
+    def test_signature(self):
+
+        # check required arguments (initial, f, g, step size, and prob)
+        with np.testing.assert_raises(TypeError):
+            proxskip = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size)
+
+        # test neg prob
+        with np.testing.assert_raises(ValueError):
+            proxskip = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=-0.1)            
+     
+        # zero prob
+        with np.testing.assert_raises(ValueError):
+            proxskip = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=0.)            
+
+    def test_coin_flip(self):
+
+        seed = 10
+        num_it = 100
+        prob = 0.2
+
+        proxskip1 = ProxSkip(initial=self.initial, f=self.f, g=self.g,
+                            step_size=self.step_size, prob=prob, seed=seed)
+        proxskip1.run(num_it, verbose=0)
+
+        rng = np.random.default_rng(seed)
+
+        thetas1 = []
+        for k in range(num_it):
+            tmp = rng.random() < prob     
+            theta = True if k == 0 else tmp
+            thetas1.append(theta)
+
+        assert np.array_equal(proxskip1.thetas, thetas1)
+
+        
+    def test_seeds(self):
+
+        # same seeds
+        proxskip1 = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=0.1, seed=10)
+        proxskip1.run(100, verbose=0)
+
+        proxskip2 = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=0.1, seed=10)
+        proxskip2.run(100, verbose=0)
+
+        np.testing.assert_allclose(proxskip2.thetas, proxskip1.thetas) 
+
+        # different seeds
+        proxskip2 = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, 
+                             prob=0.1, seed=20)
+        proxskip2.run(100, verbose=0)     
+
+        assert not np.array_equal(proxskip2.thetas, proxskip1.thetas)
+
+
+    def test_ista_vs_proxskip(self):
+
+        prox = ProxSkip(initial=self.initial, f=self.f,
+                    g=self.g, step_size = self.step_size, prob = 0.1)
+        prox.run(2000, verbose=0)
+
+        ista = ISTA(initial=self.initial, f=self.f,
+                    g=self.g, step_size = self.step_size)
+        ista.run(1000, verbose=0)        
+       
+        np.testing.assert_allclose(ista.objective[-1], prox.objective[-1], atol=1e-3)
+        np.testing.assert_allclose(
+            prox.solution.array, ista.solution.array, atol=1e-3)    
+
 
 class testISTA(CCPiTestClass):
 

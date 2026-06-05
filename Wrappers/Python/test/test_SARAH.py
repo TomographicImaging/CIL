@@ -45,7 +45,7 @@ class TestSARAH(unittest.TestCase):
 
         self.ig = self.Aop.domain
 
-        self.sampling = RandomSampling.uniform(self.n_subsets)
+        self.sampling = RandomSampler.uniform(self.n_subsets)
         self.fi = ApproximateGradientSumFunction(functions=self.fi_cil, selection=self.sampling, data_passes=[0.])           
 
         self.initial = self.ig.allocate()   
@@ -77,7 +77,7 @@ class TestSARAH(unittest.TestCase):
 
     def test_data_passes(self):
 
-        sampling = RandomSampling.uniform(self.n_subsets)
+        sampling = RandomSampler.uniform(self.n_subsets)
         fi = ApproximateGradientSumFunction(functions=self.fi_cil, 
                                             selection=sampling, 
                                             data_passes=[0.])           

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.Operator &#8212; CIL 25.0.1.dev54+gee8ca8ee2.d20260602 documentation</title>
+    <title>cil.optimisation.operators.Operator &#8212; CIL 25.0.1.dev55+gc40295d06.d20260605 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
 
-    <script src="../../../../../_static/documentation_options.js?v=5c4cc352"></script>
+    <script src="../../../../../_static/documentation_options.js?v=769bcac2"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.18.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev54+gee8ca8ee2.d20260602';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev55+gc40295d06.d20260605';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev54+gee8ca8ee2.d20260602" />
+  <meta name="docsearch:version" content="25.0.1.dev55+gc40295d06.d20260605" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -972,41 +972,60 @@
 </div>
 
 
+<div class="viewcode-block" id="AdjointOperator">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.AdjointOperator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdjointOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adjoint of a linear operator.</span>
 
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The Adjoint operator :math:`A^{*}: Y^{*}\rightarrow X^{*}` of a linear operator :math:`A: X\rightarrow Y` defined as</span>
+<span class="sd">        Given a linear operator :math:`A: X \to Y` between inner-product spaces</span>
+<span class="sd">        :math:`(X,\langle\cdot,\cdot\rangle_X)` and :math:`(Y,\langle\cdot,\cdot\rangle_Y)`,</span>
+<span class="sd">        its adjoint :math:`A^{*}: Y \to X` is defined by:</span>
 
-<span class="sd">    .. math:: &lt;x, A^* y&gt; = &lt;Ax, y&gt;</span>
+<span class="sd">        .. math::</span>
+<span class="sd">            \langle Ax,\, y\rangle_Y \;=\; \langle x,\, A^{*}y\rangle_X,</span>
+<span class="sd">            \qquad \forall x\in X,\; y\in Y.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        operator : LinearOperator</span>
+<span class="sd">            The operator :math:`A` whose adjoint is constructed.</span>
 
-<span class="sd">    operator : A linear operator</span>
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Verify the adjointness relation for the gradient operator :math:`G` and its adjoint</span>
+<span class="sd">        (the negative divergence in many discretisations):</span>
 
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    This example demonstrates that :math:` LHS:=&lt;Gx, y&gt; =&lt;x, G^* y&gt;=:RHS`, where :math:`G` is the gradient operator.</span>
-<span class="sd">    &gt;&gt;&gt; ig = ImageGeometry(2,3)</span>
-<span class="sd">    &gt;&gt;&gt; G = GradientOperator(ig)</span>
-<span class="sd">    &gt;&gt;&gt; div = AdjointOperator(G)</span>
-<span class="sd">    &gt;&gt;&gt; x = G.domain.allocate(&quot;random_int&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; y = G.range.allocate(&quot;random_int&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; lhs = G.direct(x).dot(y)</span>
-<span class="sd">    &gt;&gt;&gt; rhs = x.dot(div.direct(y))</span>
-<span class="sd">    &gt;&gt;&gt; lhs == rhs # returns True</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; ig = ImageGeometry(2, 3)</span>
+<span class="sd">        &gt;&gt;&gt; G = GradientOperator(ig)</span>
+<span class="sd">        &gt;&gt;&gt; div = AdjointOperator(G)     # represents G*</span>
+<span class="sd">        &gt;&gt;&gt; x = G.domain.allocate(&quot;random_int&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; y = G.range.allocate(&quot;random_int&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; lhs = G.direct(x).dot(y)     # &lt;Gx, y&gt;_Y</span>
+<span class="sd">        &gt;&gt;&gt; rhs = x.dot(div.direct(y))   # &lt;x, G* y&gt;_X</span>
+<span class="sd">        &gt;&gt;&gt; lhs == rhs</span>
+<span class="sd">        True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AdjointOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">(),</span>
                                        <span class="n">range_geometry</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span>
 
+<div class="viewcode-block" id="AdjointOperator.direct">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.AdjointOperator.direct">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="AdjointOperator.adjoint">
+<a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.AdjointOperator.adjoint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
+</div>
+
 
 
 <div class="viewcode-block" id="ScaledOperator">

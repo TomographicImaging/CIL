@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 25.0.1.dev54+gee8ca8ee2.d20260602 documentation</title>
+    <title>Optimisation framework &#8212; CIL 25.0.1.dev55+gc40295d06.d20260605 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
 
-    <script src="../_static/documentation_options.js?v=5c4cc352"></script>
+    <script src="../_static/documentation_options.js?v=769bcac2"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.18.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev54+gee8ca8ee2.d20260602';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev55+gc40295d06.d20260605';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -64,7 +64,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev54+gee8ca8ee2.d20260602" />
+  <meta name="docsearch:version" content="25.0.1.dev55+gc40295d06.d20260605" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -4319,6 +4319,75 @@ For example, <cite>SumOperator(left, right).direct(x)</cite> is equivalent to  <
 <span class="sig-name descname"><span class="pre">is_linear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#SumOperator.is_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.SumOperator.is_linear" title="Link to this definition">#</a></dt>
 <dd><p>Returns if the operator is linear
 :rtype: <cite>Bool</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cil.optimisation.operators.AdjointOperator">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></span><span class="sig-name descname"><span class="pre">AdjointOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#AdjointOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.AdjointOperator" title="Link to this definition">#</a></dt>
+<dd><p>Adjoint of a linear operator.</p>
+<p>Given a linear operator <span class="math notranslate nohighlight">\(A: X \to Y\)</span> between inner-product spaces
+<span class="math notranslate nohighlight">\((X,\langle\cdot,\cdot\rangle_X)\)</span> and <span class="math notranslate nohighlight">\((Y,\langle\cdot,\cdot\rangle_Y)\)</span>,
+its adjoint <span class="math notranslate nohighlight">\(A^{*}: Y \to X\)</span> is defined by:</p>
+<div class="math notranslate nohighlight">
+\[\langle Ax,\, y\rangle_Y \;=\; \langle x,\, A^{*}y\rangle_X,
+\qquad \forall x\in X,\; y\in Y.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.LinearOperator" title="cil.optimisation.operators.LinearOperator"><em>LinearOperator</em></a>) – The operator <span class="math notranslate nohighlight">\(A\)</span> whose adjoint is constructed.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Verify the adjointness relation for the gradient operator <span class="math notranslate nohighlight">\(G\)</span> and its adjoint
+(the negative divergence in many discretisations):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">div</span> <span class="o">=</span> <span class="n">AdjointOperator</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>     <span class="c1"># represents G*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s2">&quot;random_int&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s2">&quot;random_int&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lhs</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>     <span class="c1"># &lt;Gx, y&gt;_Y</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rhs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">div</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>   <span class="c1"># &lt;x, G* y&gt;_X</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lhs</span> <span class="o">==</span> <span class="n">rhs</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.operators.AdjointOperator.direct">
+<span class="sig-name descname"><span class="pre">direct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#AdjointOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.AdjointOperator.direct" title="Link to this definition">#</a></dt>
+<dd><p>Calls the operator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – Element in the domain of the Operator</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a> or BlockDataContainer containing the result.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cil.optimisation.operators.AdjointOperator.adjoint">
+<span class="sig-name descname"><span class="pre">adjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/operators/Operator/#AdjointOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.AdjointOperator.adjoint" title="Link to this definition">#</a></dt>
+<dd><p>Returns the adjoint/inverse operation evaluated at the point <span class="math notranslate nohighlight">\(x\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a>) – Element in the domain of the Operator</p></li>
+<li><p><strong>out</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em> or </em><a class="reference internal" href="#cil.framework.BlockDataContainer" title="cil.framework.BlockDataContainer"><em>BlockDataContainer</em></a><em>, </em><em>default None</em>) – If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a> or BlockDataContainer containing the result.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only available to linear operators</p>
+</div>
 </dd></dl>
 
 </dd></dl>

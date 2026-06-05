@@ -945,8 +945,8 @@ class _ShowGeometry(object):
 
             count = 0
             for x in combos:
-                s = rotation_matrix.dot(np.asarray(x[0]).reshape(3,1))
-                e = rotation_matrix.dot(np.asarray(x[1]).reshape(3,1))
+                s = rotation_matrix.dot(np.asarray(x[0]).reshape(3))
+                e = rotation_matrix.dot(np.asarray(x[1]).reshape(3))
 
                 x_data = float(s[0]) + ro[0], float(e[0]) + ro[0]
                 y_data = float(s[1]) + ro[1], float(e[1]) + ro[1]
@@ -974,7 +974,7 @@ class _ShowGeometry(object):
 
         for i in range(points):
             theta = i * (np.pi * 1.8) /36
-            point_i = np.array([np.sin(theta),-np.cos(theta),0]).reshape(3,1)
+            point_i = np.array([np.sin(theta),-np.cos(theta),0]).reshape(3)
             point_rot = -self.scale*0.5*rotation_matrix.dot(point_i)
 
             x[i] = float(point_rot[0] + ro[0])

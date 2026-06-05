@@ -30,12 +30,13 @@ log = logging.getLogger(__name__)
 class PDHG(Algorithm):
 
     r"""Primal Dual Hybrid Gradient (PDHG) algorithm, see :cite:`CP2011`, :cite:`EZXC2010`.
-    
+
     PDHG minimises objectives of the form: 
     
-     .. math:: \min_{x\in X} f(Kx) + g(x),
+    .. math:: 
+        \min_{x\in X} f(Kx) + g(x),
      
-   where :math:`f` and the regulariser :math:`g` need to be proper, convex and lower semi-continuous. The function :math:`f` and the convex conjugate of :math:`g` must also have calculable proximal methods. 
+    where :math:`f` and the regulariser :math:`g` need to be proper, convex and lower semi-continuous. The function :math:`f` and the convex conjugate of :math:`g` must also have calculable proximal methods. 
 
     Parameters
     ----------

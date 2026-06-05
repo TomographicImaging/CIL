@@ -5,7 +5,7 @@ from cil.optimisation.algorithms import SARAH
 from cil.optimisation.functions import LeastSquares, L2NormSquared, ZeroFunction, ApproximateGradientSumFunction
 from cil.framework import VectorData
 import numpy as np            
-from cil.optimisation.utilities import RandomSampling     
+from cil.optimisation.utilities import RandomSampler    
                   
 initialise_tests()
 

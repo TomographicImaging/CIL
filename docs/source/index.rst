@@ -41,15 +41,7 @@ with the code to reproduce the article's results.
 Cite this work
 ==============
 
-If you use this software please consider citing one or both of the articles below.
-
-1. Jørgensen JS et al. 2021 Core Imaging Library Part I: a versatile python framework for tomographic imaging
-https://doi.org/10.1098/rsta.2020.0192 . Phil. Trans. R. Soc. A 20200192.
-The code to reproduce the article results. https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I
-
-2. Papoutsellis E et al. 2021 Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral
-tomography https://doi.org/10.1098/rsta.2020.0193 Phil. Trans. R. Soc. A 20200193.
-The code to reproduce the article results. https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II
+For information on citing CIL and a list of publications using CIL, please see our `publications page <https://tomographicimaging.github.io/CIL/publications/>`_.
 
 Table of Contents
 =================
@@ -68,6 +60,7 @@ Table of Contents
    plugins
    developer_guide
    demos
+   usershowcase
 
 .. Indices and tables
 .. ==================

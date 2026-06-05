@@ -86,6 +86,13 @@ CGLS
    :members:
    :inherited-members: run, update_objective_interval
 
+LSQR
+----
+.. autoclass:: cil.optimisation.algorithms.LSQR
+   :members:
+   :inherited-members: run, update_objective_interval
+
+
 SIRT
 ----
 .. autoclass:: cil.optimisation.algorithms.SIRT
@@ -323,6 +330,9 @@ A :code:`ScaledOperator` represents the multiplication of any operator with a sc
 
 .. autoclass:: cil.optimisation.operators.SumOperator
    :members:
+
+.. autoclass:: cil.optimisation.operators.AdjointOperator
+   :members:   
 
 
 Trivial operators

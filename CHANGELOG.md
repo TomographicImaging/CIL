@@ -1,6 +1,35 @@
 * XX.X.X
+  - New features:
+    - LSQR algorithm added to the CIL algorithm class (#1975)
+    - Add `VolumeShrinker` tool to reduce the size of the reconstruction volume from an `AcquisitionData` (#2221)
+    - LaminographyGeometryCorrector tool added to processors (#2259)
   - Bug fixes:
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
+    - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)
+    - `cilacc` path lookup no longer broken for editable installations (#2257)
+    - update `version.py` to use `importlib` & fix tagless installation #2255 (#2269)
+    - Fixed behaviour of `ZeissDataReader` when negative values are passed in the ROI (#2244)
+    - Fix `show2D` truncating plots when count is not a multiple of `num_cols` (#2315)
+  - Dependencies:
+    - `olefile` and `dxchange` are optional dependencies, instead of required (#2209, #2321)
+    - fix missing `packaging` required dependency (#2321)
+    - dxchange minimum version set to 0.2.1 to fix #2256 (#2268)
+    - improve `tqdm` notebook support (#2241)
+    - cvxpy version set to !=1.8.2 to fix #2303 (#2306)
+    - Update to TomoPhantom v3.0 (#2287)
+    - Handle regularisation toolkit CPU only package error message (#2302)
+    - Update FindIPP.cmake to find IPP libraries in conda environments (#2286)
+    - Update to ASTRA-TOOLBOX version v2.4 from the `astra-toolbox` channel (#2330)
+    - Update to TIGRE v3.1.3 (#2317)
+  - Documentation:
+    - Render the user showcase notebooks in the documentation (#2189)
+    - Update on build instructions in README and developer guide for all OS (#2286)
+  - Enhancements:
+    - Add prefix argument to TIFFStackReader to load a subset of TIFF files in
+    a folder (#2239)
+    - Update ASTRA interface to `direct_FP3D/BP3D` removing copies for GPU `ProjectionOperator` calls (#2134)
+  - Testing:
+    - migrate from `conda build` to `rattler-build`
 
 * 25.0.0
   - New features:

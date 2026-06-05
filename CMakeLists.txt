@@ -15,16 +15,21 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-# Richard Brown (University College London)
-
+# Satwik Pani (Washington University in St. Louis)
 if(APPLE)
-  cmake_minimum_required(VERSION 3.16)
+  cmake_minimum_required(VERSION 3.16...4.1)
 else()
-  cmake_minimum_required(VERSION 3.4)
+  cmake_minimum_required(VERSION 3.5...4.1)
 endif()
 
-project (cil LANGUAGES CXX)
+if(NOT SKBUILD_PROJECT_NAME)
+  set(SKBUILD_PROJECT_NAME cil)
+endif()
+project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX)
 
+cmake_policy(PUSH)
+
+cmake_policy(SET CMP0074 NEW)
 if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
   cmake_policy(SET CMP0148 OLD)
 endif()
@@ -44,37 +49,6 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-
-# CIL version TAG is determined by git describe as for the conda package
-# variable GIT_DESCRIBE_TAG
-# https://docs.conda.io/projects/conda-build/en/stable/resources/define-metadata.html#templating-with-jinja
-# https://stackoverflow.com/questions/38919840/get-package-version-for-conda-meta-yaml-from-source-file
-
-find_package(Git REQUIRED)
-
-find_package(Python COMPONENTS Interpreter REQUIRED)
-
-if (Python_FOUND)
-  execute_process(COMMAND "${Python_EXECUTABLE}" ${CMAKE_CURRENT_SOURCE_DIR}/Wrappers/Python/CMake/parse_git_describe.py "${GIT_EXECUTABLE}"
-                RESULT_VARIABLE worked
-                OUTPUT_VARIABLE CIL_VERSION
-                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
-  if (NOT worked EQUAL 0)
-    message(FATAL_ERROR "git describe returned ${worked}")
-  else()
-    string(REPLACE " " ";" CIL_VERSION ${CIL_VERSION})
-    list(LENGTH CIL_VERSION CIL_version_len)
-
-    list(GET CIL_VERSION 0 CIL_VERSION_MAJOR)
-    list(GET CIL_VERSION 1 CIL_VERSION_MINOR)
-    list(GET CIL_VERSION 2 CIL_VERSION_PATCH)
-    list(GET CIL_VERSION 3 CIL_NUM_COMMIT)
-    list(GET CIL_VERSION 4 CIL_COMMIT_HASH)
-
-  endif()
-endif()
-
-
 add_subdirectory(src/Core)
-add_subdirectory(Wrappers/Python)
+
+cmake_policy(POP)

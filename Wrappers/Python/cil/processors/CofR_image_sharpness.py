@@ -16,15 +16,13 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import Processor, AcquisitionData, DataOrder
-import matplotlib.pyplot as plt
+from cil.framework import Processor, AcquisitionData
+from cil.framework.labels import AcquisitionDimension, AcquisitionType
 import scipy
 import numpy as np
-import inspect
 import logging
 import math
 import importlib
-import warnings
 
 log = logging.getLogger(__name__)
 
@@ -57,20 +55,22 @@ class CofR_image_sharpness(Processor):
 
     Example
     -------
-    from cil.processors import CentreOfRotationCorrector
+    .. code-block :: python 
+        from cil.processors import CentreOfRotationCorrector
 
-    processor = CentreOfRotationCorrector.image_sharpness('centre', 'tigre')
-    processor.set_input(data)
-    data_centred = processor.get_output()
+        processor = CentreOfRotationCorrector.image_sharpness('centre', 'tigre')
+        processor.set_input(data)
+        data_centred = processor.get_output()
 
 
     Example
     -------
-    from cil.processors import CentreOfRotationCorrector
+    .. code-block :: python
+        from cil.processors import CentreOfRotationCorrector
 
-    processor = CentreOfRotationCorrector.image_sharpness(slice_index=120, 'astra')
-    processor.set_input(data)
-    processor.get_output(out=data)
+        processor = CentreOfRotationCorrector.image_sharpness(slice_index=120, 'astra')
+        processor.set_input(data)
+        processor.get_output(out=data)
 
 
     Note
@@ -107,6 +107,9 @@ class CofR_image_sharpness(Processor):
         if data.geometry.geom_type == 'cone' and self.slice_index != 'centre':
             raise ValueError("Only the centre slice is supported with this algorithm")
 
+        if data.geometry.geom_type & AcquisitionType.CONE_FLEX:
+            raise ValueError("Cone-Flex geometry is not supported by this processor")
+        
         if data.geometry.system_description not in ['simple','offset']:
             raise NotImplementedError("Not implemented for rotated system geometries")
 
@@ -123,12 +126,9 @@ class CofR_image_sharpness(Processor):
                 raise ValueError('slice_index is out of range. Must be in range 0-{0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
 
         #check order for single slice data
-        if data.geometry.dimension == '3D':
-            test_geom = data.geometry.get_slice(vertical='centre')
-        else:
-            test_geom = data.geometry
+        test_geom = data.geometry.get_slice(vertical='centre') if AcquisitionType.DIM3 & data.geometry.dimension else data.geometry
 
-        if not DataOrder.check_order_for_engine(self.backend, test_geom):
+        if not AcquisitionDimension.check_order_for_engine(self.backend, test_geom):
             raise ValueError("Input data must be reordered for use with selected backend. Use input.reorder{'{0}')".format(self.backend))
 
         return True
@@ -142,12 +142,7 @@ class CofR_image_sharpness(Processor):
             raise ValueError("Backend unsupported. Supported backends: {}".format(self._supported_backends))
 
         #set FBPOperator class from backend
-        try:
-            module = importlib.import_module(f'cil.plugins.{backend}')
-        except ImportError as exc:
-            msg = {'tigre': "TIGRE (e.g. `conda install conda-forge::tigre`)",
-                   'astra': "ASTRA (e.g. `conda install astra-toolbox::astra-toolbox`)"}.get(backend, backend)
-            raise ImportError(f"Please install {msg} or select a different backend") from exc
+        module = importlib.import_module(f'cil.plugins.{backend}')
 
         return module.FBP
 
@@ -199,7 +194,7 @@ class CofR_image_sharpness(Processor):
                 new_point = sample_points[-1]- step_c
 
             else:
-                raise ValueError("The centre of rotation could not be located to the requested tolerance. Try increasing the search tolerance.")
+                raise ValueError(f"The centre of rotation could not be located to the requested tolerance ({tolerance:.6f} pixels). Try increasing the search tolerance.")
 
             if interval < tolerance:
                 break
@@ -233,6 +228,8 @@ class CofR_image_sharpness(Processor):
         return (reco*reco).sum()
 
     def plot(self, offsets,values, vox_size):
+        import matplotlib.pyplot as plt
+
         x=[x / vox_size for x in offsets]
         y=values
 
@@ -250,16 +247,12 @@ class CofR_image_sharpness(Processor):
         w1 = ind_centre - ind0
         return (1.0 - w1) * offsets[ind0] + w1 * offsets[ind0+1]
 
-
     def process(self, out=None):
-
         #get slice
-        data_full = self.get_input()
+        data = data_full = self.get_input()
 
-        if data_full.geometry.dimension == '3D':
-            data = data_full.get_slice(vertical=self.slice_index)
-        else:
-            data = data_full
+        if AcquisitionType.DIM3 & data_full.geometry.dimension:
+            data = data.get_slice(vertical=self.slice_index)
 
         data.geometry.config.system.align_reference_frame('cil')
         width = data.geometry.config.panel.num_pixels[0]
@@ -300,12 +293,9 @@ class CofR_image_sharpness(Processor):
             data_binned = new_geom.allocate()
 
             for i in range(data.shape[0]):
-                data_binned.fill(np.interp(sampling_points, initial_coordinates, data.array[i,:]),angle=i)
+                data_binned.fill(np.interp(sampling_points, initial_coordinates, data_temp.array[i,:]),angle=i)
 
-            #filter
-            data_binned_filtered = data_binned.copy()
-            data_binned_filtered.fill(scipy.ndimage.sobel(data_binned.as_array(), axis=1, mode='reflect', cval=0.0))
-            data_processed = data_binned_filtered
+            data_processed = data_binned
         else:
             data_processed = data_filtered
 
@@ -355,6 +345,7 @@ class CofR_image_sharpness(Processor):
         log.info("Return new dataset with centred geometry")
 
         if out is None:
-            return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)
+            return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry)
         else:
             out.geometry = new_geometry
+            return out

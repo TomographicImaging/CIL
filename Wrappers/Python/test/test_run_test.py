@@ -19,8 +19,7 @@
 import unittest
 import numpy
 import numpy as np
-from cil.framework import ImageData
-from cil.framework import ImageGeometry
+from cil.framework import ImageData, ImageGeometry
 
 import numpy.testing
 

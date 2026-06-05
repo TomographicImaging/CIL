@@ -17,6 +17,8 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.processors import Slicer
+from cil.framework import AcquisitionData
+from cil.framework.labels import AcquisitionType
 import numpy as np
 
 try:
@@ -95,7 +97,7 @@ class Binner(Slicer):
             raise RuntimeError("Cannot run accelerated Binner without the IPP libraries.")
 
         super(Binner,self).__init__(roi = roi)
-        self._accelerated = True
+        self._accelerated = accelerated
 
 
     def _configure(self):
@@ -104,13 +106,13 @@ class Binner(Slicer):
         """
 
         #as binning we only include bins that are inside boundaries
-        self._shape_out = [int((x.stop - x.start)//x.step) for x in self._roi_ordered]
+        self._shape_out_full = [int((x.stop - x.start)//x.step) for x in self._roi_ordered]
         self._pixel_indices = []
 
         # fix roi_ordered for binner based on shape out
         for i in range(4):
             start = self._roi_ordered[i].start
-            stop = self._roi_ordered[i].start + self._shape_out[i] * self._roi_ordered[i].step
+            stop = self._roi_ordered[i].start + self._shape_out_full[i] * self._roi_ordered[i].step
 
             self._roi_ordered[i] = range(
                 start,
@@ -146,7 +148,7 @@ class Binner(Slicer):
 
         for i in range(4):
             # reshape the data to add each 'bin' dimensions
-            shape_object.append(self._shape_out[i])
+            shape_object.append(self._shape_out_full[i])
             shape_object.append(self._roi_ordered[i].step)
 
         shape_object = tuple(shape_object)
@@ -168,7 +170,7 @@ class Binner(Slicer):
         indices_start = [x.start for x in self._roi_ordered]
         bins = [x.step for x in self._roi_ordered]
 
-        binner_ipp = Binner_IPP(self._shape_in, self._shape_out, indices_start, bins)
+        binner_ipp = Binner_IPP(self._shape_in, self._shape_out_full, indices_start, bins)
 
         res = binner_ipp.bin(array_in, array_binned)
         if res != 0:
@@ -179,6 +181,8 @@ class Binner(Slicer):
         """
         Bin the data array
         """
+        if isinstance(dc_in, AcquisitionData) and dc_in.geometry.geom_type & AcquisitionType.CONE_FLEX:
+            raise NotImplementedError("Cone-Flex geometry is not supported by this processor")
         if self._accelerated:
             self._bin_array_acc(dc_in.array, dc_out.array)
         else:

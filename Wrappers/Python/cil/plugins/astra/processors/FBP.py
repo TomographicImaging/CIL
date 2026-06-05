@@ -15,13 +15,11 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
 from cil.framework import DataProcessor
-from cil.framework import DataOrder
+from cil.framework.labels import ImageDimension, AcquisitionDimension, AcquisitionType
 from cil.plugins.astra.processors.FBP_Flexible import FBP_Flexible
 from cil.plugins.astra.processors.FDK_Flexible import FDK_Flexible
 from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU
-import warnings
 
 
 class FBP(DataProcessor):
@@ -62,15 +60,13 @@ class FBP(DataProcessor):
 
 
     def __init__(self, image_geometry=None, acquisition_geometry=None, device='gpu'):
-
         if acquisition_geometry is None:
             raise TypeError("Please specify an acquisition_geometry to configure this processor")
-
         if image_geometry is None:
             image_geometry = acquisition_geometry.get_ImageGeometry()
 
-        DataOrder.check_order_for_engine('astra', image_geometry)
-        DataOrder.check_order_for_engine('astra', acquisition_geometry)
+        AcquisitionDimension.check_order_for_engine('astra', acquisition_geometry)
+        ImageDimension.check_order_for_engine('astra', image_geometry)
 
         if device == 'gpu':
             if acquisition_geometry.geom_type == 'parallel':
@@ -84,7 +80,7 @@ class FBP(DataProcessor):
             if acquisition_geometry.geom_type == 'cone':
                 raise NotImplementedError("Cannot process cone-beam data without a GPU")
 
-            if acquisition_geometry.dimension == '2D':
+            if AcquisitionType.DIM2 & acquisition_geometry.dimension:
                 processor = FBP_CPU(image_geometry, acquisition_geometry)
             else:
                 raise NotImplementedError("Cannot process 3D data without a GPU")
@@ -107,6 +103,9 @@ class FBP(DataProcessor):
 
     def check_input(self, dataset):
         return self.processor.check_input(dataset)
+    
+    def check_output(self, out):
+        return self.processor.check_output(out=out)
 
     def process(self, out=None):
         return self.processor.process(out=out)

@@ -17,13 +17,13 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.framework import cilacc
-from cil.framework import AcquisitionGeometry
+from cil.framework.labels import AcquisitionType
 from cil.recon import Reconstructor
 from scipy.fft import fftfreq
 
 import numpy as np
 import ctypes
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 c_double_p = ctypes.POINTER(ctypes.c_double)
@@ -154,6 +154,7 @@ class GenericFilteredBackProjection(Reconstructor):
     def preset_filters(self):
         return ['ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann']
 
+
     def set_filter(self, filter='ram-lak', cutoff=1.0):
         """
         Set the filter used by the reconstruction.
@@ -254,6 +255,35 @@ class GenericFilteredBackProjection(Reconstructor):
 
         return np.asarray(filter_array,dtype=np.float32).reshape(2**self.fft_order)
 
+
+    def plot_filter(self):
+        """
+        Returns a plot of the filter array.
+
+        Requires matplotlib-base (or matplotlib) to be installed.
+
+        Returns
+        -------
+        matplotlib.pyplot
+            A plot of the filter
+        """
+        import matplotlib.pyplot as plt
+
+        filter_array = self.get_filter_array()
+        filter_length = 2**self.fft_order
+        freq = fftfreq(filter_length)
+        freq *= 2
+        ind_sorted = np.argsort(freq)
+        plt.figure()
+        plt.plot(freq[ind_sorted], filter_array[ind_sorted], label=self._filter, color='magenta')
+        plt.xlabel('Frequency (rads/pixel)')
+        plt.ylabel('Magnitude')
+        theta = np.linspace(-1, 1, 9, True)
+        plt.xticks(theta, ['-π', '-3π/4', '-π/2', '-π/4', '0', 'π/4', 'π/2', '3π/4', 'π'])
+        plt.legend()
+        return plt
+
+
     def _calculate_weights(self):
         return NotImplementedError
 
@@ -347,11 +377,11 @@ class FDK(GenericFilteredBackProjection):
     supported_backends = ['tigre']
 
     def __init__ (self, input, image_geometry=None, filter='ram-lak'):
-        #call parent initialiser
-        super().__init__(input, image_geometry, filter, backend='tigre')
 
-        if  input.geometry.geom_type != AcquisitionGeometry.CONE:
-            raise TypeError("This reconstructor is for cone-beam data only.")
+        if not AcquisitionType.CONE & input.geometry.geom_type:
+            raise TypeError(f"This reconstructor can only be used with standard cone-beam data, got {input.geometry.geom_type}.")
+
+        super().__init__(input, image_geometry, filter, backend='tigre')
 
 
     def _calculate_weights(self, acquisition_geometry):
@@ -456,12 +486,11 @@ class FBP(GenericFilteredBackProjection):
 
     def __init__ (self, input, image_geometry=None, filter='ram-lak', backend='tigre'):
 
-        super().__init__(input, image_geometry, filter, backend)
-        self.set_split_processing(False)
-
-        if  input.geometry.geom_type != AcquisitionGeometry.PARALLEL:
+        if not AcquisitionType.PARALLEL & input.geometry.geom_type:
             raise TypeError("This reconstructor is for parallel-beam data only.")
 
+        super().__init__(input, image_geometry, filter, backend)
+        self.set_split_processing(False)
 
     def set_split_processing(self, slices_per_chunk=0):
         """
@@ -514,7 +543,7 @@ class FBP(GenericFilteredBackProjection):
         self.operator = self._PO_class(ig_slice,ag_slice)
 
     def _process_chunk(self, i, step):
-        self.data_slice.fill(np.squeeze(self.input.array[:,i:i+step,:]))
+        np.take(self.input.array, np.arange(i,i+step), axis=self.input.get_dimension_axis("vertical"), out=self.data_slice.array)
         if not self.filter_inplace:
             self._pre_filtering(self.data_slice)
 
@@ -538,15 +567,13 @@ class FBP(GenericFilteredBackProjection):
         ImageData
             The reconstructed volume. Suppressed if `out` is passed
         """
-
         if verbose:
             print(self)
 
         if self.slices_per_chunk:
-
-            if self.acquisition_geometry.dimension == '2D':
+            if AcquisitionType.DIM2 & self.acquisition_geometry.dimension:
                 raise ValueError("Only 3D datasets can be processed in chunks with `set_split_processing`")
-            elif self.acquisition_geometry.system_description == 'advanced':
+            elif self.acquisition_geometry.system_description != 'simple' and self.acquisition_geometry.system_description != 'offset':
                 raise ValueError("Only simple and offset geometries can be processed in chunks with `set_split_processing`")
             elif self.acquisition_geometry.get_ImageGeometry() != self.image_geometry:
                 raise ValueError("Only default image geometries can be processed in chunks `set_split_processing`")

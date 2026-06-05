@@ -17,10 +17,8 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from cil.framework import AcquisitionGeometry
-from cil.framework.framework import ImageGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy as np
-from cil.utilities.display import show2D
 from cil.utilities import dataexample
 from utils_projectors import TestCommon_ProjectionOperatorBlockOperator
 
@@ -32,6 +30,8 @@ if has_tigre:
     from cil.plugins.tigre import ProjectionOperator
     from cil.plugins.tigre import CIL2TIGREGeometry
 
+
+@unittest.skipUnless(has_tigre, "TIGRE not installed")
 class Test_convert_geometry(unittest.TestCase):
     def setUp(self):
         self.num_pixels_x = 12
@@ -55,7 +55,6 @@ class Test_convert_geometry(unittest.TestCase):
 
         self.assertLess(abs(diff),atol)
 
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_cone2D(self):
 
         ag = AcquisitionGeometry.create_Cone2D(source_position=[0,-6], detector_position=[0,16])\
@@ -83,7 +82,6 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.nVoxel, [1,self.ig.voxel_num_y,self.ig.voxel_num_x])
         np.testing.assert_allclose(tg_geometry.dVoxel, [ag.config.panel.pixel_size[1]/ag.magnification,self.ig.voxel_size_y,self.ig.voxel_size_x])
 
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_cone3D_simple(self):
         ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-6,0], detector_position=[0,16,0])\
                                       .set_angles(self.angles_deg, angle_unit='degree')\
@@ -111,7 +109,6 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
         np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
 
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_cone3D_offset(self):
 
         #3, 4, 5 triangle for source + object
@@ -150,8 +147,6 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
         np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
 
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_cone3D_advanced(self):
 
         ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-10,0], detector_position=[0,10,0], rotation_axis_position=[0,0, 0],rotation_axis_direction=[0,-1,1])\
@@ -193,8 +188,6 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
         np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
 
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_parallel2D(self):
 
         ag = AcquisitionGeometry.create_Parallel2D()\
@@ -219,8 +212,6 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.nVoxel, [1,self.ig.voxel_num_y,self.ig.voxel_num_x])
         np.testing.assert_allclose(tg_geometry.dVoxel, [ag.config.panel.pixel_size[1],self.ig.voxel_size_y,self.ig.voxel_size_x])
 
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_parallel3D_simple(self):
         ag = AcquisitionGeometry.create_Parallel3D()\
                                       .set_angles(self.angles_deg, angle_unit='degree')\
@@ -244,8 +235,6 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
         np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
 
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_parallel3D_offset(self):
 
         ag = AcquisitionGeometry.create_Parallel3D(detector_position=[2,0,0], rotation_axis_position=[3,0, 0])\

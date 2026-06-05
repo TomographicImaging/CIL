@@ -16,7 +16,8 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import ImageData, ImageGeometry, DataContainer
+from cil.framework import ImageGeometry
+from cil.framework.labels import ImageDimension
 import numpy
 import numpy as np
 from PIL import Image
@@ -24,8 +25,6 @@ import os
 import os.path
 import sys
 from zipfile import ZipFile
-from urllib.request import urlopen
-from io import BytesIO
 from scipy.io import loadmat
 from cil.io import NEXUSDataReader, NikonDataReader, ZEISSDataReader
 
@@ -33,7 +32,7 @@ class DATA(object):
     @classmethod
     def dfile(cls):
         return None
-    
+
 class CILDATA(DATA):
     data_dir = os.path.abspath(os.path.join(sys.prefix, 'share','cil'))
     @classmethod
@@ -41,43 +40,50 @@ class CILDATA(DATA):
         ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = TestData(data_dir=ddir)
         return loader.load(cls.dfile(), size, scale, **kwargs)
-    
+
 class REMOTEDATA(DATA):
-    
     FOLDER = ''
-    URL = ''
-    FILE_SIZE = ''
+    ZENODO_RECORD = ''
+    ZIP_FILE = ''
+    CIL_DATA_DIR = os.getenv("CIL_DATA_DIR", None)
 
     @classmethod
-    def get(cls, data_dir):
-        return None
+    def assert_dir(cls, data_dir):
+        if data_dir is None:
+            raise NotADirectoryError("data_dir must be specified")
 
     @classmethod
-    def _download_and_extract_from_url(cls, data_dir):
-        with urlopen(cls.URL) as response:
-            with BytesIO(response.read()) as bytes, ZipFile(bytes) as zipfile:
-                zipfile.extractall(path = data_dir) 
+    def get(cls, data_dir=CIL_DATA_DIR):
+        raise NotImplementedError
 
     @classmethod
-    def download_data(cls, data_dir):
+    def download_data(cls, data_dir=CIL_DATA_DIR, prompt=True):
         '''
         Download a dataset from a remote repository
 
         Parameters
         ----------
-        data_dir: str, optional
-           The path to the data directory where the downloaded data should be stored
-
+        data_dir: str
+           The path to the data directory where the downloaded data should be stored.
+           If unspecified, tries to use the CIL_DATA_DIR environment variable.
         '''
+        cls.assert_dir(data_dir)
         if os.path.isdir(os.path.join(data_dir, cls.FOLDER)):
-            print("Dataset already exists in " + data_dir)
+            print(f"Dataset folder already exists in {data_dir}")
         else:
-            if input("Are you sure you want to download " + cls.FILE_SIZE + " dataset from " + cls.URL + " ? (y/n)") == "y": 
-                print('Downloading dataset from ' + cls.URL) 
-                cls._download_and_extract_from_url(os.path.join(data_dir,cls.FOLDER))
-                print('Download complete')
-            else:
+            user_input = input("Are you sure you want to download {cls.ZIP_FILE} dataset from Zenodo record {cls.ZENODO_RECORD}? [Y/n]: ") if prompt else 'y'
+            if user_input.lower() not in ('y', 'yes'):
                 print('Download cancelled')
+                return False
+
+            from zenodo_get import zenodo_get
+            zenodo_get([cls.ZENODO_RECORD, '-g', cls.ZIP_FILE, '-o', data_dir])
+            with ZipFile(os.path.join(data_dir, cls.ZIP_FILE), 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(data_dir, cls.FOLDER))
+            os.remove(os.path.join(data_dir, cls.ZIP_FILE))
+            if os.path.exists(os.path.join(data_dir, 'md5sums.txt')):
+                os.remove(os.path.join(data_dir, 'md5sums.txt'))
+            return True
 
 class BOAT(CILDATA):
     @classmethod
@@ -185,24 +191,30 @@ class SIMULATED_SPHERE_VOLUME(CILDATA):
         -------
         ImageData
             The simulated spheres volume
-        '''       
+        '''
         ddir = kwargs.get('data_dir', CILDATA.data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_volume.nxs'))
         return loader.read()
-    
+
 class WALNUT(REMOTEDATA):
     '''
-    A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516 
+    A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516
+
+    Example
+    --------
+    >>> data_dir = 'my_PC/data_folder'
+    >>> dataexample.WALNUT.download_data(data_dir) # download the data
+    >>> dataexample.WALNUT.get(data_dir) # load the data
     '''
     FOLDER = 'walnut'
-    URL = 'https://zenodo.org/record/4822516/files/walnut.zip'
-    FILE_SIZE = '6.4 GB'
+    ZENODO_RECORD = '4822516'
+    ZIP_FILE = 'walnut.zip'
 
     @classmethod
-    def get(cls, data_dir):
+    def get(cls, data_dir=REMOTEDATA.CIL_DATA_DIR):
         '''
-        A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516 
+        Get the microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516
         This function returns the raw projection data from the .txrm file
 
         Parameters
@@ -215,6 +227,7 @@ class WALNUT(REMOTEDATA):
         ImageData
             The walnut dataset
         '''
+        cls.assert_dir(data_dir)
         filepath = os.path.join(data_dir, cls.FOLDER, 'valnut','valnut_2014-03-21_643_28','tomo-A','valnut_tomo-A.txrm')
         try:
             loader = ZEISSDataReader(file_name=filepath)
@@ -222,19 +235,25 @@ class WALNUT(REMOTEDATA):
         except(FileNotFoundError):
             raise(FileNotFoundError("Dataset .txrm file not found in specifed data_dir: {} \n \
                                     Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(filepath, cls.__name__)))
-     
+
 class USB(REMOTEDATA):
     '''
-    A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516 
+    A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516
+
+    Example
+    --------
+    >>> data_dir = 'my_PC/data_folder'
+    >>> dataexample.USB.download_data(data_dir) # download the data
+    >>> dataexample.USB.get(data_dir) # load the data
     '''
-    FOLDER = 'USB' 
-    URL = 'https://zenodo.org/record/4822516/files/usb.zip'
-    FILE_SIZE = '3.2 GB'
+    FOLDER = 'USB'
+    ZENODO_RECORD = '4822516'
+    ZIP_FILE = 'usb.zip'
 
     @classmethod
-    def get(cls, data_dir):
+    def get(cls, data_dir=REMOTEDATA.CIL_DATA_DIR):
         '''
-        A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516 
+        Get the microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516
         This function returns the raw projection data from the .txrm file
 
         Parameters
@@ -247,6 +266,7 @@ class USB(REMOTEDATA):
         ImageData
             The usb dataset
         '''
+        cls.assert_dir(data_dir)
         filepath = os.path.join(data_dir, cls.FOLDER, 'gruppe 4','gruppe 4_2014-03-20_1404_12','tomo-A','gruppe 4_tomo-A.txrm')
         try:
             loader = ZEISSDataReader(file_name=filepath)
@@ -254,19 +274,25 @@ class USB(REMOTEDATA):
         except(FileNotFoundError):
             raise(FileNotFoundError("Dataset .txrm file not found in: {} \n \
                                     Specify a different data_dir or download data with dataexample.{}.download_data(data_dir)".format(filepath, cls.__name__)))
-        
+
 class KORN(REMOTEDATA):
     '''
     A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
+
+    Example
+    --------
+    >>> data_dir = 'my_PC/data_folder'
+    >>> dataexample.KORN.download_data(data_dir) # download the data
+    >>> dataexample.KORN.get(data_dir) # load the data
     '''
     FOLDER = 'korn'
-    URL = 'https://zenodo.org/record/6874123/files/korn.zip'
-    FILE_SIZE = '2.9 GB'
+    ZENODO_RECORD = '6874123'
+    ZIP_FILE = 'korn.zip'
 
     @classmethod
-    def get(cls, data_dir):
+    def get(cls, data_dir=REMOTEDATA.CIL_DATA_DIR):
         '''
-        A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
+        Get the microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123
         This function returns the raw projection data from the .xtekct file
 
         Parameters
@@ -278,7 +304,9 @@ class KORN(REMOTEDATA):
         -------
         ImageData
             The korn dataset
+
         '''
+        cls.assert_dir(data_dir)
         filepath = os.path.join(data_dir, cls.FOLDER, 'Korn i kasse','47209 testscan korn01_recon.xtekct')
         try:
             loader = NikonDataReader(file_name=filepath)
@@ -292,10 +320,43 @@ class SANDSTONE(REMOTEDATA):
     '''
     A synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435
     A small subset of the data containing selected projections and 4 slices of the reconstruction
+
+    Example
+    --------
+    >>> data_dir = 'my_PC/data_folder'
+    >>> dataexample.SANDSTONE.download_data(data_dir) # download the data
+    >>> dataexample.SANDSTONE.get(data_dir) # load the data
     '''
     FOLDER = 'sandstone'
-    URL = 'https://zenodo.org/records/4912435/files/small.zip'
-    FILE_SIZE = '227 MB'
+    ZENODO_RECORD = '4912435'
+    ZIP_FILE = 'small.zip'
+
+    @classmethod
+    def get(cls, data_dir=REMOTEDATA.CIL_DATA_DIR, filename=None):
+        '''
+        Get the synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435
+        A small subset of the data containing selected projections and 4 slices of the reconstruction
+        Parameters
+        ----------
+        data_dir: str
+           The path to the directory where the dataset is stored. Data can be downloaded with dataexample.SANDSTONE.download_data(data_dir)
+
+        file: str
+            The slices or projections to return, specify the path to the file within the data_dir
+
+        Returns
+        -------
+        ImageData
+            The selected sandstone dataset
+        '''
+        cls.assert_dir(data_dir)
+        if filename is None:
+            raise FileNotFoundError("filename must be specified")
+        extension = os.path.splitext(filename)[1]
+        if extension == '.mat':
+            return loadmat(os.path.join(data_dir,filename))
+        raise KeyError(f"Unknown extension: {extension}")
+
 
 class TestData(object):
     '''Class to return test data
@@ -319,7 +380,7 @@ class TestData(object):
 
     def __init__(self, data_dir):
         self.data_dir = data_dir
-        
+
     def load(self, which, size=None, scale=(0,1), **kwargs):
         '''
         Return a test data of the requested image
@@ -354,7 +415,7 @@ class TestData(object):
             sdata = numpy.zeros((N, M))
             sdata[int(round(N/4)):int(round(3*N/4)), int(round(M/4)):int(round(3*M/4))] = 0.5
             sdata[int(round(N/8)):int(round(7*N/8)), int(round(3*M/8)):int(round(5*M/8))] = 1
-            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X])
             data = ig.allocate()
             data.fill(sdata)
 
@@ -369,7 +430,7 @@ class TestData(object):
                     N = size[0]
                     M = size[1]
 
-                ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X])
                 data = ig.allocate()
                 tmp = numpy.array(f.convert('L').resize((M,N)))
                 data.fill(tmp/numpy.max(tmp))
@@ -391,13 +452,13 @@ class TestData(object):
                         bands = tmp.getbands()
 
                     ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=len(bands),
-                    dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X,ImageGeometry.CHANNEL])
+                    dimension_labels=[ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X,ImageDimension.CHANNEL])
                     data = ig.allocate()
                     data.fill(numpy.array(tmp.resize((M,N))))
-                    data.reorder([ImageGeometry.CHANNEL,ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                    data.reorder([ImageDimension.CHANNEL,ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X])
                     data.geometry.channel_labels = bands
                 else:
-                    ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                    ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X])
                     data = ig.allocate()
                     data.fill(numpy.array(tmp.resize((M,N))))
 

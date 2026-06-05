@@ -1,0 +1,37 @@
+{% comment %}
+*
+* This file is based on _frontpage-widget.html from the feeling-responsive theme
+* https://github.com/Phlow/feeling-responsive
+* Licensed under MIT License
+* 
+* Customization: Added inline styles to img tags for consistent image sizing
+*
+{% endcomment %}
+
+{% comment %}
+*
+*   First the include captures the url and image in a separate variable to make the code better readable.
+*
+*   These variables are widget_url and widget_image
+*
+{% endcomment %}
+
+{% capture widget_url %}{% if include.widget.url == NULL %}{% elsif include.widget.url contains 'http' %}{{ include.widget.url }}{% else %}{{ site.url }}{{ site.baseurl }}{{ include.widget.url }}{% endif %}{% endcapture %}
+
+{% capture widget_image %}{% if include.widget.image contains 'http' %}{{ include.widget.image }}{% else %}{{ site.urlimg }}{{ include.widget.image }}{% endif %}{% endcapture %}
+
+
+<div class="medium-4 columns frontpage-widget">
+	{% if include.widget.video %}
+		{{ include.widget.video }}
+	{% elsif widget_url == empty %}
+		{% if widget_image != empty %}<img src="{{ widget_image }}" alt="" style="height: 200px; width: 100%; object-fit: contain;" />{% endif %}
+	{% else %}
+		<a href="{{ widget_url }}">
+			{% if widget_image != empty %}<img src="{{ widget_image }}" alt="" style="height: 200px; width: 100%; object-fit: contain;" />{% endif %}
+		</a>
+	{% endif %}
+	<h2 class="font-size-h3 t10">{{ include.widget.title }}</h2>
+	{% if include.widget.text != empty %}<p>{{ include.widget.text }}</p>{% endif %}
+	{% if widget_url != empty %}<p><a class="button tiny radius" href="{{ widget_url }}">{{ site.data.language.more }}</a></p>{% endif %}
+</div>

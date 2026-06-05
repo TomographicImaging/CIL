@@ -19,6 +19,8 @@
 
 import astra
 import numpy as np
+from cil.framework.labels import AngleUnit
+from cil.framework.labels import AcquisitionType
 
 def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
 
@@ -41,18 +43,16 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
     """
     sinogram_geometry = sinogram_geometry_in.copy()
 
-    #this catches behaviour modified after CIL 21.3.1
-    try:
-        sinogram_geometry.config.system.align_reference_frame('cil')
-    except:
-        sinogram_geometry.config.system.update_reference_frame()
+    if sinogram_geometry.geom_type == AcquisitionType.CONE_FLEX:
+        raise ValueError('Cone-Flex geometry is not supported by this function, use convert_geometry_to_astra_vec_3D instead')
 
+    sinogram_geometry.config.system.align_reference_frame('cil')
     angles = sinogram_geometry.config.angles
     system = sinogram_geometry.config.system
     panel = sinogram_geometry.config.panel
 
     #get units
-    degrees = angles.angle_unit == sinogram_geometry.DEGREE
+    degrees = angles.angle_unit == AngleUnit.DEGREE
 
     #create a 2D astra geom from 2D CIL geometry, 2D astra geometry has axis flipped compared to 3D
     volume_geometry_temp = volume_geometry.copy()
@@ -88,7 +88,6 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
         vectors[i, :2]  = rotation_matrix.dot(src).reshape(2)
         vectors[i, 2:4] = rotation_matrix.dot(det).reshape(2)
         vectors[i, 4:6] = rotation_matrix.dot(row).reshape(2)
-
 
     proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[0], vectors)
     vol_geom = astra.create_vol_geom(volume_geometry_temp.voxel_num_y,

@@ -22,6 +22,10 @@ from .SIRT import SIRT
 from .GD import GD
 from .FISTA import FISTA
 from .FISTA import ISTA
+from .FISTA import ISTA as PGD
+from .APGD import APGD 
 from .PDHG import PDHG
 from .ADMM import LADMM
 from .SPDHG import SPDHG
+from .PD3O import PD3O
+from .LSQR import LSQR

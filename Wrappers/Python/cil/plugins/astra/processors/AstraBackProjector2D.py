@@ -84,6 +84,13 @@ class AstraBackProjector2D(DataProcessor):
         else:
             raise ValueError("Expected input dimensions is 1 or 2, got {0}"\
                              .format(dataset.number_of_dimensions))
+        
+    def _set_up(self):
+        """
+        Configure processor attributes that require the data to setup
+        Must set _shape_out
+        """
+        self._shape_out = self.volume_geometry.shape
 
     def set_projector(self, proj_id):
         self.proj_id = proj_id
@@ -107,7 +114,7 @@ class AstraBackProjector2D(DataProcessor):
 
         arr_out = np.squeeze(arr_out)
         if out is None:
-            out = ImageData(arr_out, deep_copy=False, geometry=self.volume_geometry.copy(), suppress_warning=True)
-            return out
+            out = ImageData(arr_out, deep_copy=False, geometry=self.volume_geometry.copy())
         else:
             out.fill(arr_out)
+        return out

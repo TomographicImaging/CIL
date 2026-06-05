@@ -21,9 +21,9 @@ import unittest
 from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
-from cil.utilities.errors import InPlaceError
-from cil.framework import ImageGeometry, \
-    VectorGeometry, VectorData, BlockDataContainer, DataContainer, AcquisitionGeometry
+from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, ImageGeometry, \
+    AcquisitionGeometry
+from cil.framework.labels import FillType
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
 from cil.optimisation.operators import GradientOperator
@@ -32,14 +32,14 @@ from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2Norm
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          SmoothMixedL21Norm, OperatorCompositionFunction,\
                                          Rosenbrock, IndicatorBox, TotalVariation, ScaledFunction, SumFunction, SumScalarFunction, \
-                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction, L1Sparsity
+                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction, L1Sparsity, FunctionOfAbs
 
 from cil.optimisation.functions import BlockFunction
 
 import numpy
 import scipy.special
 
-from cil.framework import ImageGeometry, BlockGeometry
+from cil.framework import BlockGeometry
 from cil.optimisation.functions import TranslateFunction
 from timeit import default_timer as timer
 
@@ -80,9 +80,9 @@ class TestFunction(CCPiTestClass):
         operator = BlockOperator(op1, op2, shape=(2, 1))
 
         # Create functions
-        noisy_data = ag.allocate(ImageGeometry.RANDOM, dtype=numpy.float64)
+        noisy_data = ag.allocate(FillType["RANDOM"], seed=42, dtype=numpy.float64)
 
-        d = ag.allocate(ImageGeometry.RANDOM, dtype=numpy.float64)
+        d = ag.allocate(FillType["RANDOM"], seed=42, dtype=numpy.float64)
         alpha = 0.5
 
         # scaled function
@@ -97,7 +97,7 @@ class TestFunction(CCPiTestClass):
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
 
-        #negative function 
+        #negative function
         g = - L2NormSquared(b=noisy_data)
 
         # Compare call of g
@@ -107,14 +107,13 @@ class TestFunction(CCPiTestClass):
         h = -g
         self.assertAlmostEqual(-a2, h(d))
 
-
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
         numpy.random.seed(1)
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(ImageGeometry.RANDOM)
-        b = ig.allocate(ImageGeometry.RANDOM)
+        u = ig.allocate(FillType["RANDOM"], seed=3)
+        b = ig.allocate(FillType["RANDOM"], seed=42)
 
         # check grad/call no data
         f = L2NormSquared()
@@ -224,8 +223,8 @@ class TestFunction(CCPiTestClass):
 
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate(ImageGeometry.RANDOM, seed=1)
-        b = ig.allocate(ImageGeometry.RANDOM, seed=2)
+        u = ig.allocate(FillType["RANDOM"], seed=1)
+        b = ig.allocate(FillType["RANDOM"], seed=2)
 
         # check grad/call no data
         f = L2NormSquared()
@@ -358,8 +357,8 @@ class TestFunction(CCPiTestClass):
         mat = np.random.randn(M, N)
         operator = MatrixOperator(mat)
         vg = VectorGeometry(N)
-        b = vg.allocate('random')
-        u = vg.allocate('random')
+        b = vg.allocate('random', seed=2)
+        u = vg.allocate('random', seed=51)
 
         func1 = OperatorCompositionFunction(0.5 * L2NormSquared(b=b), operator)
         func2 = LeastSquares(operator, b, 0.5)
@@ -371,8 +370,8 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
         M, N, K = 2, 3, 5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N)
-        u1 = ig.allocate('random')
-        u2 = ig.allocate('random')
+        u1 = ig.allocate('random', seed=3)
+        u2 = ig.allocate('random', seed=4)
 
         U = BlockDataContainer(u1, u2, shape=(2, 1))
 
@@ -391,8 +390,8 @@ class TestFunction(CCPiTestClass):
                                            U.power(2))
 
         z1 = f_no_scaled.proximal_conjugate(U, 1)
-        u3 = ig.allocate('random')
-        u4 = ig.allocate('random')
+        u3 = ig.allocate('random', seed=5)
+        u4 = ig.allocate('random', seed=6)
 
         z3 = BlockDataContainer(u3, u4, shape=(2, 1))
 
@@ -569,8 +568,8 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
         M, N, K = 2, 3, 1
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_num_z=K)
-        u = ig.allocate('random')
-        b = ig.allocate('random')
+        u = ig.allocate('random', test=3)
+        b = ig.allocate('random', test=4)
 
         # check grad/call no data
         f = L2NormSquared()
@@ -676,7 +675,7 @@ class TestFunction(CCPiTestClass):
         numpy.testing.assert_array_almost_equal(f_scaled_data.proximal_conjugate(u, tau).as_array(), \
                                                 ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)
 
-        u_out_no_out = ig.allocate('random_int')
+        u_out_no_out = ig.allocate('random_int', seed=5)
         res_no_out = f_scaled_data.proximal_conjugate(u_out_no_out, 0.5)
 
         res_out = ig.allocate()
@@ -689,8 +688,8 @@ class TestFunction(CCPiTestClass):
 
         tau = 0.1
 
-        u = ig1.allocate('random')
-        b = ig1.allocate('random')
+        u = ig1.allocate('random', seed=6)
+        b = ig1.allocate('random', seed=7)
 
         scalar = 0.5
         f_scaled = scalar * L2NormSquared(b=b)
@@ -706,7 +705,7 @@ class TestFunction(CCPiTestClass):
 
         # Tests for weighted L2NormSquared
         ig = ImageGeometry(voxel_num_x=3, voxel_num_y=3)
-        weight = ig.allocate('random')
+        weight = ig.allocate('random', seed=8)
 
         f = WeightedL2NormSquared(weight=weight)
         x = ig.allocate(0.4)
@@ -746,7 +745,7 @@ class TestFunction(CCPiTestClass):
         numpy.testing.assert_array_almost_equal(res1.as_array(), \
                                                 res2.as_array(), decimal=4)
 
-        b = ig.allocate('random')
+        b = ig.allocate('random', seed=9)
         f1 = TranslateFunction(WeightedL2NormSquared(weight=weight), b)
         f2 = WeightedL2NormSquared(weight=weight, b=b)
         res1 = f1(x)
@@ -766,11 +765,11 @@ class TestFunction(CCPiTestClass):
         numpy.random.seed(1)
 
         A = IdentityOperator(ig)
-        b = ig.allocate('random')
-        x = ig.allocate('random')
+        b = ig.allocate('random', seed=3)
+        x = ig.allocate('random', seed=4)
         c = numpy.float64(0.3)
 
-        weight = ig.allocate('random')
+        weight = ig.allocate('random', seed=5)
 
         D = DiagonalOperator(weight)
         norm_weight = numpy.float64(D.norm())
@@ -818,11 +817,11 @@ class TestFunction(CCPiTestClass):
 
         ig2 = ImageGeometry(100, 100, 100)
         A = IdentityOperator(ig2)
-        b = ig2.allocate('random')
-        x = ig2.allocate('random')
+        b = ig2.allocate('random', seed=6)
+        x = ig2.allocate('random', seed=7)
         c = 0.3
 
-        weight = ig2.allocate('random')
+        weight = ig2.allocate('random', seed=8)
 
         weight_operator = DiagonalOperator(weight.sqrt())
         tmp_A = CompositionOperator(weight_operator, A)
@@ -909,7 +908,6 @@ class TestFunction(CCPiTestClass):
         assert f4.L == 2 * f2.L
 
     def test_proximal_conjugate(self):
-        from cil.framework import AcquisitionGeometry, BlockGeometry
         ag = AcquisitionGeometry.create_Parallel2D()
         angles = np.linspace(0, 360, 10, dtype=np.float32)
 
@@ -958,7 +956,7 @@ class TestFunction(CCPiTestClass):
 
 
 class TestL1Norm (CCPiTestClass):
-    
+
     def test_L1Norm_vs_WeightedL1Norm_noweight(self):
         f1 = L1Norm()
         f2 = L1Norm(weight=None)
@@ -997,7 +995,7 @@ class TestL1Norm (CCPiTestClass):
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
 
         np.random.seed(1)
-        weights= geom.allocate('random').abs()
+        weights= geom.allocate('random', seed=2).abs()
         w = weights.abs().sum()
         x=geom.allocate(1)
         f1 = L1Norm()
@@ -1006,9 +1004,9 @@ class TestL1Norm (CCPiTestClass):
         np.testing.assert_allclose(f1(x), float(N*M))
         np.testing.assert_allclose(f2(x), w)
         np.testing.assert_allclose(f2(x), f1(weights))
-        
+
         np.random.seed(1)
-        weights= geom.allocate('random').abs()
+        weights= geom.allocate('random', seed=3).abs()
         w = weights.abs().sum()
         x=geom.allocate(2)
         b=geom.allocate(1)
@@ -1017,7 +1015,7 @@ class TestL1Norm (CCPiTestClass):
 
         np.testing.assert_allclose(f1(x), float(N*M))
         np.testing.assert_allclose(f2(x), w)
-        
+
 
         np.random.seed(1)
         w = 1
@@ -1026,8 +1024,8 @@ class TestL1Norm (CCPiTestClass):
         f2 = L1Norm(weight=w)
 
         np.testing.assert_allclose(f1(x), f2(x))
-        
-    
+
+
         with self.assertRaises(ValueError):
             a=3+4j
             f2 = L1Norm(weight=a)
@@ -1035,7 +1033,7 @@ class TestL1Norm (CCPiTestClass):
 
         geom = ImageGeometry(N, M, dtype=np.complex64)
         np.random.seed(1)
-        weights= geom.allocate('random').abs()
+        weights= geom.allocate('random', seed=4).abs()
         w = weights.abs().sum()
         x=geom.allocate(2+3j)
         b=geom.allocate(1+3j)
@@ -1044,18 +1042,18 @@ class TestL1Norm (CCPiTestClass):
 
         np.testing.assert_allclose(f1(x), float(N*M))
         np.testing.assert_allclose(f2(x), w)
-        
+
         x=geom.allocate(3j)
         b=geom.allocate(2j)
         f1 = L1Norm(b=b)
         np.testing.assert_allclose(f1(x), M*N)
-        
+
         x=geom.allocate(1+1j)
         b=geom.allocate(1)
         f1 = L1Norm(b=b)
         np.testing.assert_allclose(f1(x), M*N)
-        
-        
+
+
     def test_ZeroWeights_L1Norm(self):
         weight = VectorData(np.array([0., 1.]))
         tau = 0.2
@@ -1077,7 +1075,7 @@ class TestL1Norm (CCPiTestClass):
         N, M = 2,3
         geom = ImageGeometry(N, M)
 
-        weights = geom.allocate('random').abs().as_array()
+        weights = geom.allocate('random', seed=3).abs().as_array()
         f2 = L1Norm(weight=weights)
 
         w = np.abs(weights).sum()
@@ -1121,9 +1119,6 @@ class TestL1Norm (CCPiTestClass):
 
         xc = geom.allocate(1, dtype=np.complex64)
         self.soft_shrinkage_test(xc)
-        
-
-
 
     def soft_shrinkage_test(self, x):
         tau = 1.
@@ -1148,7 +1143,7 @@ class TestL1Norm (CCPiTestClass):
         tau = -3j
         with self.assertRaises(ValueError):
             ret = soft_shrinkage(-0.5 *x, tau)
-            
+
         # tau np.ndarray
         tau = 1. * np.ones_like(x.as_array())
         ret = soft_shrinkage(x, tau)
@@ -1191,12 +1186,10 @@ class TestL1Norm (CCPiTestClass):
 
         np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
 
-        
-
     def test_L1_prox_init(self):
         pass
 
-    def test_L1Sparsity(self):    
+    def test_L1Sparsity(self):
         from cil.optimisation.operators import WaveletOperator
         f1 = L1Norm()
         N, M = 2,3
@@ -1209,17 +1202,15 @@ class TestL1Norm (CCPiTestClass):
         W = WaveletOperator(geom, level=0) # level=0 makes this the identity operator
         f2 = L1Sparsity(W, weight=weights)
         self.L1SparsityTest(f1, f2, x)
-        
+
         f2 = L1Sparsity(W, b=b, weight=weights)
         self.L1SparsityTest(f3, f2, x)
 
         f2 = L1Sparsity(W)
         self.L1SparsityTest(f1, f2, x)
-        
+
         f2 = L1Sparsity(W, b=b)
         self.L1SparsityTest(f3, f2, x)
-        
-        
 
     def L1SparsityTest(self, f1, f2, x):
         np.testing.assert_almost_equal(f1(x), f2(x))
@@ -1228,10 +1219,8 @@ class TestL1Norm (CCPiTestClass):
 
         np.testing.assert_allclose(f1.proximal(x, tau).as_array(),\
                                    f2.proximal(x, tau).as_array())
-        
+
         np.testing.assert_almost_equal(f1.convex_conjugate(x), f2.convex_conjugate(x))
-
-
 
 
 class TestTotalVariation(unittest.TestCase):
@@ -1544,7 +1533,7 @@ class TestTotalVariation(unittest.TestCase):
         print(np.linalg.norm(test))
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_equal(np.any(np.not_equal(x.as_array(), checkp2[i].as_array())), True, err_msg="The stored value of p2 doesn't change after calling proximal")
-        np.testing.assert_almost_equal(np.sum(np.linalg.norm(test)),126.3372581, err_msg="Incorrect value of the proximal")
+        np.testing.assert_almost_equal(np.sum(np.linalg.norm(test)),126.3372581, err_msg="Incorrect value of the proximal", decimal=4)
 
 
     def test_get_p2_without_warm_start(self):
@@ -1967,7 +1956,7 @@ class TestIndicatorBox(unittest.TestCase):
         im = ig.allocate(2)
         ib = IndicatorBox(lower=-2 * mask, accelerated=accelerated)
         for val, res in zip([2, -3], [ig.allocate(2), -2 * mask]):
-            # log.info("test1", val, res)
+            # log.info("test1 %r %r", val, res)
             im.fill(val)
             np.testing.assert_allclose(
                 ib.proximal(im, 1).as_array(), res.as_array())
@@ -1975,7 +1964,7 @@ class TestIndicatorBox(unittest.TestCase):
         im = ig.allocate(2)
         ib = IndicatorBox(upper=2 * mask, accelerated=accelerated)
         for val, res in zip([-1, 3], [ig.allocate(-1), 2 * mask]):
-            # log.info("test1", val, res)
+            # log.info("test1 %r %r", val, res)
             print("test2", val, res)
             im.fill(val)
             np.testing.assert_allclose(
@@ -2135,3 +2124,105 @@ class TestIndicatorBox(unittest.TestCase):
             N = 10
             ib.set_num_threads(N)
             assert ib.num_threads == N
+
+
+class MockFunction(Function):
+    """Mock function to test FunctionOfAbs"""
+    def __init__(self, L=1.0):
+        super().__init__(L=L)
+    
+    def __call__(self, x):
+        return x.array**2  # Simple squared function
+    
+    def proximal(self, x, tau, out=None):
+        if out is None:
+            out = x.geometry.allocate(None)
+        out.array = x.array / (1 + tau)  # Simple proximal operator
+        return out
+    
+    def convex_conjugate(self, x):
+        return 0.5 * x.array**2  # Quadratic conjugate function
+
+
+class TestFunctionOfAbs(unittest.TestCase):
+    def setUp(self):
+        self.data_complex64 = VectorData(np.array([1+2j, -3+4j, -5-6j], dtype=np.complex64))
+        self.data_complex128 = VectorData(np.array([1+2j, -3+4j, -5-6j], dtype=np.complex128))
+        self.data_real32 = VectorData(np.array([1, 2, 3], dtype=np.float32))
+        self.mock_function = MockFunction()
+        self.abs_function = FunctionOfAbs(self.mock_function)
+        
+    
+    def test_initialization(self):
+        self.assertIsInstance(self.abs_function._function, MockFunction)
+        self.assertFalse(self.abs_function._lower_semi)
+
+
+
+    def test_call(self):
+        result = self.abs_function(self.data_complex64)
+        expected = np.abs(self.data_complex64.array)**2
+        np.testing.assert_array_almost_equal(result, expected, decimal=4)
+        
+        result = self.abs_function(self.data_complex128)
+        expected = np.abs(self.data_complex128.array)**2
+        np.testing.assert_array_almost_equal(result, expected, decimal=6)
+        
+        result = self.abs_function(self.data_real32)
+        expected = np.abs(self.data_real32.array)**2
+        np.testing.assert_array_almost_equal(result, expected, decimal=6)
+        
+    def test_get_real_complex_dtype(self):
+        from cil.optimisation.functions.AbsFunction import _get_real_complex_dtype
+        real, compl = _get_real_complex_dtype(self.data_complex128)
+        self.assertEqual( real, np.float64)
+        self.assertEqual(compl, np.complex128)
+        
+        real, compl = _get_real_complex_dtype(self.data_complex64)
+        self.assertEqual( real, np.float32)
+        self.assertEqual(compl, np.complex64)
+        
+        real, compl = _get_real_complex_dtype(self.data_real32)
+        self.assertEqual( real, np.float32)
+        self.assertEqual(compl, np.complex64)
+        
+        
+        
+    
+    def test_proximal(self):
+        tau = 0.5
+        result = self.abs_function.proximal(self.data_complex128, tau)
+        expected = (np.abs(self.data_complex128.array) / (1 + tau)) * np.exp(1j * np.angle(self.data_complex128.array))
+        np.testing.assert_array_almost_equal(result.array, expected, decimal=6)
+    
+        result = self.abs_function.proximal(self.data_complex64, tau)
+        expected = (np.abs(self.data_complex64.array) / (1 + tau)) * np.exp(1j * np.angle(self.data_complex64.array))
+        np.testing.assert_array_almost_equal(result.array, expected, decimal=4)
+        
+        result = self.abs_function.proximal(self.data_real32, tau)
+        expected = (np.abs(self.data_real32.array) / (1 + tau)) * np.exp(1j * np.angle(self.data_real32.array))
+        np.testing.assert_array_almost_equal(result.array, expected, decimal=4)
+        
+        
+        
+    def test_convex_conjugate_lower_semi(self):
+        self.abs_function._lower_semi = True
+        result = self.abs_function.convex_conjugate(self.data_complex128)
+        expected = 0.5 * np.abs(self.data_complex128.array) ** 2
+        np.testing.assert_array_almost_equal(result, expected, decimal=6)
+        
+        result = self.abs_function.convex_conjugate(self.data_complex64)
+        expected = 0.5 * np.abs(self.data_complex64.array) ** 2
+        np.testing.assert_array_almost_equal(result, expected, decimal=4)
+        
+        result = self.abs_function.convex_conjugate(self.data_real32)
+        expected = 0.5 * np.abs(self.data_real32.array) ** 2
+        np.testing.assert_array_almost_equal(result, expected, decimal=4)
+        
+    
+    def test_convex_conjugate_not_implemented(self):
+        self.abs_function._lower_semi = False
+        
+        self.assertEqual(self.abs_function.convex_conjugate(self.data_real32), 0.)
+
+

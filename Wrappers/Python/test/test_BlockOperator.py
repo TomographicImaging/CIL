@@ -20,9 +20,9 @@ import unittest
 from utils import initialise_tests
 import logging
 from cil.optimisation.operators import BlockOperator, GradientOperator
-from cil.framework import BlockDataContainer
+from cil.framework import BlockDataContainer, BlockGeometry, ImageGeometry
+from cil.framework.labels import FillType
 from cil.optimisation.operators import IdentityOperator
-from cil.framework import ImageGeometry, ImageData, BlockGeometry
 import numpy
 from cil.optimisation.operators import FiniteDifferenceOperator
 from testclass import CCPiTestClass
@@ -35,7 +35,7 @@ def dt(steps):
     return steps[-1] - steps[-2]
 
 class TestBlockOperator(CCPiTestClass):
-    
+
     def setUp(self):
         numpy.random.seed(1)
 
@@ -43,14 +43,14 @@ class TestBlockOperator(CCPiTestClass):
     def test_BlockOperator(self):
         M, N  = 3, 4
         ig = ImageGeometry(M, N)
-        arr = ig.allocate('random')
+        arr = ig.allocate('random', seed=5)
 
         G = GradientOperator(ig)
         Id = IdentityOperator(ig)
 
         B = BlockOperator(G, Id)
         # Nx1 case
-        u = ig.allocate('random')
+        u = ig.allocate('random', seed=6)
         z1 = B.direct(u)
 
         res = B.range_geometry().allocate()
@@ -59,7 +59,7 @@ class TestBlockOperator(CCPiTestClass):
 
         self.assertBlockDataContainerEqual(z1, res)
 
-        z1 = B.range_geometry().allocate(ImageGeometry.RANDOM)
+        z1 = B.range_geometry().allocate(FillType["RANDOM"], seed=7)
 
         res1 = B.adjoint(z1)
         res2 = B.domain_geometry().allocate()
@@ -160,7 +160,7 @@ class TestBlockOperator(CCPiTestClass):
             )
 
         B1 = BlockOperator(G, Id)
-        U = ig.allocate(ImageGeometry.RANDOM)
+        U = ig.allocate(FillType["RANDOM"], seed=5)
         #U = BlockDataContainer(u,u)
         RES1 = B1.range_geometry().allocate()
 
@@ -168,7 +168,7 @@ class TestBlockOperator(CCPiTestClass):
         B1.direct(U, out = RES1)
 
         self.assertBlockDataContainerEqual(Z1,RES1)
-        
+
     def test_block_operator_1_1(self):
         M, N ,W = 3, 4, 5
         ig = ImageGeometry(M, N, W)
@@ -181,20 +181,20 @@ class TestBlockOperator(CCPiTestClass):
         #self.assertNumpyArrayEqual( ans.shape, ig.allocate(0).as_array())
         self.assertNumpyArrayEqual( ans.as_array(), ig.allocate(0).as_array())
         self.assertFalse(isinstance(ans, BlockDataContainer))
-        
+
         self.assertEqual(K.range_geometry(), ig)
 
-        
+
         ans2 = K.adjoint(ans)
         self.assertTrue(isinstance(ans2, BlockDataContainer))
         self.assertNumpyArrayEqual(ans2.shape, (2,1))
-        
+
         range_data=ans.geometry.allocate('random', seed=2)
         ans3=K.adjoint(range_data)
         self.assertNumpyArrayEqual(ans3.shape, (2,1))
         self.assertNumpyArrayEqual(ans3.get_item(0).as_array(), range_data.as_array())
         self.assertNumpyArrayEqual(ans3.get_item(1).as_array(), -range_data.as_array())
-        
+
         M, N ,W = 3, 4, 5
         ig = ImageGeometry(M, N, W)
         operator0=IdentityOperator(ig)
@@ -206,8 +206,67 @@ class TestBlockOperator(CCPiTestClass):
         #self.assertNumpyArrayEqual( ans.shape, ig.allocate(0).as_array())
         self.assertNumpyArrayEqual( ans.get_item(0).as_array(), data.as_array())
         self.assertNumpyArrayEqual( ans.get_item(1).as_array(), -data.as_array())
-        
+
         self.assertEqual(K.domain_geometry(), ig)
+
+    def test_blockoperator_out_datacontainer(self):
+        
+        #test direct
+        M, N ,W = 3, 4, 5
+        ig = ImageGeometry(M, N, W)
+        operator0=IdentityOperator(ig)
+        operator1=-IdentityOperator(ig)
+        K = BlockOperator(operator0, operator1, shape = (1,2))
+        bg=BlockGeometry(ig, ig)
+        data=bg.allocate('random', seed=2)
+        out=K.range.allocate(0)
+        assert not isinstance(out, BlockDataContainer)
+        ans = K.direct(data)  
+        K.direct(data, out)
+        self.assertNumpyArrayEqual(ans.array, out.array) 
+        
+        #test direct out is BlockDataContainer 
+        out = BlockDataContainer(out)
+        assert isinstance(out, BlockDataContainer)
+        ans = K.direct(data)  
+        K.direct(data, out)
+        self.assertNumpyArrayEqual(ans.array, out.get_item(0).array) 
+        
+        #test adjoint wrong dimension 
+        out=ig.allocate(0) 
+        data = ig.allocate('random', seed=3)
+        print(K.range_geometry)
+        with self.assertRaises(ValueError):
+            K.adjoint(data, out)
+        
+        
+        #test adjoint out not BlockDataContainer 
+        M, N ,W = 3, 4, 5
+        operator0=IdentityOperator(ig)
+        operator1=-IdentityOperator(ig)
+        K = BlockOperator(operator0, operator1, shape = (2,1))
+        bg=BlockGeometry(ig, ig)
+        data=bg.allocate('random', seed=2)
+        out=K.domain.allocate(0)
+        assert not isinstance(out, BlockDataContainer)
+        ans = K.adjoint(data)  
+        K.adjoint(data, out)
+        self.assertNumpyArrayEqual(ans.array, out.array) 
+        
+        #test adjoint out is BlockDataContainer 
+        out = BlockDataContainer(out)
+        assert isinstance(out, BlockDataContainer)
+        ans = K.adjoint(data)  
+        K.adjoint(data, out)
+        self.assertNumpyArrayEqual(ans.array, out.get_item(0).array) 
+        
+        #test direct wrong dimension 
+        out=ig.allocate(0) 
+        data = ig.allocate('random', seed=4)
+        print(K.range_geometry)
+        with self.assertRaises(ValueError):
+            K.direct(data, out)
+
         
         
 
@@ -215,7 +274,7 @@ class TestBlockOperator(CCPiTestClass):
     def test_timedifference(self):
         M, N ,W = 100, 512, 512
         ig = ImageGeometry(M, N, W)
-        arr = ig.allocate('random')
+        arr = ig.allocate('random', seed=4)
 
         G = GradientOperator(ig, backend='numpy')
         Id = IdentityOperator(ig)
@@ -224,7 +283,7 @@ class TestBlockOperator(CCPiTestClass):
 
 
         # Nx1 case
-        u = ig.allocate('random')
+        u = ig.allocate('random', seed=5)
         steps = [timer()]
         i = 0
         n = 10.
@@ -285,7 +344,7 @@ class TestBlockOperator(CCPiTestClass):
         B = BlockOperator(G, Id)
         # Nx1 case
         u = ig.allocate('random', seed=2)
-        w = B.range_geometry().allocate(ImageGeometry.RANDOM, seed=3)
+        w = B.range_geometry().allocate(FillType["RANDOM"], seed=3)
         w1 = B.direct(u)
         u1 = B.adjoint(w)
         self.assertAlmostEqual((w * w1).sum() , (u1*u).sum(), places=5)
@@ -340,10 +399,7 @@ class TestBlockOperator(CCPiTestClass):
         with self.assertRaises(ValueError):
             A.set_norms([-1,-3])
 
-    
-
-
-    def test_BlockOperator(self):
+    def test_BlockOperator2(self):
         ig = [ ImageGeometry(10,20,30) , \
                ImageGeometry(10,20,30) , \
                ImageGeometry(10,20,30) ]
@@ -495,7 +551,7 @@ class TestBlockOperator(CCPiTestClass):
         N, M = 200, 300
 
         ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N)
-        u = ig.allocate('random_int')
+        u = ig.allocate('random_int', seed=3)
         G = FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann')
         log.info("%s %s", type(u), u.as_array())
         log.info("%s", G.direct(u).as_array())
@@ -504,7 +560,7 @@ class TestBlockOperator(CCPiTestClass):
 
         M1, N1, K1 = 200, 300, 2
         ig1 = ImageGeometry(voxel_num_x = M1, voxel_num_y = N1, channels = K1)
-        u1 = ig1.allocate('random_int')
+        u1 = ig1.allocate('random_int', seed=4)
         G1 = FiniteDifferenceOperator(ig1, direction=2, bnd_cond = 'Periodic')
         log.info(ig1.shape==u1.shape)
         log.info("%s", G1.norm())

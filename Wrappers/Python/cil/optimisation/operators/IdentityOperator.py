@@ -23,11 +23,17 @@ import numpy as np
 
 class IdentityOperator(LinearOperator):
 
-    '''IdentityOperator:  Id: X -> Y,  Id(x) = x\in Y
+    r''' `IdentityOperator`: :math:`\mathrm{Id}: X \rightarrow Y`,  :math:`\mathrm{Id}(x) = x`
 
-                   X : gm_domain
-                   Y : gm_range ( Default: Y = X )
+                   :math:`X` : domain
+                   :math:`Y` : range ( Default: :math:`Y = X` )
 
+    Parameters
+    ----------
+    domain_geometry: CIL Geometry
+        domain of the operator
+    range_geometry: CIL Geometry, optional
+        range of the operator, default: same as domain
     '''
 
 
@@ -42,7 +48,21 @@ class IdentityOperator(LinearOperator):
 
     def direct(self,x,out=None):
 
-        '''Returns Id(x)'''
+        r'''Returns the input data :math:`x`
+        
+        Parameters
+        ----------
+        x : DataContainer or BlockDataContainer
+            Input data
+        out : DataContainer or BlockDataContainer, optional
+            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned. The default is None.
+        
+        Returns
+        -------
+        DataContainer or BlockDataContainer
+            :math:`\mathrm{Id}(x) = x`
+            
+        '''
 
         if out is None:
             return x.copy()
@@ -51,8 +71,21 @@ class IdentityOperator(LinearOperator):
             return out
 
     def adjoint(self,x, out=None):
-
-        '''Returns Id(x)'''
+        r'''Returns the input data, :math:`x`
+        
+        Parameters
+        ----------
+        x : DataContainer or BlockDataContainer
+            Input data
+        out : DataContainer or BlockDataContainer, optional
+            If out is not None the output of the Operator will be filled in out, otherwise a new object is instantiated and returned. The default is None.
+            
+        Returns
+        -------
+        DataContainer or BlockDataContainer
+            :math:`\mathrm{Id}^*(x)=x`
+        
+        '''
 
 
         if out is None:
@@ -63,7 +96,7 @@ class IdentityOperator(LinearOperator):
 
     def calculate_norm(self, **kwargs):
 
-        '''Evaluates operator norm of IdentityOperator'''
+        '''Evaluates operator norm of  `IdentityOperator`'''
 
         return 1.0
 
@@ -85,8 +118,10 @@ class IdentityOperator(LinearOperator):
     
     def is_orthogonal(self):
         '''Returns if the operator is orthogonal
+        
         Returns
         -------
         `Bool`
+            Always returns `True` for `IdentityOperator`
         '''
         return True 

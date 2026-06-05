@@ -1,6 +1,8 @@
-/build/
-/Wrappers/Python/build/
-/Wrappers/Python/*.egg*/
-/Wrappers/Python/cil/version.py
-/Wrappers/Python/setup.py
+/build*
+/output/
 __pycache__/
+/Wrappers/Python/cil-*.dist-info/
+/Wrappers/Python/cil/include/
+/Wrappers/Python/cil/lib/
+*.vscode*
+*.egg*

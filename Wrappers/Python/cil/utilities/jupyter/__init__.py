@@ -17,13 +17,12 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Kyle Pidgeon (UKRI-STFC)
 
-try:
-    from ipywidgets import interactive_output
-    import ipywidgets as widgets
-except ImportError as ie:
-    raise ImportError("please conda/pip install ipywidgets") from ie
+from ipywidgets import interactive_output
+import ipywidgets as widgets
+
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
+
 import numpy
 
 from IPython.display import HTML, display

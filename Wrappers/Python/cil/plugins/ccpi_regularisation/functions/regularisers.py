@@ -20,17 +20,26 @@ try:
     from ccpi.filters import regularisers
     from ccpi.filters.TV import TV_ENERGY
 except ImportError as exc:
-    raise ImportError('Please `conda install "ccpi::ccpi-regulariser>=24"`') from exc
+    raise ImportError('Please `conda install "ccpi::ccpi-regulariser>=24.0.1"`') from exc
 
 
-from cil.framework import DataOrder
 from cil.framework import DataContainer
+from cil.framework.labels import ImageDimension
 from cil.optimisation.functions import Function
 import numpy as np
 import warnings
 from numbers import Number
 
 class RegulariserFunction(Function):
+
+    def __init__(self, device='cpu'):
+        self.device = device
+        if device == 'gpu':
+            from ccpi.filters.utils import cilregcuda
+            if cilregcuda is None:
+                raise ValueError("GPU code is not available. Please check the ccpi-regulariser version: if installed via conda it should have 'cuda' in the package name, or select device='cpu'.")
+        super().__init__()
+
     def proximal(self, x, tau, out=None):
 
         r""" Generic proximal method for a RegulariserFunction
@@ -111,9 +120,10 @@ class TV_Base(RegulariserFunction):
 
     """
 
-    def __init__(self, strong_convexity_constant = 0):
+    def __init__(self, strong_convexity_constant = 0, device='cpu'):
 
         self.strong_convexity_constant = strong_convexity_constant
+        super().__init__(device=device)
 
     def __call__(self,x):
         in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
@@ -138,6 +148,9 @@ class FGP_TV(TV_Base):
         The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm
         applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
 
+        Note
+        -----
+        In CIL Version 24.1.0 we change the default value of nonnegativity to False. This means non-negativity is not enforced by default.
 
         Parameters
         ----------
@@ -155,7 +168,7 @@ class FGP_TV(TV_Base):
 
                     .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})
 
-        nonnegativity : :obj:`boolean`. Default = True .
+        nonnegativity : :obj:`boolean`. Default = False .
                         Non-negativity constraint for the solution of the FGP algorithm.
 
         tolerance : :obj:`float`, Default = 0 .
@@ -202,13 +215,16 @@ class FGP_TV(TV_Base):
         """
 
 
-    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu', strong_convexity_constant=0):
+    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=None, device='cpu', strong_convexity_constant=0):
 
         if isotropic == True:
             self.methodTV = 0
         else:
             self.methodTV = 1
 
+        if nonnegativity is None: # Deprecate this warning in future versions and allow nonnegativity to be default False in the init.
+            warnings.warn('Note that the default behaviour now sets the nonnegativity constraint to False ', UserWarning, stacklevel=2)
+            nonnegativity=False
         if nonnegativity == True:
             self.nonnegativity = 1
         else:
@@ -220,7 +236,7 @@ class FGP_TV(TV_Base):
         self.nonnegativity = nonnegativity
         self.device = device
 
-        super(FGP_TV, self).__init__(strong_convexity_constant=strong_convexity_constant)
+        super().__init__(strong_convexity_constant=strong_convexity_constant, device=device)
 
     def _fista_on_dual_rof(self, in_arr, tau):
 
@@ -299,6 +315,7 @@ class TGV(RegulariserFunction):
         if kwargs.get('iter_TGV', None) is not None:
             # raise ValueError('iter_TGV parameter has been superseded by num_iter. Use that instead.')
             self.num_iter = kwargs.get('iter_TGV')
+        super().__init__(device=device)
 
     def __call__(self,x):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
@@ -402,12 +419,13 @@ class FGP_dTV(RegulariserFunction):
         self.reference = np.asarray(reference.as_array(), dtype=np.float32)
         self.eta = eta
 
+        super().__init__(device=device)
     def __call__(self,x):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
 
     def proximal_numpy(self, in_arr, tau):
-        
+
         info = np.zeros((2,), dtype=np.float32)
 
         res = regularisers.FGP_dTV(\
@@ -458,6 +476,7 @@ class TNV(RegulariserFunction):
         self.max_iteration = max_iteration
         self.tolerance = tolerance
 
+        super().__init__(device='cpu')
     def __call__(self,x):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
@@ -465,7 +484,7 @@ class TNV(RegulariserFunction):
     def proximal_numpy(self, in_arr, tau):
         # remove any dimension of size 1
         in_arr = np.squeeze(in_arr)
-    
+
         res = regularisers.TNV(in_arr,
               self.alpha * tau,
               self.max_iteration,
@@ -489,7 +508,7 @@ class TNV(RegulariserFunction):
     def check_input(self, input):
         '''TNV requires 2D+channel data with the first dimension as the channel dimension'''
         if isinstance(input, DataContainer):
-            DataOrder.check_order_for_engine('cil', input.geometry)
+            ImageDimension.check_order_for_engine('cil', input.geometry)
             if ( input.geometry.channels == 1 ) or ( not input.geometry.ndim == 3) :
                 raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
         else:

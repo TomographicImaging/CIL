@@ -18,7 +18,7 @@
 
 import scipy.sparse as sp
 import numpy as np
-from cil.framework import ImageData
+from cil.framework import ImageData, ImageGeometry
 from cil.optimisation.operators import Operator
 
 class SparseFiniteDifferenceOperator(Operator):
@@ -90,7 +90,6 @@ class SparseFiniteDifferenceOperator(Operator):
         return ImageData(res)
 
 if __name__ == '__main__':
-    from cil.framework import ImageGeometry
     M, N= 2, 3
     ig = ImageGeometry(M, N)
     arr = ig.allocate('random_int')

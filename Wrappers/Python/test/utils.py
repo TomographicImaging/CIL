@@ -104,10 +104,14 @@ if module_info != None:
 
 if module_info is None:
     has_ccpi_regularisation = False
+    has_ccpi_regularisation_cuda = False
 else:
     has_ccpi_regularisation = True
+    from ccpi.filters.utils import cilregcuda
+    has_ccpi_regularisation_cuda = cilregcuda is not None
 
 system_state['has_ccpi_regularisation']= has_ccpi_regularisation
+system_state['has_ccpi_regularisation_cuda']= has_ccpi_regularisation_cuda
 
 
 #tomophantom
@@ -127,6 +131,30 @@ else:
     has_numba = True
 system_state['has_numba']= has_numba
 
+module_info = importlib.util.find_spec("matplotlib")
+if module_info is None:
+    has_matplotlib = False
+else:
+    has_matplotlib = True
+system_state['has_matplotlib'] = has_matplotlib
+
+#has_skimage
+module_info = importlib.util.find_spec("skimage")
+if module_info is None:
+    has_skimage = False
+else:
+    has_skimage = True
+system_state['has_skimage']= has_skimage
+
+#has_zenodo_get
+module_info = importlib.util.find_spec("zenodo_get")
+if module_info is None:
+    has_zenodo_get = False
+else:
+    import zenodo_get
+
+    has_zenodo_get = hasattr(zenodo_get, 'zenodo_get')
+system_state['has_zenodo_get'] = has_zenodo_get
 
 # to disable prints from 3rd part libraries and tests
 def disable_print():

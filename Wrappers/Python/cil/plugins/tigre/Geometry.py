@@ -16,14 +16,13 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
-from cil.framework import AcquisitionGeometry, ImageGeometry
+from cil.framework.labels import AcquisitionType, AngleUnit
 import numpy as np
 
 try:
     from tigre.utilities.geometry import Geometry
 except ModuleNotFoundError:
-    raise ModuleNotFoundError("This plugin requires the additional package TIGRE\n" +
-            "Please install it via conda as tigre from the ccpi channel")
+    Geometry = object
 
 class CIL2TIGREGeometry(object):
     @staticmethod
@@ -33,7 +32,7 @@ class CIL2TIGREGeometry(object):
         #angles
         angles = ag.config.angles.angle_data + ag.config.angles.initial_angle
 
-        if ag.config.angles.angle_unit == AcquisitionGeometry.DEGREE:
+        if ag.config.angles.angle_unit == AngleUnit.DEGREE:
             angles *= (np.pi/180.)
 
         #convert CIL to TIGRE angles s
@@ -50,10 +49,15 @@ class CIL2TIGREGeometry(object):
         return tg, angles
 
 class TIGREGeometry(Geometry):
-
     def __init__(self, ig, ag):
+        if Geometry is object:
+            raise ModuleNotFoundError(
+                "This plugin requires the additional package TIGRE\n"
+                "Please install it via conda as tigre from the ccpi channel")
+        super().__init__()
 
-        Geometry.__init__(self)
+        if ag.geom_type not in ['cone', 'parallel']:
+            raise ValueError(f"CIL cannot use TIGRE to process geometries of type {ag.geom_type}.")
 
         ag_in = ag.copy()
         system = ag_in.config.system
@@ -109,7 +113,7 @@ class TIGREGeometry(Geometry):
         self.sDetector = self.dDetector * self.nDetector    # total size of the detector    (mm)
 
 
-        if ag_in.dimension == '2D':
+        if AcquisitionType.DIM2 & ag_in.dimension:
             self.is2D = True
 
             #fix IG to single slice in z

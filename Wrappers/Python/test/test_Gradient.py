@@ -17,6 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
+from unittest.mock import Mock, patch
 import logging
 import numpy
 from cil.framework import ImageGeometry
@@ -156,7 +157,7 @@ class TestGradientOperator(unittest.TestCase):
                                                     bnd_cond = bnd,
                                                     backend = backend,
                                                     correlation = corr, method=method)
-                            tmp_x = Grad.domain.allocate('random')
+                            tmp_x = Grad.domain.allocate('random', seed=5)
                             res_in_place = Grad.direct(tmp_x)
                             res_allocate = Grad.range.allocate()
                             Grad.direct(tmp_x, out = res_allocate)
@@ -185,7 +186,7 @@ class TestGradientOperator(unittest.TestCase):
                                                     bnd_cond = bnd,
                                                     backend = backend,
                                                     correlation = corr, method=method)
-                            tmp_x = Grad.range.allocate('random')
+                            tmp_x = Grad.range.allocate('random', seed=5)
                             res_in_place = Grad.adjoint(tmp_x)
                             res_allocate = Grad.domain.allocate()
                             Grad.adjoint(tmp_x, out = res_allocate)
@@ -265,7 +266,7 @@ class TestGradientOperator(unittest.TestCase):
         Grad2D_split_false = GradientOperator(geom, split = False, correlation="SpaceChannels", backend='c')
         Grad2D_split_true = GradientOperator(geom, split = True, correlation="SpaceChannels", backend='c')
 
-        tmp_x = geom.allocate('random')
+        tmp_x = geom.allocate('random', seed=5)
         res1 = Grad2D_split_false.direct(tmp_x)
         res2 = Grad2D_split_true.direct(tmp_x)
         res1_adj = Grad2D_split_false.adjoint(res1)
@@ -281,7 +282,7 @@ class TestGradientOperator(unittest.TestCase):
         Grad3D_split_false = GradientOperator(geom, split = False, correlation="SpaceChannels", backend='c')
         Grad3D_split_true = GradientOperator(geom, split = True, correlation="SpaceChannels", backend='c')
 
-        tmp_x = geom.allocate('random')
+        tmp_x = geom.allocate('random', seed=6)
         res1 = Grad3D_split_false.direct(tmp_x)
         res2 = Grad3D_split_true.direct(tmp_x)
         res1_adj = Grad3D_split_false.adjoint(res1)
@@ -307,7 +308,7 @@ class TestGradientOperator(unittest.TestCase):
                         Grad_c = GradientOperator(geom, bnd_cond = bnd, method=method, correlation= corr, backend = 'c')
                         Grad_numpy =  GradientOperator(geom, bnd_cond = bnd, method=method, correlation= corr, backend = 'numpy')
 
-                        tmp_x = geom.allocate('random')
+                        tmp_x = geom.allocate('random', seed=5)
                         res1_c = Grad_c.direct(tmp_x)
                         res1_np = Grad_numpy.direct(tmp_x)
 
@@ -335,7 +336,7 @@ class TestGradientOperator(unittest.TestCase):
                                 self.print_assertion_info(geom, bnd, None, None, corr, None)
                                 raise
 
-                        tmp_x = Grad_c.range.allocate('random')
+                        tmp_x = Grad_c.range.allocate('random', seed=6)
                         res1_c = Grad_c.adjoint(tmp_x)
                         res1_np = Grad_numpy.adjoint(tmp_x)
 
@@ -374,9 +375,9 @@ class TestGradientOperator(unittest.TestCase):
             ig3 = ImageGeometry(voxel_num_x = 5, voxel_num_y = 1, voxel_num_z=5,
                                 voxel_size_x = 0.6, voxel_size_y = 0.4, voxel_size_z=0.3)
 
-            data1 = ig1.allocate('random')
-            data2 = ig2.allocate('random')
-            data3 = ig3.allocate('random')
+            data1 = ig1.allocate('random', seed=5)
+            data2 = ig2.allocate('random', seed=6)
+            data3 = ig3.allocate('random', seed=7)
 
             data = [data1, data2, data3]
             ig = [ig1, ig2, ig3]
@@ -440,7 +441,7 @@ class TestGradientOperator(unittest.TestCase):
     def test_GradientOperator_complex_data(self):
         # make complex dtype
         self.ig_2D.dtype = numpy.complex64
-        x = self.ig_2D.allocate('random')
+        x = self.ig_2D.allocate('random', seed=5)
 
         Grad = GradientOperator(domain_geometry=self.ig_2D, backend='numpy')
 
@@ -454,3 +455,30 @@ class TestGradientOperator(unittest.TestCase):
         # check dot_test
         for sd in [5, 10, 15]:
             self.assertTrue(LinearOperator.dot_test(Grad, seed=sd))
+
+
+    def test_GradientOperator_cpp_failure_direct(self):
+        # Simulate the failure by setting the status to non-zero
+            ig = ImageGeometry(voxel_num_x = 2, voxel_num_y = 3, voxel_num_z=4)
+            data = ig.allocate('random', seed=5)
+
+            Grad = GradientOperator(ig, backend='c')
+        
+            # with the call to status = self.fd(args) returning a non-zero value
+            Grad.operator.fd = Mock(return_value=-1)
+            with self.assertRaises(RuntimeError):
+                Grad.direct(data)
+
+
+    def test_GradientOperator_cpp_failure_adjoint(self):
+        # Simulate the failure by setting the status to non-zero
+            ig = ImageGeometry(voxel_num_x = 2, voxel_num_y = 3, voxel_num_z=4)
+            data = ig.allocate('random', seed=5)
+
+            Grad = GradientOperator(ig, backend='c')
+            res_direct = Grad.direct(data)
+        
+            # with the call to status = self.fd(args) returning a non-zero value
+            Grad.operator.fd = Mock(return_value=-1)
+            with self.assertRaises(RuntimeError):
+                Grad.adjoint(res_direct)

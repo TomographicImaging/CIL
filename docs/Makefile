@@ -25,6 +25,7 @@ web:
 	@$(JEKYLLBUILD) -s "$(JEKYLLSRCDIR)" $(JEKYLLOPTS)
 	@ls "$(JEKYLLSRCDIR)"/*.md | xargs -II basename I .md | xargs -II rm -rf "$(BUILDDIR)/I"
 	@rm -rf "$(BUILDDIR)/assets"
+	@rm -rf "$(BUILDDIR)/publications"
 	@mv _site/* "$(BUILDDIR)/"
 dirhtml:
 	@rm -rf "$(BUILDDIR)/$(BUILDSUBDIR)"

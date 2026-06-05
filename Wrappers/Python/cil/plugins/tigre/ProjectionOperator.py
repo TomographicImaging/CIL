@@ -15,27 +15,16 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-from cil.framework import ImageData, AcquisitionData, AcquisitionGeometry
-from cil.framework import DataOrder
-from cil.framework import BlockGeometry
-from cil.optimisation.operators import BlockOperator
-from cil.optimisation.operators import LinearOperator
-from cil.plugins.tigre import CIL2TIGREGeometry
-import numpy as np
 import logging
-import warnings
+
+import numpy as np
+
+from cil.framework import ImageData, AcquisitionData, BlockGeometry
+from cil.framework.labels import AcquisitionDimension, ImageDimension
+from cil.optimisation.operators import BlockOperator, LinearOperator
+from cil.plugins.tigre import CIL2TIGREGeometry
 
 log = logging.getLogger(__name__)
-
-try:
-    from _Atb import _Atb_ext as Atb
-    from _Ax import _Ax_ext as Ax
-
-except ModuleNotFoundError:
-    raise ModuleNotFoundError(
-        "This plugin requires the additional package TIGRE\n" +
-        "Please install it via conda as tigre from the ccpi channel")
 
 try:
     from tigre.utilities.gpu import GpuIds
@@ -147,8 +136,8 @@ class ProjectionOperator_ag(ProjectionOperator):
                 "TIGRE projectors are GPU only. Got device = {}".format(
                     device))
 
-        DataOrder.check_order_for_engine('tigre', image_geometry)
-        DataOrder.check_order_for_engine('tigre', acquisition_geometry)
+        ImageDimension.check_order_for_engine('tigre', image_geometry)
+        AcquisitionDimension.check_order_for_engine('tigre', acquisition_geometry)
 
         super(ProjectionOperator,self).__init__(domain_geometry=image_geometry,\
              range_geometry=acquisition_geometry)
@@ -178,6 +167,13 @@ class ProjectionOperator_ag(ProjectionOperator):
             self.gpuids = GpuIds()
 
     def __call_Ax(self, data):
+        try:
+            from _Ax import _Ax_ext as Ax
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError(
+                "This plugin requires the additional package TIGRE\n"
+                "Please install it via conda as tigre from the ccpi channel")
+
         if has_gpu_sel:
             return Ax(data, self.tigre_geom, self.tigre_geom.angles,
                       self.method['direct'], self.tigre_geom.mode, self.gpuids)
@@ -203,13 +199,19 @@ class ProjectionOperator_ag(ProjectionOperator):
         if out is None:
             out = AcquisitionData(arr_out,
                                   deep_copy=False,
-                                  geometry=self._range_geometry.copy(),
-                                  suppress_warning=True)
-            return out
+                                  geometry=self._range_geometry.copy())
         else:
             out.fill(arr_out)
+        return out
 
     def __call_Atb(self, data):
+        try:
+            from _Atb import _Atb_ext as Atb
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError(
+                "This plugin requires the additional package TIGRE\n"
+                "Please install it via conda as tigre from the ccpi channel")
+
         if has_gpu_sel:
             return Atb(data, self.tigre_geom, self.tigre_geom.angles,
                        self.method['adjoint'], self.tigre_geom.mode,
@@ -223,7 +225,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         data = x.as_array()
 
         #if single angle projection add the dimension in for TIGRE
-        if x.dimension_labels[0] != AcquisitionGeometry.ANGLE:
+        if x.dimension_labels[0] != AcquisitionDimension.ANGLE:
             data = np.expand_dims(data, axis=0)
 
         if self.tigre_geom.is2D:
@@ -236,11 +238,10 @@ class ProjectionOperator_ag(ProjectionOperator):
         if out is None:
             out = ImageData(arr_out,
                             deep_copy=False,
-                            geometry=self._domain_geometry.copy(),
-                            suppress_warning=True)
-            return out
+                            geometry=self._domain_geometry.copy())
         else:
             out.fill(arr_out)
+        return out
 
     def domain_geometry(self):
         return self._domain_geometry

@@ -19,59 +19,74 @@
 from cil.optimisation.algorithms import Algorithm
 import numpy
 import logging
+import warnings 
 
 log = logging.getLogger(__name__)
 
 
 class CGLS(Algorithm):
 
-    r'''Conjugate Gradient Least Squares algorithm
+    r'''Conjugate Gradient Least Squares (CGLS) algorithm
+    
+    The Conjugate Gradient Least Squares (CGLS) algorithm is commonly used for solving large systems of linear equations, due to its fast convergence.
 
     Problem:
 
     .. math::
 
-      \min || A x - b ||^2_2
+      \min_x || A x - b ||^2_2
+      
+      
+    Parameters
+    ------------
+    operator : Operator
+        Linear operator for the inverse problem
+    initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros. 
+        Initial guess 
+    data : DataContainer in the range of the operator 
+        Acquired data to reconstruct
+        
+    Note
+    -----
+    Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks and in particular the CGLSEarlyStopping callback replicated the old behaviour.
 
-    |
-
-    Parameters :
-
-      :parameter operator : Linear operator for the inverse problem
-      :parameter initial : Initial guess ( Default initial = 0)
-      :parameter data : Acquired data to reconstruct
-      :parameter tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
-
-    Reference:
-        https://web.stanford.edu/group/SOL/software/cgls/
+    Reference
+    ---------
+    https://web.stanford.edu/group/SOL/software/cgls/
     '''
-    def __init__(self, initial=None, operator=None, data=None, tolerance=1e-6, **kwargs):
+    def __init__(self, initial=None, operator=None, data=None, **kwargs):
         '''initialisation of the algorithm
-
-        :param operator : Linear operator for the inverse problem
-        :param initial : Initial guess ( Default initial = 0)
-        :param data : Acquired data to reconstruct
-        :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
         '''
+        #We are deprecating tolerance 
+        self.tolerance=kwargs.pop("tolerance", None)
+        if self.tolerance is not None:
+            warnings.warn( stacklevel=2, category=DeprecationWarning, message="Passing tolerance directly to CGLS is being deprecated. Instead we recommend using the callback functionality: https://tomographicimaging.github.io/CIL/nightly/optimisation/#callbacks and in particular the CGLSEarlyStopping callback replicated the old behaviour")
+        else:
+            self.tolerance = 0
+        
         super(CGLS, self).__init__(**kwargs)
 
         if initial is None and operator is not None:
             initial = operator.domain_geometry().allocate(0)
         if initial is not None and operator is not None and data is not None:
-            self.set_up(initial=initial, operator=operator, data=data, tolerance=tolerance)
+            self.set_up(initial=initial, operator=operator, data=data) 
 
-    def set_up(self, initial, operator, data, tolerance=1e-6):
-        '''initialisation of the algorithm
+    def set_up(self, initial, operator, data):
+        r'''Initialisation of the algorithm
+        Parameters
+        ------------
+        operator : Operator
+            Linear operator for the inverse problem
+        initial : (optional) DataContainer in the domain of the operator, default is a DataContainer filled with zeros. 
+            Initial guess 
+        data : DataContainer in the range of the operator 
+            Acquired data to reconstruct
 
-        :param operator: Linear operator for the inverse problem
-        :param initial: Initial guess ( Default initial = 0)
-        :param data: Acquired data to reconstruct
-        :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
         '''
+        
         log.info("%s setting up", self.__class__.__name__)
         self.x = initial.copy()
         self.operator = operator
-        self.tolerance = tolerance
 
         self.r = data - self.operator.direct(self.x)
         self.s = self.operator.adjoint(self.r)
@@ -110,7 +125,7 @@ class CGLS(Algorithm):
         #self.p = self.s + self.beta * self.p
         self.p.sapyb(self.beta, self.s, 1, out=self.p)
 
-        self.normx = self.x.norm()
+        self.normx = self.x.norm()# TODO: Deprecated, remove when CGLS tolerance is removed
 
 
     def update_objective(self):
@@ -119,17 +134,15 @@ class CGLS(Algorithm):
             raise StopIteration()
         self.loss.append(a)
 
-    def should_stop(self):
+    def should_stop(self): # TODO: Deprecated, remove when CGLS tolerance is removed
         return self.flag() or super().should_stop()
 
-    def flag(self):
+    def flag(self): # TODO: Deprecated, remove when CGLS tolerance is removed
         '''returns whether the tolerance has been reached'''
         flag  = (self.norms <= self.norms0 * self.tolerance) or (self.normx * self.tolerance >= 1)
 
         if flag:
             self.update_objective()
-            if self.iteration > self._iteration[-1]:
-                print (self.verbose_output())
             print('Tolerance is reached: {}'.format(self.tolerance))
 
         return flag

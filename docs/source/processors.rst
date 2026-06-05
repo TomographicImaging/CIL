@@ -112,6 +112,14 @@ Data Normaliser
    :members:
    :inherited-members: set_input, get_output
 
+Flux Normaliser
+-----------------
+
+.. autoclass:: cil.processors.FluxNormaliser
+   :exclude-members: check_input, get_input
+   :members:
+   :inherited-members: set_input, get_output
+
 
 Transmission to Absorption Converter
 -------------------------------------
@@ -135,6 +143,47 @@ Ring Remover
 ------------
 
 .. autoclass:: cil.processors.RingRemover
+   :exclude-members: check_input, get_input
+   :members:
+   :inherited-members: set_input, get_output
+
+
+Paganin Processor
+-----------------
+
+.. autoclass:: cil.processors.PaganinProcessor
+   :exclude-members: check_input, get_input
+   :members:
+   :inherited-members: set_input, get_output
+
+Laminography Geometry Corrector
+-----------------------------
+
+Laminography is a technique similar to tomography in which the rotation axis
+is tilted relative to the beam. This can be setup as below, by tilting the
+sample and rotation axis by an angle :math:`\phi`:
+
+.. figure:: images/lamino_tilt1.png
+    :align: center
+    :alt: laminography geometry showing tilted rotation axis
+    :figclass: align-center
+
+    Laminography geometry from tilted rotation axis
+
+or equivalently by offsetting the source and detector:
+
+.. figure:: images/lamino_tilt2.png
+    :align: center
+    :alt: laminography geometry showing tilted rotation axis
+    :figclass: align-center
+
+    Laminography geometry from offset source and detector
+
+This processor fits the tilt angle :math:`\phi` as well as the centre of 
+rotation offset (defined above) for parallel beam laminography data.
+
+
+.. autoclass:: cil.processors.LaminographyGeometryCorrector
    :exclude-members: check_input, get_input
    :members:
    :inherited-members: set_input, get_output

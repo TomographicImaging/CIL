@@ -221,8 +221,8 @@ class LinearOperator(Operator):
         raise NotImplementedError
 
     @staticmethod
-    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, method='auto'):
-        r"""Power method or Power iteration algorithm
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance=1e-5,  return_all=False, method='auto', seed=None):
+        r"""Power method or Power iteration algorithm 
 
         The Power method computes the largest (dominant) eigenvalue of a matrix in magnitude, e.g.,
         absolute value in the real case and modulus in the complex case.
@@ -233,7 +233,7 @@ class LinearOperator(Operator):
         operator: LinearOperator
         max_iteration: positive:`int`, default=10
             Number of iterations for the Power method algorithm.
-        initial: DataContainer, default = None
+        initial: DataContainer, default = None, optional
             Starting point for the Power method.
         tolerance: positive:`float`, default = 1e-5
             Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.
@@ -241,7 +241,8 @@ class LinearOperator(Operator):
             Toggles the verbosity of the return
         method: `string` one of `"auto"`, `"composed_with_adjoint"` and `"direct_only"`, default = `"auto"`
             The default `auto` lets the code choose the method, this can be specified with `"direct_only"` or `"composed_with_adjoint"`
-
+        seed: `int` or default = None, optional
+            If initial is not provided, this random is seed used by the random number generator to create the `initial` starting point
 
         Returns
         -------
@@ -307,7 +308,7 @@ class LinearOperator(Operator):
                     apply_adjoint = False
 
         if initial is None:
-            x0 = operator.domain_geometry().allocate('random')
+            x0 = operator.domain_geometry().allocate('random_deprecated', seed=seed)
         else:
             x0 = initial.copy()
 
@@ -424,29 +425,39 @@ class LinearOperator(Operator):
             return False
 
 class AdjointOperator(LinearOperator):
+    
+    r"""
+        Adjoint of a linear operator.
 
-    """
-    The Adjoint operator :math:`A^{*}: Y^{*}\rightarrow X^{*}` of a linear operator :math:`A: X\rightarrow Y` defined as
+        Given a linear operator :math:`A: X \to Y` between inner-product spaces
+        :math:`(X,\langle\cdot,\cdot\rangle_X)` and :math:`(Y,\langle\cdot,\cdot\rangle_Y)`,
+        its adjoint :math:`A^{*}: Y \to X` is defined by:
 
-    .. math:: <x, A^* y> = <Ax, y>
+        .. math::
+            \langle Ax,\, y\rangle_Y \;=\; \langle x,\, A^{*}y\rangle_X,
+            \qquad \forall x\in X,\; y\in Y.
 
-    Parameters
-    ----------
+        Parameters
+        ----------
+        operator : LinearOperator
+            The operator :math:`A` whose adjoint is constructed.
 
-    operator : A linear operator
+        Examples
+        --------
+        Verify the adjointness relation for the gradient operator :math:`G` and its adjoint
+        (the negative divergence in many discretisations):
 
-    Examples
-    --------
-    This example demonstrates that :math:` LHS:=<Gx, y> =<x, G^* y>=:RHS`, where :math:`G` is the gradient operator.
-    >>> ig = ImageGeometry(2,3)
-    >>> G = GradientOperator(ig)
-    >>> div = AdjointOperator(G)
-    >>> x = G.domain.allocate("random_int")
-    >>> y = G.range.allocate("random_int")
-    >>> lhs = G.direct(x).dot(y)
-    >>> rhs = x.dot(div.direct(y))
-    >>> lhs == rhs # returns True
-    """
+        >>> ig = ImageGeometry(2, 3)
+        >>> G = GradientOperator(ig)
+        >>> div = AdjointOperator(G)     # represents G*
+        >>> x = G.domain.allocate("random_int")
+        >>> y = G.range.allocate("random_int")
+        >>> lhs = G.direct(x).dot(y)     # <Gx, y>_Y
+        >>> rhs = x.dot(div.direct(y))   # <x, G* y>_X
+        >>> lhs == rhs
+        True
+        """
+
 
     def __init__(self, operator):
         super(AdjointOperator, self).__init__(domain_geometry=operator.range_geometry(),
@@ -609,7 +620,7 @@ class CompositionOperator(Operator):
 
     Parameters
     ----------
-    args: `Operator`s
+    args: `Operator` s
         Operators to be composed. As in mathematical notation, the operators will be applied right to left
 
     """

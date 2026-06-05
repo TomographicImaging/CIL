@@ -19,6 +19,8 @@
 Utilities
 *********
 
+By default, CIL will look for small (built-in) data in `{sys.prefix}/share/cil`,
+and larger remote (downloadable) data in the `CIL_DATA_DIR` environment variable (if present).
 
 Test datasets
 =============
@@ -35,9 +37,6 @@ A set of simulated volumes and CT data
 .. autoclass:: cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA
    :members:
 
-.. autoclass:: cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA
-   :members:
-
 
 A CT dataset from the Diamond Light Source
 ------------------------------------------
@@ -52,6 +51,40 @@ Simulated image data
 .. autoclass:: cil.utilities.dataexample.TestData
    :members:
    :inherited-members:
+
+Remote data
+-----------
+Remote data classes can be used to access specific datasets from zenodo. These
+datasets are not packaged as part of CIL, instead the `download_data(data_dir)`
+method can be used to download the dataset to a chosen data directory then loaded
+from that data directory using `get(data_dir)`.
+
+Walnut
+------
+
+.. autoclass:: cil.utilities.dataexample.WALNUT
+      :members:
+      :inherited-members:
+
+USB
+------
+
+.. autoclass:: cil.utilities.dataexample.USB
+      :members:
+      :inherited-members:
+
+KORN
+------
+
+.. autoclass:: cil.utilities.dataexample.KORN
+      :members:
+      :inherited-members:
+
+SANDSTONE
+------
+.. autoclass:: cil.utilities.dataexample.SANDSTONE
+      :members:
+      :inherited-members:
 
 
 
@@ -102,5 +135,14 @@ link_islicer - link islicer objects by index
    :members:
    :inherited-members:
 
+
+Shrink volume
+=============
+VolumeShrinker - create a cropped reconstruction volume from image data
+--------------------------
+
+.. autoclass:: cil.utilities.shrink_volume.VolumeShrinker
+   :members:
+   :inherited-members:
 
 :ref:`Return Home <mastertoc>`

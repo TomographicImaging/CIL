@@ -22,6 +22,7 @@ import numpy as np
 from utils import has_astra, has_nvidia, initialise_tests
 from utils_projectors import TestCommon_ProjectionOperatorBlockOperator
 from cil.utilities import dataexample
+from unittest_parametrize import param, parametrize, ParametrizedTestCase
 
 initialise_tests()
 
@@ -29,7 +30,9 @@ if has_astra:
     from cil.plugins.astra.operators import AstraProjector2D, AstraProjector3D
     from cil.plugins.astra.operators import ProjectionOperator
 
-class TestAstraProjectors(unittest.TestCase):
+
+@unittest.skipUnless(has_astra, "Requires ASTRA")
+class TestAstraProjectors(ParametrizedTestCase, unittest.TestCase):
     def setUp(self):
 
         N = 128
@@ -70,6 +73,44 @@ class TestAstraProjectors(unittest.TestCase):
 
         self.norm = 14.85
 
+    def test_ProjectionOperator_img_geom_default(self):
+        K = ProjectionOperator(image_geometry=None, acquisition_geometry=self.ag, device='cpu')
+        assert(K.volume_geometry == self.ag.get_ImageGeometry())
+
+    def test_ProjectionOperator_acq_geom_default(self):
+        with self.assertRaises(TypeError):
+            ProjectionOperator(image_geometry=self.ig, acquisition_geometry=None, device='cpu')
+
+    def test_ProjectionOperator_all_default(self):
+        with self.assertRaises(TypeError):
+            ProjectionOperator(image_geometry=None, acquisition_geometry=None, device='cpu')
+
+    @parametrize("device, raise_error, err_type",
+        [param('cpu', False, None, id="cpu_NoError"),
+         param('CPU', False, None, id="CPU_NoError"),
+         param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")])
+    def test_ProjectionOperator_2Ddata(self, device, raise_error: bool, err_type):
+        if raise_error:
+            with self.assertRaises(err_type):
+                ProjectionOperator(self.ig, self.ag, device)
+        else:
+            assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
+
+    @parametrize("device, raise_error, err_type",
+        [param('gpu', False, None, id="gpu_NoError"),
+         param('GPU', False, None, id="GPU_NoError"),
+         param('cpu', True, NotImplementedError, id="cpu_NotImplementedError"),
+         param('CPU', True, NotImplementedError, id="CPU_NotImplementedError"),
+         param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")])
+    @unittest.skipUnless(has_nvidia, "Requires GPU")
+    def test_ProjectionOperator_3Ddata(self, device, raise_error: bool, err_type):
+        if raise_error:
+            with self.assertRaises(err_type):
+                ProjectionOperator(self.ig3, self.ag3, device)
+        else:
+            assert isinstance(ProjectionOperator(self.ig3, self.ag3, device), object)
+
+
     def foward_projection(self, A, ig, ag):
         image_data = ig.allocate(None)
         image_data.fill(1)
@@ -102,7 +143,6 @@ class TestAstraProjectors(unittest.TestCase):
         n = A.norm()
         self.assertAlmostEqual(n, self.norm, places=2)
 
-    @unittest.skipUnless(has_astra, "Requires ASTRA")
     def test_AstraProjector2D_cpu(self):
 
         A = AstraProjector2D(self.ig, self.ag, device = 'cpu')
@@ -111,7 +151,7 @@ class TestAstraProjectors(unittest.TestCase):
         self.backward_projection(A,self.ig, self.ag)
         self.projector_norm(A)
 
-    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_nvidia, "Requires GPU")
     def test_AstraProjector2D_gpu(self):
 
         A = AstraProjector2D(self.ig, self.ag, device = 'gpu')
@@ -120,7 +160,7 @@ class TestAstraProjectors(unittest.TestCase):
         self.backward_projection(A,self.ig, self.ag)
         self.projector_norm(A)
 
-    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_nvidia, "Requires GPU")
     def test_AstraProjector3D_2Ddata(self):
 
         A = AstraProjector3D(self.ig, self.ag)
@@ -139,7 +179,7 @@ class TestAstraProjectors(unittest.TestCase):
         with self.assertRaises(ValueError):
             A = AstraProjector3D(ig_2, self.ag)
 
-    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    @unittest.skipUnless(has_nvidia, "Requires GPU")
     def test_AstraProjector3D_3Ddata(self):
         # test exists
         A = AstraProjector3D(self.ig3, self.ag3)
@@ -158,6 +198,8 @@ class TestAstraProjectors(unittest.TestCase):
         with self.assertRaises(ValueError):
             A3 = AstraProjector3D(ig3_2, self.ag3)
 
+
+@unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA and a GPU")
 class TestASTRA_BlockOperator(unittest.TestCase, TestCommon_ProjectionOperatorBlockOperator):
     def setUp(self):
         data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
@@ -169,6 +211,5 @@ class TestASTRA_BlockOperator(unittest.TestCase, TestCommon_ProjectionOperatorBl
         A = ProjectionOperator(image_geometry=ig, acquisition_geometry=self.data.geometry)
         self.projectionOperator = (A, K)
 
-    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA and a GPU")
     def test_partition(self):
         self.partition_test()

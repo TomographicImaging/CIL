@@ -16,8 +16,133 @@
 Developers' Guide
 *****************
 
-CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adheres to the following conventions. New additions must comply with
-the following.
+CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adhere to the following conventions. New additions must comply with
+the conventions and documentation guidelines described in this section.
+
+Building CIL from source code
+==============================
+
+Getting the code
+^^^^^^^^^^^^^^^^
+
+In case of local development and testing it is useful to be able to build the software directly. 
+You should first clone this repository as:
+
+.. code:: sh
+
+   git clone git@github.com:TomographicImaging/CIL
+
+The parameter ``--depth 1`` can be added to create a shallow clone with a history truncated to the specified number of commits reducing the size of the clone.
+See `git documentation <https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---depthdepth>`_
+
+
+Building with ``pip``
+^^^^^^^^^^^^^^^^^^^^^
+
+Install Dependencies
+""""""""""""""""""
+
+We suggest creating a conda environment with all the dependencies for building CIL using the appropriate command for your operating system:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 65 15
+
+   * - OS
+     - Command
+     - Status
+   * - Linux
+     - ``conda env create -f ./scripts/cil_development.yml``
+     - Tested
+   * - Windows
+     - ``conda env create -f ./scripts/cil_development.yml``
+     - Tested
+   * - MacOS (ARM)
+     - ``conda env create -f ./scripts/cil_development_osx.yml``
+     - Experimental
+
+.. note::
+   Currently only Linux and Windows are tested and supported. The support on MacOS (ARM) is experimental and certain features are not available and not working, such as FFT filtering for FDK.
+
+This will create an environment called `cil_dev`.
+
+Activate the environment with:
+
+.. code:: sh
+
+   conda activate cil_dev
+
+Build CIL
+""""""""
+
+A C++ compiler is required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
+
+
+.. code:: sh
+
+   pip install -e .
+
+.. note::
+   You need to have a **working compiler** on your system, such as Visual Studio on Windows, GCC on Linux and XCode on MacOS.
+
+
+If not installing inside a conda environment, then the user might need to set the locations of optional libraries:
+
+.. code:: sh
+
+   pip install -e . -Ccmake.define.IPP_ROOT="<path_to_ipp>" -Ccmake.define.OpenMP_ROOT="<path_to_openmp>" -Ccmake.define.CMAKE_BUILD_TYPE=RelWithDebInfo
+
+
+Notes for Windows users
+"""""""""""""""""""""""
+
+One option for development on Windows is using `Windows Subsystem for Linux (WSL) <https://learn.microsoft.com/en-us/windows/wsl/install#change-the-default-linux-distribution-installed>`_
+Launch WSL and install build-essential using:
+
+.. code:: sh
+
+   apt install build-essential
+
+This will enable you to then follow the linux instructions for creating the environment and building CIL.
+
+
+To build for windows you can install Visual Studio Community (or higher) and select the **Desktop development with C++** workload.
+
+If you are developing on Windows with conda, you need to have access to both the Visual Studio compiler and have created the conda environment using the command for Windows above. 
+
+You can achieve this in two ways:
+
+1. by opening "x64 Native Tools Command Prompt for VS" and activating the conda environment from there. This requires you 
+   to know the path to the ``conda.bat`` file, which is typically located in the ``condabin`` subdirectory of your conda installation. 
+   Once located you need to run ``<path_to>\conda.bat activate <env_name>`` to activate the conda environment, and then you can run the build command from there.
+2. by opening the conda prompt and running the ``vcvarsall.bat x64`` file from the Visual Studio installation (with ``x64`` argument), and then running the build command.
+   This requires you to know the path to the ``vcvarsall.bat`` file, 
+   which is typically located in the ``VC/Auxiliary/Build`` subdirectory of your Visual Studio installation.
+
+Note: we tested these instructions with Visual Studio 2026 version 18.1.1
+
+
+Building with Docker
+^^^^^^^^^^^^^^^^^^^^^
+
+In the repository root, simply update submodules and run ``docker build``:
+
+.. code:: sh
+
+   git submodule update --init --recursive
+   docker build . -t ghcr.io/tomographicimaging/cil
+
+
+Testing
+^^^^^^^
+
+Once installed, CIL functionality can be tested using the following command:
+
+.. code:: sh
+   
+   export TESTS_FORCE_GPU=1  # optional, makes GPU test failures noisy
+   python -m unittest discover -v ./Wrappers/Python/test
+
 
 Conventions on new CIL objects
 ==============================
@@ -55,6 +180,31 @@ Other methods
 Methods that are not meant to be used by the user should have a `_` (underscore) at the beginning of the name.
 All methods should follow the convention of small caps underscore separated words.
 
+Logging and warning
+===================
+We follow pythons convention on logging (see e.g. https://docs.python.org/3/howto/logging.html). In particular:
+
+.. list-table:: Logging and warning guidelines
+   :header-rows: 1
+   :widths: 40 60
+
+   * - Task you want to perform
+     - The best tool for the task
+   * - Display console output for ordinary usage of a command line script or program
+     - ``print()``
+   * - Report events that occur during normal operation of a program
+       (e.g. for status monitoring or fault investigation)
+     - A logger’s ``info()`` (or ``debug()`` method for very detailed output for diagnostic purposes)
+   * - Issue a warning regarding a particular runtime event
+     - ``warnings.warn()``  if the issue is avoidable and the user's code
+       should be modified to eliminate the warning.
+
+       A logger’s ``warning()`` method if there is nothing the user can do about
+       the situation, but the event should still be noted
+   * - Report an error regarding a particular runtime event
+     - Raise an exception
+
+
 Documentation
 =============
 
@@ -83,6 +233,7 @@ Rendered
 """"""""
 
 .. automethod:: cil.recon.FBP.FBP.run
+
 
 
 Building documentation locally
@@ -138,20 +289,18 @@ a HTTP server to view the documentation.
 #. Follow the instructions `here <https://github.com/TomographicImaging/CIL/tree/master#building-cil-from-source-code>`_ to create a conda environment and build ``cil`` from source
 #. Go to ``docs`` folder
 #. Install packages from ``docs_environment.yml``
-#. [Install Ruby version 3.2](https://www.ruby-lang.org/en/documentation/installation/#installers)
+#. `Install Ruby version 3.2 <https://www.ruby-lang.org/en/documentation/installation/#installers>`_
 #. Install the web dependencies with ``make web-deps``
 #. Build the documentation with ``make dirhtml web``
 #. Start an HTTP server with ``make serve`` to access the docs via `localhost:8000 <http://localhost:8000>`_.
 
 Example:
 ::
-
-  git clone --recurse-submodule git@github.com:TomographicImaging/CIL
+  git clone git@github.com:TomographicImaging/CIL
   cd CIL
-  sh scripts/create_local_env_for_cil_development_tests.sh -n NUMPY_VERSION -p PYTHON_VERSION -e ENVIRONMENT_NAME
+  conda env create -f ./scripts/cil_development.yml
   conda activate ENVIRONMENT_NAME
-  cmake -S . -B ./build -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}
-  cmake --build ./build --target install
+  pip install -e .
   cd docs
   conda update -n base -c defaults conda
   conda env update -f docs_environment.yml # with the name field set to ENVIRONMENT_NAME
@@ -167,6 +316,64 @@ The ``mkdemos.py`` script (called by ``make dirhtml``):
 - uses the ``demos-template.rst`` file to generate the gallery in ``source/demos.rst``
 
 The ``nbsphinx`` extension will convert the ``*.ipynb`` files to HTML.
+
+
+Testing
+=======
+
+Parametrized Tests
+------------------
+Methods are tested using Python's `unittest <https://docs.python.org/3/library/unittest.html>`_ library. Please see the documentation `here <https://docs.python.org/3/library/unittest.html#basic-example>`_  for information and usage examples.
+The `unittest-parametrize <https://github.com/adamchainz/unittest-parametrize>`_ library is used to generate parametrized test cases.
+
+The ``@parametrize`` decorator allows you to define multiple sets of input parameters for a single test method, treating each combination as a separate test case.
+This helps to test various scenarios without duplicating code.
+
+Example: Parameterized Test for ``ProjectionOperator``
+
+.. code:: python
+   @parametrize("device, raise_error, err_type",
+     [param('cpu', False, None, id="cpu_NoError"),
+      param('CPU', False, None, id="CPU_NoError"),
+      param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")])
+
+   def test_ProjectionOperator_2Ddata(self, device, raise_error: bool, err_type):
+       if raise_error:
+           with self.assertRaises(err_type):
+               ProjectionOperator(self.ig, self.ag, device)
+       else:
+           assert isinstance(ProjectionOperator(self.ig, self.ag, device), object)
+
+The parameters passed to the test are: The ``device`` (string), which is the device name passed to the ``ProjectionOperator``,
+``raise_error`` (bool), which specifies if an error is expected during initialisation, and the expected ``err_type``.
+
+In this example, the test instantiates a ``ProjectionOperator`` with a ``device`` name, checks if any errors should be raised, and ensures they are the expected type.
+There are 3 sets of parameters:
+
+- ``param('cpu', False, None, id="cpu_NoError")`` - Test using the device name 'cpu' (lowercase), and expects no error.
+- ``param('CPU', False, None, id="CPU_NoError")`` - Test using the device name 'CPU' (uppercase), and expects no error.
+- ``param('InvalidInput', True, ValueError, id="InvalidInput_ValueError")`` - Test using an invalid string, and expects the ``ValueError`` to be raised.
+
+Each parameter set has a unique id which can also be customised for easier identification in test outputs (e.g., ``cpu_NoError``, ``InvalidInput_ValueError``)
+
+When running the test, each parameterized case is shown as a distinct result:
+
+.. code:: python
+   test_ProjectionOperator_2Ddata[cpu_NoError] ... ok
+   test_ProjectionOperator_2Ddata[CPU_NoError] ... ok
+   test_ProjectionOperator_2Ddata[InvalidInput_ValueError] ... ok
+
+   ----------------------------------------------------------------------
+   Ran 3 tests in 0.001s
+
+   OK
+
+GitHub Actions CI
+-----------------
+
+If you open a pull request, continuous integration & deployment (CI/CD) via GitHub Actions (GHA) will run automatically. The CI will run the tests and build the documentation. Note that the ``test-cuda`` job uses `unittest -k <https://docs.python.org/3/library/unittest.html#cmdoption-unittest-k>`_ flags to detect GPU test names.
+
+For more information please see the `GHA README <https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md>`_.
 
 Contributions guidelines
 ========================

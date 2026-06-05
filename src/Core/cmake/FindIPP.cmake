@@ -1,0 +1,27 @@
+# Outputs: IPP_FOUND, IPP_INCLUDE_DIRS, IPP_LIBRARIES
+
+find_path(IPP_ROOT_DIR include/ipp.h PATHS ${IPP_ROOT} $ENV{IPPROOT} $ENV{CONDA_PREFIX})
+find_path(IPP_INCLUDE_DIR ipp.h PATHS ${IPP_ROOT_DIR}/include)
+
+if(APPLE)
+  set(IPP_PRE "lib")
+  set(IPP_POST ".a")
+elseif(NOT WIN32)
+  set(IPP_PRE "lib")
+  set(IPP_POST ".so")
+endif()
+find_library(IPP_CORE ${IPP_PRE}ippcore${IPP_POST} PATHS ${IPP_ROOT_DIR} $ENV{CONDA_PREFIX} PATH_SUFFIXES lib Library/lib)
+find_library(IPP_S ${IPP_PRE}ipps${IPP_POST} PATHS ${IPP_ROOT_DIR} $ENV{CONDA_PREFIX} PATH_SUFFIXES lib Library/lib)
+find_library(IPP_VM ${IPP_PRE}ippvm${IPP_POST} PATHS ${IPP_ROOT_DIR} $ENV{CONDA_PREFIX} PATH_SUFFIXES lib Library/lib)
+find_library(IPP_I ${IPP_PRE}ippi${IPP_POST} PATHS ${IPP_ROOT_DIR} $ENV{CONDA_PREFIX} PATH_SUFFIXES lib Library/lib)
+
+if(IPP_INCLUDE_DIR AND IPP_CORE AND IPP_S AND IPP_VM AND IPP_I)
+  message(STATUS "IPP found in: ${IPP_ROOT_DIR}")
+  set(IPP_FOUND TRUE)
+  set(IPP_INCLUDE_DIRS "${IPP_INCLUDE_DIR}")
+  set(IPP_LIBRARIES "${IPP_CORE};${IPP_S};${IPP_VM};${IPP_I}")
+  message(STATUS "IPP libraries: ${IPP_LIBRARIES}")
+  message(STATUS "IPP include dirs: ${IPP_INCLUDE_DIRS}")
+else()
+  message(STATUS "IPP not found")
+endif()

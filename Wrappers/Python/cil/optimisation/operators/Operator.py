@@ -431,11 +431,11 @@ class AdjointOperator(LinearOperator):
 
         Given a linear operator :math:`A: X \to Y` between inner-product spaces
         :math:`(X,\langle\cdot,\cdot\rangle_X)` and :math:`(Y,\langle\cdot,\cdot\rangle_Y)`,
-        its adjoint :math:`A^{*}: Y \to X` is defined by
-        \[
-        \langle Ax,\, y\rangle_Y \;=\; \langle x,\, A^{*}y\rangle_X,
-        \qquad \forall x\in X,\; y\in Y.
-        \]
+        its adjoint :math:`A^{*}: Y \to X` is defined by:
+
+        .. math::
+            \langle Ax,\, y\rangle_Y \;=\; \langle x,\, A^{*}y\rangle_X,
+            \qquad \forall x\in X,\; y\in Y.
 
         Parameters
         ----------
@@ -446,6 +446,7 @@ class AdjointOperator(LinearOperator):
         --------
         Verify the adjointness relation for the gradient operator :math:`G` and its adjoint
         (the negative divergence in many discretisations):
+
         >>> ig = ImageGeometry(2, 3)
         >>> G = GradientOperator(ig)
         >>> div = AdjointOperator(G)     # represents G*

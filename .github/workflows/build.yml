@@ -30,7 +30,7 @@ jobs:
         os: [windows]
         python-version: [3.12]
         numpy-version: [1.26]
-        tqdm-ref: [e4d9742, a31d97f, fc69588, c682c7b, 17f246b, ef4a142, v4.68.0]
+        tqdm-ref: [67aad80, dce90c8]
       fail-fast: false
     steps:
     - uses: actions/checkout@v6

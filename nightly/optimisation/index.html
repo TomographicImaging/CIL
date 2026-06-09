@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 25.0.1.dev55+gc40295d06.d20260605 documentation</title>
+    <title>Optimisation framework &#8212; CIL 25.0.1.dev56+g1c4e04b8d.d20260609 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../_static/documentation_options.js?v=769bcac2"></script>
+    <script src="../_static/documentation_options.js?v=2b2e883f"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,9 +51,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'optimisation';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.18.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev55+gc40295d06.d20260605';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev56+g1c4e04b8d.d20260609';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -64,7 +64,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev55+gc40295d06.d20260605" />
+  <meta name="docsearch:version" content="25.0.1.dev56+g1c4e04b8d.d20260609" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -2492,14 +2492,18 @@ The default <code class="code docutils literal notranslate"><span class="pre">st
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.PDHG">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.optimisation.algorithms.</span></span><span class="sig-name descname"><span class="pre">PDHG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_fconj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/PDHG/#PDHG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG" title="Link to this definition">#</a></dt>
 <dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id10">[<a class="reference internal" href="#id40" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">3</a>]</span>, <span id="id11">[<a class="reference internal" href="#id41" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">5</a>]</span>.</p>
+<p>PDHG minimises objectives of the form:</p>
+<div class="math notranslate nohighlight">
+\[\min_{x\in X} f(Kx) + g(x),\]</div>
+<p>where <span class="math notranslate nohighlight">\(f\)</span> and the regulariser <span class="math notranslate nohighlight">\(g\)</span> need to be proper, convex and lower semi-continuous. The function <span class="math notranslate nohighlight">\(f\)</span> and the convex conjugate of <span class="math notranslate nohighlight">\(g\)</span> must also have calculable proximal methods.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – A convex function with a “simple” proximal method of its conjugate.</p></li>
-<li><p><strong>g</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – A convex function with a “simple” proximal.</p></li>
+<li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – A convex function with a “simple” proximal method of its conjugate. This function must map from the operator range to the Reals, as :math: <cite>f(Kx)</cite> will be the contribution to the total objective. See below for details.</p></li>
+<li><p><strong>g</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – A convex function with a “simple” proximal. This function must map from the operator domain to the Reals. See below for details.</p></li>
 <li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.LinearOperator" title="cil.optimisation.operators.LinearOperator"><em>LinearOperator</em></a>) – A Linear Operator.</p></li>
-<li><p><strong>sigma</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, or <cite>np.ndarray</cite>, <cite>DataContainer</cite>, <cite>BlockDataContainer</cite>, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided) – Step size for the dual problem.</p></li>
-<li><p><strong>tau</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, or <cite>np.ndarray</cite>, <cite>DataContainer</cite>, <cite>BlockDataContainer</cite>, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided) – Step size for the primal problem.</p></li>
+<li><p><strong>sigma</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, or <cite>np.ndarray</cite>, <cite>DataContainer</cite>, <cite>BlockDataContainer</cite>, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided) – Step size for the dual problem. Needs to obey constraints with tau and operator norm to satisfy convergence guarantees, see below for details.</p></li>
+<li><p><strong>tau</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, or <cite>np.ndarray</cite>, <cite>DataContainer</cite>, <cite>BlockDataContainer</cite>, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided) – Step size for the primal problem. Needs to obey constraints with sigma and operator’s norm to satisfy convergence guarantees, see below for details.</p></li>
 <li><p><strong>initial</strong> (<cite>DataContainer</cite>, or <cite>list</cite> or <cite>tuple</cite> of <a href="#id12"><span class="problematic" id="id13">`</span></a>DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables) – Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.</p></li>
 <li><p><strong>gamma_g</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, optional, default=None) – Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.</p></li>
 <li><p><strong>gamma_fconj</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, optional, default=None) – Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.</p></li>
@@ -2527,7 +2531,7 @@ In the future, these parameters will be properties of the corresponding function
 <p>A first-order primal-dual algorithm for convex optimization problems with known saddle-point structure with applications in imaging.</p>
 <p>The general problem considered in the PDHG algorithm is the generic saddle-point problem</p>
 <div class="math notranslate nohighlight">
-\[\min_{x\in X}\max_{y\in Y} \langle Kx, y \rangle + g(x) - f^{*}(x)\]</div>
+\[\min_{x\in X}\max_{y\in Y} \langle Kx, y \rangle + g(x) - f^{*}(y)\]</div>
 <p>where <span class="math notranslate nohighlight">\(f\)</span> and <span class="math notranslate nohighlight">\(g\)</span> are convex functions with “simple” proximal operators.</p>
 <p><span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> are two two finite-dimensional vector spaces with an inner product and representing the domain of <span class="math notranslate nohighlight">\(g\)</span> and <span class="math notranslate nohighlight">\(f^{*}\)</span>, the convex conjugate of <span class="math notranslate nohighlight">\(f\)</span>, respectively.</p>
 <p>The operator <span class="math notranslate nohighlight">\(K\)</span> is a continuous linear operator with operator norm defined as</p>
@@ -10702,8 +10706,8 @@ Otherwise it is a BlockGeometry.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

@@ -14,8 +14,6 @@
 name: cil_dev
 channels:
   - conda-forge
-  - https://tomography.stfc.ac.uk/conda
-  - ccpi
   - defaults
 dependencies:
   # in addition to CIL deps (see ../scripts/cil_development.yml)

@@ -22,7 +22,7 @@
     - Update to ASTRA-TOOLBOX version v2.4 from the `astra-toolbox` channel (#2330)
     - Update to TIGRE v3.1.3 (#2317)
     - Added support for numpy 2 (#2218)
-      - Update to CCPi-Regularisation toolkit 25.0.0
+      - Update to CCPi-Regularisation toolkit 26.0.0
       - Added support for python 3.13
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)

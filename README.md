@@ -37,7 +37,7 @@ where `<env_name>` is `cil_demos`, `cil_demos_cpu` or whatever name you specifie
 #### Install CIL into an existing environment
 If you prefer to install CIL with minimal dependencies into an existing environment you can use:
 ```sh
-conda install -c https://software.repos.intel.com/python/conda -c conda-forge -c ccpi cil=25.0.0
+conda install -c https://tomography.stfc.ac.uk/conda -c conda-forge -c ccpi cil=25.0.0
 ```
 A number of additional dependencies are required for specific functionality in CIL, these should be added to your environment as necessary. See the dependency table below for details.
 
@@ -49,7 +49,7 @@ While building the CIL package we test with specific versions of dependencies. T
 |----|----|--------|--------|----|
 | [Python](https://www.python.org/) | 3.10 - 3.12 | `"python>=3.10,<=3.12"` || [PSF-2.0](https://docs.python.org/3/license.html) |
 | [Numpy](https://github.com/numpy/numpy) | 1.23 - 1.26 | `"numpy>=1.23,<2"` || [BSD-3-Clause](https://numpy.org/doc/stable/license.html) |
-| [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `-c https://software.repos.intel.com/python/conda ipp=2021.12` | The Intel Integrated Performance Primitives Library (required for the CIL recon class). | [ISSL](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
+| [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `-c https://tomography.stfc.ac.uk/conda ipp=2021.12` | The Intel Integrated Performance Primitives Library (required for the CIL recon class). | [ISSL](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
 |--|--| **Optional dependencies** |--|--|
 | [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 | CPU: `conda-forge::astra-toolbox=2.1=py*` <br> GPU: `conda-forge::astra-toolbox=2.1=cuda*` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
 | [TIGRE](https://github.com/CERN/TIGRE) | 2.6 | `ccpi::tigre=2.6` | CT projectors, FBP and FDK. | [BSD-3-Clause](https://github.com/CERN/TIGRE/blob/master/LICENSE.txt) |

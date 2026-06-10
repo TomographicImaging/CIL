@@ -26,7 +26,7 @@
 
 import numpy as np
 from cil.optimisation.functions import Function
-from cil.framework import DataContainer
+from cil.framework import DataContainer, ImageGeometry
 from typing import Optional
 import warnings
 import logging
@@ -147,10 +147,15 @@ def _take_abs_input(func):
     def _take_abs_decorator(self, x: DataContainer, *args, **kwargs):
         real_dtype, _ = _get_real_complex_dtype(x)
         
-        rgeo = x.geometry.copy()
-        rgeo.dtype = real_dtype
-        r = rgeo.allocate(0)
-        r.fill(np.abs(x.as_array()).astype(real_dtype))
+        try:
+            rgeo = x.geometry.copy()
+            rgeo.dtype = real_dtype
+            r = rgeo.allocate(0)
+            r.fill(np.abs(x.as_array()).astype(real_dtype))
+        except AttributeError as excp:
+            rgeo = ImageGeometry(*x.shape[::-1])
+            r = rgeo.allocate(None, dtype=real_dtype)
+            r.fill(np.abs(x.asarray()))
         fval = func(r, *args, **kwargs)
         return fval
     return _take_abs_decorator
@@ -174,8 +179,6 @@ def _abs_and_project(func):
             r.fill(np.abs(x.as_array()).astype(real_dtype))
             Phi = np.exp((1j*np.angle(x.array)))
         except AttributeError as excp:
-            print (excp)
-            from cil.framework import ImageGeometry
             rgeo = ImageGeometry(*x.shape[::-1])
             r = rgeo.allocate(None, dtype=real_dtype)
             r.fill(np.abs(x.asarray()))

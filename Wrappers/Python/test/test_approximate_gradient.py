@@ -78,7 +78,7 @@ class approx_gradient_child_class_testing():
         np.random.seed(10)
         self.sampler = Sampler.random_with_replacement(self.n_subsets)
         self.initial = VectorData(np.zeros(30))
-        b = VectorData(np.array(range(30))/50)
+        b = VectorData(np.arange(30)/50)
 
         self.f_subsets = []
         for i in range(self.n_subsets):
@@ -141,7 +141,7 @@ class approx_gradient_child_class_testing():
     def test_toy_example(self):
         sampler = Sampler.random_with_replacement(5)
         initial = VectorData(np.zeros(25))
-        b = VectorData(np.array(range(25)))
+        b = VectorData(np.arange(25))
         functions = []
         for i in range(5):
             diagonal = np.zeros(25)

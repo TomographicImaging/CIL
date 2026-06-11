@@ -20,6 +20,13 @@
     - Handle regularisation toolkit CPU only package error message (#2302)
     - Update FindIPP.cmake to find IPP libraries in conda environments (#2286)
     - Update to ASTRA-TOOLBOX version v2.4 from the `astra-toolbox` channel (#2330)
+    - Update to TIGRE v3.1.3 (#2317)
+    - Added support for numpy 2 (#2218)
+      - Added utililty method `dtype_like` to convert an input value to the same type as a reference array
+      - Added documentation to developer guide on scalar types with numpy>=2.
+    - Update to CCPi-Regularisation toolkit v25.0.0 (#2218)
+    - Update to Tomophantom v3.1.4 (#2218)
+    - Added support for python 3.13 (#2218)
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
     - Update on build instructions in README and developer guide for all OS (#2286)

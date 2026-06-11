@@ -83,7 +83,7 @@ class TestSPDHG(CCPiTestClass):
         sampler = Sampler.random_with_replacement(5, seed=10)
         np.random.seed(10)
         initial = VectorData(np.random.standard_normal(25))
-        b = VectorData(np.array(range(25)))
+        b = VectorData(np.arange(25))
         functions = []
         operators=[]
         for i in range(5):
@@ -122,7 +122,7 @@ class TestLSQR(CCPiTestClass):
         self.m = 70
 
         A = np.random.uniform(0, 1, (self.m, self.n)).astype('float32')
-        x = np.array(range(self.n))/self.n
+        x = np.arange(self.n, dtype=np.float32) / self.n
         b = A.dot(x)
 
         self.Aop = MatrixOperator(A)
@@ -290,9 +290,9 @@ class TestGD(CCPiTestClass):
         np.random.seed(2)
         n = 10
         m = 10
-        A = np.array(range(1,n*m+1)).reshape(n,m).astype('float32')
+        A = np.arange(1, n*m+1, dtype=np.float32).reshape(n,m)
         A = np.diag(1/(np.transpose(A)@np.ones(m)))*A
-        x = (np.array(range(n)).astype('float32')-n/2)/n
+        x = (np.arange(n, dtype=np.float32)-n/2)/n
         b=A@x
 
 
@@ -300,7 +300,7 @@ class TestGD(CCPiTestClass):
         bop = VectorData(b)
         ig=Aop.domain
 
-        initial = VectorData((np.array(range(n)).astype('float32')-n/2)/(n+1))
+        initial = VectorData((np.arange(n, dtype=np.float32)-n/2)/(n+1))
         f = LeastSquares(Aop, b=bop, c=2)
 
 

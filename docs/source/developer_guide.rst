@@ -274,7 +274,7 @@ Folder layout:
 
       - `demos-template.rst`
 
-    - `mkversions.py` - creates `versions.json` used but sphinx docs version switcher
+    - `mkversions.py` - creates `versions.json` used by sphinx docs version switcher
 
 The easiest way to test documentation changes is to open a pull request and `download the rendered documentation from the CI <https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md>`_.
 

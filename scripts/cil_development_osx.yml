@@ -15,16 +15,21 @@ name: cil_dev
 channels:
   - conda-forge
 dependencies:
-  - python=3.12
-  - numpy=1.26
+  - python >=3.10
+  - numpy >=1.23,<3
   - llvm-openmp
   - ccpi::cil-data >=22
-  - numba
-  - astra-toolbox=2.1=py*
-  - cvxpy!=1.8.2
+  - httomo::tomophantom 3.1.4
+  - conda-forge::astra-toolbox>=2=py*
+  - cvxpy !=1.8.2
   - python-wget
   - scikit-image
-  - matplotlib-base >=3.3.0
+  - packaging
+  - cmake >=3.16
+  - setuptools >=64
+  - ipywidgets
+  - scipy >=1.4
+  - matplotlib-base >=3.3
   - h5py
   - pillow
   - dxchange >=0.2.1
@@ -36,4 +41,3 @@ dependencies:
   - pip
   - pip:
     - unittest-parametrize
-    

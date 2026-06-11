@@ -53,18 +53,18 @@ requirements:
     - packaging
     - if: x86_64
       then: ipp ${{ ipp_version }}
-    - numpy >=1.23,<2
+    - numpy >=1.23,<3
     - scipy >=1.4
     - h5py
     - pillow
     - pywavelets
-    - cil-data >=22
+    - cil-data >=22 # -c ccpi
     - tqdm
     - numba
   # version constraints of optional dependencies
   run_constraints:
     - tomophantom >=3.0.3
-    - astra-toolbox >=1.9.9.dev5
+    - astra-toolbox >=2
     - tigre >=3.1.3
     - ccpi-regulariser >=24.0.1
     - olefile >=0.46
@@ -92,15 +92,18 @@ tests:
         - if: linux
           then: cvxpy !=1.8.2
         - scikit-image
-        - tomophantom 3.0.3.*
+        - httomo::tomophantom 3.1.4.*
         - if: not osx
-          then: ccpi-regulariser 24.0.1.*
+          then:
+            - if: test_gpu
+              then: ccpi::ccpi-regulariser 26.* cuda*
+              else: ccpi::ccpi-regulariser 26.* cpu*
         - if: test_gpu
-          then: tigre 3.1.3.*
-        - astra-toolbox 2.4.*
+          then: ccpi::tigre 3.1.3.*
+        - astra-toolbox::astra-toolbox 2.4.*
         - matplotlib-base >=3.3
         - zenodo_get >=1.6
-        - dxchange >=0.2.1
+        - ccpi::dxchange >=0.2.1
         - olefile >=0.46
 
 about:

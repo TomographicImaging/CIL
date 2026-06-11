@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.acquisition_data &#8212; CIL 25.0.1.dev57+ga428a0687.d20260611 documentation</title>
+    <title>cil.framework.acquisition_data &#8212; CIL 25.0.1.dev79+gce75cc80b.d20260611 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../../../../_static/documentation_options.js?v=bffd03f7"></script>
+    <script src="../../../../_static/documentation_options.js?v=6a70e537"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.19.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev57+ga428a0687.d20260611';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev79+gce75cc80b.d20260611';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev57+ga428a0687.d20260611" />
+  <meta name="docsearch:version" content="25.0.1.dev79+gce75cc80b.d20260611" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -532,7 +532,7 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">AcquisitionData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">,</span> <span class="n">Partitioner</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    DataContainer for holding 2D or 3D sinogram</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    array : numpy.ndarray or DataContainer</span>
@@ -541,10 +541,10 @@
 <span class="sd">        If True, the array will be deep copied. If False, the array will be shallow copied.</span>
 <span class="sd">    geometry : AcquisitionGeometry</span>
 <span class="sd">        The geometry of the data. If the dtype of the array and geometry are different, the geometry dtype will be overridden.</span>
-<span class="sd">    </span>
+
 <span class="sd">    **kwargs:</span>
 <span class="sd">        dtype : numpy.dtype</span>
-<span class="sd">            Specify the data type of the AcquisitionData array, this is useful if you pass None to array and want to over-ride the dtype of the geometry. </span>
+<span class="sd">            Specify the data type of the AcquisitionData array, this is useful if you pass None to array and want to over-ride the dtype of the geometry.</span>
 <span class="sd">            If an array is passed, dtype must match the dtype of the array.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -589,7 +589,7 @@
             <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">dtype</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">dtype</span>
             <span class="n">array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
-    
+
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="n">array</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
 
@@ -612,12 +612,12 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Check if two AcquisitionData objects are equal. This is done by checking if the geometry, data and dtype are equal.</span>
 <span class="sd">        Also, if the other object is a numpy.ndarray, it will check if the data and dtype are equal.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        other: AcquisitionData or numpy.ndarray</span>
 <span class="sd">            The object to compare with.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
@@ -628,12 +628,12 @@
             <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">other</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span> \
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">geometry</span> \
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">True</span> 
+                <span class="k">return</span> <span class="kc">True</span>
         <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">other</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">==</span><span class="n">other</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
-        
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Functionality of get_slice</span>
@@ -670,8 +670,8 @@
             <span class="k">return</span> <span class="n">out</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry_new</span><span class="p">)</span>
-        
-    
+
+
 <div class="viewcode-block" id="AcquisitionData.get_slice">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.AcquisitionData.get_slice">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -712,10 +712,10 @@
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot use &#39;projection&#39; for geometries that use angles. Use &#39;angle&#39; instead.&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AcquisitionDimension</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;force&#39;</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; not in allowed labels </span><span class="si">{</span><span class="n">AcquisitionDimension</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-            
+
         <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Positional arguments for get_slice are deprecated. Use keyword arguments instead.&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-            
+
             <span class="n">num_args</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">num_args</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>

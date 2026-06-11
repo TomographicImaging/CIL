@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.SPDHG &#8212; CIL 25.0.1.dev57+ga428a0687.d20260611 documentation</title>
+    <title>cil.optimisation.algorithms.SPDHG &#8212; CIL 25.0.1.dev79+gce75cc80b.d20260611 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../../../../../_static/documentation_options.js?v=bffd03f7"></script>
+    <script src="../../../../../_static/documentation_options.js?v=6a70e537"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.19.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev57+ga428a0687.d20260611';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev79+gce75cc80b.d20260611';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev57+ga428a0687.d20260611" />
+  <meta name="docsearch:version" content="25.0.1.dev79+gce75cc80b.d20260611" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -535,8 +535,8 @@
 <div class="viewcode-block" id="SPDHG">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.SPDHG">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SPDHG</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Stochastic Primal Dual Hybrid Gradient (SPDHG) solves separable optimisation problems of the type: </span>
-<span class="sd">    </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Stochastic Primal Dual Hybrid Gradient (SPDHG) solves separable optimisation problems of the type:</span>
+
 <span class="sd">      .. math:: \min_{x} f(Kx) + g(x) = \min_{x} \sum f_i(K_i x) + g(x)</span>
 
 <span class="sd">    where :math:`f_i` and the regulariser :math:`g` need to be proper, convex and lower semi-continuous.</span>
@@ -550,27 +550,27 @@
 <span class="sd">    operator : BlockOperator</span>
 <span class="sd">        BlockOperator must contain Linear Operators</span>
 <span class="sd">    tau : positive float, optional</span>
-<span class="sd">        Step size parameter for the primal problem. If `None` will be computed by algorithm, see note for details. </span>
+<span class="sd">        Step size parameter for the primal problem. If `None` will be computed by algorithm, see note for details.</span>
 <span class="sd">    sigma : list of positive float, optional</span>
-<span class="sd">        List of Step size parameters for dual problem.  If `None` will be computed by algorithm, see note for details. </span>
+<span class="sd">        List of Step size parameters for dual problem.  If `None` will be computed by algorithm, see note for details.</span>
 <span class="sd">    initial : DataContainer, optional</span>
 <span class="sd">        Initial point for the SPDHG algorithm. The default value is a zero DataContainer in the range of the `operator`.</span>
 <span class="sd">    gamma : float, optional</span>
 <span class="sd">            Parameter controlling the trade-off between the primal and dual step sizes</span>
-<span class="sd">    sampler: `cil.optimisation.utilities.Sampler`, optional </span>
-<span class="sd">            A `Sampler` controllingthe selection of the next index for the SPDHG update. If `None`, a sampler will be created for uniform random sampling with replacement. See notes.  </span>
+<span class="sd">    sampler: `cil.optimisation.utilities.Sampler`, optional</span>
+<span class="sd">            A `Sampler` controllingthe selection of the next index for the SPDHG update. If `None`, a sampler will be created for uniform random sampling with replacement. See notes.</span>
 
-<span class="sd">    prob_weights: list of floats, optional,  </span>
+<span class="sd">    prob_weights: list of floats, optional,</span>
 <span class="sd">             Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute: if the sampler has a `prob_weight` attribute it will take precedence on this parameter. Should be a list of floats of length `num_indices` that sum to 1. If no sampler with `prob_weights` is passed, it defaults to `[1/len(operator)]*len(operator)`.</span>
 
 
-<span class="sd">    Note  </span>
-<span class="sd">    -----  </span>
-<span class="sd">    The `sampler` can be an instance of the `cil.optimisation.utilities.Sampler` class or a custom class with the `__next__(self)` method implemented, which outputs an integer index from {1, ..., len(operator)}. </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    The `sampler` can be an instance of the `cil.optimisation.utilities.Sampler` class or a custom class with the `__next__(self)` method implemented, which outputs an integer index from {1, ..., len(operator)}.</span>
 
-<span class="sd">    Note  </span>
-<span class="sd">    -----  </span>
-<span class="sd">    &quot;Random sampling with replacement&quot; will select the next index with equal probability from  `1 - len(operator)`.  </span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    &quot;Random sampling with replacement&quot; will select the next index with equal probability from  `1 - len(operator)`.</span>
 
 
 <span class="sd">    Example</span>
@@ -608,7 +608,7 @@
 
 <span class="sd">    and `tau` is set as per case 2</span>
 
-<span class="sd">    - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula </span>
+<span class="sd">    - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula</span>
 
 <span class="sd">    .. math:: \tau = 0.99\min_i( \frac{p_i}{ (\sigma_i  \|K_i\|^2) })</span>
 
@@ -629,10 +629,10 @@
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 
-<span class="sd">    [1]&quot;Stochastic primal-dual hybrid gradient algorithm with arbitrary </span>
+<span class="sd">    [1]&quot;Stochastic primal-dual hybrid gradient algorithm with arbitrary</span>
 <span class="sd">    sampling and imaging applications&quot;,</span>
 <span class="sd">    Chambolle, Antonin, Matthias J. Ehrhardt, Peter Richtárik, and Carola-Bibiane Schonlieb,</span>
-<span class="sd">    SIAM Journal on Optimization 28, no. 4 (2018): 2783-2808.   https://doi.org/10.1137/17M1134834 </span>
+<span class="sd">    SIAM Journal on Optimization 28, no. 4 (2018): 2783-2808.   https://doi.org/10.1137/17M1134834</span>
 
 <span class="sd">    [2]&quot;Faster PET reconstruction with non-smooth priors by randomization and preconditioning&quot;,</span>
 <span class="sd">    Matthias J Ehrhardt, Pawel Markiewicz and Carola-Bibiane Schönlieb,</span>
@@ -666,14 +666,14 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;operator should be a BlockOperator&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_ndual_subsets</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="p">)</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="s1">&#39;prob_weights&#39;</span><span class="p">,</span> <span class="n">prob_weights</span><span class="p">)</span> 
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">_deprecated_set_prob</span><span class="p">(</span><span class="n">deprecated_kwargs</span><span class="p">,</span> <span class="n">sampler</span><span class="p">)</span> 
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="s1">&#39;prob_weights&#39;</span><span class="p">,</span> <span class="n">prob_weights</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_deprecated_set_prob</span><span class="p">(</span><span class="n">deprecated_kwargs</span><span class="p">,</span> <span class="n">sampler</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_ndual_subsets</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_ndual_subsets</span>
-        
+
         <span class="k">if</span>  <span class="n">prob_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="o">!=</span> <span class="n">prob_weights</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39; You passed a `prob_weights` argument and a sampler with a different attribute `prob_weights`, please remove the `prob_weights` argument.&#39;</span><span class="p">)</span>
 
@@ -682,9 +682,9 @@
                 <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="p">),</span> <span class="n">prob</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sampler</span> <span class="o">=</span> <span class="n">sampler</span>
-        
+
         <span class="c1">#Set the norms of the operators</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_deprecated_set_norms</span><span class="p">(</span><span class="n">deprecated_kwargs</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_deprecated_set_norms</span><span class="p">(</span><span class="n">deprecated_kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_norms</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">get_norms_as_list</span><span class="p">()</span>
         <span class="c1">#Check for other kwargs</span>
         <span class="k">if</span> <span class="n">deprecated_kwargs</span><span class="p">:</span>
@@ -723,14 +723,14 @@
 <span class="sd">        ----------</span>
 <span class="sd">        deprecated_kwargs : dict</span>
 <span class="sd">            Dictionary of keyword arguments.</span>
-<span class="sd">        sampler : Sampler           </span>
+<span class="sd">        sampler : Sampler</span>
 <span class="sd">            Sampler class for selecting the next index for the SPDHG update.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        This method is called by the set_up method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
+
         <span class="n">prob</span> <span class="o">=</span> <span class="n">deprecated_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;prob&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">prob</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -758,14 +758,14 @@
 <span class="sd">        This method is called by the set_up method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">norms</span> <span class="o">=</span> <span class="n">deprecated_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;norms&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="n">norms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">set_norms</span><span class="p">(</span><span class="n">norms</span><span class="p">)</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s1">&#39; `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 
-        
+
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
@@ -824,7 +824,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">set_step_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Sets sigma and tau step-sizes for the SPDHG algorithm after the initial set-up. The step sizes can be either scalar or array-objects.</span>
 
-<span class="sd">        When setting `sigma` and `tau`, there are 4 possible cases considered by setup function: </span>
+<span class="sd">        When setting `sigma` and `tau`, there are 4 possible cases considered by setup function:</span>
 
 <span class="sd">        - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:</span>
 
@@ -832,7 +832,7 @@
 
 <span class="sd">        and `tau` is set as per case 2</span>
 
-<span class="sd">        - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula </span>
+<span class="sd">        - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula</span>
 
 <span class="sd">        .. math:: \tau = 0.99\min_i( \frac{p_i}{ (\sigma_i  \|K_i\|^2) })</span>
 
@@ -893,7 +893,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Boolean</span>
-<span class="sd">            True if convergence criterion is satisfied. False if not satisfied or convergence is unknown. </span>
+<span class="sd">            True if convergence criterion is satisfied. False if not satisfied or convergence is unknown.</span>
 
 <span class="sd">        Note</span>
 <span class="sd">        -----</span>
@@ -901,8 +901,8 @@
 
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
-<span class="sd">        This checks the convergence criterion. Numerical errors may mean some sigma and tau values that satisfy the convergence criterion may not converge. </span>
-<span class="sd">        Alternatively, step sizes outside the convergence criterion may still allow (fast) convergence. </span>
+<span class="sd">        This checks the convergence criterion. Numerical errors may mean some sigma and tau values that satisfy the convergence criterion may not converge.</span>
+<span class="sd">        Alternatively, step sizes outside the convergence criterion may still allow (fast) convergence.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ndual_subsets</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Number</span><span class="p">):</span>
@@ -916,7 +916,7 @@
 <div class="viewcode-block" id="SPDHG.update">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.SPDHG.update">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;  Runs one iteration of SPDHG </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  Runs one iteration of SPDHG</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Gradient descent for the primal variable</span>
@@ -964,9 +964,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.SPDHG.update_objective">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)</span>
-        <span class="n">p1</span> <span class="o">=</span> <span class="mf">0.</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">op</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">operators</span><span class="p">):</span>
-            <span class="n">p1</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="n">op</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="n">op</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">op</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">operators</span><span class="p">))</span>
         <span class="n">p1</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
 
         <span class="n">d1</span> <span class="o">=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y_old</span><span class="p">)</span>
@@ -979,39 +977,39 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;The saved primal objectives. </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;The saved primal objectives.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        list</span>
-<span class="sd">            The saved primal objectives from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg. </span>
+<span class="sd">            The saved primal objectives from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dual_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;The saved dual objectives. </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;The saved dual objectives.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        list</span>
-<span class="sd">            The saved dual objectives from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg. </span>
+<span class="sd">            The saved dual objectives from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">primal_dual_gap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;The saved primal-dual gap. </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;The saved primal-dual gap.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        list</span>
-<span class="sd">            The saved primal dual gap from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg. </span>
+<span class="sd">            The saved primal dual gap from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_save_previous_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">y_current</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39; Internal function used to save the previous iteration </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; Internal function used to save the previous iteration</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_y_old</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">y_current</span><span class="p">)</span></div>
 

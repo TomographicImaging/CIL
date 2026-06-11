@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.plugins.tigre.ProjectionOperator &#8212; CIL 25.0.1.dev57+ga428a0687.d20260611 documentation</title>
+    <title>cil.plugins.tigre.ProjectionOperator &#8212; CIL 25.0.1.dev79+gce75cc80b.d20260611 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../../../../../_static/documentation_options.js?v=bffd03f7"></script>
+    <script src="../../../../../_static/documentation_options.js?v=6a70e537"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.19.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev57+ga428a0687.d20260611';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev79+gce75cc80b.d20260611';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev57+ga428a0687.d20260611" />
+  <meta name="docsearch:version" content="25.0.1.dev79+gce75cc80b.d20260611" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -665,6 +665,11 @@
             <span class="n">image_geometry</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span>
 
         <span class="n">tigre_geom</span><span class="o">.</span><span class="n">check_geo</span><span class="p">(</span><span class="n">tigre_angles</span><span class="p">)</span>
+
+        <span class="c1"># fix for https://github.com/CERN/TIGRE/issues/744</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tigre_geom</span><span class="o">.</span><span class="n">COR</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">tigre_geom</span><span class="o">.</span><span class="n">COR</span> <span class="o">=</span> <span class="n">tigre_geom</span><span class="o">.</span><span class="n">COR</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
         <span class="n">tigre_geom</span><span class="o">.</span><span class="n">cast_to_single</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tigre_geom</span> <span class="o">=</span> <span class="n">tigre_geom</span>
 

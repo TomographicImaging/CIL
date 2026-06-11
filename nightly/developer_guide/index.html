@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Developers’ Guide &#8212; CIL 25.0.1.dev57+ga428a0687.d20260611 documentation</title>
+    <title>Developers’ Guide &#8212; CIL 25.0.1.dev79+gce75cc80b.d20260611 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../_static/documentation_options.js?v=bffd03f7"></script>
+    <script src="../_static/documentation_options.js?v=6a70e537"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.19.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev57+ga428a0687.d20260611';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev79+gce75cc80b.d20260611';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="CIL Plugins" href="../plugins/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev57+ga428a0687.d20260611" />
+  <meta name="docsearch:version" content="25.0.1.dev79+gce75cc80b.d20260611" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -454,7 +454,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#testing">Testing</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#conventions-on-new-cil-objects">Conventions on new CIL objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conventions-on-new-cil-objects">Conventions on new CIL objects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cil.utilities.dtype_like"><code class="docutils literal notranslate"><span class="pre">dtype_like()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#logging-and-warning">Logging and warning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#example-from-cil">Example from <code class="docutils literal notranslate"><span class="pre">cil</span></code></a></li>
@@ -664,10 +667,21 @@ create the instance.</p>
 Setter methods should be named <cite>set_&lt;parameter&gt;</cite>. The use of <cite>set_</cite> helps IDEs and user to find what they should change in an instance of a class.</p>
 <p>Methods that are not meant to be used by the user should have a <cite>_</cite> (underscore) at the beginning of the name.
 All methods should follow the convention of small caps underscore separated words.</p>
+<p>From numpy v2.0 onwards, [numpy data types are promoted in operations](<a class="reference external" href="https://numpy.org/doc/2.3/numpy_2_0_migration_guide.html#changes-to-numpy-data-type-promotion">https://numpy.org/doc/2.3/numpy_2_0_migration_guide.html#changes-to-numpy-data-type-promotion</a>).
+Scalars should be stored as Python types (e.g. int, float) instead of numpy data types (e.g. np.int32, np.float64) to avoid unexpected behaviour in operations with variables with numpy types.</p>
+<p>Note: This convention is not fully adhered to across CIL yet, but new code should follow this convention.
+We have updated CIL operations to make use of:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="cil.utilities.dtype_like">
+<span class="sig-prename descclassname"><span class="pre">cil.utilities.</span></span><span class="sig-name descname"><span class="pre">dtype_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/#dtype_like"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dtype_like" title="Link to this definition">#</a></dt>
+<dd><p>Converts <cite>input_value</cite> to type of <cite>reference_array</cite> if <cite>input_value</cite> has <cite>astype</cite> or <cite>dtype.type</cite> methods</p>
+</dd></dl>
+
+<p>This function promotes a scalar value to the same data type as a given numpy array, ensuring the array type is preserved in the operation.</p>
 </section>
 <section id="logging-and-warning">
 <h2>Logging and warning<a class="headerlink" href="#logging-and-warning" title="Link to this heading">#</a></h2>
-<p>We follow pythons convention on logging (see e.g. <a class="reference external" href="https://docs.python.org/3/howto/logging.html">https://docs.python.org/3/howto/logging.html</a>). In particular:</p>
+<p>We follow python’s convention on logging (see e.g. <a class="reference external" href="https://docs.python.org/3/howto/logging.html">https://docs.python.org/3/howto/logging.html</a>). In particular:</p>
 <div class="pst-scrollable-table-container"><table class="table" id="id3">
 <caption><span class="caption-text">Logging and warning guidelines</span><a class="headerlink" href="#id3" title="Link to this table">#</a></caption>
 <colgroup>

@@ -16,6 +16,7 @@
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 # Andrew Shartis (UES, Inc.)
+
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
 from cil.framework.labels import AngleUnit, AcquisitionDimension, ImageDimension
 import numpy as np
@@ -37,18 +38,41 @@ class ZEISSDataReader:
         dictionary with roi to load for each axis:
         ``{'axis_labels_1': (start, end, step),'axis_labels_2': (start, end, step)}``.
         ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.
+        This accepts negative indexing.
 
     Notes
     -----
     `roi` behaviour:
-        For ImageData to skip files or to change number of files to load,
-        adjust ``vertical``. E.g. ``'vertical': (100, 300)`` will skip first 100 files
-        and will load 200 files.
+        The indices provided are start inclusive, stop exclusive.
 
         ``'axis_label': -1`` is a shortcut to load all elements along axis.
 
         ``start`` and ``end`` can be specified as ``None`` which is equivalent
         to ``start = 0`` and ``end = load everything to the end``, respectively.
+
+        The ROI accepts negative indexing. i.e. {'axis_name1':(10, -10)} will 
+        crop the dimension symmetrically
+        The following two examples are equivalent, if the size of the horizontal dimension is 2000:
+
+        >>> reader1 = ZeissDataReader(file_name, roi={'horizontal': (10, -10)})
+
+        >>> reader2 = ZeissDataReader(file_name, roi={'horizontal': (10, 1990)})
+
+        For more info on negative indexing in python see: https://numpy.org/doc/stable/user/basics.indexing.html
+
+        **Acquisition Data**
+
+        The axis labels in the `roi` dict for `AcquisitionData` will be:
+        ``{'angle':(...),'vertical':(...),'horizontal':(...)}``
+
+        **Image Data**
+
+        The axis labels in the `roi` dict for `ImageData` will be:
+        ``{'angle':(...),'vertical':(...),'horizontal':(...)}``
+
+        To skip files or to change number of files to load,
+        adjust ``vertical``. E.g. ``'vertical': (100, 300)`` will skip first 100 files
+        and will load 200 files.
     '''
 
     def __init__(self, file_name=None, roi=None):
@@ -78,28 +102,12 @@ class ZEISSDataReader:
             dictionary with roi to load for each axis:
             ``{'axis_labels_1': (start, end, step),'axis_labels_2': (start, end, step)}``.
             ``axis_labels`` are defined by ImageGeometry and AcquisitionGeometry dimension labels.
-
+            This accepts negative indexing.
+            
         Notes
         -----
-        `roi` behaviour:
-            ``'axis_label': -1`` is a shortcut to load all elements along axis.
+        For more info on the parameters see the class docstring.
 
-            ``start`` and ``end`` can be specified as ``None`` which is equivalent
-            to ``start = 0`` and ``end = load everything to the end``, respectively.
-
-            **Acquisition Data**
-
-            The axis labels in the `roi` dict for `AcquisitionData` will be:
-            ``{'angle':(...),'vertical':(...),'horizontal':(...)}``
-
-            **Image Data**
-
-            The axis labels in the `roi` dict for `ImageData` will be:
-            ``{'angle':(...),'vertical':(...),'horizontal':(...)}``
-
-            To skip files or to change number of files to load,
-            adjust ``vertical``. E.g. ``'vertical': (100, 300)`` will skip first 100 files
-            and will load 200 files.
         '''
 
         # check if file exists
@@ -131,17 +139,20 @@ class ZEISSDataReader:
 
             # check roi labels and create tuple for slicing
             for key in roi.keys():
+                if key not in zeiss_data_order:
+                    raise ValueError('Invalid roi key: {}. Keys should be one of {}'.format(key, list(zeiss_data_order.keys())))
                 idx = zeiss_data_order[key]
                 if roi[key] != -1:
                     for i, x in enumerate(roi[key]):
                         if x is None:
                             continue
-
                         if i != 2: #start and stop
-                            default_roi[idx][i] = x if x >= 0 else default_roi[idx][1] - x
+                            adjusted_x = x if x >= 0 else default_roi[idx][1] + x
+                            if adjusted_x < 0 or adjusted_x > default_roi[idx][1]:
+                                raise ValueError('Invalid roi value: {} for key: {}. Values should be between -{} and {}'.format(x, key, default_roi[idx][1], default_roi[idx][1]))
+                            default_roi[idx][i] = x if x >= 0 else default_roi[idx][1] + x
                         else: #step
                             default_roi[idx][i] =  x if x > 0 else 1
-
             self._roi = default_roi
             self._metadata = self.slice_metadata(metadata)
         else:

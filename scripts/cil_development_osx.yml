@@ -14,7 +14,6 @@
 name: cil_dev
 channels:
   - conda-forge
-  - https://software.repos.intel.com/python/conda
 dependencies:
   - python=3.12
   - numpy=1.26

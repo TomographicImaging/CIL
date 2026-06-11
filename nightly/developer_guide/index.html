@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Developers’ Guide &#8212; CIL 25.0.1.dev79+gce75cc80b.d20260611 documentation</title>
+    <title>Developers’ Guide &#8212; CIL 25.0.1.dev78+g2d03882d4.d20260611 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../_static/documentation_options.js?v=6a70e537"></script>
+    <script src="../_static/documentation_options.js?v=be025953"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.19.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev79+gce75cc80b.d20260611';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev78+g2d03882d4.d20260611';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="CIL Plugins" href="../plugins/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev79+gce75cc80b.d20260611" />
+  <meta name="docsearch:version" content="25.0.1.dev78+g2d03882d4.d20260611" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -674,7 +674,7 @@ We have updated CIL operations to make use of:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="cil.utilities.dtype_like">
 <span class="sig-prename descclassname"><span class="pre">cil.utilities.</span></span><span class="sig-name descname"><span class="pre">dtype_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/utilities/#dtype_like"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dtype_like" title="Link to this definition">#</a></dt>
-<dd><p>Converts <cite>input_value</cite> to type of <cite>reference_array</cite> if <cite>input_value</cite> has <cite>astype</cite> or <cite>dtype.type</cite> methods</p>
+<dd><p><cite>input_value.astype(reference_array.dtype, copy=False)</cite> with fallback to <cite>input_value</cite></p>
 </dd></dl>
 
 <p>This function promotes a scalar value to the same data type as a given numpy array, ensuring the array type is preserved in the operation.</p>

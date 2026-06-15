@@ -43,24 +43,7 @@ A number of additional dependencies are required for specific functionality in C
 
 
 #### Binary packages and dependencies
-While building the CIL package we test with specific versions of dependencies. These are listed in the [build.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml) GitHub workflow and [cil_development.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/cil_development.yml). The following table tries to resume the tested versions of CIL and its required and optional dependencies. If you use these packages as a backend please remember to cite them in addition to CIL.
-
-| Package | Tested Version |  Conda install command | Description | License |
-|----|----|--------|--------|----|
-| [Python](https://www.python.org/) | 3.10 - 3.13 | `"python>=3.10,<=3.13"` || [PSF-2.0](https://docs.python.org/3/license.html) |
-| [Numpy](https://github.com/numpy/numpy) | 2.0 - 2.4 | `"numpy>=2,<=2.4"` || [BSD-3-Clause](https://numpy.org/doc/stable/license.html) |
-| [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `-c https://tomography.stfc.ac.uk/conda ipp=2021.12` | The Intel Integrated Performance Primitives Library (required for the CIL recon class). | [ISSL](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
-|--|--| **Optional dependencies** |--|--|
-| [ASTRA toolbox](http://www.astra-toolbox.com) | 2.0 - 2.4 | `astra-toolbox::astra-toolbox=2.4` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
-| [TIGRE](https://github.com/CERN/TIGRE) | 3.1.3 | `ccpi::tigre=3.1.3` | CT projectors, FBP and FDK. | [BSD-3-Clause](https://github.com/CERN/TIGRE/blob/master/LICENSE.txt) |
-| [CCPi Regularisation Toolkit](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit) | 26.0.0 | CPU: `ccpi::ccpi-regulariser=26.0.0=cpu*` <br> GPU: `ccpi::ccpi-regulariser=26.0.0=cuda*` | Toolbox of regularisation methods. | [Apache-2.0](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit/blob/master/LICENSE) |
-| [TomoPhantom](https://github.com/dkazanc/TomoPhantom) | 3.0.3 - 3.1.4 | `httomo::tomophantom=3.1.4` | Generates phantoms to use as test data. | [Apache-2.0](https://github.com/dkazanc/TomoPhantom/blob/master/LICENSE) |
-| [ipykernel](https://github.com/ipython/ipykernel) || `ipykernel` | Provides the IPython kernel to run Jupyter notebooks. | [BSD-3-Clause](https://github.com/ipython/ipykernel/blob/main/LICENSE) |
-| [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) || `ipywidgets` | Enables visualisation tools within jupyter noteboooks. | [BSD-3-Clause](https://github.com/jupyter-widgets/ipywidgets/blob/main/LICENSE) |
-|[zenodo_get](https://github.com/dvolgyes/zenodo_get)|>= 1.6|`zenodo_get>=1.6`| Downloads datasets from Zenodo, is used by `dataexample` to get data used in CIL-Demos |[AGPL-3.0](https://github.com/dvolgyes/zenodo_get?tab=AGPL-3.0-1-ov-file)|
-|--|--| **CT data readers** |--|--|
-|[olefile](https://github.com/decalage2/olefile)|>= 0.46|`olefile>=0.46`|Package to process Microsoft OLE2 files, used to read ZEISS data files.|[BSD-style (custom)](https://github.com/decalage2/olefile?tab=License-1-ov-file)|
-|[dxchange](https://github.com/data-exchange/dxchange)|>= 0.2.1|`dxchange>=0.2.1`|Provides an interface with TomoPy for loading tomography data.|[BSD-style (custom)](https://github.com/data-exchange/dxchange?tab=License-1-ov-file)|
+See our [documentation](https://tomographicimaging.github.io/CIL/nightly/dependencies) for details of dependency versions we support.
 
 ### Docker
 

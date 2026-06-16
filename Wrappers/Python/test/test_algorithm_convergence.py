@@ -2,7 +2,7 @@
 from cil.optimisation.algorithms import SPDHG, PDHG, LSQR, FISTA, APGD, GD, PD3O
 from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction, LeastSquares, TotalVariation, MixedL21Norm, L1Norm
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
-from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule, ArmijoStepSizeRule, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015, PDHGBayesOptimisationStepSize
+from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule, ArmijoStepSizeRule, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015, PDHGBayesOptimisationStepSize, SPDHGBayesOptimisationStepSize, SPDHGStepSizesFromRatio
 from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData, ImageGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
@@ -487,3 +487,30 @@ class TestPDHGConvergence(CCPiTestClass):
         gamma = np.sqrt(pdhg.sigma / pdhg.tau)
         pdhg.run(30, verbose=1)
         self.assertAlmostEqual((pdhg.x-ideal).norm(), 0, places=4)
+        
+        
+class TestSPDHGConvergence(CCPiTestClass):
+    def test_SPDHG_adaptive_bayes(self):
+        self.subsets = 2
+        ig = ImageGeometry(3, 3)
+        data_ind=ig.allocate(0)
+        data_ind.fill(np.diag([1, 2, 3]))
+        ideal_ind = ig.allocate(0)
+        ideal_ind.fill(np.diag([0.5, 1, 1.5]))
+        data = BlockDataContainer([data_ind]*self.subsets)
+        ideal = BlockDataContainer([ideal_ind]*self.subsets)
+
+        self.A = BlockOperator(
+            *[IdentityOperator(ig) for i in range(self.subsets)])
+
+
+        # block function
+        self.F = BlockFunction(*[L2NormSquared(b=data_ind)
+                                for i in range(self.subsets)])
+        self.G = L2NormSquared()
+    
+        rule = SPDHGBayesOptimisationStepSize(
+            gamma_bounds=None, n_initial_points=5, n_calls=10,  n_iterations=10, seed = 42)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+        spdhg.run(50, verbose=1)
+        self.assertBlockDataContainerAlmostEqual(spdhg.x, ideal, decimal=4)

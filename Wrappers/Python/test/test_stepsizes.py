@@ -4,7 +4,7 @@ from cil.framework import ImageGeometry, VectorGeometry, VectorData
 from cil.optimisation.operators import BlockOperator,  IdentityOperator, MatrixOperator, LinearOperator
 
 from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015, PDHGBayesOptimisationStepSize
-from cil.optimisation.utilities import SPDHGConstantStepSize, SPDHGBayesOptimisationStepSize, SPDHGStepSizesFromRatio
+from cil.optimisation.utilities import SPDHGConstantStepSize, SPDHGBayesOptimisationStepSize, SPDHGStepSizesFromRatio, Sampler
 import numpy as np
 
 from cil.utilities import dataexample
@@ -1207,8 +1207,7 @@ class TestSPDHGConstantStepSize(CCPiTestClass):
         partitioned_data = data.partition(self.subsets, 'sequential')
         self.A = BlockOperator(
             *[IdentityOperator(partitioned_data[i].geometry) for i in range(self.subsets)])
-        self.A2 = BlockOperator(
-            *[IdentityOperator(partitioned_data[i].geometry) for i in range(self.subsets)])
+
 
         # block function
         self.F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
@@ -1262,3 +1261,67 @@ class TestSPDHGConstantStepSize(CCPiTestClass):
         self.assertEqual(spdhg.tau, min([pi*rho / (si * ni**2) for pi, ni,
                                             si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
 
+
+class TestSPDHGBayesStepSize(CCPiTestClass):
+    def setUp(self):
+        self.subsets = 4
+
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get(size=(4, 4))
+
+        partitioned_data = data.partition(self.subsets, 'sequential')
+        self.A = BlockOperator(
+            *[IdentityOperator(partitioned_data[i].geometry) for i in range(self.subsets)])
+
+
+        # block function
+        self.F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
+                                for i in range(self.subsets)])
+        alpha = 0.025
+        self.G = alpha * IndicatorBox(lower=0)
+        
+    def test_init(self):
+        rule = SPDHGBayesOptimisationStepSize(
+            gamma_bounds=[0.1, 2], n_initial_points=5, n_calls=5,  n_iterations=10, seed=42)
+        self.assertEqual(rule.gamma_bounds, [0.1, 2])
+        self.assertEqual(rule.n_initial_points, 5)
+        self.assertEqual(rule.n_calls, 5)
+        self.assertEqual(rule.n_iterations, 10)
+        self.assertEqual(rule.seed, 42)
+
+    def test_init_default(self):
+        rule = SPDHGBayesOptimisationStepSize()
+        self.assertEqual(rule.n_initial_points, 5)
+        self.assertEqual(rule.n_calls, 20)
+        self.assertEqual(rule.n_iterations, None)
+        self.assertEqual(rule.seed, None)
+
+    def test_init_invalid(self):
+        with self.assertRaises(ValueError):
+            SPDHGBayesOptimisationStepSize(gamma_bounds=[
+                (0.1, 10)], n_initial_points=5)
+
+        with self.assertRaises(ValueError):
+            SPDHGBayesOptimisationStepSize(gamma_bounds=[
+                -0, 1.1], n_calls=-5)
+
+    def test_get_gamma_bounded(self):
+
+        rule = SPDHGBayesOptimisationStepSize(
+            gamma_bounds=[5, 6], n_initial_points=5, n_calls=5,  n_iterations=None, seed=42)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,
+                    step_size=rule, update_objective_interval=4)
+        self.assertEqual(rule.n_iterations, 10*self.subsets)
+        gamma = min([ pi/(spdhg.tau *ni) for pi, ni in zip(spdhg._prob_weights, spdhg._norms)])
+        self.assertTrue(5.8 <= gamma <= 6)
+
+        self.assertEqual(spdhg.iteration, -1)
+        self.assertEqual(spdhg.update_objective_interval, 4)
+        self.assertEqual(spdhg.objective, [])
+
+    def test_get_gamma(self):
+        rule = SPDHGBayesOptimisationStepSize(
+            gamma_bounds=None, n_initial_points=5, n_calls=10,  seed=42)
+        sampler = Sampler.sequential(self.subsets)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule, sampler=sampler)
+        gamma = min([ pi/(spdhg.tau *ni) for pi, ni in zip(spdhg._prob_weights, spdhg._norms)])
+        self.assertAlmostEqual(gamma, 0.5, places=1)

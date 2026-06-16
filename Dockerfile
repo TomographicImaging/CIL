@@ -9,7 +9,7 @@ LABEL org.opencontainers.image.source=https://github.com/TomographicImaging/CIL
 LABEL org.opencontainers.image.licenses="Apache-2.0 AND BSD-3-Clause AND GPL-3.0"
 
 # CUDA-specific packages
-ARG CIL_EXTRA_PACKAGES="tigre=2.6 astra-toolbox::astra-toolbox=2.4"
+ARG CIL_EXTRA_PACKAGES="ccpi::tigre=3.1.3 astra-toolbox::astra-toolbox=2.4"
 # build & runtime dependencies
 # TODO: sync scripts/cil_development.yml, recipe.yaml
 COPY --chown="${NB_USER}" scripts/cil_development.yml environment.yml

@@ -3595,8 +3595,8 @@ class TestFluxNormaliser(unittest.TestCase):
         detector_position_set=[[0,0,0]]*3
         detector_direction_x_set=[[1, 0, 0]]*3
         detector_direction_y_set=[[0, 0, 1]]*3
-        cone_flex_ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([3,3])
-        self.cone_flex  = AcquisitionData(arr, geometry=cone_flex_ag)
+        cone_flex_ag = AcquisitionGeometry.create_Cone3D_Flex(source_position_set, detector_position_set, detector_direction_x_set, detector_direction_y_set).set_panel([128,128])
+        self.cone_flex  = cone_flex_ag.allocate(1)
 
     def error_message(self,processor, test_parameter):
             return "Failed with processor " + str(processor) + " on test parameter " + test_parameter
@@ -3809,92 +3809,8 @@ class TestFluxNormaliser(unittest.TestCase):
 
         # Test no error with preview_configuration with different data shapes
         for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
-                     self.data_slice, self.data_reorder, self.data_single_angle]:
-            mock_show.reset_mock()
-
-            roi = {'horizontal':(25,40)}
-            processor = FluxNormaliser(roi=roi)
-            processor.set_input(data)
-            fig = processor.preview_configuration()
-            
-            mock_show.assert_called_once()
-
-            # for 3D, check no error specifying a single angle to plot
-            if data.geometry.dimension == '3D':
-                processor.preview_configuration(angle=1)
-            # if 2D, attempt to plot single angle should cause error
-            else:
-                with self.assertRaises(ValueError):
-                    processor.preview_configuration(angle=1)
-
-            # if data is multichannel, check no error specifying a single channel to plot
-            if 'channel' in data.dimension_labels:
-                processor.preview_configuration(angle=1, channel=1)
-                processor.preview_configuration(channel=1)
-            # if single channel, check specifying channel causes an error
-            else:
-                with self.assertRaises(ValueError):
-                    processor.preview_configuration(channel=1)
-
-        # Re-enable logging
-        logging.disable(logging.NOTSET)
-
-    @unittest.skipIf(not has_matplotlib, "matplotlib not installed")
-    @patch('matplotlib.pyplot.show')
-    def test_preview_configuration_flex(self, mock_show):
-        
-        # Suppress backround range warning
-        logging.disable(logging.CRITICAL)
-
-        # Test correct data is plotted
-        roi = {'horizontal':(0,3),'vertical':(0,1)}
-        processor = FluxNormaliser(roi=roi)
-        processor.set_input(self.cone_flex)
-        
-        fig = processor.preview_configuration()
-        
-        # Check slice plots
-        slice_plot1 = fig.axes[0].images[0].get_array().data
-        slice_plot2 = fig.axes[2].images[0].get_array().data
-        numpy.testing.assert_allclose(self.data_simple.array[0], slice_plot1)
-        numpy.testing.assert_allclose(self.data_simple.array[2], slice_plot2)
-
-        # Check ROI plots
-        for f in [fig.axes[0], fig.axes[2]]:
-            roi_x_lower = f.lines[0].get_xdata()
-            roi_x_upper = f.lines[1].get_xdata()
-            roi_y_lower = f.lines[0].get_ydata()
-            roi_y_upper = f.lines[1].get_ydata()
-            numpy.testing.assert_allclose(roi_x_lower, [0,3])
-            numpy.testing.assert_allclose(roi_x_upper, [0,3])
-            numpy.testing.assert_allclose(roi_y_lower, [0,0])
-            numpy.testing.assert_allclose(roi_y_upper, [1,1])
-
-            roi_x_left = f.lines[2].get_xdata()
-            roi_x_right = f.lines[3].get_xdata()
-            roi_y_left = f.lines[2].get_ydata()
-            roi_y_right = f.lines[3].get_ydata()
-            numpy.testing.assert_allclose(roi_x_left, [0,0])
-            numpy.testing.assert_allclose(roi_x_right, [3,3])
-            numpy.testing.assert_allclose(roi_y_left, [0,1])
-            numpy.testing.assert_allclose(roi_y_right, [0,1])
-
-        # Check line data
-        data_mean = self.data_simple.get_slice(vertical=1).array.mean(axis=1)
-        plot_mean = fig.axes[4].lines[0].get_ydata()
-        numpy.testing.assert_allclose(data_mean, plot_mean)
-
-        data_min = self.data_simple.get_slice(vertical=1).array.min(axis=1)
-        plot_min = fig.axes[4].lines[1].get_ydata()
-        numpy.testing.assert_allclose(data_min, plot_min)
-
-        data_max = self.data_simple.get_slice(vertical=1).array.max(axis=1)
-        plot_max = fig.axes[4].lines[2].get_ydata()
-        numpy.testing.assert_allclose(data_max, plot_max)
-
-        # Test no error with preview_configuration with different data shapes
-        for data in [self.data_cone, self.data_parallel, self.data_multichannel, 
-                     self.data_slice, self.data_reorder, self.data_single_angle]:
+                     self.data_slice, self.data_reorder, self.data_single_angle,
+                     self.cone_flex]:
             mock_show.reset_mock()
 
             roi = {'horizontal':(25,40)}

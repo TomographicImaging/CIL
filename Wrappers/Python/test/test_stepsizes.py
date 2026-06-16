@@ -1,11 +1,13 @@
-from cil.optimisation.algorithms import SIRT, GD, ISTA, FISTA, PDHG
-from cil.optimisation.functions import LeastSquares, IndicatorBox, ZeroFunction, L2NormSquared
+from cil.optimisation.algorithms import SIRT, GD, ISTA, FISTA, PDHG, SPDHG
+from cil.optimisation.functions import BlockFunction, LeastSquares, IndicatorBox, ZeroFunction, L2NormSquared
 from cil.framework import ImageGeometry, VectorGeometry, VectorData
-from cil.optimisation.operators import IdentityOperator, MatrixOperator, LinearOperator
+from cil.optimisation.operators import BlockOperator,  IdentityOperator, MatrixOperator, LinearOperator
 
 from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015, PDHGBayesOptimisationStepSize
+from cil.optimisation.utilities import SPDHGConstantStepSize, SPDHGBayesOptimisationStepSize, SPDHGStepSizesFromRatio
 import numpy as np
 
+from cil.utilities import dataexample
 from testclass import CCPiTestClass
 from unittest.mock import MagicMock
 from unittest.mock import Mock
@@ -1195,3 +1197,68 @@ class TestPDHGBayesOpt(CCPiTestClass):
         pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
         gamma = np.sqrt(pdhg.sigma / pdhg.tau)
         self.assertAlmostEqual(gamma, 1.7, places=1)
+
+class TestSPDHGConstantStepSize(CCPiTestClass):
+    def setUp(self):
+        self.subsets = 10
+
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get(size=(16, 16))
+
+        partitioned_data = data.partition(self.subsets, 'sequential')
+        self.A = BlockOperator(
+            *[IdentityOperator(partitioned_data[i].geometry) for i in range(self.subsets)])
+        self.A2 = BlockOperator(
+            *[IdentityOperator(partitioned_data[i].geometry) for i in range(self.subsets)])
+
+        # block function
+        self.F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
+                                for i in range(self.subsets)])
+        alpha = 0.025
+        self.G = alpha * IndicatorBox(lower=0)
+        
+    def test_init_and_constant_step_size(self):
+        gamma = 1.
+        rho = .99
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
+        
+        self.assertListEqual(
+            spdhg.sigma, [rho / ni for ni in spdhg._norms])
+        self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni,
+                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+        self.assertNumpyArrayEqual(
+            spdhg.x.as_array(), self.A.domain_geometry().allocate(0).as_array())
+        self.assertEqual(spdhg.update_objective_interval, 1)
+
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=(100, [1]*self.subsets))
+        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
+        self.assertEqual(spdhg.tau, 100)
+
+        # Test SPDHG setters - set_step_sizes with sigma
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=(None, [1]*self.subsets))
+        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
+        self.assertEqual(spdhg.tau, min([(rho*pi / (si * ni**2)) for pi, ni,
+                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+
+        # Test SPDHG setters - set_step_sizes with tau
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=(100, None))
+        self.assertListEqual(spdhg.sigma, [
+                             gamma * rho*pi / (spdhg.tau*ni**2) for ni, pi in zip(spdhg._norms, spdhg._prob_weights)])
+        self.assertEqual(spdhg.tau, 100)
+        
+
+    def test_init_and_constant_step_size_invalid(self):
+        with self.assertRaises(ValueError):
+            SPDHGConstantStepSize(step_size=[1.0])
+        with self.assertRaises(ValueError):
+            SPDHGConstantStepSize(step_size=[1.0, 2.0]).get_initial_step_size(SPDHG(f=self.F, g=self.G, operator=self.A))
+            
+    def test_step_sizes_from_ratio(self):
+        gamma = 3.7
+        rho = 5.6
+        rule = SPDHGStepSizesFromRatio(gamma,rho)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+        self.assertListEqual(
+            spdhg.sigma, [gamma * rho / ni for ni in spdhg._norms])
+        self.assertEqual(spdhg.tau, min([pi*rho / (si * ni**2) for pi, ni,
+                                            si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+

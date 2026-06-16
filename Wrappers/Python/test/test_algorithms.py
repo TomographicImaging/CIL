@@ -1091,48 +1091,7 @@ class TestSPDHG(CCPiTestClass):
         self.assertListEqual(spdhg._prob_weights, [
                              1/self.subsets] * self.subsets)
         self.assertEqual(spdhg._sampler._type, 'random_with_replacement')
-        self.assertListEqual(
-            spdhg.sigma, [rho / ni for ni in spdhg._norms])
-        self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni,
-                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
-        self.assertNumpyArrayEqual(
-            spdhg.x.as_array(), self.A.domain_geometry().allocate(0).as_array())
-        self.assertEqual(spdhg.update_objective_interval, 1)
-
-        # Test SPDHG setters - "from ratio"
-        gamma = 3.7
-        rho = 5.6
-        spdhg.set_step_sizes_from_ratio(gamma, rho)
-        self.assertListEqual(
-            spdhg.sigma, [gamma * rho / ni for ni in spdhg._norms])
-        self.assertEqual(spdhg.tau, min([pi*rho / (si * ni**2) for pi, ni,
-                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
-
-        # Test SPDHG setters - set_step_sizes default values for sigma and tau
-        gamma = 1.
-        rho = .99
-        spdhg.set_step_sizes()
-        self.assertListEqual(
-            spdhg.sigma, [rho / ni for ni in spdhg._norms])
-        self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni,
-                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
-
-        # Test SPDHG setters - set_step_sizes with sigma and tau
-        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=100)
-        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
-        self.assertEqual(spdhg.tau, 100)
-
-        # Test SPDHG setters - set_step_sizes with sigma
-        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=None)
-        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
-        self.assertEqual(spdhg.tau, min([(rho*pi / (si * ni**2)) for pi, ni,
-                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
-
-        # Test SPDHG setters - set_step_sizes with tau
-        spdhg.set_step_sizes(sigma=None, tau=100)
-        self.assertListEqual(spdhg.sigma, [
-                             gamma * rho*pi / (spdhg.tau*ni**2) for ni, pi in zip(spdhg._norms, spdhg._prob_weights)])
-        self.assertEqual(spdhg.tau, 100)
+        
 
     def test_spdhg_non_default_init(self):
         # Test SPDHG init with non-default values

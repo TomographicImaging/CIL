@@ -21,7 +21,7 @@ from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.operators import BlockOperator
 import numpy as np
 import logging
-from cil.optimisation.utilities import Sampler, StepSizeRule, SPDHGConstantStepSize, SPDHGConstantStepSize, SPDHG_constant_sizes_from_ratio
+from cil.optimisation.utilities import Sampler, StepSizeRule, SPDHGConstantStepSize
 from numbers import Number
 import warnings
 from cil.framework import BlockDataContainer
@@ -135,7 +135,7 @@ class SPDHG(Algorithm):
     def __init__(self, f=None, g=None, operator=None, step_size=None,
                  initial=None, sampler=None, prob_weights=None,   **kwargs):
 
-
+        self.initial = initial
         self._sigma = kwargs.pop('sigma', None)  # To be deprecated
         self._tau = kwargs.pop('tau', None)  # To be deprecated
     
@@ -323,7 +323,8 @@ class SPDHG(Algorithm):
         # save previous iteration
         self._save_previous_iteration(i, self.y_k)
         
-
+        self._tau, self._sigma = self.step_size_rule.get_step_size(self)
+        
     def update_objective(self):
         # p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
         p1 = 0.

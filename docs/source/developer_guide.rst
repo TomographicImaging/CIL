@@ -183,7 +183,8 @@ All methods should follow the convention of small caps underscore separated word
 
 Scalar Types
 -------------
-From numpy v2.0 onwards, [numpy data types are promoted in operations](https://numpy.org/doc/2.3/numpy_2_0_migration_guide.html#changes-to-numpy-data-type-promotion).
+
+From numpy v2.0 onwards, `numpy data types are promoted in operations <https://numpy.org/doc/2.3/numpy_2_0_migration_guide.html#changes-to-numpy-data-type-promotion>`_.
 Scalars should be stored as Python types (e.g. int, float) instead of numpy data types (e.g. np.int32, np.float64) to avoid unexpected behaviour in operations with variables with numpy types.
 
 Note: This convention is not fully adhered to across CIL yet, but new code should follow this convention.

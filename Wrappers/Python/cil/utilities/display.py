@@ -627,21 +627,17 @@ class show2D(show_base):
             num_cols = num_plots
 
         num_rows = num_plots // num_cols + (num_plots % num_cols > 0)
-        fig, (ax) = plt.subplots(num_rows, num_cols, figsize=size)
-        axes = ax.flatten()
+        fig, axs = plt.subplots(num_rows, num_cols, figsize=size, squeeze=False)
 
-        #set up plots
-        for i in range(num_rows*num_cols):
-            axes[i].set_visible(False)
+        for axis in axs.flat[num_plots:]:
+            fig.delaxes(axis)
 
-        for i, subplot in enumerate(subplots):
-
-            axes[i].set_visible(True)
-            axes[i].set_title(subplot.title)
+        for i, (axis, subplot) in enumerate(zip(axs.flat, subplots)):
+            axis.set_title(subplot.title)
 
             if subplot.axis_labels is not None:
-                axes[i].set_ylabel(subplot.axis_labels[1])
-                axes[i].set_xlabel(subplot.axis_labels[0])
+                axis.set_ylabel(subplot.axis_labels[1])
+                axis.set_xlabel(subplot.axis_labels[0])
 
             #set origin
             data, data_origin, extent = set_origin(subplot.data, subplot.origin)
@@ -649,28 +645,28 @@ class show2D(show_base):
                 dcmap = cmap[i]
             else:
                 dcmap = cmap
-            sp = axes[i].imshow(data, cmap=dcmap, origin=data_origin, extent=extent)
+            sp = axis.imshow(data, cmap=dcmap, origin=data_origin, extent=extent)
 
             im_ratio = subplot.data.shape[0]/subplot.data.shape[1]
 
             y_axes2 = False
             if isinstance(subplot.data,(AcquisitionData)):
-                if axes[i].get_ylabel() == 'angle':
-                    locs = axes[i].get_yticks()
+                if axis.get_ylabel() == 'angle':
+                    locs = axis.get_yticks()
                     location_new = locs[0:-1].astype(int)
 
                     ang = subplot.data.geometry.config.angles
 
                     labels_new = ["{:.2f}".format(i) for i in np.take(ang.angle_data, location_new)]
-                    axes[i].set_yticks(location_new, labels=labels_new)
+                    axis.set_yticks(location_new, labels=labels_new)
 
-                    axes[i].set_ylabel('angle / ' + str(ang.angle_unit))
+                    axis.set_ylabel('angle / ' + str(ang.angle_unit))
 
-                    y_axes2 = axes[i].axes.secondary_yaxis('right')
+                    y_axes2 = axis.axes.secondary_yaxis('right')
                     y_axes2.set_ylabel('angle / index')
 
                     if subplot.data.shape[0] < subplot.data.shape[1]//2:
-                        axes[i].set_aspect(1/im_ratio)
+                        axis.set_aspect(1/im_ratio)
                         im_ratio = 1
 
             if y_axes2:
@@ -680,7 +676,7 @@ class show2D(show_base):
                 scale = 0.0467*im_ratio
                 pad = 0.02
 
-            plt.colorbar(sp, orientation='vertical', ax=axes[i],fraction=scale, pad=pad)
+            plt.colorbar(sp, orientation='vertical', ax=axis, fraction=scale, pad=pad)
 
             if subplot.range is not None:
                 sp.set_clim(subplot.range[0],subplot.range[1])
@@ -785,7 +781,7 @@ class _ShowGeometry(object):
         world_limits = self.ax.get_w_lims()
         self.ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
-        l = self.ax.plot(np.NaN, np.NaN, '-', color='none', label='')[0]
+        l = self.ax.plot(np.nan, np.nan, '-', color='none', label='')[0]
 
         for i in range(3):
             self.handles.insert(2,l)
@@ -949,8 +945,8 @@ class _ShowGeometry(object):
 
             count = 0
             for x in combos:
-                s = rotation_matrix.dot(np.asarray(x[0]).reshape(3,1))
-                e = rotation_matrix.dot(np.asarray(x[1]).reshape(3,1))
+                s = rotation_matrix.dot(np.asarray(x[0]).reshape(3))
+                e = rotation_matrix.dot(np.asarray(x[1]).reshape(3))
 
                 x_data = float(s[0]) + ro[0], float(e[0]) + ro[0]
                 y_data = float(s[1]) + ro[1], float(e[1]) + ro[1]
@@ -978,7 +974,7 @@ class _ShowGeometry(object):
 
         for i in range(points):
             theta = i * (np.pi * 1.8) /36
-            point_i = np.array([np.sin(theta),-np.cos(theta),0]).reshape(3,1)
+            point_i = np.array([np.sin(theta),-np.cos(theta),0]).reshape(3)
             point_rot = -self.scale*0.5*rotation_matrix.dot(point_i)
 
             x[i] = float(point_rot[0] + ro[0])

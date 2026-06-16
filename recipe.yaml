@@ -2,12 +2,11 @@ schema_version: 1
 
 context:
   name: ${{ load_from_file("pyproject.toml").project.name }} # ratter-build --experimental
-  build_number: 0
-  version: ${{ git.latest_tag(".") | replace("v", "") }} # .dev${{ build_number }}+g${{ git.head_rev(".") }} # ratter-build --experimental
+  build_number: ${{ git.latest_tag_distance(".") }} # ratter-build>=0.65 --experimental
+  version: ${{ git.latest_tag(".") | replace("v", "") }} # ratter-build --experimental
   test_gpu: ${{ env.get("TESTS_FORCE_GPU", default="") | bool }}
   # used multiple times, so defined once here to avoid repetition
   ipp_version: '2021.12.*'
-  astra_version: '2.1.*'
 
 package:
   name: ${{ name }}
@@ -55,19 +54,19 @@ requirements:
     - packaging
     - if: x86_64
       then: ipp ${{ ipp_version }}
-    - numpy >=1.23,<2
+    - numpy >=1.23,<3
     - scipy >=1.4
     - h5py
     - pillow
     - pywavelets
-    - cil-data >=22
+    - cil-data >=22 # -c ccpi
     - tqdm
     - numba
   # version constraints of optional dependencies
   run_constraints:
     - tomophantom >=3.0.3
-    - astra-toolbox >=1.9.9.dev5
-    - tigre >=2.4
+    - astra-toolbox >=2
+    - tigre >=3.1.3
     - ccpi-regulariser >=24.0.1
     - olefile >=0.46
     - zenodo_get >=1.6
@@ -79,8 +78,11 @@ tests:
         - cil.framework
         - cil.version
   - script:
+      content:
       - pip install unittest-parametrize
       - python -m unittest discover -v -s Wrappers/Python/test
+      env:
+        TESTS_FORCE_GPU: ${{ "1" if test_gpu else "" }}
     files:
       source:
         - ./Wrappers/Python/test
@@ -91,16 +93,18 @@ tests:
         - if: linux
           then: cvxpy !=1.8.2
         - scikit-image
-        - tomophantom 3.0.3.*
+        - httomo::tomophantom 3.1.4.*
         - if: not osx
-          then: ccpi-regulariser 24.0.1.*
-        - if: test_gpu
           then:
-          - tigre 2.6.*
-        - astra-toolbox 2.4.*
+            - if: test_gpu
+              then: ccpi::ccpi-regulariser 26.* cuda*
+              else: ccpi::ccpi-regulariser 26.* cpu*
+        - if: test_gpu
+          then: ccpi::tigre 3.1.3.*
+        - astra-toolbox::astra-toolbox 2.4.*
         - matplotlib-base >=3.3
         - zenodo_get >=1.6
-        - dxchange >=0.2.1
+        - ccpi::dxchange >=0.2.1
         - olefile >=0.46
 
 about:

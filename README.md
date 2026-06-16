@@ -19,7 +19,7 @@ Binary installation of CIL can be achieved with `conda`.
 We recommend using either [`miniconda`](https://docs.conda.io/projects/miniconda/en/latest) or [`miniforge`](https://github.com/conda-forge/miniforge), which are both minimal installers for `conda`. We also recommend a `conda` version of at least `23.10` for quicker installation.
 
 #### Create a conda environment with CIL
-We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies that are outlined in the table below: 
+We maintain an environment file with the required packages to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) which you can use to create a new environment. This will have specific and tested versions of all dependencies that are outlined in the table below:
 
 ```sh
 conda env create -f https://tomographicimaging.github.io/scripts/env/cil_demos.yml
@@ -37,31 +37,13 @@ where `<env_name>` is `cil_demos`, `cil_demos_cpu` or whatever name you specifie
 #### Install CIL into an existing environment
 If you prefer to install CIL with minimal dependencies into an existing environment you can use:
 ```sh
-conda install -c https://software.repos.intel.com/python/conda -c conda-forge -c ccpi cil=25.0.0
+conda install -c conda-forge -c ccpi cil=25.0.0
 ```
 A number of additional dependencies are required for specific functionality in CIL, these should be added to your environment as necessary. See the dependency table below for details.
 
 
 #### Binary packages and dependencies
-While building the CIL package we test with specific versions of dependencies. These are listed in the [build.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/build.yml) GitHub workflow and [cil_development.yml](https://github.com/TomographicImaging/CIL/blob/master/scripts/cil_development.yml). The following table tries to resume the tested versions of CIL and its required and optional dependencies. If you use these packages as a backend please remember to cite them in addition to CIL.
-
-| Package | Tested Version |  Conda install command | Description | License |
-|----|----|--------|--------|----|
-| [Python](https://www.python.org/) | 3.10 - 3.12 | `"python>=3.10,<=3.12"` || [PSF-2.0](https://docs.python.org/3/license.html) |
-| [Numpy](https://github.com/numpy/numpy) | 1.23 - 1.26 | `"numpy>=1.23,<2"` || [BSD-3-Clause](https://numpy.org/doc/stable/license.html) |
-| [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) | 2021.12 | `-c https://software.repos.intel.com/python/conda ipp=2021.12` | The Intel Integrated Performance Primitives Library (required for the CIL recon class). | [ISSL](http://www.intel.com/content/www/us/en/developer/articles/license/end-user-license-agreement.html) |
-|--|--| **Optional dependencies** |--|--|
-| [ASTRA toolbox](http://www.astra-toolbox.com) | 2.1 | CPU: `conda-forge::astra-toolbox=2.1=py*` <br> GPU: `conda-forge::astra-toolbox=2.1=cuda*` | CT projectors, FBP and FDK. | [GPL-3.0](https://github.com/astra-toolbox/astra-toolbox/blob/master/COPYING) |
-| [TIGRE](https://github.com/CERN/TIGRE) | 2.6 | `ccpi::tigre=2.6` | CT projectors, FBP and FDK. | [BSD-3-Clause](https://github.com/CERN/TIGRE/blob/master/LICENSE.txt) |
-| [CCPi Regularisation Toolkit](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit) | 24.0.1 | `ccpi::ccpi-regulariser=24.0.1` | Toolbox of regularisation methods. | [Apache-2.0](https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit/blob/master/LICENSE) |
-| [TomoPhantom](https://github.com/dkazanc/TomoPhantom) | [3.0.3](https://github.com/dkazanc/TomoPhantom/releases/tag/v3.0) | `ccpi::tomophantom=3.0.3` | Generates phantoms to use as test data. | [Apache-2.0](https://github.com/dkazanc/TomoPhantom/blob/master/LICENSE) |
-| [ipykernel](https://github.com/ipython/ipykernel) || `ipykernel` | Provides the IPython kernel to run Jupyter notebooks. | [BSD-3-Clause](https://github.com/ipython/ipykernel/blob/main/LICENSE) |
-| [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) || `ipywidgets` | Enables visualisation tools within jupyter noteboooks. | [BSD-3-Clause](https://github.com/jupyter-widgets/ipywidgets/blob/main/LICENSE) |
-|[zenodo_get](https://github.com/dvolgyes/zenodo_get)|>= 1.6|`zenodo_get>=1.6`| Downloads datasets from Zenodo, is used by `dataexample` to get data used in CIL-Demos |[AGPL-3.0](https://github.com/dvolgyes/zenodo_get?tab=AGPL-3.0-1-ov-file)|
-|--|--| **CT data readers** |--|--|
-|[olefile](https://github.com/decalage2/olefile)|>= 0.46|`olefile>=0.46`|Package to process Microsoft OLE2 files, used to read ZEISS data files.|[BSD-style (custom)](https://github.com/decalage2/olefile?tab=License-1-ov-file)|
-|[dxchange](https://github.com/data-exchange/dxchange)|>= 0.2.1|`dxchange>=0.2.1`|Provides an interface with TomoPy for loading tomography data.|[BSD-style (custom)](https://github.com/data-exchange/dxchange?tab=License-1-ov-file)|
-
+See our [documentation](https://tomographicimaging.github.io/CIL/nightly/dependencies) for details of dependency versions we support.
 
 ### Docker
 

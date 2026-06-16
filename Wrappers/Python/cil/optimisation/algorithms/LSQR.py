@@ -20,14 +20,14 @@
 from cil.optimisation.algorithms import Algorithm
 import numpy
 import logging
-import warnings 
+import warnings
 import math
 
 log = logging.getLogger(__name__)
 
+
 class LSQR(Algorithm):
 
-    
     r"""
     Least Squares with QR factorisation (LSQR) algorithm.
 
@@ -77,19 +77,17 @@ class LSQR(Algorithm):
             Regularisation parameter. Default is 0 (no regularisation).
         """
 
-
-        
         super(LSQR, self).__init__(**kwargs)
 
         if initial is None and operator is not None:
             initial = operator.domain_geometry().allocate(0)
-        self.regalpha = alpha 
+        self.regalpha = alpha
 
         if initial is not None and operator is not None and data is not None:
             self.set_up(initial=initial, operator=operator, data=data)
         else:
-            raise ValueError(' You must initialise LSQR with an `operator` and `data`')
-
+            raise ValueError(
+                ' You must initialise LSQR with an `operator` and `data`')
 
     def set_up(self, initial, operator, data):
         """
@@ -105,18 +103,18 @@ class LSQR(Algorithm):
             Measured data.
         """
         log.info("%s setting up", self.__class__.__name__)
-        self.x = initial.copy() #1 domain
+        self.x = initial.copy()  # 1 domain
         self.operator = operator
 
         # Initialise Golub-Kahan bidiagonalisation (GKB)
-        
-        #self.u = data - self.operator.direct(self.x)
-        self.u = self.operator.direct(self.x) #1 range 
+
+        # self.u = data - self.operator.direct(self.x)
+        self.u = self.operator.direct(self.x)  # 1 range
         self.u.sapyb(-1, data, 1, out=self.u)
         self.beta = self.u.norm()
         self.u /= self.beta
-        
-        self.v = self.operator.adjoint(self.u) #2 domain 
+
+        self.v = self.operator.adjoint(self.u)  # 2 domain
         self.alpha = self.v.norm()
         self.v /= self.alpha
 
@@ -134,12 +132,11 @@ class LSQR(Algorithm):
         self.configured = True
         log.info("%s configured", self.__class__.__name__)
 
-
     def update(self):
         """Perform a single iteration of the LSQR algorithm."""
         # Update u in GKB
         self.operator.direct(self.v, out=self.tmp_range)
-        self.tmp_range.sapyb(1.,  self.u,-self.alpha, out=self.u)
+        self.tmp_range.sapyb(1.,  self.u, -self.alpha, out=self.u)
         self.beta = self.u.norm()
         self.u /= self.beta
 
@@ -175,10 +172,9 @@ class LSQR(Algorithm):
         # Update d
         self.d.sapyb(-theta/rho, self.v, 1, out=self.d)
 
-        # Estimate residual norm 
+        # Estimate residual norm
         self.res2 += psi ** 2
         self.normr = math.sqrt(self.phibar ** 2 + self.res2)
-        
 
     def update_objective(self):
         """
@@ -188,5 +184,3 @@ class LSQR(Algorithm):
         if self.normr is numpy.nan:
             raise StopIteration()
         self.loss.append(self.normr**2)
-
-

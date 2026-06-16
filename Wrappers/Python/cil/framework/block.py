@@ -733,9 +733,7 @@ class BlockDataContainer(object):
         return -1 * self
 
     def dot(self, other):
-#
-        tmp = [ self.containers[i].dot(other.containers[i]) for i in range(self.shape[0])]
-        return sum(tmp)
+        return sum(self.containers[i].dot(other.containers[i]) for i in range(self.shape[0]))
 
     def __len__(self):
 

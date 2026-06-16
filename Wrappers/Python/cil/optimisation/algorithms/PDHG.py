@@ -338,7 +338,6 @@ class PDHG(Algorithm):
         """
         log.info("%s setting up", self.__class__.__name__)
 
-
         # Triplet (f, g, K)
         self.f = f
         self.g = g

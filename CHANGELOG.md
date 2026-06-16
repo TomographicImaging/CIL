@@ -34,6 +34,7 @@
     - Add prefix argument to TIFFStackReader to load a subset of TIFF files in
     a folder (#2239)
     - Update ASTRA interface to `direct_FP3D/BP3D` removing copies for GPU `ProjectionOperator` calls (#2134)
+    - Update `FluxNormaliser` to work with `Cone3D_Flex` (#2347)
   - Removes the following code which had been deprecated since v24.3.0 or earlier:
     - Removes `max_iteration` and `log_file` input parameters to `Algorithm`s. 
     - Removes `max_iteration_stop_criterion`, `objective_to_string`, `verbose_output` and `verbose_header` methods from `Algorithm`s.

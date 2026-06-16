@@ -116,10 +116,7 @@ class FluxNormaliser(Processor):
         if not (type(dataset), AcquisitionData):
             raise TypeError("Expected AcquistionData, found {}"
                             .format(type(dataset)))
-        
-        if dataset.geometry.geom_type & AcquisitionType.CONE_FLEX:
-            raise NotImplementedError("FluxNormaliser does not yet support CONE3D_FLEX data")
-        
+
         image_axes = 0
         if 'vertical' in dataset.dimension_labels:
             self.v_axis = dataset.get_dimension_axis('vertical')
@@ -259,7 +256,7 @@ class FluxNormaliser(Processor):
         Parameters:
         -----------
         angle: float, optional
-            Index of the angle to plot, default=None displays the data with the 
+            Index of the angle/projection to plot, default=None displays the data with the 
             minimum and maximum pixel values in the roi. For 2D data, the roi is 
             plotted on the sinogram.
 
@@ -308,13 +305,13 @@ class FluxNormaliser(Processor):
             plt.figure(figsize=(8,8))
             if data.geometry.dimension == '3D':
                 if angle is None:
-                    if 'angle' in data.dimension_labels:
+                    if 'angle' in data.dimension_labels or 'projection' in data.dimension_labels:
                         self._plot_slice_roi(angle_index=numpy.argmin(min), channel_index=channel, log=log, ax=221)
                         self._plot_slice_roi(angle_index=numpy.argmax(max), channel_index=channel, log=log, ax=222)
                     else:
                         self._plot_slice_roi(log=log, channel_index=channel, ax=211)
                 else:
-                    if 'angle' in data.dimension_labels:
+                    if 'angle' in data.dimension_labels or 'projection' in data.dimension_labels:
                         self._plot_slice_roi(angle_index=angle, channel_index=channel, log=log, ax=211)
                     else:
                         self._plot_slice_roi(log=log, channel_index=channel, ax=211)
@@ -332,23 +329,24 @@ class FluxNormaliser(Processor):
                 plt.plot(0, min,'.k', label='Minimum')
                 plt.plot(0, max,'.k', label='Maximum')
             else:
-                indices = range(data.get_dimension_size('angle'))
+                indices = range(data.geometry.num_projections)
                 plt.plot(indices, flux_array, 'r', label='Mean')
                 plt.plot(indices, min,'--k', label='Minimum')
                 plt.plot(indices, max,'--k', label='Maximum')
 
             plt.legend()
-            plt.xlabel('angle index')
+            plt.xlabel('projection index')
             plt.ylabel('Intensity in roi')
             plt.grid()
 
             ax1 = plt.gca()
-            ax2 = ax1.twiny()
-            valid_ticks = [int(tick) for tick in ax1.get_xticks() if 0 <= tick < data.geometry.num_projections]
-            ax2.set_xticks(valid_ticks)
-            ax2.set_xbound(ax1.get_xbound())
-            ax2.set_xticklabels([data.geometry.angles[tick] for tick in valid_ticks])
-            ax2.set_xlabel('angle')
+            if 'angle' in data.geometry.dimension_labels:
+                ax2 = ax1.twiny()
+                valid_ticks = [int(tick) for tick in ax1.get_xticks() if 0 <= tick < data.geometry.num_projections]
+                ax2.set_xticks(valid_ticks)
+                ax2.set_xbound(ax1.get_xbound())
+                ax2.set_xticklabels([data.geometry.angles[tick] for tick in valid_ticks])
+                ax2.set_xlabel('angle')
             
             plt.tight_layout()
             
@@ -363,7 +361,7 @@ class FluxNormaliser(Processor):
         Parameters:
         -----------
         angle_index: int, optional
-            Index of the angle to plot
+            Index of the projection to plot
         channel_index: int, optional
             Index of the channel to plot
         log: bool, optional
@@ -376,6 +374,8 @@ class FluxNormaliser(Processor):
         data = self.get_input()
         if angle_index is not None and 'angle' in data.dimension_labels:
             data_slice = data.get_slice(angle=angle_index)
+        elif angle_index is not None and 'projection' in data.dimension_labels:
+            data_slice = data.get_slice(projection=angle_index)
         else:
             data_slice = data
         
@@ -383,7 +383,7 @@ class FluxNormaliser(Processor):
             data_slice = data_slice.get_slice(channel=channel_index)
 
         if len(data_slice.shape) != 2:
-            raise ValueError("Data shape not compatible with preview_configuration(), data must have at least two of 'horizontal', 'vertical' and 'angle'")
+            raise ValueError("Data shape not compatible with preview_configuration(), data must have at least two of 'horizontal', 'vertical' and 'angle'/'projection'")
         
         # if horizontal and vertical are not specified in the roi, get the
         # min and max extent from the full size of the dimension
@@ -409,14 +409,14 @@ class FluxNormaliser(Processor):
         v = data_slice.dimension_labels[0]
 
         # get the box to plot from the roi
-        if h == 'angle':
+        if h == 'angle' or h == 'projection':
             h_min = min_angle
             h_max = max_angle
         else:
             h_min = self.roi[h][0]
             h_max = self.roi[h][1]
 
-        if v == 'angle':
+        if v == 'angle' or v == 'projection':
             v_min = min_angle
             v_max = max_angle
         else:
@@ -431,8 +431,12 @@ class FluxNormaliser(Processor):
         ax1.plot([h_max, h_max],[v_min, v_max],'--r')
         
         title = 'ROI'
-        if angle_index is not None:
+        if angle_index is not None and 'angle' in  data_slice.dimension_labels:
             title += ' angle = ' + str(data.geometry.angles[angle_index])
+
+        if angle_index is not None and 'projection' in  data_slice.dimension_labels:
+            title += ' projection = ' + str(angle_index)
+
         if channel_index is not None:
             title += ' channel = ' + str(channel_index)
         ax1.set_title(title)

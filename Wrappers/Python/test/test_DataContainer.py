@@ -57,26 +57,35 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         return ds
 
     def test_creation_nocopy(self):
-        shape = 2, 3, 4, 5
-        size = np.prod(shape)
-        a = np.arange(size)
-        #print("a refcount " , sys.getrefcount(a))
-        a = np.reshape(a, shape)
-        #print("a refcount " , sys.getrefcount(a))
-        ds = DataContainer(a, False, ['X', 'Y', 'Z', 'W'])
-        #print("a refcount " , sys.getrefcount(a))
+
+        a = np.arange(120).reshape(2, 3, 4, 5)
+        before = sys.getrefcount(a)
+        ds = DataContainer(a, deep_copy=False, dimension_labels=['X', 'Y', 'Z', 'W'])
+        self.assertEqual(sys.getrefcount(a) - before, 1)
         self.assertEqual(id(a), id(ds.array))
         self.assertEqual(ds.dimension_labels, ('X', 'Y', 'Z', 'W'))
 
+    def test_creation_copy(self):
+
+        a = np.arange(120).reshape(2, 3, 4, 5)
+        before = sys.getrefcount(a)
+        ds = DataContainer(a, deep_copy=True, dimension_labels=['X', 'Y', 'Z', 'W'])
+        self.assertEqual(sys.getrefcount(a), before)
+        self.assertNotEqual(id(a), id(ds.array))
+
+
     def testGb_creation_nocopy(self):
-        X, Y, Z = 8, 64, 64
-        a = np.ones((X, Y, Z), dtype='float32')
-        #print("a refcount " , sys.getrefcount(a))
-        ds = DataContainer(a, False, ['X', 'Y', 'Z'])
-        #print("a refcount " , sys.getrefcount(a))
-        self.assertEqual(sys.getrefcount(a), 3)
+        a = np.ones((8, 64, 64), dtype='float32')
+        before = sys.getrefcount(a)
+
+        ds = DataContainer(a, deep_copy=False)
+        # ds.array holds one new reference to a (no copy made)
+        self.assertEqual(sys.getrefcount(a) - before, 1)
+        self.assertEqual(id(a), id(ds.array))
+
         ds1 = ds.copy()
         self.assertNotEqual(aid(ds), aid(ds1))
+
         ds1 = ds.clone()
         self.assertNotEqual(aid(ds), aid(ds1))
 
@@ -380,16 +389,6 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         b = number ** ds
         np.testing.assert_array_almost_equal(a * 8, b.as_array())
 
-    def test_creation_copy(self):
-        shape = 2, 3, 4, 5
-        size = np.prod(shape)
-        a = np.arange(size)
-        #print("a refcount " , sys.getrefcount(a))
-        a = np.reshape(a, shape)
-        #print("a refcount " , sys.getrefcount(a))
-        ds = DataContainer(a, True, ['X', 'Y', 'Z', 'W'])
-        #print("a refcount " , sys.getrefcount(a))
-        self.assertEqual(sys.getrefcount(a), 2)
 
     def test_dot(self):
         a0 = np.arange(2*3*4)

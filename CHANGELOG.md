@@ -21,6 +21,12 @@
     - Update FindIPP.cmake to find IPP libraries in conda environments (#2286)
     - Update to ASTRA-TOOLBOX version v2.4 from the `astra-toolbox` channel (#2330)
     - Update to TIGRE v3.1.3 (#2317)
+    - Added support for numpy 2 (#2218)
+      - Added utililty method `dtype_like` to convert an input value to the same type as a reference array
+      - Added documentation to developer guide on scalar types with numpy>=2.
+    - Update to CCPi-Regularisation toolkit v26.0.0 (#2218)
+    - Update to Tomophantom v3.1.4 (#2218)
+    - Added support for python 3.13 (#2218)
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
     - Update on build instructions in README and developer guide for all OS (#2286)
@@ -28,6 +34,15 @@
     - Add prefix argument to TIFFStackReader to load a subset of TIFF files in
     a folder (#2239)
     - Update ASTRA interface to `direct_FP3D/BP3D` removing copies for GPU `ProjectionOperator` calls (#2134)
+  - Removes the following code which had been deprecated since v24.3.0 or earlier:
+    - Removes `max_iteration` and `log_file` input parameters to `Algorithm`s. 
+    - Removes `max_iteration_stop_criterion`, `objective_to_string`, `verbose_output` and `verbose_header` methods from `Algorithm`s.
+    - Removes `print_interval` and `callback` kwargs from `Algorithm.run` (note: `callbacks` kwarg remains)
+    - Removes `tolerance` input parameter to `CGLS`.
+    - Removes `should_stop` and `flag` methods from `CGLS`.
+    - Removes `alpha`, `beta`, `rtol` and `atol` kwargs from `GD`.
+    - Removes `should_stop` and `objective_function` methods from `GD`.
+    - Removes `norms` and `prob` kwargs from `SPDHG`.
   - Testing:
     - migrate from `conda build` to `rattler-build`
 

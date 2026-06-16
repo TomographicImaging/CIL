@@ -180,9 +180,23 @@ Other methods
 Methods that are not meant to be used by the user should have a `_` (underscore) at the beginning of the name.
 All methods should follow the convention of small caps underscore separated words.
 
+
+Scalar Types
+-------------
+From numpy v2.0 onwards, [numpy data types are promoted in operations](https://numpy.org/doc/2.3/numpy_2_0_migration_guide.html#changes-to-numpy-data-type-promotion).
+Scalars should be stored as Python types (e.g. int, float) instead of numpy data types (e.g. np.int32, np.float64) to avoid unexpected behaviour in operations with variables with numpy types.
+
+Note: This convention is not fully adhered to across CIL yet, but new code should follow this convention.
+We have updated CIL operations to make use of:
+
+.. autofunction:: cil.utilities.dtype_like
+
+This function promotes a scalar value to the same data type as a given numpy array, ensuring the array type is preserved in the operation.
+
+
 Logging and warning
 ===================
-We follow pythons convention on logging (see e.g. https://docs.python.org/3/howto/logging.html). In particular:
+We follow python's convention on logging (see e.g. https://docs.python.org/3/howto/logging.html). In particular:
 
 .. list-table:: Logging and warning guidelines
    :header-rows: 1

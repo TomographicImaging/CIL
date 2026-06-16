@@ -224,45 +224,45 @@ class DataContainer(object):
             self.geometry.set_labels(dimension_labels_new)
 
     def fill(self, array, **kwargs):
-        '''Fills the internal data array with a DataContainer, numpy array, number 
+        '''Fills the internal data array with a DataContainer, numpy array, number
         or using a random fill method
 
         Parameters
         ----------
         array : DataContainer, numpy array, number or string
-            The value or method with which to fill the DataContainer. Accepts a 
+            The value or method with which to fill the DataContainer. Accepts a
             numpy array or DataContainer or a number to allocate a uniform array
-            or a string specifying a method to fill with a random array: 'random' 
-            allocates floats between 0 and 1, 'random_int' by default allocates 
+            or a string specifying a method to fill with a random array: 'random'
+            allocates floats between 0 and 1, 'random_int' by default allocates
             integers between 0 and 100  or between provided `min_value` and `max_value`.
 
         **kwargs:
-            **dimension : int, optional 
-                An optional named parameter to specify in which axis the fill should 
-                happen. The name passed must match one of the DataContainer 
+            **dimension : int, optional
+                An optional named parameter to specify in which axis the fill should
+                happen. The name passed must match one of the DataContainer
                 dimension_labels and the axis must be an int
 
             seed : int, optional
-                A random seed to fix reproducibility, only used if `array` is a 
+                A random seed to fix reproducibility, only used if `array` is a
                 `random method`. Default is `None`.
 
             min_value : int, optional, default=0
-                The minimum value random integer to generate, only used if `array` 
+                The minimum value random integer to generate, only used if `array`
                 is 'random_int'. New since version 25.0.0 Default is 0.
 
             max_value : int, optional, default=100
-                The maximum value random integer to generate, only used if `array` 
+                The maximum value random integer to generate, only used if `array`
                 is 'random_int'. Default is 100.
-        
+
         Note
         ----
-            If the passed numpy array points to the same array that is contained 
+            If the passed numpy array points to the same array that is contained
             in the DataContainer, the DataContainer is not updated, and None is returned.
 
         Note
         ----
-            Since v25.0.0 the methods used by 'random' or 'random_int' use `numpy.random.default_rng`. 
-            This method does not use the global numpy.random.seed() so if a seed is 
+            Since v25.0.0 the methods used by 'random' or 'random_int' use `numpy.random.default_rng`.
+            This method does not use the global numpy.random.seed() so if a seed is
             required it should be passed directly as a kwarg.
             To fill random numbers using the earlier behaviour use `array='random_deprecated'` 
             or `array='random_int_deprecated'` 
@@ -288,7 +288,7 @@ class DataContainer(object):
             dimension_labels = self.dimension_labels
         except AttributeError:
             dimension_labels = None
-        
+
         if dimension_labels is not None:
             for k in list(kwargs):
                 if k in self.dimension_labels:
@@ -299,7 +299,7 @@ class DataContainer(object):
 
             for k, v in dimension.items():
                 i = dimension_labels.index(k)
-                index[i] = v  
+                index[i] = v
             index = tuple(index)
         else:
             index = (slice(None),) * self.array.ndim
@@ -317,7 +317,7 @@ class DataContainer(object):
         if array in FillType:
 
             seed = kwargs.pop("seed", None)
-            
+
             if array == FillType.RANDOM_DEPRECATED:
                 warnings.warn("RANDOM_DEPRECATED will be removed in a future version", DeprecationWarning, stacklevel=2)
                 if seed is not None:
@@ -327,7 +327,7 @@ class DataContainer(object):
                 else:
                     r = numpy.random.random_sample(self.array[index].shape).astype(self.dtype)
                 self.array[index] = r
-            
+
             elif array == FillType.RANDOM_INT_DEPRECATED:
                 warnings.warn("RANDOM_INT_DEPRECATED will be removed in a future version", DeprecationWarning, stacklevel=2)
                 if seed is not None:
@@ -341,7 +341,7 @@ class DataContainer(object):
                 self.array[index] = r
 
             elif array == FillType.RANDOM:
-                
+
                 rng = numpy.random.default_rng(seed)
                 if numpy.issubdtype(self.dtype, numpy.complexfloating):
                     complex_example = numpy.array([1 + 1j], dtype=self.dtype)
@@ -352,7 +352,7 @@ class DataContainer(object):
                 self.array[index] = r
 
             elif array == FillType.RANDOM_INT:
-                
+
                 rng = numpy.random.default_rng(seed)
                 max_value = kwargs.pop("max_value", 100)
                 min_value = kwargs.pop("min_value", 0)
@@ -455,7 +455,7 @@ class DataContainer(object):
 
     def __rpow__(self, other):
         if isinstance(other, Number) :
-            fother = numpy.ones(numpy.shape(self.array)) * other
+            fother = numpy.ones_like(self.array) * self.dtype.type(other)
             return type(self)(fother ** self.array ,
                            dimension_labels=self.dimension_labels,
                            geometry=self.geometry)
@@ -536,7 +536,7 @@ class DataContainer(object):
 
         if out is None:
             if isinstance(x2, Number):
-                out = pwop(self.as_array() , x2 , *args, **kwargs )
+                out = pwop(self.as_array(), self.dtype.type(x2), *args, **kwargs)
             elif issubclass(x2.__class__ , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
             else:
@@ -772,11 +772,11 @@ class DataContainer(object):
                 return type(self)(out,
                     deep_copy=False,
                     dimension_labels=self.dimension_labels)
-            
+
             return type(self)(out,
                        deep_copy=False,
                        geometry=self.geometry)
-        
+
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
                 kwargs['out'] = out.as_array()

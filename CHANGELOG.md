@@ -24,7 +24,7 @@
     - Added support for numpy 2 (#2218)
       - Added utililty method `dtype_like` to convert an input value to the same type as a reference array
       - Added documentation to developer guide on scalar types with numpy>=2.
-    - Update to CCPi-Regularisation toolkit v25.0.0 (#2218)
+    - Update to CCPi-Regularisation toolkit v26.0.0 (#2218)
     - Update to Tomophantom v3.1.4 (#2218)
     - Added support for python 3.13 (#2218)
   - Documentation:

@@ -65,7 +65,7 @@ gpu = [
 ]
 [dependency-groups]
 test = [
-    #"ccpi-regulariser=25.0.0", # [not osx] # missing from PyPI
+    #"ccpi-regulariser>=24", # [not osx] # missing from PyPI
     "cvxpy",
     "matplotlib-base>=3.3",
     "scikit-image",

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.utilities.callbacks &#8212; CIL 25.0.1.dev79+g639e5feeb.d20260612 documentation</title>
+    <title>cil.optimisation.utilities.callbacks &#8212; CIL 25.0.1.dev80+g5d46550d3.d20260616 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../../../../../_static/documentation_options.js?v=6bd4a93b"></script>
+    <script src="../../../../../_static/documentation_options.js?v=a3e0957f"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/utilities/callbacks';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0rc0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev79+g639e5feeb.d20260612';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev80+g5d46550d3.d20260616';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev79+g639e5feeb.d20260612" />
+  <meta name="docsearch:version" content="25.0.1.dev80+g5d46550d3.d20260616" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -564,22 +564,6 @@
 
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">_OldCallback</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Converts an old-style :code:`def callback` to a new-style :code:`class Callback`.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    callback: :code:`callable(iteration, objective, x)`</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">callback</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">update_objective_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">iteration</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">get_last_objective</span><span class="p">(</span><span class="n">return_all</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;=</span><span class="mi">2</span><span class="p">),</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-
-
 <div class="viewcode-block" id="ProgressCallback">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.callbacks.ProgressCallback">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ProgressCallback</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
@@ -600,7 +584,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;pbar&#39;</span><span class="p">):</span>
             <span class="n">tqdm_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tqdm_kwargs</span>
-            <span class="n">tqdm_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">max_iteration</span><span class="p">)</span>
+            <span class="n">tqdm_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">_total_iterations</span><span class="p">)</span>
             <span class="n">tqdm_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
             <span class="n">tqdm_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;initial&#39;</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">iteration</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pbar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tqdm_class</span><span class="p">(</span><span class="o">**</span><span class="n">tqdm_kwargs</span><span class="p">)</span>
@@ -739,7 +723,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The norm of the residual is less than </span><span class="si">{}</span><span class="s1"> times the norm of the initial residual and so the algorithm is terminated&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">))</span>
             <span class="k">raise</span> <span class="ne">StopIteration</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">normx</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">normx</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normx</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The norm of the solution is greater than </span><span class="si">{}</span><span class="s1"> and so the algorithm is terminated&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="p">))</span>
             <span class="k">raise</span> <span class="ne">StopIteration</span></div>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.SPDHG &#8212; CIL 25.0.1.dev79+g639e5feeb.d20260612 documentation</title>
+    <title>cil.optimisation.algorithms.SPDHG &#8212; CIL 25.0.1.dev80+g5d46550d3.d20260616 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../../../../../_static/documentation_options.js?v=6bd4a93b"></script>
+    <script src="../../../../../_static/documentation_options.js?v=a3e0957f"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/algorithms/SPDHG';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0rc0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev79+g639e5feeb.d20260612';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev80+g5d46550d3.d20260616';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev79+g639e5feeb.d20260612" />
+  <meta name="docsearch:version" content="25.0.1.dev80+g5d46550d3.d20260616" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -662,12 +662,12 @@
             <span class="n">update_objective_interval</span><span class="o">=</span><span class="n">update_objective_interval</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">operator</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">,</span>
-                    <span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span>  <span class="n">sampler</span><span class="o">=</span><span class="n">sampler</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="n">prob_weights</span><span class="p">,</span>  <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                    <span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">,</span>  <span class="n">sampler</span><span class="o">=</span><span class="n">sampler</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="n">prob_weights</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SPDHG.set_up">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.SPDHG.set_up">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>   <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">deprecated_kwargs</span><span class="p">):</span>
+               <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>   <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prob_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;set-up of the algorithm</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> setting up&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
@@ -684,13 +684,12 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="s1">&#39;prob_weights&#39;</span><span class="p">,</span> <span class="n">prob_weights</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_deprecated_set_prob</span><span class="p">(</span><span class="n">deprecated_kwargs</span><span class="p">,</span> <span class="n">sampler</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_ndual_subsets</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_ndual_subsets</span>
 
-        <span class="k">if</span>  <span class="n">prob_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="o">!=</span> <span class="n">prob_weights</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39; You passed a `prob_weights` argument and a sampler with a different attribute `prob_weights`, please remove the `prob_weights` argument.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prob_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="o">!=</span> <span class="n">prob_weights</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39; You passed a `prob_weights` argument and a sampler with a different attribute `prob_weights`, please remove the `prob_weights` argument.&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">sampler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">random_with_replacement</span><span class="p">(</span>
@@ -698,12 +697,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sampler</span> <span class="o">=</span> <span class="n">sampler</span>
 
-        <span class="c1">#Set the norms of the operators</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_deprecated_set_norms</span><span class="p">(</span><span class="n">deprecated_kwargs</span><span class="p">)</span>
+        <span class="c1"># Set the norms of the operators</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_norms</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">get_norms_as_list</span><span class="p">()</span>
-        <span class="c1">#Check for other kwargs</span>
-        <span class="k">if</span> <span class="n">deprecated_kwargs</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Additional keyword arguments passed but not used: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">deprecated_kwargs</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">set_step_sizes</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span>
 
@@ -717,8 +712,9 @@
 
         <span class="c1"># initialize dual variable to 0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_y_old</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y_old</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span> <span class="c1">#This can be removed once #1863 is fixed</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_y_old</span> <span class="o">=</span><span class="n">BlockDataContainer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y_old</span><span class="p">)</span>
+        <span class="c1"># This can be removed once #1863 is fixed</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y_old</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_y_old</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y_old</span><span class="p">)</span>
 
         <span class="c1"># initialize variable z corresponding to back-projected dual variable</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -728,57 +724,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">configured</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> configured&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">))</span></div>
-
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_deprecated_set_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deprecated_kwargs</span><span class="p">,</span> <span class="n">sampler</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Handle deprecated keyword arguments for backward compatibility.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        deprecated_kwargs : dict</span>
-<span class="sd">            Dictionary of keyword arguments.</span>
-<span class="sd">        sampler : Sampler</span>
-<span class="sd">            Sampler class for selecting the next index for the SPDHG update.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        This method is called by the set_up method.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">prob</span> <span class="o">=</span> <span class="n">deprecated_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;prob&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">prob</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">sampler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. To randomly sample with replacement use &quot;sampler=Sampler.randomWithReplacement(number_of_subsets,  prob=prob). To pass probabilities to the calculation for `sigma` and `tau` please use `prob_weights`. &#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_prob_weights</span> <span class="o">=</span> <span class="n">prob</span>
-            <span class="k">else</span><span class="p">:</span>
-
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s1">&#39;`prob` is being deprecated to be replaced with a sampler class and `prob_weights`. You passed  a `prob` argument, and either a `prob_weights` argument or a sampler. Please remove the `prob` argument.&#39;</span><span class="p">)</span>
-
-
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_deprecated_set_norms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deprecated_kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Handle deprecated keyword arguments for backward compatibility.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        deprecated_kwargs : dict</span>
-<span class="sd">            Dictionary of keyword arguments.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        This method is called by the set_up method.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">norms</span> <span class="o">=</span> <span class="n">deprecated_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;norms&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">norms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">set_norms</span><span class="p">(</span><span class="n">norms</span><span class="p">)</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s1">&#39; `norms` is being deprecated, use instead the `BlockOperator` function `set_norms`&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
 
 
     <span class="nd">@property</span>
@@ -893,7 +838,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_tau</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span> <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="mf">1e-8</span><span class="p">])</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tau</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tau</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;The step-sizes of SPDHG must be positive, passed tau = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tau</span><span class="p">))</span>
 
@@ -925,7 +870,8 @@
                     <span class="k">return</span> <span class="kc">False</span>
                 <span class="k">return</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Convergence criterion currently can only be checked for scalar values of tau and sigma[i].&#39;</span><span class="p">)</span></div>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s1">&#39;Convergence criterion currently can only be checked for scalar values of tau and sigma[i].&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SPDHG.update">
@@ -936,8 +882,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Gradient descent for the primal variable</span>
         <span class="c1"># x_tmp = x - tau * zbar</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_zbar</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tau</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_tmp</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_x_tmp</span><span class="o">*=-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zbar</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tau</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_tmp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_tmp</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_tmp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
 

@@ -245,7 +245,7 @@ class FluxNormaliser(Processor):
             raise TypeError("Target must be string or a number, found {}"
                             .format(type(self.target)))
             
-    def preview_configuration(self, angle=None, channel=None, log=False):
+    def preview_configuration(self, projection_idx=None, channel=None, log=False, **kwargs):
         '''
         Preview the FluxNormalisation processor configuration for roi mode.
         Plots the region of interest on the image and the mean, maximum and 
@@ -255,8 +255,8 @@ class FluxNormaliser(Processor):
         
         Parameters:
         -----------
-        angle: float, optional
-            Index of the angle/projection to plot, default=None displays the data with the 
+        projection_idx: int, optional
+            Index of the projection to plot, default=None displays the data with the 
             minimum and maximum pixel values in the roi. For 2D data, the roi is 
             plotted on the sinogram.
 
@@ -267,12 +267,26 @@ class FluxNormaliser(Processor):
         log: bool, default=False
             If True, plot the image with a log scale, default is False
 
+        **kwargs:
+            angle: int, optional
+                Deprecated alias for `projection_idx`. Use `projection_idx` instead.
+
         Returns:
         --------
         matplotlib.figure.Figure
             The figure object created to plot the configuration
         '''
         import matplotlib.pyplot as plt
+        
+        if 'angle' in kwargs:
+            if projection_idx is not None:
+                raise TypeError("Both projection_idx and angle were specified; angle is deprecated, use projection_idx instead")
+            projection_idx = kwargs.pop('angle')
+            warnings.warn(
+                "The 'angle' keyword argument is deprecated and will be removed in a future version; use 'projection_idx' instead.",
+                DeprecationWarning, stacklevel=2)
+        if kwargs:
+            raise TypeError(f"preview_configuration() got unexpected keyword arguments {list(kwargs)}")
 
         self._calculate_flux()
 
@@ -304,7 +318,7 @@ class FluxNormaliser(Processor):
         
             plt.figure(figsize=(8,8))
             if data.geometry.dimension == '3D':
-                if angle is None:
+                if projection_idx is None:
                     if 'angle' in data.dimension_labels or 'projection' in data.dimension_labels:
                         self._plot_slice_roi(angle_index=numpy.argmin(min), channel_index=channel, log=log, ax=221)
                         self._plot_slice_roi(angle_index=numpy.argmax(max), channel_index=channel, log=log, ax=222)
@@ -312,16 +326,16 @@ class FluxNormaliser(Processor):
                         self._plot_slice_roi(log=log, channel_index=channel, ax=211)
                 else:
                     if 'angle' in data.dimension_labels or 'projection' in data.dimension_labels:
-                        self._plot_slice_roi(angle_index=angle, channel_index=channel, log=log, ax=211)
+                        self._plot_slice_roi(angle_index=projection_idx, channel_index=channel, log=log, ax=211)
                     else:
                         self._plot_slice_roi(log=log, channel_index=channel, ax=211)
                         
             # if data is 2D plot roi on all angles
             elif data.geometry.dimension == '2D':
-                if angle is None:
+                if projection_idx is None:
                     self._plot_slice_roi(channel_index=channel, log=log, ax=211)
                 else:
-                    raise ValueError("Cannot plot ROI for a single angle on 2D data, please specify angle=None to plot ROI on the sinogram")
+                    raise ValueError("Cannot plot ROI for a single projection on 2D data, please specify projection_idx=None to plot ROI on the sinogram")
             
             plt.subplot(212)
             if data.geometry.num_projections==1:

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Developers’ Guide &#8212; CIL 25.0.1.dev82+g50f5919dc.d20260617 documentation</title>
+    <title>Developers’ Guide &#8212; CIL 25.0.1.dev83+g4ca47ea42.d20260617 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../_static/documentation_options.js?v=6e084958"></script>
+    <script src="../_static/documentation_options.js?v=c4f62d58"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev82+g50f5919dc.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev83+g4ca47ea42.d20260617';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="CIL Plugins" href="../plugins/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev82+g50f5919dc.d20260617" />
+  <meta name="docsearch:version" content="25.0.1.dev83+g4ca47ea42.d20260617" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -470,15 +470,24 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#conventions-on-new-cil-objects">Conventions on new CIL objects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#cil.utilities.dtype_like"><code class="docutils literal notranslate"><span class="pre">dtype_like()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creator">Creator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setter-methods-and-properties">Setter methods and properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#other-methods">Other methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scalar-types">Scalar Types</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#logging-and-warning">Logging and warning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#example-from-cil">Example from <code class="docutils literal notranslate"><span class="pre">cil</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#docstrings">Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-documentation-locally">Building documentation locally</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notebooks-gallery">Notebooks gallery</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#id1">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Testing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#parametrized-tests">Parametrized Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#github-actions-ci">GitHub Actions CI</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#contributions-guidelines">Contributions guidelines</a></li>
 </ul>
 </li>
@@ -674,15 +683,26 @@ python<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w">
 </li>
 </ul>
 <p>The definition of what are the essential, often-configured and advanced parameters depends on the actual class.</p>
+<section id="creator">
+<h3>Creator<a class="headerlink" href="#creator" title="Link to this heading">#</a></h3>
 <p>To create an instance of a class, the creator of a class should require the <strong>essential</strong> and <strong>often-configured</strong> parameters as named parameters.</p>
 <p>It should not accept positional arguments <cite>*args</cite> or key-worded arguments <cite>**kwargs</cite> so that the user can clearly understand what parameters are necessary to
 create the instance.</p>
+</section>
+<section id="setter-methods-and-properties">
+<h3>Setter methods and properties<a class="headerlink" href="#setter-methods-and-properties" title="Link to this heading">#</a></h3>
 <p>Use of <cite>property</cite> is favoured instead of class members to store parameters so that the parameters can be protected.</p>
 <p>The class should provide setter methods to change all the parameters at any time. Setter methods to set multiple parameters at the same time is also accepted.
 Setter methods should be named <cite>set_&lt;parameter&gt;</cite>. The use of <cite>set_</cite> helps IDEs and user to find what they should change in an instance of a class.</p>
+</section>
+<section id="other-methods">
+<h3>Other methods<a class="headerlink" href="#other-methods" title="Link to this heading">#</a></h3>
 <p>Methods that are not meant to be used by the user should have a <cite>_</cite> (underscore) at the beginning of the name.
 All methods should follow the convention of small caps underscore separated words.</p>
-<p>From numpy v2.0 onwards, [numpy data types are promoted in operations](<a class="reference external" href="https://numpy.org/doc/2.3/numpy_2_0_migration_guide.html#changes-to-numpy-data-type-promotion">https://numpy.org/doc/2.3/numpy_2_0_migration_guide.html#changes-to-numpy-data-type-promotion</a>).
+</section>
+<section id="scalar-types">
+<h3>Scalar Types<a class="headerlink" href="#scalar-types" title="Link to this heading">#</a></h3>
+<p>From numpy v2.0 onwards, <a class="reference external" href="https://numpy.org/doc/2.3/numpy_2_0_migration_guide.html#changes-to-numpy-data-type-promotion">numpy data types are promoted in operations</a>.
 Scalars should be stored as Python types (e.g. int, float) instead of numpy data types (e.g. np.int32, np.float64) to avoid unexpected behaviour in operations with variables with numpy types.</p>
 <p>Note: This convention is not fully adhered to across CIL yet, but new code should follow this convention.
 We have updated CIL operations to make use of:</p>
@@ -693,6 +713,7 @@ We have updated CIL operations to make use of:</p>
 </dd></dl>
 
 <p>This function promotes a scalar value to the same data type as a given numpy array, ensuring the array type is preserved in the operation.</p>
+</section>
 </section>
 <section id="logging-and-warning">
 <h2>Logging and warning<a class="headerlink" href="#logging-and-warning" title="Link to this heading">#</a></h2>
@@ -732,12 +753,12 @@ the situation, but the event should still be noted</p>
 </section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
+<section id="docstrings">
+<h3>Docstrings<a class="headerlink" href="#docstrings" title="Link to this heading">#</a></h3>
 <p>The Core Imaging Library (CIL) follows the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">NumpyDoc</a>
 style with the <a class="reference external" href="https://pydata-sphinx-theme.readthedocs.io/en/latest/">PyData Sphinx HTML theme</a>.
 When contributing your code please refer to <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">this</a> link
 for docstring formatting and this rendered <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/example.html#example">example</a>.</p>
-<section id="example-from-cil">
-<h3>Example from <code class="docutils literal notranslate"><span class="pre">cil</span></code><a class="headerlink" href="#example-from-cil" title="Link to this heading">#</a></h3>
 <p>The following provides an example of the docstring format used within <code class="docutils literal notranslate"><span class="pre">cil</span></code>, and the rendered documentation generated from it.</p>
 <section id="source">
 <h4>Source<a class="headerlink" href="#source" title="Link to this heading">#</a></h4>
@@ -865,8 +886,10 @@ for docstring formatting and this rendered <a class="reference external" href="h
 </dl>
 </dd></dl>
 
+</section>
+</section>
 <section id="building-documentation-locally">
-<h5>Building documentation locally<a class="headerlink" href="#building-documentation-locally" title="Link to this heading">#</a></h5>
+<h3>Building documentation locally<a class="headerlink" href="#building-documentation-locally" title="Link to this heading">#</a></h3>
 <p>The easiest way to test documentation changes is to open a pull request and <a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md">download the rendered documentation from the CI</a>.</p>
 <p>Alternatively, to build the docs locally, you will need a working <code class="docutils literal notranslate"><span class="pre">cil</span></code> installation.
 For development of the documentation embedded within the source code itself (e.g. docstrings), you should build <code class="docutils literal notranslate"><span class="pre">cil</span></code> from source.</p>
@@ -898,7 +921,7 @@ a HTTP server to view the documentation.</p>
 </div>
 </section>
 <section id="notebooks-gallery">
-<h5>Notebooks gallery<a class="headerlink" href="#notebooks-gallery" title="Link to this heading">#</a></h5>
+<h3>Notebooks gallery<a class="headerlink" href="#notebooks-gallery" title="Link to this heading">#</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">mkdemos.py</span></code> script (called by <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">dirhtml</span></code>):</p>
 <ul class="simple">
 <li><p>downloads notebooks from external URLs to <code class="docutils literal notranslate"><span class="pre">source/demos/*.ipynb</span></code></p></li>
@@ -907,10 +930,10 @@ a HTTP server to view the documentation.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">nbsphinx</span></code> extension will convert the <code class="docutils literal notranslate"><span class="pre">*.ipynb</span></code> files to HTML.</p>
 </section>
 </section>
-</section>
-</section>
 <section id="id1">
 <h2>Testing<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<section id="parametrized-tests">
+<h3>Parametrized Tests<a class="headerlink" href="#parametrized-tests" title="Link to this heading">#</a></h3>
 <p>Methods are tested using Python’s <a class="reference external" href="https://docs.python.org/3/library/unittest.html">unittest</a> library. Please see the documentation <a class="reference external" href="https://docs.python.org/3/library/unittest.html#basic-example">here</a>  for information and usage examples.
 The <a class="reference external" href="https://github.com/adamchainz/unittest-parametrize">unittest-parametrize</a> library is used to generate parametrized test cases.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">&#64;parametrize</span></code> decorator allows you to define multiple sets of input parameters for a single test method, treating each combination as a separate test case.
@@ -927,8 +950,12 @@ There are 3 sets of parameters:</p>
 </ul>
 <p>Each parameter set has a unique id which can also be customised for easier identification in test outputs (e.g., <code class="docutils literal notranslate"><span class="pre">cpu_NoError</span></code>, <code class="docutils literal notranslate"><span class="pre">InvalidInput_ValueError</span></code>)</p>
 <p>When running the test, each parameterized case is shown as a distinct result:</p>
+</section>
+<section id="github-actions-ci">
+<h3>GitHub Actions CI<a class="headerlink" href="#github-actions-ci" title="Link to this heading">#</a></h3>
 <p>If you open a pull request, continuous integration &amp; deployment (CI/CD) via GitHub Actions (GHA) will run automatically. The CI will run the tests and build the documentation. Note that the <code class="docutils literal notranslate"><span class="pre">test-cuda</span></code> job uses <a class="reference external" href="https://docs.python.org/3/library/unittest.html#cmdoption-unittest-k">unittest -k</a> flags to detect GPU test names.</p>
 <p>For more information please see the <a class="reference external" href="https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/README.md">GHA README</a>.</p>
+</section>
 </section>
 <section id="contributions-guidelines">
 <h2>Contributions guidelines<a class="headerlink" href="#contributions-guidelines" title="Link to this heading">#</a></h2>

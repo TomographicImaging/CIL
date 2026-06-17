@@ -28,6 +28,7 @@ build:
     env:
       CMAKE_BUILD_TYPE: Release
       CMAKE_GENERATOR: Ninja
+      CIL_FORCE_IPP: ${{ "ON" if x86_64 else "OFF" }}
 
 requirements:
   build:

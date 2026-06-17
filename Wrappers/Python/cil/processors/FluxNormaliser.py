@@ -245,7 +245,7 @@ class FluxNormaliser(Processor):
             raise TypeError("Target must be string or a number, found {}"
                             .format(type(self.target)))
             
-    def preview_configuration(self, projection_idx=None, channel=None, log=False, **kwargs):
+    def preview_configuration(self, projection_index=None, channel=None, log=False, **kwargs):
         '''
         Preview the FluxNormalisation processor configuration for roi mode.
         Plots the region of interest on the image and the mean, maximum and 
@@ -255,7 +255,7 @@ class FluxNormaliser(Processor):
         
         Parameters:
         -----------
-        projection_idx: int, optional
+        projection_index: int, optional
             Index of the projection to plot, default=None displays the data with the 
             minimum and maximum pixel values in the roi. For 2D data, the roi is 
             plotted on the sinogram.
@@ -269,7 +269,7 @@ class FluxNormaliser(Processor):
 
         **kwargs:
             angle: int, optional
-                Deprecated alias for `projection_idx`. Use `projection_idx` instead.
+                Deprecated alias for `projection_index`. Use `projection_index` instead.
 
         Returns:
         --------
@@ -279,11 +279,11 @@ class FluxNormaliser(Processor):
         import matplotlib.pyplot as plt
         
         if 'angle' in kwargs:
-            if projection_idx is not None:
-                raise TypeError("Both projection_idx and angle were specified; angle is deprecated, use projection_idx instead")
-            projection_idx = kwargs.pop('angle')
+            if projection_index is not None:
+                raise TypeError("Both projection_index and angle were specified; angle is deprecated, use projection_index instead")
+            projection_index = kwargs.pop('angle')
             warnings.warn(
-                "The 'angle' keyword argument is deprecated and will be removed in a future version; use 'projection_idx' instead.",
+                "The 'angle' keyword argument is deprecated and will be removed in a future version; use 'projection_index' instead.",
                 DeprecationWarning, stacklevel=2)
         if kwargs:
             raise TypeError(f"preview_configuration() got unexpected keyword arguments {list(kwargs)}")
@@ -318,7 +318,7 @@ class FluxNormaliser(Processor):
         
             plt.figure(figsize=(8,8))
             if data.geometry.dimension == '3D':
-                if projection_idx is None:
+                if projection_index is None:
                     if 'angle' in data.dimension_labels or 'projection' in data.dimension_labels:
                         self._plot_slice_roi(angle_index=numpy.argmin(min), channel_index=channel, log=log, ax=221)
                         self._plot_slice_roi(angle_index=numpy.argmax(max), channel_index=channel, log=log, ax=222)
@@ -326,16 +326,16 @@ class FluxNormaliser(Processor):
                         self._plot_slice_roi(log=log, channel_index=channel, ax=211)
                 else:
                     if 'angle' in data.dimension_labels or 'projection' in data.dimension_labels:
-                        self._plot_slice_roi(angle_index=projection_idx, channel_index=channel, log=log, ax=211)
+                        self._plot_slice_roi(angle_index=projection_index, channel_index=channel, log=log, ax=211)
                     else:
                         self._plot_slice_roi(log=log, channel_index=channel, ax=211)
                         
             # if data is 2D plot roi on all angles
             elif data.geometry.dimension == '2D':
-                if projection_idx is None:
+                if projection_index is None:
                     self._plot_slice_roi(channel_index=channel, log=log, ax=211)
                 else:
-                    raise ValueError("Cannot plot ROI for a single projection on 2D data, please specify projection_idx=None to plot ROI on the sinogram")
+                    raise ValueError("Cannot plot ROI for a single projection on 2D data, please specify projection_index=None to plot ROI on the sinogram")
             
             plt.subplot(212)
             if data.geometry.num_projections==1:

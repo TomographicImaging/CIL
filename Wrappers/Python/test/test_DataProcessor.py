@@ -3822,15 +3822,15 @@ class TestFluxNormaliser(unittest.TestCase):
 
             # for 3D, check no error specifying a single angle to plot
             if data.geometry.dimension == '3D':
-                processor.preview_configuration(projection_idx=1)
+                processor.preview_configuration(projection_index=1)
             # if 2D, attempt to plot single angle should cause error
             else:
                 with self.assertRaises(ValueError):
-                    processor.preview_configuration(projection_idx=1)
+                    processor.preview_configuration(projection_index=1)
 
             # if data is multichannel, check no error specifying a single channel to plot
             if 'channel' in data.dimension_labels:
-                processor.preview_configuration(projection_idx=1, channel=1)
+                processor.preview_configuration(projection_index=1, channel=1)
                 processor.preview_configuration(channel=1)
             # if single channel, check specifying channel causes an error
             else:
@@ -3852,10 +3852,10 @@ class TestFluxNormaliser(unittest.TestCase):
         with self.assertWarns(DeprecationWarning):
             processor.preview_configuration(angle=1)
 
-        processor.preview_configuration(projection_idx=1)
+        processor.preview_configuration(projection_index=1)
 
         with self.assertRaises(TypeError):
-            processor.preview_configuration(projection_idx=1, angle=1)
+            processor.preview_configuration(projection_index=1, angle=1)
 
         logging.disable(logging.NOTSET)
 

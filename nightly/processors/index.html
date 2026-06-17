@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Processors &#8212; CIL 25.0.1.dev81+g56f0a898e.d20260617 documentation</title>
+    <title>Processors &#8212; CIL 25.0.1.dev82+g50f5919dc.d20260617 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../_static/documentation_options.js?v=b8dbe65f"></script>
+    <script src="../_static/documentation_options.js?v=6e084958"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev81+g56f0a898e.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev82+g50f5919dc.d20260617';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -64,7 +64,7 @@
     <link rel="prev" title="Optimisation framework" href="../optimisation/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev81+g56f0a898e.d20260617" />
+  <meta name="docsearch:version" content="25.0.1.dev82+g50f5919dc.d20260617" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -1620,7 +1620,7 @@ in the roi dictionary</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.processors.FluxNormaliser.preview_configuration">
-<span class="sig-name descname"><span class="pre">preview_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/FluxNormaliser/#FluxNormaliser.preview_configuration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.FluxNormaliser.preview_configuration" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">preview_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/processors/FluxNormaliser/#FluxNormaliser.preview_configuration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.FluxNormaliser.preview_configuration" title="Link to this definition">#</a></dt>
 <dd><p>Preview the FluxNormalisation processor configuration for roi mode.
 Plots the region of interest on the image and the mean, maximum and
 minimum intensity in the roi.</p>
@@ -1628,7 +1628,7 @@ minimum intensity in the roi.</p>
 <section id="id1">
 <h5>Parameters:<a class="headerlink" href="#id1" title="Link to this heading">#</a></h5>
 <dl class="simple">
-<dt>angle: float, optional</dt><dd><p>Index of the angle to plot, default=None displays the data with the
+<dt>projection_index: int, optional</dt><dd><p>Index of the projection to plot, default=None displays the data with the
 minimum and maximum pixel values in the roi. For 2D data, the roi is
 plotted on the sinogram.</p>
 </dd>
@@ -1637,10 +1637,15 @@ the data has channels</p>
 </dd>
 <dt>log: bool, default=False</dt><dd><p>If True, plot the image with a log scale, default is False</p>
 </dd>
+<dt><a href="#id2"><span class="problematic" id="id3">**</span></a>kwargs:</dt><dd><dl class="simple">
+<dt>angle: int, optional</dt><dd><p>Deprecated alias for <cite>projection_index</cite>. Use <cite>projection_index</cite> instead.</p>
+</dd>
+</dl>
+</dd>
 </dl>
 </section>
-<section id="id2">
-<h5>Returns:<a class="headerlink" href="#id2" title="Link to this heading">#</a></h5>
+<section id="id4">
+<h5>Returns:<a class="headerlink" href="#id4" title="Link to this heading">#</a></h5>
 <dl class="simple">
 <dt>matplotlib.figure.Figure</dt><dd><p>The figure object created to plot the configuration</p>
 </dd>
@@ -1691,8 +1696,8 @@ based on the Beer-Lambert law, by:
 - clipping data to min_intensity (any values below min intensity are set to min_intensity)
 - taking the logarithm and multiplying by minus 1.
 If the data contains zero or negative values, inf or NaN values will be present in the output.</p>
-<section id="id3">
-<h4>Parameters:<a class="headerlink" href="#id3" title="Link to this heading">#</a></h4>
+<section id="id5">
+<h4>Parameters:<a class="headerlink" href="#id5" title="Link to this heading">#</a></h4>
 <dl class="simple">
 <dt>min_intensity: float, default=0.0</dt><dd><p>Clips data below this value to ensure log is taken of positive numbers only.</p>
 </dd>
@@ -1702,8 +1707,8 @@ If the data contains zero or negative values, inf or NaN values will be present 
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h4>Returns:<a class="headerlink" href="#id4" title="Link to this heading">#</a></h4>
+<section id="id6">
+<h4>Returns:<a class="headerlink" href="#id6" title="Link to this heading">#</a></h4>
 <p>AcquisitionData, ImageData or DataContainer depending on input data type, return is suppressed if ‘out’ is passed</p>
 </section>
 <section id="notes">
@@ -2052,17 +2057,17 @@ it will be calculated <span class="math notranslate nohighlight">\(\frac{\Delta\
 <p>Laminography is a technique similar to tomography in which the rotation axis
 is tilted relative to the beam. This can be setup as below, by tilting the
 sample and rotation axis by an angle <span class="math notranslate nohighlight">\(\phi\)</span>:</p>
-<figure class="align-center" id="id5">
+<figure class="align-center" id="id7">
 <img alt="laminography geometry showing tilted rotation axis" src="../_images/lamino_tilt1.png" />
 <figcaption>
-<p><span class="caption-text">Laminography geometry from tilted rotation axis</span><a class="headerlink" href="#id5" title="Link to this image">#</a></p>
+<p><span class="caption-text">Laminography geometry from tilted rotation axis</span><a class="headerlink" href="#id7" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <p>or equivalently by offsetting the source and detector:</p>
-<figure class="align-center" id="id6">
+<figure class="align-center" id="id8">
 <img alt="laminography geometry showing tilted rotation axis" src="../_images/lamino_tilt2.png" />
 <figcaption>
-<p><span class="caption-text">Laminography geometry from offset source and detector</span><a class="headerlink" href="#id6" title="Link to this image">#</a></p>
+<p><span class="caption-text">Laminography geometry from offset source and detector</span><a class="headerlink" href="#id8" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <p>This processor fits the tilt angle <span class="math notranslate nohighlight">\(\phi\)</span> as well as the centre of

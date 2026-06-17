@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.FluxNormaliser &#8212; CIL 25.0.1.dev81+g56f0a898e.d20260617 documentation</title>
+    <title>cil.processors.FluxNormaliser &#8212; CIL 25.0.1.dev82+g50f5919dc.d20260617 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../../../../_static/documentation_options.js?v=b8dbe65f"></script>
+    <script src="../../../../_static/documentation_options.js?v=6e084958"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev81+g56f0a898e.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev82+g50f5919dc.d20260617';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev81+g56f0a898e.d20260617" />
+  <meta name="docsearch:version" content="25.0.1.dev82+g50f5919dc.d20260617" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -636,10 +636,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">AcquisitionData</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected AcquistionData, found </span><span class="si">{}</span><span class="s2">&quot;</span>
                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">)))</span>
-        
-        <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;FluxNormaliser does not yet support CONE3D_FLEX data&quot;</span><span class="p">)</span>
-        
+
         <span class="n">image_axes</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="s1">&#39;vertical&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">v_axis</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_dimension_axis</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
@@ -770,7 +767,7 @@
             
 <div class="viewcode-block" id="FluxNormaliser.preview_configuration">
 <a class="viewcode-back" href="../../../../processors/#cil.processors.FluxNormaliser.preview_configuration">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">preview_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">preview_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Preview the FluxNormalisation processor configuration for roi mode.</span>
 <span class="sd">        Plots the region of interest on the image and the mean, maximum and </span>
@@ -780,8 +777,8 @@
 <span class="sd">        </span>
 <span class="sd">        Parameters:</span>
 <span class="sd">        -----------</span>
-<span class="sd">        angle: float, optional</span>
-<span class="sd">            Index of the angle to plot, default=None displays the data with the </span>
+<span class="sd">        projection_index: int, optional</span>
+<span class="sd">            Index of the projection to plot, default=None displays the data with the </span>
 <span class="sd">            minimum and maximum pixel values in the roi. For 2D data, the roi is </span>
 <span class="sd">            plotted on the sinogram.</span>
 
@@ -792,12 +789,26 @@
 <span class="sd">        log: bool, default=False</span>
 <span class="sd">            If True, plot the image with a log scale, default is False</span>
 
+<span class="sd">        **kwargs:</span>
+<span class="sd">            angle: int, optional</span>
+<span class="sd">                Deprecated alias for `projection_index`. Use `projection_index` instead.</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">        --------</span>
 <span class="sd">        matplotlib.figure.Figure</span>
 <span class="sd">            The figure object created to plot the configuration</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+        
+        <span class="k">if</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">projection_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Both projection_index and angle were specified; angle is deprecated, use projection_index instead&quot;</span><span class="p">)</span>
+            <span class="n">projection_index</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The &#39;angle&#39; keyword argument is deprecated and will be removed in a future version; use &#39;projection_index&#39; instead.&quot;</span><span class="p">,</span>
+                <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;preview_configuration() got unexpected keyword arguments </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_flux</span><span class="p">()</span>
 
@@ -829,24 +840,24 @@
         
             <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;3D&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">angle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">projection_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="ow">or</span> <span class="s1">&#39;projection&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">angle_index</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="nb">min</span><span class="p">),</span> <span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">221</span><span class="p">)</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">angle_index</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="nb">max</span><span class="p">),</span> <span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">222</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">211</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">angle_index</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span> <span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">211</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="ow">or</span> <span class="s1">&#39;projection&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">angle_index</span><span class="o">=</span><span class="n">projection_index</span><span class="p">,</span> <span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">211</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">211</span><span class="p">)</span>
                         
             <span class="c1"># if data is 2D plot roi on all angles</span>
             <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">angle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">projection_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_plot_slice_roi</span><span class="p">(</span><span class="n">channel_index</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="mi">211</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot plot ROI for a single angle on 2D data, please specify angle=None to plot ROI on the sinogram&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot plot ROI for a single projection on 2D data, please specify projection_index=None to plot ROI on the sinogram&quot;</span><span class="p">)</span>
             
             <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">212</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">num_projections</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
@@ -854,23 +865,24 @@
                 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span><span class="s1">&#39;.k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Minimum&#39;</span><span class="p">)</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span><span class="s1">&#39;.k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Maximum&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">indices</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get_dimension_size</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">))</span>
+                <span class="n">indices</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">num_projections</span><span class="p">)</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">flux_array</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Mean&#39;</span><span class="p">)</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span><span class="s1">&#39;--k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Minimum&#39;</span><span class="p">)</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span><span class="s1">&#39;--k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Maximum&#39;</span><span class="p">)</span>
 
             <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;angle index&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;projection index&#39;</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Intensity in roi&#39;</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
 
             <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-            <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twiny</span><span class="p">()</span>
-            <span class="n">valid_ticks</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">tick</span><span class="p">)</span> <span class="k">for</span> <span class="n">tick</span> <span class="ow">in</span> <span class="n">ax1</span><span class="o">.</span><span class="n">get_xticks</span><span class="p">()</span> <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">tick</span> <span class="o">&lt;</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">num_projections</span><span class="p">]</span>
-            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">valid_ticks</span><span class="p">)</span>
-            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xbound</span><span class="p">(</span><span class="n">ax1</span><span class="o">.</span><span class="n">get_xbound</span><span class="p">())</span>
-            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">tick</span><span class="p">]</span> <span class="k">for</span> <span class="n">tick</span> <span class="ow">in</span> <span class="n">valid_ticks</span><span class="p">])</span>
-            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twiny</span><span class="p">()</span>
+                <span class="n">valid_ticks</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">tick</span><span class="p">)</span> <span class="k">for</span> <span class="n">tick</span> <span class="ow">in</span> <span class="n">ax1</span><span class="o">.</span><span class="n">get_xticks</span><span class="p">()</span> <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">tick</span> <span class="o">&lt;</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">num_projections</span><span class="p">]</span>
+                <span class="n">ax2</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">valid_ticks</span><span class="p">)</span>
+                <span class="n">ax2</span><span class="o">.</span><span class="n">set_xbound</span><span class="p">(</span><span class="n">ax1</span><span class="o">.</span><span class="n">get_xbound</span><span class="p">())</span>
+                <span class="n">ax2</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">tick</span><span class="p">]</span> <span class="k">for</span> <span class="n">tick</span> <span class="ow">in</span> <span class="n">valid_ticks</span><span class="p">])</span>
+                <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">)</span>
             
             <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
             
@@ -886,7 +898,7 @@
 <span class="sd">        Parameters:</span>
 <span class="sd">        -----------</span>
 <span class="sd">        angle_index: int, optional</span>
-<span class="sd">            Index of the angle to plot</span>
+<span class="sd">            Index of the projection to plot</span>
 <span class="sd">        channel_index: int, optional</span>
 <span class="sd">            Index of the channel to plot</span>
 <span class="sd">        log: bool, optional</span>
@@ -899,6 +911,8 @@
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">angle_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
             <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">angle</span><span class="o">=</span><span class="n">angle_index</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">angle_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;projection&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+            <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="n">angle_index</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data</span>
         
@@ -906,7 +920,7 @@
             <span class="n">data_slice</span> <span class="o">=</span> <span class="n">data_slice</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel_index</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_slice</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Data shape not compatible with preview_configuration(), data must have at least two of &#39;horizontal&#39;, &#39;vertical&#39; and &#39;angle&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Data shape not compatible with preview_configuration(), data must have at least two of &#39;horizontal&#39;, &#39;vertical&#39; and &#39;angle&#39;/&#39;projection&#39;&quot;</span><span class="p">)</span>
         
         <span class="c1"># if horizontal and vertical are not specified in the roi, get the</span>
         <span class="c1"># min and max extent from the full size of the dimension</span>
@@ -932,14 +946,14 @@
         <span class="n">v</span> <span class="o">=</span> <span class="n">data_slice</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># get the box to plot from the roi</span>
-        <span class="k">if</span> <span class="n">h</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">h</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">or</span> <span class="n">h</span> <span class="o">==</span> <span class="s1">&#39;projection&#39;</span><span class="p">:</span>
             <span class="n">h_min</span> <span class="o">=</span> <span class="n">min_angle</span>
             <span class="n">h_max</span> <span class="o">=</span> <span class="n">max_angle</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">h_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">h_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">or</span> <span class="n">v</span> <span class="o">==</span> <span class="s1">&#39;projection&#39;</span><span class="p">:</span>
             <span class="n">v_min</span> <span class="o">=</span> <span class="n">min_angle</span>
             <span class="n">v_max</span> <span class="o">=</span> <span class="n">max_angle</span>
         <span class="k">else</span><span class="p">:</span>
@@ -954,8 +968,12 @@
         <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">h_max</span><span class="p">,</span> <span class="n">h_max</span><span class="p">],[</span><span class="n">v_min</span><span class="p">,</span> <span class="n">v_max</span><span class="p">],</span><span class="s1">&#39;--r&#39;</span><span class="p">)</span>
         
         <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;ROI&#39;</span>
-        <span class="k">if</span> <span class="n">angle_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">angle_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;angle&#39;</span> <span class="ow">in</span>  <span class="n">data_slice</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
             <span class="n">title</span> <span class="o">+=</span> <span class="s1">&#39; angle = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">angle_index</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">angle_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;projection&#39;</span> <span class="ow">in</span>  <span class="n">data_slice</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">+=</span> <span class="s1">&#39; projection = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">angle_index</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">channel_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">title</span> <span class="o">+=</span> <span class="s1">&#39; channel = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">channel_index</span><span class="p">)</span>
         <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>

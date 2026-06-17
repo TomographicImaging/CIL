@@ -1,9 +1,13 @@
-* XX.X.X
+* 26.0.0
   - New features:
-    - LSQR algorithm added to the CIL algorithm class (#1975)
+    - `LSQR` algorithm added to the CIL algorithm class (#1975)
     - Add `VolumeShrinker` tool to reduce the size of the reconstruction volume from an `AcquisitionData` (#2221)
-    - LaminographyGeometryCorrector tool added to processors (#2259)
+    - `LaminographyGeometryCorrector` tool added to processors (#2259)
     - `FluxNormaliser` can be used on `Cone3D_Flex` data (#2347)
+  - Enhancements:
+    - Add prefix argument to `TIFFStackReader` to load a subset of TIFF files in
+    a folder (#2239)
+    - Update ASTRA interface to `direct_FP3D/BP3D` removing copies for GPU `ProjectionOperator` calls (#2134)
   - Bug fixes:
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)
@@ -16,10 +20,9 @@
     - fix missing `packaging` required dependency (#2321)
     - dxchange minimum version set to 0.2.1 to fix #2256 (#2268)
     - improve `tqdm` notebook support (#2241)
-    - cvxpy version set to !=1.8.2 to fix #2303 (#2306)
-    - Update to TomoPhantom v3.0 (#2287)
+    - `cvxpy` version set to !=1.8.2 to fix #2303 (#2306)
     - Handle regularisation toolkit CPU only package error message (#2302)
-    - Update FindIPP.cmake to find IPP libraries in conda environments (#2286)
+    - Update `FindIPP.cmake` to find IPP libraries in conda environments (#2286)
     - Update to ASTRA-TOOLBOX version v2.4 from the `astra-toolbox` channel (#2330)
     - Update to TIGRE v3.1.3 (#2317)
     - Added support for numpy 2 (#2218)
@@ -31,21 +34,19 @@
   - Documentation:
     - Render the user showcase notebooks in the documentation (#2189)
     - Update on build instructions in README and developer guide for all OS (#2286)
-  - Enhancements:
-    - Add prefix argument to TIFFStackReader to load a subset of TIFF files in
-    a folder (#2239)
-    - Update ASTRA interface to `direct_FP3D/BP3D` removing copies for GPU `ProjectionOperator` calls (#2134)
-  - Removes the following code which had been deprecated since v24.3.0 or earlier:
-    - Removes `max_iteration` and `log_file` input parameters to `Algorithm`s. 
-    - Removes `max_iteration_stop_criterion`, `objective_to_string`, `verbose_output` and `verbose_header` methods from `Algorithm`s.
-    - Removes `print_interval` and `callback` kwargs from `Algorithm.run` (note: `callbacks` kwarg remains)
-    - Removes `tolerance` input parameter to `CGLS`.
-    - Removes `should_stop` and `flag` methods from `CGLS`.
-    - Removes `alpha`, `beta`, `rtol` and `atol` kwargs from `GD`.
-    - Removes `should_stop` and `objective_function` methods from `GD`.
-    - Removes `norms` and `prob` kwargs from `SPDHG`.
-  - Testing:
-    - migrate from `conda build` to `rattler-build`
+  - Breaking Changes:
+    - CIL is no longer compatible with Tomophantom versions earlier than v3.1.4 (#2218)
+    - Removes the following code which had been deprecated since v24.3.0 or earlier:
+      - Removes `max_iteration` and `log_file` input parameters to `Algorithm`s. 
+      - Removes `max_iteration_stop_criterion`, `objective_to_string`, `verbose_output` and `verbose_header` methods from `Algorithm`s.
+      - Removes `print_interval` and `callback` kwargs from `Algorithm.run` (note: `callbacks` kwarg remains)
+      - Removes `tolerance` input parameter to `CGLS`.
+      - Removes `should_stop` and `flag` methods from `CGLS`.
+      - Removes `alpha`, `beta`, `rtol` and `atol` kwargs from `GD`.
+      - Removes `should_stop` and `objective_function` methods from `GD`.
+      - Removes `norms` and `prob` kwargs from `SPDHG`.
+  - Build changes:
+    - migrate from `conda build` to `rattler-build` (#2321)
 
 * 25.0.0
   - New features:

@@ -41,8 +41,8 @@ Core Dependencies
      - `PSF-2.0 <https://docs.python.org/3/license.html>`_
 
    * - `Numpy <https://github.com/numpy/numpy>`_
-     - 2.0–2.4
-     - ``numpy>=2,<=2.4``
+     - 1.26–2.4
+     - ``numpy>=1.26,<=2.4``
      - 
      - `BSD-3-Clause <https://numpy.org/doc/stable/license.html>`_
 
@@ -85,7 +85,7 @@ Optional Dependencies
      - `Apache-2.0 <https://github.com/TomographicImaging/CCPi-Regularisation-Toolkit/blob/master/LICENSE>`_
 
    * - `TomoPhantom <https://github.com/dkazanc/TomoPhantom>`_
-     - 3.0.3–3.1.4
+     - 3.1.4
      - ``httomo::tomophantom=3.1.4``
      - Generates phantoms for test data
      - `Apache-2.0 <https://github.com/dkazanc/TomoPhantom/blob/master/LICENSE>`_

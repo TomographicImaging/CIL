@@ -23,7 +23,7 @@ Building CIL from source code
 ==============================
 
 Getting the code
-^^^^^^^^^^^^^^^^
+-----------------
 
 In case of local development and testing it is useful to be able to build the software directly. 
 You should first clone this repository as:
@@ -37,10 +37,10 @@ See `git documentation <https://git-scm.com/docs/git-clone#Documentation/git-clo
 
 
 Building with ``pip``
-^^^^^^^^^^^^^^^^^^^^^
+----------------------
 
 Install Dependencies
-""""""""""""""""""
+""""""""""""""""""""
 
 We suggest creating a conda environment with all the dependencies for building CIL using the appropriate command for your operating system:
 
@@ -73,7 +73,7 @@ Activate the environment with:
    conda activate cil_dev
 
 Build CIL
-""""""""
+"""""""""
 
 A C++ compiler is required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
 
@@ -123,7 +123,7 @@ Note: we tested these instructions with Visual Studio 2026 version 18.1.1
 
 
 Building with Docker
-^^^^^^^^^^^^^^^^^^^^^
+----------------------
 
 In the repository root, simply update submodules and run ``docker build``:
 
@@ -134,7 +134,7 @@ In the repository root, simply update submodules and run ``docker build``:
 
 
 Testing
-^^^^^^^
+--------
 
 Once installed, CIL functionality can be tested using the following command:
 
@@ -183,7 +183,8 @@ All methods should follow the convention of small caps underscore separated word
 
 Scalar Types
 -------------
-From numpy v2.0 onwards, [numpy data types are promoted in operations](https://numpy.org/doc/2.3/numpy_2_0_migration_guide.html#changes-to-numpy-data-type-promotion).
+
+From numpy v2.0 onwards, `numpy data types are promoted in operations <https://numpy.org/doc/2.3/numpy_2_0_migration_guide.html#changes-to-numpy-data-type-promotion>`_.
 Scalars should be stored as Python types (e.g. int, float) instead of numpy data types (e.g. np.int32, np.float64) to avoid unexpected behaviour in operations with variables with numpy types.
 
 Note: This convention is not fully adhered to across CIL yet, but new code should follow this convention.

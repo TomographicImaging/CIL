@@ -3,6 +3,7 @@
     - LSQR algorithm added to the CIL algorithm class (#1975)
     - Add `VolumeShrinker` tool to reduce the size of the reconstruction volume from an `AcquisitionData` (#2221)
     - LaminographyGeometryCorrector tool added to processors (#2259)
+    - `FluxNormaliser` can be used on `Cone3D_Flex` data (#2347)
   - Bug fixes:
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)

@@ -35,27 +35,22 @@ class CIL2TIGREGeometry(object):
         if ag.config.angles.angle_unit == AngleUnit.DEGREE:
             angles *= (np.pi/180.)
 
+        # convert CIL to TIGRE angles
+        angles += np.pi/2 + tg.theta
+        angles *= -1
+
+        for i, a in enumerate(angles):
+            while a < -np.pi:
+                a += 2 * np.pi
+            while a >= np.pi:
+                a -= 2 * np.pi
+            angles[i] = a
+            
         if ag.geom_type == 'parallel' and ag.system_description == 'advanced':
             angles = calculate_euler_angles(angles, tg)
             # reset the detector rotation to 0 as the rotation is now included in the Euler angles
             tg.rotDetector = np.array((0.0, 0.0, 0.0))
         
-        else:
-            # don't do this if using Euler angles because the tigre conversion
-            # is applied in calculate_euler_angles
-
-            #convert CIL to TIGRE angles s
-            angles += np.pi/2 + tg.theta
-            angles *= -1
-            
-            #angles in range -pi->pi
-            for i, a in enumerate(angles):
-                while a < -np.pi:
-                    a += 2 * np.pi
-                while a >= np.pi:
-                    a -= 2 * np.pi
-                angles[i] = a
-
         return tg, angles
     
 def calculate_euler_angles(angles, tg):
@@ -65,9 +60,7 @@ def calculate_euler_angles(angles, tg):
 
     euler_angles = []
     for angle in angles:
-        R_combined = R_detector @ rot_z(angle)
-        # convert to tigre angles
-        R_tigre = rot_z(-np.pi/2 - tg.theta) @ R_combined
+        R_tigre = rot_z(angle) @ R_detector
         euler_angles.append(euler_from_matrix_zyz(R_tigre))
     euler_angles = np.array(euler_angles, dtype=np.float32)
     

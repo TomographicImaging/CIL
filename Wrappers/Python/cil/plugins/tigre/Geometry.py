@@ -22,8 +22,7 @@ import numpy as np
 try:
     from tigre.utilities.geometry import Geometry
 except ModuleNotFoundError:
-    raise ModuleNotFoundError("This plugin requires the additional package TIGRE\n" +
-            "Please install it via conda as tigre from the ccpi channel")
+    Geometry = object
 
 class CIL2TIGREGeometry(object):
     @staticmethod
@@ -46,7 +45,8 @@ class CIL2TIGREGeometry(object):
             # is applied in calculate_euler_angles
 
             #convert CIL to TIGRE angles s
-            angles = -(angles + np.pi/2 +tg.theta )
+            angles += np.pi/2 + tg.theta
+            angles *= -1
             
             #angles in range -pi->pi
             for i, a in enumerate(angles):
@@ -136,10 +136,12 @@ def euler_from_matrix_zyz(R, eps=1e-12):
     return np.array([alpha, beta, gamma])
 
 class TIGREGeometry(Geometry):
-
     def __init__(self, ig, ag):
-
-        Geometry.__init__(self)
+        if Geometry is object:
+            raise ModuleNotFoundError(
+                "This plugin requires the additional package TIGRE\n"
+                "Please install it via conda as tigre from the ccpi channel")
+        super().__init__()
 
         if ag.geom_type not in ['cone', 'parallel']:
             raise ValueError(f"CIL cannot use TIGRE to process geometries of type {ag.geom_type}.")

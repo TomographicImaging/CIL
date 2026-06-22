@@ -496,9 +496,8 @@ class TestSPDHGConvergence(CCPiTestClass):
         data_ind=ig.allocate(0)
         data_ind.fill(np.diag([1, 2, 3]))
         ideal_ind = ig.allocate(0)
-        ideal_ind.fill(np.diag([0.5, 1, 1.5]))
-        data = BlockDataContainer([data_ind]*self.subsets)
-        ideal = BlockDataContainer([ideal_ind]*self.subsets)
+        ideal_ind.fill(np.diag([2/3, 4/3, 2]))
+
 
         self.A = BlockOperator(
             *[IdentityOperator(ig) for i in range(self.subsets)])
@@ -513,4 +512,4 @@ class TestSPDHGConvergence(CCPiTestClass):
             gamma_bounds=None, n_initial_points=5, n_calls=10,  n_iterations=10, seed = 42)
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         spdhg.run(50, verbose=1)
-        self.assertBlockDataContainerAlmostEqual(spdhg.x, ideal, decimal=4)
+        self.assertNumpyArrayAlmostEqual(spdhg.x.as_array() , ideal_ind.as_array(), decimal=4)

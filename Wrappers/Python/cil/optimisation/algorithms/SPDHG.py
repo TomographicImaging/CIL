@@ -50,20 +50,20 @@ class SPDHG(Algorithm):
         Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
     gamma : float, optional
             Parameter controlling the trade-off between the primal and dual step sizes
-    sampler: `cil.optimisation.utilities.Sampler`, optional 
-            A `Sampler` controllingthe selection of the next index for the SPDHG update. If `None`, a sampler will be created for uniform random sampling with replacement. See notes.  
+    sampler: `cil.optimisation.utilities.Sampler`, optional
+            A `Sampler` controllingthe selection of the next index for the SPDHG update. If `None`, a sampler will be created for uniform random sampling with replacement. See notes.
 
-    prob_weights: list of floats, optional,  
+    prob_weights: list of floats, optional,
              Consider that the sampler is called a large number of times this argument holds the expected number of times each index would be called,  normalised to 1. Note that this should not be passed if the provided sampler has it as an attribute: if the sampler has a `prob_weight` attribute it will take precedence on this parameter. Should be a list of floats of length `num_indices` that sum to 1. If no sampler with `prob_weights` is passed, it defaults to `[1/len(operator)]*len(operator)`.
 
 
-    Note  
-    -----  
-    The `sampler` can be an instance of the `cil.optimisation.utilities.Sampler` class or a custom class with the `__next__(self)` method implemented, which outputs an integer index from {1, ..., len(operator)}. 
+    Note
+    -----
+    The `sampler` can be an instance of the `cil.optimisation.utilities.Sampler` class or a custom class with the `__next__(self)` method implemented, which outputs an integer index from {1, ..., len(operator)}.
 
-    Note  
-    -----  
-    "Random sampling with replacement" will select the next index with equal probability from  `1 - len(operator)`.  
+    Note
+    -----
+    "Random sampling with replacement" will select the next index with equal probability from  `1 - len(operator)`.
 
 
     Example
@@ -101,7 +101,7 @@ class SPDHG(Algorithm):
 
     and `tau` is set as per case 2
 
-    - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula 
+    - Case 2: If `sigma` is provided but not `tau` then `tau` is calculated using the formula
 
     .. math:: \tau = 0.99\min_i( \frac{p_i}{ (\sigma_i  \|K_i\|^2) })
 
@@ -122,10 +122,10 @@ class SPDHG(Algorithm):
     References
     ----------
 
-    [1]"Stochastic primal-dual hybrid gradient algorithm with arbitrary 
+    [1]"Stochastic primal-dual hybrid gradient algorithm with arbitrary
     sampling and imaging applications",
     Chambolle, Antonin, Matthias J. Ehrhardt, Peter Richtárik, and Carola-Bibiane Schonlieb,
-    SIAM Journal on Optimization 28, no. 4 (2018): 2783-2808.   https://doi.org/10.1137/17M1134834 
+    SIAM Journal on Optimization 28, no. 4 (2018): 2783-2808.   https://doi.org/10.1137/17M1134834
 
     [2]"Faster PET reconstruction with non-smooth priors by randomization and preconditioning",
     Matthias J Ehrhardt, Pawel Markiewicz and Carola-Bibiane Schönlieb,
@@ -236,6 +236,7 @@ class SPDHG(Algorithm):
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
 
+
     @property
     def sigma(self):
         return self._sigma
@@ -252,7 +253,7 @@ class SPDHG(Algorithm):
         Returns
         -------
         Boolean
-            True if convergence criterion is satisfied. False if not satisfied or convergence is unknown. 
+            True if convergence criterion is satisfied. False if not satisfied or convergence is unknown.
 
         Note
         -----
@@ -260,8 +261,8 @@ class SPDHG(Algorithm):
 
         Note
         ----
-        This checks the convergence criterion. Numerical errors may mean some sigma and tau values that satisfy the convergence criterion may not converge. 
-        Alternatively, step sizes outside the convergence criterion may still allow (fast) convergence. 
+        This checks the convergence criterion. Numerical errors may mean some sigma and tau values that satisfy the convergence criterion may not converge.
+        Alternatively, step sizes outside the convergence criterion may still allow (fast) convergence.
         """
         for i in range(self._ndual_subsets):
             if isinstance(self._tau, Number) and isinstance(self._sigma[i], Number):
@@ -327,9 +328,7 @@ class SPDHG(Algorithm):
         
     def update_objective(self):
         # p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
-        p1 = 0.
-        for i, op in enumerate(self.operator.operators):
-            p1 += self.f[i](op.direct(self.x))
+        p1 = sum(self.f[i](op.direct(self.x)) for i, op in enumerate(self.operator.operators))
         p1 += self.g(self.x)
 
         d1 = - self.f.convex_conjugate(self._y_old)
@@ -341,38 +340,38 @@ class SPDHG(Algorithm):
 
     @property
     def objective(self):
-        '''The saved primal objectives. 
+        '''The saved primal objectives.
 
         Returns
         -------
         list
-            The saved primal objectives from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg. 
+            The saved primal objectives from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg.
         '''
         return [x[0] for x in self.loss]
 
     @property
     def dual_objective(self):
-        '''The saved dual objectives. 
+        '''The saved dual objectives.
 
         Returns
         -------
         list
-            The saved dual objectives from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg. 
+            The saved dual objectives from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg.
         '''
         return [x[1] for x in self.loss]
 
     @property
     def primal_dual_gap(self):
-        '''The saved primal-dual gap. 
+        '''The saved primal-dual gap.
 
         Returns
         -------
         list
-            The saved primal dual gap from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg. 
+            The saved primal dual gap from `update_objective`. The number of saved values depends on the `update_objective_interval` kwarg.
         '''
         return [x[2] for x in self.loss]
 
     def _save_previous_iteration(self, index, y_current):
-        ''' Internal function used to save the previous iteration 
+        ''' Internal function used to save the previous iteration
         '''
         self._y_old[index].fill(y_current)

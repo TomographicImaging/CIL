@@ -159,6 +159,11 @@ class ProjectionOperator_ag(ProjectionOperator):
             image_geometry, acquisition_geometry)
 
         tigre_geom.check_geo(tigre_angles)
+
+        # fix for https://github.com/CERN/TIGRE/issues/744
+        if isinstance(tigre_geom.COR[0], np.ndarray):
+            tigre_geom.COR = tigre_geom.COR[0]
+
         tigre_geom.cast_to_single()
         self.tigre_geom = tigre_geom
 

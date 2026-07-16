@@ -27,11 +27,11 @@ log = logging.getLogger(__name__)
 
 class StepSizeRule(ABC):
     """
-    Abstract base class for a step size rule. The abstract method, `get_step_size` takes in an algorithm and thus can access all parts of the algorithm (e.g. current iterate, current gradient, objective functions etc) and from this  should return a float as a step size. 
+    Abstract base class for a step size rule. The abstract method, `get_step_size` takes in an algorithm and thus can access all parts of the algorithm (e.g. current iterate, current gradient, objective functions etc) and from this  should return a float as a step size.
     """
 
     def __init__(self):
-        '''Initialises the step size rule 
+        '''Initialises the step size rule
         '''
         pass
 
@@ -40,27 +40,28 @@ class StepSizeRule(ABC):
         """
         Returns
         --------
-        the calculated step size:float 
+        the calculated step size:float
         """
         pass
 
 
 class ConstantStepSize(StepSizeRule):
     """
-    Step-size rule that always returns a constant step-size. 
+    Step-size rule that always returns a constant step-size.
 
     Parameters
     ----------
     step_size: float
-        The step-size to be returned with each call. 
+        The step-size to be returned with each call.
     """
 
     def __init__(self, step_size):
         '''Initialises the constant step size rule
 
+
          Parameters:
          -------------
-         step_size : float, the constant step size 
+         step_size : float, the constant step size
         '''
         self.step_size = step_size
 
@@ -89,19 +90,19 @@ class ArmijoStepSizeRule(StepSizeRule):
     Parameters
     ----------
     alpha: float, optional, default=1e6
-        The starting point for the step size iterations 
+        The starting point for the step size iterations
     beta: float between 0 and 1, optional, default=0.5
         The amount the step_size is reduced if the criterion is not met
     max_iterations: integer, optional, default is numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))
-        The maximum number of iterations to find a suitable step size 
+        The maximum number of iterations to find a suitable step size
     warmstart: Boolean, default is True
-        If `warmstart = True` the initial step size at each Armijo iteration is the calculated step size from the last iteration. If `warmstart = False` at each  Armijo iteration, the initial step size is reset to the original, large `alpha`. 
-        In the case of *well-behaved* convex functions, `warmstart = True` is likely to be computationally less expensive. In the case of non-convex functions, or particularly tricky functions, setting `warmstart = False` may be beneficial. 
+        If `warmstart = True` the initial step size at each Armijo iteration is the calculated step size from the last iteration. If `warmstart = False` at each  Armijo iteration, the initial step size is reset to the original, large `alpha`.
+        In the case of *well-behaved* convex functions, `warmstart = True` is likely to be computationally less expensive. In the case of non-convex functions, or particularly tricky functions, setting `warmstart = False` may be beneficial.
 
     """
 
     def __init__(self, alpha=1e6, beta=0.5, max_iterations=None, warmstart=True):
-        '''Initialises the step size rule 
+        '''Initialises the step size rule
         '''
 
         self.alpha_orig = alpha
@@ -148,16 +149,18 @@ class ArmijoStepSizeRule(StepSizeRule):
             f_x_a = algorithm.calculate_objective_function_at_point(
                 self.x_armijo)
             sqnorm = algorithm.gradient_update.squared_norm()
-            if f_x_a - f_x <= - (self.alpha/2.) * sqnorm:
+            if f_x_a - f_x <= - (self.alpha/2) * sqnorm:
                 break
             k += 1.
             self.alpha *= self.beta
+
 
         log.info("Armijo rule took %d iterations to find step size", k)
 
         if k == self.max_iterations:
             raise ValueError(
                 'Could not find a proper step_size in {} loops. Consider increasing alpha or max_iterations.'.format(self.max_iterations))
+
 
         return self.alpha
 
@@ -176,14 +179,17 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
 
     This is suitable for use with gradient based iterative methods where the calculated gradient is stored as `algorithm.gradient_update`.
 
+
     Parameters
     ----------
-    initial: float, greater than zero 
+    initial: float, greater than zero
         The step-size for the first iteration. We recommend something of the order :math:`1/f.L` where :math:`f` is the (differentiable part of) the objective you wish to minimise.
-    mode: One of 'long', 'short' or 'alternate', default is 'short'. 
-        This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short. 
+    mode: One of 'long', 'short' or 'alternate', default is 'short'.
+        This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short.
     stabilisation_param: 'auto', float or 'off', default is 'auto'
         In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` where by 'default', the `stabilisation_param`, :math:`\Delta` is  determined automatically to be the minimium of :math:`\Delta x` from the first 3 iterations. The user can also pass a fixed constant or turn "off" the stabilisation, equivalently passing `np.inf`.
+
+
 
 
     Reference
@@ -196,7 +202,7 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
     """
 
     def __init__(self, initial, mode='short', stabilisation_param="auto"):
-        '''Initialises the step size rule 
+        '''Initialises the step size rule
         '''
 
         self.mode = mode
@@ -241,6 +247,7 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
             self.store_grad = algorithm.gradient_update.copy()
             return self.initial
 
+
         gradient_norm = algorithm.gradient_update.norm()
         # If the gradient is zero, gradient based algorithms will not update and te step size calculation will divide by zero so we stop iterations.
         if gradient_norm < 1e-8:
@@ -268,6 +275,7 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         # We store the last iterate and gradient in order to calculate the BB step size
         self.store_x.fill(algorithm.x)
         self.store_grad.fill(algorithm.gradient_update)
+
 
         if self.mode == "alternate":
             self.is_short = not self.is_short

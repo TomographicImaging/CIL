@@ -30,7 +30,7 @@ from cil.framework import VectorData, ImageData, ImageGeometry, AcquisitionData,
 
 from cil.framework.labels import FillType
 
-from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks, Sensitivity, StepSizeRule
+from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks, Sensitivity, StepSizeRule, SPDHGStepSizesFromRatio, SPDHGConstantStepSize
 from cil.optimisation.algorithms.APGD import NesterovMomentum, ScalarMomentumCoefficient, ConstantMomentum
 from cil.optimisation.operators import IdentityOperator, AdjointOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
@@ -1129,27 +1129,33 @@ class TestSPDHG(CCPiTestClass):
         self.assertListEqual(spdhg._norms, [1]*len(self.A2))
 
     def test_spdhg_check_convergence(self):
+    
+       
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
-
         self.assertTrue(spdhg.check_convergence())
 
         gamma = 3.7
         rho = 0.9
-        spdhg.set_step_sizes_from_ratio(gamma, rho)
+        rule = SPDHGStepSizesFromRatio(gamma, rho)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         self.assertTrue(spdhg.check_convergence())
 
         gamma = 3.7
         rho = 100
-        spdhg.set_step_sizes_from_ratio(gamma, rho)
+        rule = SPDHGStepSizesFromRatio(gamma, rho)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         self.assertFalse(spdhg.check_convergence())
 
-        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=100)
+        rule = SPDHGConstantStepSize(step_size=(100, [1]*self.subsets))
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         self.assertFalse(spdhg.check_convergence())
 
-        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=None)
+        rule = SPDHGConstantStepSize(step_size=(None, [1]*self.subsets))
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         self.assertTrue(spdhg.check_convergence())
 
-        spdhg.set_step_sizes(sigma=None, tau=100)
+        rule = SPDHGConstantStepSize(step_size=(100, None))
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         self.assertTrue(spdhg.check_convergence())
 
         

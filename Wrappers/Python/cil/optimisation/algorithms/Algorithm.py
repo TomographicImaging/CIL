@@ -45,12 +45,24 @@ class Algorithm:
 
         self.iteration = -1
         self._total_iterations = 1
-        self._loss = []
+        self.__loss = []
         self.memopt = False
         self.configured = False
         self._iteration = []
         self.update_objective_interval = update_objective_interval
         self.iter_string = 'Iter'
+
+    def _reset_iteration_state(self):
+        '''Resets the iteration counter and the objective/iteration history.
+
+        This is intended for internal use by step-size rules that re-run the
+        algorithm during set-up (e.g. Bayesian optimisation of the step sizes),
+        so that they do not need to reach into the algorithm's private state.
+        '''
+        self.iteration = -1
+        self.__loss = []
+        self._iteration = []
+        self._total_iterations = 1
 
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
@@ -155,7 +167,7 @@ class Algorithm:
 
         '''
         try:
-            objective = self._loss[-1]
+            objective = self.__loss[-1]
         except IndexError:
             objective = np.nan
         if isinstance(objective, list):
@@ -179,7 +191,7 @@ class Algorithm:
 
         The length of this list may be shorter than the number of iterations run when the `update_objective_interval` > 1
         '''
-        return self._loss
+        return self.__loss
 
     objective = loss  # alias
 

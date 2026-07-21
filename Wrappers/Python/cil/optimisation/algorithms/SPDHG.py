@@ -48,8 +48,6 @@ class SPDHG(Algorithm):
         A tuple containing the step size parameters for the primal and dual problems. If `None` will be computed by algorithm, see note for details.
     initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
         Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
-    gamma : float, optional
-            Parameter controlling the trade-off between the primal and dual step sizes
     sampler: `cil.optimisation.utilities.Sampler`, optional
             A `Sampler` controllingthe selection of the next index for the SPDHG update. If `None`, a sampler will be created for uniform random sampling with replacement. See notes.
 
@@ -141,16 +139,14 @@ class SPDHG(Algorithm):
     
         if step_size is not None:  # To be deprecated
             if self._sigma is not None or self._tau is not None:  # To be deprecated
-                raise ValueError("The parameters `sigma` and `tau` are being deprecated in favour of `step_size`. You have passed both. Instead please pass these as part of the `step_size` argument, either as a tuple of (sigma, tau) or using a compatible step size rule.", DeprecationWarning)
+                raise ValueError("The parameters `sigma` and `tau` are being deprecated in favour of `step_size`. You have passed both. Instead please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma ) or using a compatible step size rule.")
 
         if self._sigma is not None or self._tau is not None:  # To be deprecated
-            warnings.warn("The parameters `sigma` and `tau` are being deprecated. In the future, please pass these as part of the `step_size` argument, either as a tuple of (sigma, tau) or using a compatible step size rule.", DeprecationWarning)
+            warnings.warn("The parameters `sigma` and `tau` are being deprecated. In the future, please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.", category=DeprecationWarning, stacklevel=2)
             step_size = (self._tau, self._sigma)
             
             
-        update_objective_interval = kwargs.pop('update_objective_interval', 1)
-        super(SPDHG, self).__init__(
-            update_objective_interval=update_objective_interval)
+        super(SPDHG, self).__init__(**kwargs)
 
         self.set_up(f=f, g=g, operator=operator, step_size=step_size,
                     initial=initial,  sampler=sampler, prob_weights=prob_weights)
@@ -196,7 +192,7 @@ class SPDHG(Algorithm):
         elif isinstance(step_size, (tuple, list)):
             self.step_size_rule = SPDHGConstantStepSize(step_size=step_size)
         else:
-            raise ValueError("The `step_size` argument must be either None, a SPDHG compatible step size rule or a tuple of (sigma, tau) where sigma is the step size for the dual problem and tau is the step size for the primal problem.")
+            raise ValueError("The `step_size` argument must be either None, a SPDHG compatible step size rule or a tuple of (tau, sigma) where sigma is the step size for the dual problem and tau is the step size for the primal problem.")
 
 
         if isinstance(initial, (tuple, list)):

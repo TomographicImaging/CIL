@@ -66,9 +66,9 @@ class PDHG(Algorithm):
         gamma_fconj : positive :obj:`float`, optional, default=None
             Note: this is being deprecated. Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.
         sigma :  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided
-           Step size for the dual problem. Note: this is being deprecated. In the future, please pass this as part of the `step_size` argument, either as a tuple of (sigma, tau) or using a compatible step size rule.
+           Step size for the dual problem. Note: this is being deprecated. In the future, please pass this as part of the `step_size` argument, either as a tuple of (tau,) or using a compatible step size rule.
         tau :  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided
-            Step size for the primal problem. In the future, please pass this as part of the `step_size` argument, either as a tuple of (sigma, tau) or using a compatible step size rule.
+            Step size for the primal problem. In the future, please pass this as part of the `step_size` argument, either as a tuple of (tau,) or using a compatible step size rule.
     Example
     -------
 
@@ -202,16 +202,16 @@ class PDHG(Algorithm):
 
         if step_size is not None:  # To be deprecated
             if self._sigma is not None or self._tau is not None:  # To be deprecated
-                raise ValueError("The parameters `sigma` and `tau` are being deprecated in favour of `step_size`. You have passed both. Instead please pass these as part of the `step_size` argument, either as a tuple of (sigma, tau) or using a compatible step size rule.", DeprecationWarning)
+                raise ValueError("The parameters `sigma` and `tau` are being deprecated in favour of `step_size`. You have passed both. Instead please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.", category=DeprecationWarning, stacklevel=2, )
 
         if self._sigma is not None or self._tau is not None:  # To be deprecated
-            warnings.warn("The parameters `sigma` and `tau` are being deprecated. In the future, please pass these as part of the `step_size` argument, either as a tuple of (sigma, tau) or using a compatible step size rule.", DeprecationWarning)
+            warnings.warn("The parameters `sigma` and `tau` are being deprecated. In the future, please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.", category=DeprecationWarning, stacklevel=2)
             step_size = (self._tau, self._sigma)
 
         self._gamma_g = kwargs.pop('gamma_g', None)  # To be deprecated
         self._gamma_fconj = kwargs.pop('gamma_fconj', None)  # To be deprecated
         if self._gamma_g is not None or self._gamma_fconj is not None:  # To be deprecated
-            warnings.warn("The parameter `gamma_g` is being deprecated. In the future, if you would like to utilise strong convexity you should use the step size method cil.optimisation.utilities.StepSizeMethods.PDHGStronglyConvexUpdate.", DeprecationWarning)
+            warnings.warn("The parameter `gamma_g` is being deprecated. In the future, if you would like to utilise strong convexity you should use the step size method cil.optimisation.utilities.StepSizeMethods.PDHGStronglyConvexUpdate.", category=DeprecationWarning, stacklevel=2)
             step_size = PDHGStronglyConvexUpdate(initial_step_size=(
                 self._tau, self._sigma), gamma_g=self._gamma_g, gamma_fconj=self._gamma_fconj)
 
@@ -270,7 +270,7 @@ class PDHG(Algorithm):
         elif isinstance(step_size, (tuple, list)):
             self.step_size_rule = PDHGConstantStepSize(step_size=step_size)
         else:
-            raise ValueError("The `step_size` argument must be either None, a PDHG compatible step size rule or a tuple of (sigma, tau) where sigma is the step size for the dual problem and tau is the step size for the primal problem.")
+            raise ValueError("The `step_size` argument must be either None, a PDHG compatible step size rule or a tuple of (tau, sigma) where sigma is the step size for the dual problem and tau is the step size for the primal problem.")
 
 
 

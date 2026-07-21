@@ -10,6 +10,7 @@ from cil.utilities import noise as applynoise
 import numpy as np
 import unittest
 from testclass import CCPiTestClass
+from utils import has_skopt
 
 from scipy.optimize import minimize, rosen
 from cil.optimisation.functions import Rosenbrock
@@ -437,12 +438,13 @@ class TestPDHGConvergence(CCPiTestClass):
         log.info("RMSE %f", rmse)
         self.assertLess(rmse, 2e-4)  
         
+    @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_PDHG_adaptive_bayes(self):
         ig = ImageGeometry(3, 3)
         data = ig.allocate(0)
         data.fill(np.diag([1, 2, 3]))
         ideal = ig.allocate(0)
-        ideal.fill(np.diag([0.5, 1, 1.5]))  
+        ideal.fill(np.diag([0.5, 1, 1.5]))
         f = L2NormSquared(b=data)
         g = L2NormSquared()
         operator = IdentityOperator(ig)
@@ -490,6 +492,7 @@ class TestPDHGConvergence(CCPiTestClass):
         
         
 class TestSPDHGConvergence(CCPiTestClass):
+    @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_SPDHG_adaptive_bayes(self):
         self.subsets = 2
         ig = ImageGeometry(3, 3)

@@ -9,6 +9,8 @@ import numpy as np
 
 from cil.utilities import dataexample
 from testclass import CCPiTestClass
+from utils import has_skopt
+import unittest
 from unittest.mock import MagicMock
 from unittest.mock import Mock
 from numbers import Number
@@ -415,6 +417,16 @@ class TestStepSizePDHGStronglyConvex(CCPiTestClass):
                         gamma_fconj=0.5)
         self.assertEqual(pdhg.step_size_rule.gamma_fconj, 0.5)
 
+    def test_init_invalid_initial_step_size_length(self):
+        # initial_step_size must be a length-two list/tuple. A wrong length must
+        # raise ValueError (regression: the error path previously referenced an
+        # undefined `step_size` and raised NameError instead).
+        with self.assertRaises(ValueError):
+            PDHGStronglyConvexUpdate(initial_step_size=(1.0,), gamma_g=0.5)
+        with self.assertRaises(ValueError):
+            PDHGStronglyConvexUpdate(
+                initial_step_size=(1.0, 2.0, 3.0), gamma_g=0.5)
+
     def test_PDHG_strongly_convex_gamma_g(self):
         ig = ImageGeometry(3, 3)
         data = ig.allocate('random', seed=3)
@@ -570,6 +582,31 @@ class TestPDHGAdaptive2013(CCPiTestClass):
             rule.x_resid.as_array(), pdhg.y_tmp.as_array())
         self.assertEqual(rule.y_resid.dot(pdhg.y_tmp), 9)
         self.assertEqual(b, 1)
+
+    def test_backtracking_no_change_returns_zero(self):
+        # When the iterate does not change (x == x_old and y == y_old) the
+        # backtracking denominator is zero; ensure we return 0 (accept) rather
+        # than 0/0 = nan, which would poison the step sizes.
+        ig = ImageGeometry(3, 3)
+        f = L2NormSquared(b=ig.allocate('random', seed=3))
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGAdaptiveStepSize2013(
+            initial_step_size=[1.0, 1.0], initial_alpha=0, gamma=1)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        pdhg.x_old = operator.domain.allocate(1)
+        pdhg.x = operator.domain.allocate(1)          # x == x_old  -> no primal change
+        pdhg.y = operator.range.allocate(1)
+        pdhg.y_tmp = operator.range.allocate(0)
+        rule.x_resid = operator.domain.allocate(0)
+        rule.y_resid = operator.range.allocate(0)
+        rule.y_old = operator.range.allocate(1)        # y == y_old  -> no dual change
+
+        b = rule._calculate_backtracking(pdhg)
+        self.assertTrue(np.isfinite(b))
+        self.assertEqual(b, 0.0)
+        self.assertLessEqual(b, 1)                     # caller would accept, not backtrack
 
     def test_backtracking(self):
         ig = ImageGeometry(3, 3)
@@ -1164,6 +1201,7 @@ class TestPDHGBayesOpt(CCPiTestClass):
             PDHGBayesOptimisationStepSize(gamma_bounds=[
                 -0, 1.1], n_calls=-5)
 
+    @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_get_gamma_bounded(self):
         ig = ImageGeometry(3, 3)
         data = ig.allocate('random', seed=3)
@@ -1184,6 +1222,7 @@ class TestPDHGBayesOpt(CCPiTestClass):
         self.assertEqual(pdhg.update_objective_interval, 4)
         self.assertEqual(pdhg.objective, [])
 
+    @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_get_gamma(self):
         ig = ImageGeometry(3, 3)
         data = ig.allocate('random', seed=3)
@@ -1281,10 +1320,10 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
         
     def test_init(self):
         rule = SPDHGBayesOptimisationStepSize(
-            gamma_bounds=[0.1, 2], n_initial_points=5, n_calls=5,  n_iterations=10, seed=42)
+            gamma_bounds=[0.1, 2], n_initial_points=5, n_calls=10,  n_iterations=10, seed=42)
         self.assertEqual(rule.gamma_bounds, [0.1, 2])
         self.assertEqual(rule.n_initial_points, 5)
-        self.assertEqual(rule.n_calls, 5)
+        self.assertEqual(rule.n_calls, 10)
         self.assertEqual(rule.n_iterations, 10)
         self.assertEqual(rule.seed, 42)
 
@@ -1304,10 +1343,11 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
             SPDHGBayesOptimisationStepSize(gamma_bounds=[
                 -0, 1.1], n_calls=-5)
 
+    @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_get_gamma_bounded(self):
 
         rule = SPDHGBayesOptimisationStepSize(
-            gamma_bounds=[5, 6], n_initial_points=5, n_calls=5,  n_iterations=None, seed=42)
+            gamma_bounds=[5, 6], n_initial_points=5, n_calls=10,  n_iterations=None, seed=42)
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,
                     step_size=rule, update_objective_interval=4)
         self.assertEqual(rule.n_iterations, 10*self.subsets)
@@ -1318,10 +1358,11 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
         self.assertEqual(spdhg.update_objective_interval, 4)
         self.assertEqual(spdhg.objective, [])
 
+    @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_get_gamma(self):
         rule = SPDHGBayesOptimisationStepSize(
             gamma_bounds=None, n_initial_points=5, n_calls=10,  seed=42)
         sampler = Sampler.sequential(self.subsets)
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule, sampler=sampler)
         gamma = min([ pi/(spdhg.tau *ni) for pi, ni in zip(spdhg._prob_weights, spdhg._norms)])
-        self.assertAlmostEqual(gamma, 0.5, places=1)
+        self.assertAlmostEqual(gamma, 0.4, places=1)

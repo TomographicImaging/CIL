@@ -22,6 +22,7 @@ from cil.optimisation.operators import BlockOperator
 import numpy as np
 import logging
 from cil.optimisation.utilities import Sampler, StepSizeRule, SPDHGConstantStepSize
+from cil.optimisation.utilities.StepSizeMethods import _validate_spdhg_step_sizes
 from numbers import Number
 import warnings
 from cil.framework import BlockDataContainer
@@ -188,6 +189,10 @@ class SPDHG(Algorithm):
         if step_size is None:  # This line can be removed when sigma and tau deprecated
             step_size = (None, None)
         if isinstance(step_size, StepSizeRule):
+            if not hasattr(step_size, 'get_initial_step_size'):
+                raise ValueError(
+                    "The step-size rule {} does not provide initial primal/dual step sizes "
+                    "and is not compatible with SPDHG.".format(type(step_size).__name__))
             self.step_size_rule = step_size
         elif isinstance(step_size, (tuple, list)):
             self.step_size_rule = SPDHGConstantStepSize(step_size=step_size)
@@ -228,7 +233,8 @@ class SPDHG(Algorithm):
 
         self._tau, self._sigma = self.step_size_rule.get_initial_step_size(
             self)
-        
+        _validate_spdhg_step_sizes(self._tau, self._sigma, self._ndual_subsets)
+
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
 

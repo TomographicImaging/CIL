@@ -21,6 +21,7 @@
 from cil.framework import DataContainer, BlockDataContainer
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.utilities import StepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015
+from cil.optimisation.utilities.StepSizeMethods import _validate_pdhg_step_sizes
 import warnings
 import numpy as np
 from numbers import Number
@@ -55,8 +56,8 @@ class PDHG(Algorithm):
         Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
 
     **kwargs:
-        objective_interval : :obj:`int`, optional, default=1
-            Evaluates objectives, e.g., primal/dual/primal-dual gap every ``objective_interval``.
+        update_objective_interval : :obj:`int`, optional, default=1
+            Evaluates objectives, e.g., primal/dual/primal-dual gap every ``update_objective_interval``.
         check_convergence : :obj:`boolean`, default=True
             Checks scalar sigma and tau values satisfy convergence criterion and warns if not satisfied. Can be computationally expensive for custom sigma or tau values.
         theta :  Float between 0 and 1, default 1.0
@@ -182,7 +183,7 @@ class PDHG(Algorithm):
         - The primal objective is printed if `verbose=1`, ``pdhg.run(verbose=1)``.
         - All the objectives are printed if `verbose=2`, ``pdhg.run(verbose=2)``.
 
-        Computing these objectives can be costly, so it is better to compute every some iterations. To do this, use ``objective_interval = #number``.
+        Computing these objectives can be costly, so it is better to compute every some iterations. To do this, use ``update_objective_interval = #number``.
 
 
 
@@ -202,7 +203,7 @@ class PDHG(Algorithm):
 
         if step_size is not None:  # To be deprecated
             if self._sigma is not None or self._tau is not None:  # To be deprecated
-                raise ValueError("The parameters `sigma` and `tau` are being deprecated in favour of `step_size`. You have passed both. Instead please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.", category=DeprecationWarning, stacklevel=2, )
+                raise ValueError("The parameters `sigma` and `tau` are being deprecated in favour of `step_size`. You have passed both. Instead please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.")
 
         if self._sigma is not None or self._tau is not None:  # To be deprecated
             warnings.warn("The parameters `sigma` and `tau` are being deprecated. In the future, please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.", category=DeprecationWarning, stacklevel=2)
@@ -266,6 +267,10 @@ class PDHG(Algorithm):
         if step_size is None:  # This line can be removed when sigma and tau deprecated
             step_size = (None, None)
         if isinstance(step_size, StepSizeRule):
+            if not hasattr(step_size, 'get_initial_step_size'):
+                raise ValueError(
+                    "The step-size rule {} does not provide initial primal/dual step sizes "
+                    "and is not compatible with PDHG.".format(type(step_size).__name__))
             self.step_size_rule = step_size
         elif isinstance(step_size, (tuple, list)):
             self.step_size_rule = PDHGConstantStepSize(step_size=step_size)
@@ -298,10 +303,11 @@ class PDHG(Algorithm):
 
         self._tau, self._sigma = self.step_size_rule.get_initial_step_size(
             self)
+        _validate_pdhg_step_sizes(self._tau, self._sigma, self.operator)
 
         if self._check_convergence:
             self.check_convergence()
-            
+
         self.configured = True
         log.info("%s configured", self.__class__.__name__)
 
@@ -319,25 +325,26 @@ class PDHG(Algorithm):
         return self.x_old
 
     def _pdhg_update(self):
+        """Applies the primal-dual updates for one PDHG step (see the Notes in the
+        class docstring for the update equations)."""
 
         # calculate x-bar and store in self.x_tmp
         self.x_old.sapyb((self.theta + 1.0), self.x, -
-                         self.theta, out=self.x_tmp)  # somewhere in line 4
+                         self.theta, out=self.x_tmp)
 
         # Gradient ascent for the dual variable
-        self.operator.direct(self.x_tmp, out=self.y_tmp)  # line 4
+        self.operator.direct(self.x_tmp, out=self.y_tmp)
 
-        self.y_tmp.sapyb(self.sigma, self.y, 1.0, out=self.y_tmp)  # line 4
+        self.y_tmp.sapyb(self.sigma, self.y, 1.0, out=self.y_tmp)
 
-        self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)  # line 5
+        self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
 
         # Gradient descent for the primal variable
-        self.operator.adjoint(self.y, out=self.x_tmp)  # line 2
+        self.operator.adjoint(self.y, out=self.x_tmp)
 
-        self.x_tmp.sapyb(-self.tau, self.x_old, 1.0, self.x_tmp)  # line 2
+        self.x_tmp.sapyb(-self.tau, self.x_old, 1.0, self.x_tmp)
 
-        self.g.proximal(self.x_tmp, self.tau, out=self.x)  # line 3
-
+        self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
     def update(self):
         """Performs a single iteration of the PDHG algorithm"""

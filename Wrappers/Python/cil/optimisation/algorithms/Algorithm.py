@@ -23,7 +23,6 @@ from warnings import warn
 import numpy as np
 
 from cil.optimisation.utilities.callbacks import Callback, ProgressCallback
-from cil.optimisation.utilities.callbacks import Callback, ProgressCallback
 
 
 class Algorithm:

@@ -3,7 +3,7 @@ from cil.optimisation.functions import BlockFunction, LeastSquares, IndicatorBox
 from cil.framework import ImageGeometry, VectorGeometry, VectorData
 from cil.optimisation.operators import BlockOperator,  IdentityOperator, MatrixOperator, LinearOperator
 
-from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015, PDHGBayesOptimisationStepSize
+from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015, PDHGBayesOptimisationStepSize, StepSizeRule
 from cil.optimisation.utilities import SPDHGConstantStepSize, SPDHGBayesOptimisationStepSize, SPDHGStepSizesFromRatio, Sampler
 import numpy as np
 
@@ -403,6 +403,43 @@ class TestPDHGConstantStepSize(CCPiTestClass):
         self.assertTrue(isinstance(pdhg.tau, Number))
         self.assertEqual(warnings_log, [])
 
+    def test_step_size_and_deprecated_sigma_tau_raises_valueerror(self):
+        # Passing both `step_size` and the deprecated `sigma`/`tau` must raise a
+        # clear ValueError. Regression: this branch previously passed keyword
+        # arguments to ValueError, which raised a TypeError instead.
+        operator = IdentityOperator(ImageGeometry(2, 2))
+        with self.assertRaises(ValueError):
+            PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator,
+                 step_size=(0.1, 0.1), sigma=0.5)
+        with self.assertRaises(ValueError):
+            PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator,
+                 step_size=(0.1, 0.1), tau=0.5)
+
+    def test_incompatible_gd_rule_raises_valueerror(self):
+        # A GD-style step-size rule returns a single scalar and has no
+        # get_initial_step_size, so it is not compatible with PDHG and must
+        # raise a clear ValueError rather than an opaque AttributeError.
+        operator = IdentityOperator(ImageGeometry(2, 2))
+        with self.assertRaises(ValueError):
+            PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator,
+                 step_size=ConstantStepSize(0.1))
+
+    def test_wrong_shape_rule_raises_valueerror(self):
+        # A rule that provides get_initial_step_size but returns wrong-shaped
+        # step sizes (here a list where PDHG expects a scalar/array) must raise
+        # a clear ValueError from the PDHG step-size validation.
+        class _BadRule(StepSizeRule):
+            def get_initial_step_size(self, algorithm):
+                return 0.1, [0.1, 0.1]
+
+            def get_step_size(self, algorithm):
+                return 0.1, [0.1, 0.1]
+
+        operator = IdentityOperator(ImageGeometry(2, 2))
+        with self.assertRaises(ValueError):
+            PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator,
+                 step_size=_BadRule())
+
 
 class TestStepSizePDHGStronglyConvex(CCPiTestClass):
 
@@ -526,6 +563,29 @@ class TestPDHGAdaptive2013(CCPiTestClass):
     def test_init_invalid(self):
         with self.assertRaises(ValueError):
             PDHGAdaptiveStepSize2013(initial_step_size=[1.0])
+
+    def test_no_false_nonconvergence_warning(self):
+        # Regression: the non-convergence warning used `k == inner_iterations-1`,
+        # which false-fired when backtracking legitimately converged on the last
+        # inner iteration. With inner_iterations=1 a converging step (b <= 1)
+        # breaks at that last index, so no "did not converge" warning should be
+        # logged.
+        ig = ImageGeometry(3, 3)
+        data = ig.allocate('random', seed=3)
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        rule = PDHGAdaptiveStepSize2013(
+            initial_step_size=[1.0, 1.0], inner_iterations=1)
+        pdhg = PDHG(f=f, g=g, operator=operator, step_size=rule)
+        # Force backtracking to report convergence (b <= 1) on the first (and
+        # only, hence last) inner iteration.
+        rule._calculate_backtracking = MagicMock(return_value=0.5)
+
+        logger = 'cil.optimisation.utilities.StepSizeMethods'
+        with self.assertNoLogs(logger, level='WARNING'):
+            pdhg.run(3)
 
     def test_initial_step_size_defaults(self):
         ig = ImageGeometry(3, 3)
@@ -1289,6 +1349,23 @@ class TestSPDHGConstantStepSize(CCPiTestClass):
             SPDHGConstantStepSize(step_size=[1.0])
         with self.assertRaises(ValueError):
             SPDHGConstantStepSize(step_size=[1.0, 2.0]).get_initial_step_size(SPDHG(f=self.F, g=self.G, operator=self.A))
+
+    def test_step_size_and_deprecated_sigma_tau_raises_valueerror(self):
+        # Passing both `step_size` and the deprecated `sigma`/`tau` must raise a
+        # clear ValueError.
+        with self.assertRaises(ValueError):
+            SPDHG(f=self.F, g=self.G, operator=self.A,
+                  step_size=(100, [1]*self.subsets), sigma=0.5)
+        with self.assertRaises(ValueError):
+            SPDHG(f=self.F, g=self.G, operator=self.A,
+                  step_size=(100, [1]*self.subsets), tau=0.5)
+
+    def test_incompatible_gd_rule_raises_valueerror(self):
+        # A GD-style step-size rule has no get_initial_step_size and is not
+        # compatible with SPDHG; it must raise a clear ValueError.
+        with self.assertRaises(ValueError):
+            SPDHG(f=self.F, g=self.G, operator=self.A,
+                  step_size=ConstantStepSize(0.1))
             
     def test_step_sizes_from_ratio(self):
         gamma = 3.7

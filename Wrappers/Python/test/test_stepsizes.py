@@ -5,6 +5,7 @@ from cil.optimisation.operators import BlockOperator,  IdentityOperator, MatrixO
 
 from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015, PDHGBayesOptimisationStepSize, StepSizeRule
 from cil.optimisation.utilities import SPDHGConstantStepSize, SPDHGBayesOptimisationStepSize, SPDHGStepSizesFromRatio, Sampler
+from cil.optimisation.utilities import SPDHGAdaptiveStepSizeBalancing, SPDHGAdaptiveStepSizeAngle
 import numpy as np
 
 from cil.utilities import dataexample
@@ -1443,3 +1444,175 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule, sampler=sampler)
         gamma = min([ pi/(spdhg.tau *ni) for pi, ni in zip(spdhg._prob_weights, spdhg._norms)])
         self.assertAlmostEqual(gamma, 0.4, places=1)
+
+class TestSPDHGAdaptiveStepSize(CCPiTestClass):
+    """Tests for the adaptive SPDHG step-size rules based on arXiv:2301.02511."""
+
+    def setUp(self):
+        self.subsets = 10
+
+        data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get(size=(16, 16))
+
+        partitioned_data = data.partition(self.subsets, 'sequential')
+        self.A = BlockOperator(
+            *[IdentityOperator(partitioned_data[i].geometry) for i in range(self.subsets)])
+
+        self.F = BlockFunction(*[L2NormSquared(b=partitioned_data[i])
+                                 for i in range(self.subsets)])
+        alpha = 0.025
+        self.G = alpha * IndicatorBox(lower=0)
+
+
+    def test_balancing_init(self):
+        rule = SPDHGAdaptiveStepSizeBalancing(
+            initial_step_size=[1.0, 2.0], initial_alpha=0.9, eta=0.99,
+            delta=2.0, s=3.0, auto_stop=False, auto_stop_patience=5)
+        self.assertEqual(rule.initial_step_size, [1.0, 2.0])
+        self.assertEqual(rule.alpha, 0.9)
+        self.assertEqual(rule.eta, 0.99)
+        self.assertEqual(rule.delta, 2.0)
+        self.assertEqual(rule.s, 3.0)
+        self.assertFalse(rule.auto_stop)
+        self.assertEqual(rule.auto_stop_patience, 5)
+        self.assertTrue(rule.adaptive)
+        self.assertEqual(rule.count, 0)
+
+    def test_balancing_init_defaults(self):
+        rule = SPDHGAdaptiveStepSizeBalancing()
+        self.assertEqual(rule.initial_step_size, [None, None])
+        self.assertAlmostEqual(rule.alpha, 0.95)
+        self.assertAlmostEqual(rule.eta, 0.995)
+        self.assertEqual(rule.delta, 1.5)
+        self.assertIsNone(rule.s)
+        self.assertTrue(rule.auto_stop)
+        self.assertEqual(rule.auto_stop_patience, 10)
+
+    def test_angle_init(self):
+        rule = SPDHGAdaptiveStepSizeAngle(
+            initial_step_size=[1.0, 2.0], initial_alpha=0.5, eta=0.9,
+            c=0.9, auto_stop=False, auto_stop_patience=3)
+        self.assertEqual(rule.initial_step_size, [1.0, 2.0])
+        self.assertEqual(rule.alpha, 0.5)
+        self.assertEqual(rule.eta, 0.9)
+        self.assertEqual(rule.c, 0.9)
+        self.assertFalse(rule.auto_stop)
+        self.assertEqual(rule.auto_stop_patience, 3)
+
+    def test_angle_init_defaults(self):
+        rule = SPDHGAdaptiveStepSizeAngle()
+        self.assertEqual(rule.initial_step_size, [None, None])
+        self.assertAlmostEqual(rule.alpha, 1.0)
+        self.assertAlmostEqual(rule.eta, 0.995)
+        self.assertEqual(rule.c, 0.999)
+        self.assertTrue(rule.auto_stop)
+
+    def test_init_invalid(self):
+        with self.assertRaises(ValueError):
+            SPDHGAdaptiveStepSizeBalancing(initial_step_size=[1.0])
+        with self.assertRaises(ValueError):
+            SPDHGAdaptiveStepSizeAngle(initial_step_size=[1.0, 2.0, 3.0])
+
+
+    def test_initial_step_size_defaults(self):
+        rho = 0.99
+        for RuleCls in (SPDHGAdaptiveStepSizeBalancing, SPDHGAdaptiveStepSizeAngle):
+            rule = RuleCls()
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+            # tau scalar, sigma list of length n, all positive
+            self.assertTrue(isinstance(spdhg.tau, Number))
+            self.assertEqual(len(spdhg.sigma), self.subsets)
+            self.assertTrue(all(s > 0 for s in spdhg.sigma))
+            # matches the standard SPDHG relations
+            self.assertListEqual(spdhg.sigma, [rho / ni for ni in spdhg._norms])
+            self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni, si in
+                                             zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+            # per-operator convergence criterion  sigma_i * tau * ||A_i||^2 <= p_i
+            for si, ni, pi in zip(spdhg.sigma, spdhg._norms, spdhg._prob_weights):
+                self.assertLessEqual(si * spdhg.tau * ni**2, pi + 1e-9)
+
+    def test_initial_step_size_scalar_sigma_broadcast(self):
+        # a single dual step size is broadcast to a per-operator list
+        rule = SPDHGAdaptiveStepSizeBalancing(initial_step_size=[3.0, 0.5])
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+        self.assertEqual(spdhg.tau, 3.0)
+        self.assertListEqual(spdhg.sigma, [0.5]*self.subsets)
+
+    def test_initial_step_size_tau_from_sigma_list(self):
+        # sigma given as a list, tau derived
+        rho = 0.99
+        rule = SPDHGAdaptiveStepSizeAngle(initial_step_size=[None, [0.7]*self.subsets])
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+        self.assertListEqual(spdhg.sigma, [0.7]*self.subsets)
+        self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni, si in
+                                         zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+
+    
+
+    def test_balancing_adapts_step_sizes(self):
+        # from a deliberately imbalanced ratio, the rule should rescale the step sizes
+        rule = SPDHGAdaptiveStepSizeBalancing(
+            initial_step_size=[10.0, 0.001], auto_stop=False)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+        start_ratio = spdhg.tau / spdhg.sigma[0]
+        spdhg.run(20)
+        end_ratio = spdhg.tau / spdhg.sigma[0]
+        self.assertNotAlmostEqual(start_ratio, end_ratio)
+        # step sizes remain valid (positive scalar tau, positive sigma list)
+        self.assertGreater(spdhg.tau, 0)
+        self.assertEqual(len(spdhg.sigma), self.subsets)
+        self.assertTrue(all(s > 0 for s in spdhg.sigma))
+        # the adaptation strength decayed as the step sizes were rebalanced
+        self.assertLess(rule.alpha, 0.95)
+
+    def test_angle_adapts_step_sizes(self):
+        # a permissive threshold (c=0) makes every iteration rebalance, exercising the
+        # angle-alignment mechanism (the default c=0.999 is deliberately conservative).
+        rule = SPDHGAdaptiveStepSizeAngle(
+            initial_step_size=[10.0, 0.001], c=0.0, auto_stop=False)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+        start_ratio = spdhg.tau / spdhg.sigma[0]
+        spdhg.run(20)
+        end_ratio = spdhg.tau / spdhg.sigma[0]
+        self.assertNotAlmostEqual(start_ratio, end_ratio)
+        self.assertGreater(spdhg.tau, 0)
+        self.assertEqual(len(spdhg.sigma), self.subsets)
+        self.assertTrue(all(s > 0 for s in spdhg.sigma))
+
+    def test_products_preserved_under_rescaling(self):
+        # rescaling multiplies tau by 1/f and every sigma_i by f, so tau*sigma_i is fixed
+        for RuleCls in (SPDHGAdaptiveStepSizeBalancing, SPDHGAdaptiveStepSizeAngle):
+            rule = RuleCls(initial_step_size=[10.0, 0.001], auto_stop=False)
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+            prod0 = [spdhg.tau * si for si in spdhg.sigma]
+            spdhg.run(15)
+            prod1 = [spdhg.tau * si for si in spdhg.sigma]
+            for a, b in zip(prod0, prod1):
+                self.assertAlmostEqual(a, b)
+
+    def test_auto_stop_freezes_and_frees(self):
+        # force the "no change" branch every iteration by making the tolerance gate
+        # impossible to pass; the rule should then stop after auto_stop_patience.
+        rule = SPDHGAdaptiveStepSizeBalancing(auto_stop=True, auto_stop_patience=3)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+        rule.tolerance = 1e12
+        self.assertTrue(rule.adaptive)
+        spdhg.run(6)
+        self.assertFalse(rule.adaptive)
+        # buffers released on auto-stop
+        self.assertFalse(hasattr(rule, 'x_prev') and rule.x_prev is not None)
+        # continuing to run after auto-stop keeps returning valid step sizes
+        tau_frozen = spdhg.tau
+        sigma_frozen = list(spdhg.sigma)
+        spdhg.run(3)
+        self.assertEqual(spdhg.tau, tau_frozen)
+        self.assertListEqual(list(spdhg.sigma), sigma_frozen)
+
+    def test_auto_stop_disabled_keeps_adapting(self):
+        rule = SPDHGAdaptiveStepSizeAngle(auto_stop=False, auto_stop_patience=2)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+        spdhg.run(20)
+        self.assertTrue(rule.adaptive)
+        self.assertTrue(hasattr(rule, 'x_prev'))
+
+
+

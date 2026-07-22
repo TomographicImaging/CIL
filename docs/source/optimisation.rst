@@ -763,7 +763,7 @@ For `cil.optimisation.algorithms.PDHG`, the rule's `get_initial_step_size` metho
 
 SPDHG step-size rules
 ~~~~~~~~~~~~~~~~~~~~~~~
-For `cil.optimisation.algorithms.SPDHG`, the rule's `get_initial_step_size` method sets the initial step sizes during set-up and `get_step_size` is called at the end of each iteration. Here the primal step size ``tau`` is a scalar while the dual step size ``sigma`` is a list with one entry per operator.
+For `cil.optimisation.algorithms.SPDHG`, the rule's `get_initial_step_size` method sets the initial step sizes during set-up and `get_step_size` is called at the end of each iteration. Here the primal step size ``tau`` is a scalar while the dual step size ``sigma`` is a list with one entry per operator. The rules below span a fixed step size (`SPDHGConstantStepSize`), a fixed primal/dual ratio (`SPDHGStepSizesFromRatio`), a one-off Bayesian-optimisation search for the best ratio (`SPDHGBayesOptimisationStepSize`), and two per-iteration adaptive rules from :cite:`chambolle2023stochastic` that rescale the step sizes as the algorithm runs — one balancing the primal and dual progress residuals (`SPDHGAdaptiveStepSizeBalancing`) and one exploiting the alignment of successive primal directions (`SPDHGAdaptiveStepSizeAngle`).
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.SPDHGConstantStepSize
    :members:
@@ -772,6 +772,12 @@ For `cil.optimisation.algorithms.SPDHG`, the rule's `get_initial_step_size` meth
    :members:
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.SPDHGBayesOptimisationStepSize
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.SPDHGAdaptiveStepSizeBalancing
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.SPDHGAdaptiveStepSizeAngle
    :members:
 
 

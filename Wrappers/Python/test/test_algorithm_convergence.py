@@ -2,7 +2,7 @@
 from cil.optimisation.algorithms import SPDHG, PDHG, LSQR, FISTA, APGD, GD, PD3O
 from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction, LeastSquares, TotalVariation, MixedL21Norm, L1Norm
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
-from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule, ArmijoStepSizeRule, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015, PDHGBayesOptimisationStepSize, SPDHGBayesOptimisationStepSize, SPDHGStepSizesFromRatio
+from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule, ArmijoStepSizeRule, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015, PDHGBayesOptimisationStepSize, SPDHGBayesOptimisationStepSize, SPDHGStepSizesFromRatio, SPDHGAdaptiveStepSizeBalancing, SPDHGAdaptiveStepSizeAngle
 from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData, ImageGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
@@ -494,7 +494,7 @@ class TestPDHGConvergence(CCPiTestClass):
 class TestSPDHGConvergence(CCPiTestClass):
     @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_SPDHG_adaptive_bayes(self):
-        self.subsets = 2
+        subsets = 2
         ig = ImageGeometry(3, 3)
         data_ind=ig.allocate(0)
         data_ind.fill(np.diag([1, 2, 3]))
@@ -503,12 +503,12 @@ class TestSPDHGConvergence(CCPiTestClass):
 
 
         self.A = BlockOperator(
-            *[IdentityOperator(ig) for i in range(self.subsets)])
+            *[IdentityOperator(ig) for i in range(subsets)])
 
 
         # block function
         self.F = BlockFunction(*[L2NormSquared(b=data_ind)
-                                for i in range(self.subsets)])
+                                for i in range(subsets)])
         self.G = L2NormSquared()
     
         rule = SPDHGBayesOptimisationStepSize(
@@ -516,3 +516,85 @@ class TestSPDHGConvergence(CCPiTestClass):
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         spdhg.run(50, verbose=1)
         self.assertNumpyArrayAlmostEqual(spdhg.x.as_array() , ideal_ind.as_array(), decimal=4)
+        
+    def test_convergence_balancing(self):
+        # From a poorly balanced start (tau far too large, sigma far too small) the
+        # residual-balancing rule (rule (a) of Chambolle et al. 2023) should tilt the
+        # step sizes back, reduce the objective and reach a value comparable to a
+        # well-tuned constant rule, converging to the same minimiser.
+        # SPDHG samples subsets at random, so both runs are seeded for reproducibility.
+        subsets = 2
+        ig = ImageGeometry(3, 3)
+        data_ind=ig.allocate(0)
+        data_ind.fill(np.diag([1, 2, 3]))
+        ideal_ind = ig.allocate(0)
+        ideal_ind.fill(np.diag([2/3, 4/3, 2]))
+
+        self.A = BlockOperator(
+            *[IdentityOperator(ig) for i in range(subsets)])
+
+
+        # block function
+        self.F = BlockFunction(*[L2NormSquared(b=data_ind)
+                                for i in range(subsets)])
+        self.G = L2NormSquared()
+
+        seed = 7
+        np.random.seed(seed)
+        constant = SPDHG(f=self.F, g=self.G, operator=self.A,
+                         sampler=Sampler.random_with_replacement(subsets, seed=seed))
+        constant.run(50)
+
+        rule = SPDHGAdaptiveStepSizeBalancing(initial_step_size=[10.0, 0.001])
+        adaptive = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
+                         sampler=Sampler.random_with_replacement(subsets, seed=seed))
+        adaptive.run(50)
+        # objective is recorded during the run; the first entry is the initial value
+        self.assertLess(adaptive.objective[-1], adaptive.objective[0])
+        self.assertLess(adaptive.objective[-1], 1.1 * constant.objective[-1] + 1e-3)
+        self.assertNumpyArrayAlmostEqual(constant.x.as_array() , ideal_ind.as_array(), decimal=4)
+        # the adaptive run recovers from the bad start but, having spent early iterations
+        # rebalancing, is a little behind the well-tuned constant rule at 50 iterations.
+        self.assertNumpyArrayAlmostEqual(adaptive.x.as_array() , ideal_ind.as_array(), decimal=2)
+
+    def test_convergence_angles(self):
+        # Companion to test_convergence_balancing for the angle/alignment rule (rule (b)
+        # of Chambolle et al. 2023). This rule *increases* the primal step when successive
+        # primal directions stay aligned, so the imbalanced start is chosen the other way
+        # round: tau far too small (sigma filled in from the operator norms). From there it
+        # should grow tau, reduce the objective and reach a value comparable to a well-tuned
+        # constant rule, converging to the same minimiser.
+        # SPDHG samples subsets at random, so both runs are seeded for reproducibility.
+        subsets = 2
+        ig = ImageGeometry(3, 3)
+        data_ind=ig.allocate(0)
+        data_ind.fill(np.diag([1, 2, 3]))
+        ideal_ind = ig.allocate(0)
+        ideal_ind.fill(np.diag([2/3, 4/3, 2]))
+
+        self.A = BlockOperator(
+            *[IdentityOperator(ig) for i in range(subsets)])
+
+
+        # block function
+        self.F = BlockFunction(*[L2NormSquared(b=data_ind)
+                                for i in range(subsets)])
+        self.G = L2NormSquared()
+
+        seed = 7
+        np.random.seed(seed)
+        constant = SPDHG(f=self.F, g=self.G, operator=self.A,
+                         sampler=Sampler.random_with_replacement(subsets, seed=seed))
+        constant.run(50)
+
+        rule = SPDHGAdaptiveStepSizeAngle(initial_step_size=[0.001, None])
+        adaptive = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
+                         sampler=Sampler.random_with_replacement(subsets, seed=seed))
+        adaptive.run(50)
+        # objective is recorded during the run; the first entry is the initial value
+        self.assertLess(adaptive.objective[-1], adaptive.objective[0])
+        self.assertLess(adaptive.objective[-1], 1.1 * constant.objective[-1] + 1e-3)
+        self.assertNumpyArrayAlmostEqual(constant.x.as_array() , ideal_ind.as_array(), decimal=4)
+        # the adaptive run recovers from the bad start but, having spent early iterations
+        # rebalancing, is a little behind the well-tuned constant rule at 50 iterations.
+        self.assertNumpyArrayAlmostEqual(adaptive.x.as_array() , ideal_ind.as_array(), decimal=2)

@@ -1369,3 +1369,356 @@ class SPDHGBayesOptimisationStepSize(_BayesOptimisationStepSizeBase):
         tau = _spdhg_tau_from_sigma(
             sigma, algorithm._norms, algorithm._prob_weights, self.rho)
         return tau, sigma
+
+
+class _SPDHGAdaptiveStepSizeBase(StepSizeRule):
+    r"""Shared machinery for the adaptive SPDHG step-size rules of :cite:`chambolle2023stochastic`.
+
+    The two concrete rules (:class:`SPDHGAdaptiveStepSizeBalancing` and
+    :class:`SPDHGAdaptiveStepSizeAngle`) only *rescale* the step sizes between iterations,
+    keeping the standard extrapolated SPDHG update. Following equation (2.6) of
+    :cite:`chambolle2023stochastic`, a single balancing scalar :math:`\gamma` is used at
+    each iteration,
+
+    .. math::
+
+        \tau \leftarrow \tau/\gamma, \qquad \sigma_i \leftarrow \gamma\,\sigma_i
+        \quad (i = 1,\dots,n),
+
+    so the same factor is applied to every dual step size and the products
+    :math:`\tau\sigma_i` are preserved. Both rules are *balancing only* — there is no
+    backtracking inner loop (SPDHG has no side-effect-free re-runnable update), so the
+    step sizes are adjusted once per iteration from quantities measured on the subset that
+    was sampled that iteration.
+
+    This base class is not meant to be used directly. It owns the buffers required to form
+    the per-subset primal/dual increments and defers the actual decision to
+    :meth:`_rebalance`, implemented by each subclass. All state is held by the rule, so the
+    only cooperation required from SPDHG is that it records the sampled subset index in
+    ``algorithm._index`` (see :meth:`~cil.optimisation.algorithms.SPDHG.update`).
+
+    Notes
+    -----
+    This rule stores one extra image (the previous primal iterate), a copy of the dual
+    variable and three domain-sized working buffers. When ``auto_stop=True`` the adaptive
+    updates are switched off, and the extra storage released, once the step sizes have been
+    unchanged for ``auto_stop_patience`` consecutive iterations.
+    """
+
+    def __init__(self, initial_step_size=[None, None], initial_alpha=0.95, eta=0.995,
+                 auto_stop=True, auto_stop_patience=10):
+        '''Initialises the shared adaptive SPDHG step size rule'''
+        if len(initial_step_size) != 2:
+            raise ValueError(
+                "initial_step_size should be a list or tuple of length two, "
+                "initial_step_size = {}".format(initial_step_size))
+        self.initial_step_size = initial_step_size
+        self.alpha = initial_alpha
+        self.eta = eta
+        self.auto_stop = auto_stop
+        self.auto_stop_patience = auto_stop_patience
+        self.tolerance = 1e-6
+        self.count = 0
+        self.adaptive = True
+        # buffers allocated in get_initial_step_size
+        self.x_prev = None
+        self.y_prev = None
+        self.x_diff = None
+        self.adj_tmp = None
+        self.res_tmp = None
+
+    def _resolve_initial(self, algorithm):
+        '''Resolve the initial (tau, sigma) pair, filling in any missing value.'''
+        gamma = 1.
+        rho = 0.99
+        tau = self.initial_step_size[0]
+        sigma = self.initial_step_size[1]
+        if sigma is not None and isinstance(sigma, Number):
+            # a single dual step size is broadcast to every operator
+            sigma = [sigma] * algorithm._ndual_subsets
+        if sigma is None and tau is None:
+            sigma = _spdhg_sigma_from_gamma(gamma, rho, algorithm._norms)
+            tau = _spdhg_tau_from_sigma(
+                sigma, algorithm._norms, algorithm._prob_weights, rho)
+        elif sigma is None:
+            sigma = [rho * pi / (tau * ni**2)
+                     for ni, pi in zip(algorithm._norms, algorithm._prob_weights)]
+        elif tau is None:
+            tau = _spdhg_tau_from_sigma(
+                sigma, algorithm._norms, algorithm._prob_weights, rho)
+        return tau, sigma
+
+    def get_initial_step_size(self, algorithm):
+        tau, sigma = self._resolve_initial(algorithm)
+        # buffers owned by the rule; seeded from the initial iterates so the first
+        # increment (x^0 - x^1, y^0 - y^1) is exact.
+        self.x_prev = algorithm.x.copy()
+        self.y_prev = algorithm._y_old.copy()
+        self.x_diff = algorithm.operator.domain_geometry().allocate(0)
+        self.adj_tmp = algorithm.operator.domain_geometry().allocate(0)
+        self.res_tmp = algorithm.operator.domain_geometry().allocate(0)
+        return tau, sigma
+
+    def get_step_size(self, algorithm):
+        if self.adaptive:
+            i = algorithm._index
+            p_i = algorithm._prob_weights[i]
+            tau = algorithm._tau
+            sigma = algorithm._sigma
+
+            # primal increment  Delta x = x^k - x^{k+1}
+            algorithm.x.sapyb(-1.0, self.x_prev, 1.0, out=self.x_diff)
+            # dual increment on the sampled subset  Delta y_i = y^k_i - y^{k+1}_i
+            dy = self.y_prev[i].subtract(algorithm._y_old[i])
+            # back-projected dual increment  A_i^* Delta y_i
+            algorithm.operator[i].adjoint(dy, out=self.adj_tmp)
+            # primal residual direction  q = Delta x / tau - (1/p_i) A_i^* Delta y_i
+            self.x_diff.sapyb(1.0 / tau, self.adj_tmp, -1.0 / p_i, out=self.res_tmp)
+
+            if self.x_diff.norm() > self.tolerance and self.res_tmp.norm() > self.tolerance:
+                tau_new, sigma_new, changed = self._rebalance(
+                    algorithm, i, p_i, tau, sigma, dy)
+                if not changed:
+                    self.count += 1
+            else:
+                log.debug('SPDHG adaptive step size: increments below tolerance, '
+                          'no change to step sizes.')
+                tau_new, sigma_new = tau, sigma
+                self.count += 1
+
+            # refresh the stored iterates for the next call (only subset i changed)
+            self.x_prev.fill(algorithm.x)
+            self.y_prev[i].fill(algorithm._y_old[i])
+
+            if self.auto_stop and self.count > self.auto_stop_patience:
+                self.adaptive = False
+                log.debug('SPDHG adaptive step size: automatically stopping updates, '
+                          'step sizes unchanged for {} iterations.'.format(
+                              self.auto_stop_patience))
+                del self.x_prev, self.y_prev, self.x_diff, self.adj_tmp, self.res_tmp
+            return tau_new, sigma_new
+
+        return algorithm._tau, algorithm._sigma
+
+    def _rebalance(self, algorithm, i, p_i, tau, sigma, dy):
+        """Decide and apply the step-size rescaling for one iteration.
+
+        Returns
+        -------
+        tuple
+            ``(tau, sigma, changed)`` where ``sigma`` is the list of dual step sizes and
+            ``changed`` is ``True`` if the step sizes were rescaled this iteration.
+        """
+        raise NotImplementedError
+
+
+class SPDHGAdaptiveStepSizeBalancing(_SPDHGAdaptiveStepSizeBase):
+    r"""Adaptively balances the SPDHG primal and dual step sizes by tracking the primal and dual progress, following rule (a) of :cite:`chambolle2023stochastic`.
+
+    This is an SPDHG-compatible step-size rule (:class:`SPDHGAdaptiveStepSizeBalancing`
+    implements A-SPDHG rule (a), Algorithm 3.1 of :cite:`chambolle2023stochastic`). It is
+    the stochastic, minibatch generalisation of the deterministic adaptive PDHG rule of
+    :cite:`goldstein2013adaptive` (:class:`PDHGAdaptiveStepSize2013`), to which it reduces
+    when there is a single operator.
+
+    At the end of each iteration, with sampled subset :math:`i`, sampling probability
+    :math:`p_i`, primal increment :math:`\Delta x = x^{k} - x^{k+1}` and dual increment
+    :math:`\Delta y_i = y^{k}_i - y^{k+1}_i`, two :math:`\ell_1` "progress" residuals are
+    formed (equation (3.6) of :cite:`chambolle2023stochastic`),
+
+    .. math::
+
+        v = \left\| \frac{\Delta x}{\tau}
+                    - \frac{1}{p_i} A_i^{*}\Delta y_i \right\|_1, \qquad
+        d = \left\| \frac{1}{p_i}\frac{\Delta y_i}{\sigma_i}
+                    - A_i \Delta x \right\|_1 ,
+
+    which track the primal and dual subgradients respectively. They are compared using the
+    balancing scale :math:`s` and the band parameter :math:`\delta > 1`:
+
+    - if :math:`v > s\,\delta\, d` the primal is making less progress, so the primal step
+      is boosted and the dual shrunk,
+      :math:`\tau \leftarrow \tau/(1-\alpha)`, :math:`\sigma_i \leftarrow (1-\alpha)\sigma_i`;
+    - if :math:`v < s\, d/\delta` the opposite tilt is applied,
+      :math:`\tau \leftarrow (1-\alpha)\tau`, :math:`\sigma_i \leftarrow \sigma_i/(1-\alpha)`;
+    - otherwise the step sizes are left unchanged.
+
+    Every dual step size :math:`\sigma_i` is rescaled by the same factor, and each time a
+    tilt is applied the adaptation strength decays, :math:`\alpha \leftarrow \eta\,\alpha`,
+    so the changes become progressively smaller (guaranteeing the summable-deviation
+    condition of :cite:`chambolle2023stochastic`). The products :math:`\tau\sigma_i` are
+    preserved.
+
+    Parameters
+    ----------
+    initial_step_size : list of length two, optional, default=[None, None]
+        Initial primal and dual step sizes ``[tau, sigma]``. ``tau`` is a positive scalar
+        and ``sigma`` is either a positive scalar (broadcast to every operator) or a list
+        of one positive number per operator. Any entry left as ``None`` is filled in from
+        the operator norms and sampling probabilities using the standard SPDHG relations
+        (as in :class:`SPDHGConstantStepSize`).
+    initial_alpha : positive :obj:`float`, optional, default=0.95
+        Initial value of the adaptation strength :math:`\alpha \in (0,1)` controlling the size of the rescaling.
+    eta : positive :obj:`float`, optional, default=0.995
+        The decay factor :math:`\eta \in (0,1)` applied to :math:`\alpha` each time the step sizes are rebalanced.
+    delta : positive :obj:`float`, greater than one, optional, default=1.5
+        The band parameter :math:`\delta` setting how far apart the primal and dual residuals are allowed to drift before rebalancing.
+    s : positive :obj:`float`, optional, default=norm of the operator
+        The balancing scale :math:`s` used to compare the primal and dual residuals. Defaults to the operator norm :math:`\|A\|`, as recommended in :cite:`chambolle2023stochastic`.
+    auto_stop : :obj:`bool`, optional, default=True
+        If True, the adaptive updates stop and the extra storage is released once the step sizes have been unchanged for ``auto_stop_patience`` consecutive iterations.
+    auto_stop_patience : :obj:`int`, optional, default=10
+        Number of consecutive iterations with no change to the step sizes after which the adaptive updates are stopped (only used when ``auto_stop=True``).
+
+    Notes
+    -----
+    The dual step size ``sigma`` is a list with one entry per operator, while ``tau`` is a
+    scalar; :meth:`get_initial_step_size` and :meth:`get_step_size` return the tuple
+    ``(tau, sigma)``. Computing the residuals costs one extra forward and one extra adjoint
+    application per iteration (the overhead discussed in :cite:`chambolle2023stochastic`).
+
+    See Also
+    --------
+    SPDHGAdaptiveStepSizeAngle : The companion angle-alignment rule (rule (b)) from the same paper.
+    PDHGAdaptiveStepSize2013 : The deterministic PDHG rule this generalises.
+
+    Reference
+    ---------
+    Chambolle, A., Delplancke, C., Ehrhardt, M.J., Schönlieb, C.-B. and Tang, J., 2023. Stochastic Primal-Dual Hybrid Gradient Algorithm with Adaptive Step-Sizes. arXiv preprint arXiv:2301.02511. :cite:`chambolle2023stochastic`
+    """
+
+    def __init__(self, initial_step_size=[None, None], initial_alpha=0.95, eta=0.995,
+                 delta=1.5, s=None, auto_stop=True, auto_stop_patience=10):
+        '''Initialises the step size rule'''
+        super().__init__(initial_step_size=initial_step_size, initial_alpha=initial_alpha,
+                         eta=eta, auto_stop=auto_stop, auto_stop_patience=auto_stop_patience)
+        self.delta = delta
+        self.s = s
+
+    def _rebalance(self, algorithm, i, p_i, tau, sigma, dy):
+        if self.s is None:
+            self.s = algorithm.operator.norm()  # default balancing scale, ||A||
+
+        # primal residual (l1 norm of q = res_tmp)
+        v = self.res_tmp.abs().sum()
+        # dual residual  d = || (1/p_i) Delta y_i / sigma_i - A_i Delta x ||_1
+        fwd = algorithm.operator[i].direct(self.x_diff)
+        d_term = dy.sapyb(1.0 / (p_i * sigma[i]), fwd, -1.0)
+        d = d_term.abs().sum()
+
+        log.debug('SPDHG adaptive balancing: v = {}, d = {}, s = {}'.format(v, d, self.s))
+        if v > self.s * self.delta * d:
+            factor = 1 - self.alpha
+            tau_new = tau / factor
+            sigma_new = [si * factor for si in sigma]
+            self.alpha *= self.eta
+            self.count = 0
+            return tau_new, sigma_new, True
+        elif v < self.s * d / self.delta:
+            factor = 1 - self.alpha
+            tau_new = tau * factor
+            sigma_new = [si / factor for si in sigma]
+            self.alpha *= self.eta
+            self.count = 0
+            return tau_new, sigma_new, True
+        return tau, sigma, False
+
+
+class SPDHGAdaptiveStepSizeAngle(_SPDHGAdaptiveStepSizeBase):
+    r"""Adaptively adjusts the SPDHG primal and dual step sizes using the alignment between successive primal directions, following rule (b) of :cite:`chambolle2023stochastic`.
+
+    This is an SPDHG-compatible step-size rule (A-SPDHG rule (b), Algorithm 3.2 of
+    :cite:`chambolle2023stochastic`). It is the stochastic extension of the angle-based
+    adaptive PDHG scheme of Yokota and Hontani, and an alternative to the residual-balancing
+    :class:`SPDHGAdaptiveStepSizeBalancing`.
+
+    At the end of each iteration, with sampled subset :math:`i`, sampling probability
+    :math:`p_i`, primal increment :math:`\Delta x = x^{k} - x^{k+1}` and dual increment
+    :math:`\Delta y_i = y^{k}_i - y^{k+1}_i`, the primal-residual direction is formed
+    (equation (3.8) of :cite:`chambolle2023stochastic`),
+
+    .. math::
+
+        q = \frac{\Delta x}{\tau} - \frac{1}{p_i} A_i^{*}\Delta y_i ,
+
+    and the cosine of the angle between :math:`\Delta x` and :math:`q` is measured
+    (equation (3.9)),
+
+    .. math::
+
+        w = \frac{\langle \Delta x, q\rangle}{\|\Delta x\|_2\,\|q\|_2} .
+
+    The step sizes are then adjusted against the threshold :math:`c` (close to one):
+
+    - if :math:`w \ge c` the directions are well aligned, so the primal step is increased,
+      :math:`\tau \leftarrow (1+\alpha)\tau`, :math:`\sigma_i \leftarrow \sigma_i/(1+\alpha)`;
+    - if :math:`w < 0` the directions oppose, so the primal step is decreased,
+      :math:`\tau \leftarrow \tau/(1+\alpha)`, :math:`\sigma_i \leftarrow (1+\alpha)\sigma_i`;
+    - otherwise the step sizes are left unchanged.
+
+    Every dual step size :math:`\sigma_i` is rescaled by the same factor, and each time the
+    step sizes change the adaptation strength decays, :math:`\alpha \leftarrow \eta\,\alpha`.
+    The products :math:`\tau\sigma_i` are preserved.
+
+    Parameters
+    ----------
+    initial_step_size : list of length two, optional, default=[None, None]
+        Initial primal and dual step sizes ``[tau, sigma]``. ``tau`` is a positive scalar
+        and ``sigma`` is either a positive scalar (broadcast to every operator) or a list
+        of one positive number per operator. Any entry left as ``None`` is filled in from
+        the operator norms and sampling probabilities using the standard SPDHG relations.
+    initial_alpha : positive :obj:`float`, optional, default=1.0
+        Initial value of the adaptation strength :math:`\alpha` controlling the size of the rescaling (the paper uses :math:`\alpha_0 = 1`).
+    eta : positive :obj:`float`, optional, default=0.995
+        The decay factor :math:`\eta \in (0,1)` applied to :math:`\alpha` each time the step sizes change.
+    c : :obj:`float`, optional, default=0.999
+        The cosine threshold :math:`c` above which the primal step size is increased. Should be close to one in high-dimensional problems, as recommended in :cite:`chambolle2023stochastic`.
+    auto_stop : :obj:`bool`, optional, default=True
+        If True, the adaptive updates stop and the extra storage is released once the step sizes have been unchanged for ``auto_stop_patience`` consecutive iterations.
+    auto_stop_patience : :obj:`int`, optional, default=10
+        Number of consecutive iterations with no change to the step sizes after which the adaptive updates are stopped (only used when ``auto_stop=True``).
+
+    Notes
+    -----
+    The dual step size ``sigma`` is a list with one entry per operator, while ``tau`` is a
+    scalar; :meth:`get_initial_step_size` and :meth:`get_step_size` return the tuple
+    ``(tau, sigma)``. Computing the direction costs one extra adjoint application per
+    iteration.
+
+    See Also
+    --------
+    SPDHGAdaptiveStepSizeBalancing : The companion residual-balancing rule (rule (a)) from the same paper.
+
+    Reference
+    ---------
+    Chambolle, A., Delplancke, C., Ehrhardt, M.J., Schönlieb, C.-B. and Tang, J., 2023. Stochastic Primal-Dual Hybrid Gradient Algorithm with Adaptive Step-Sizes. arXiv preprint arXiv:2301.02511. :cite:`chambolle2023stochastic`
+    """
+
+    def __init__(self, initial_step_size=[None, None], initial_alpha=1.0, eta=0.995,
+                 c=0.999, auto_stop=True, auto_stop_patience=10):
+        '''Initialises the step size rule'''
+        super().__init__(initial_step_size=initial_step_size, initial_alpha=initial_alpha,
+                         eta=eta, auto_stop=auto_stop, auto_stop_patience=auto_stop_patience)
+        self.c = c
+
+    def _rebalance(self, algorithm, i, p_i, tau, sigma, dy):
+        # cosine of the angle between Delta x and the primal residual direction q
+        w = self.x_diff.dot(self.res_tmp) / \
+            (self.x_diff.norm() * self.res_tmp.norm())
+
+        log.debug('SPDHG adaptive angle: cos(angle) w = {}'.format(w))
+        if w >= self.c:
+            factor = 1 + self.alpha
+            tau_new = tau * factor
+            sigma_new = [si / factor for si in sigma]
+            self.alpha *= self.eta
+            self.count = 0
+            return tau_new, sigma_new, True
+        elif w < 0:
+            factor = 1 + self.alpha
+            tau_new = tau / factor
+            sigma_new = [si * factor for si in sigma]
+            self.alpha *= self.eta
+            self.count = 0
+            return tau_new, sigma_new, True
+        return tau, sigma, False

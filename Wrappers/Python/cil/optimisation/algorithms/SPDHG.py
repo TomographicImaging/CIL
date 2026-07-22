@@ -319,12 +319,12 @@ class SPDHG(Algorithm):
 
         """
         # Choose subset
-        i = next(self._sampler)
-        
-        self._spdhg_update(i)
+        self._index = next(self._sampler)
+
+        self._spdhg_update(self._index)
         
         # save previous iteration
-        self._save_previous_iteration(i, self.y_k)
+        self._save_previous_iteration(self._index, self.y_k)
         
         self._tau, self._sigma = self.step_size_rule.get_step_size(self)
         

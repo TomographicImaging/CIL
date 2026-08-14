@@ -22,7 +22,7 @@ from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
 from cil.framework import VectorGeometry, VectorData, BlockDataContainer, DataContainer, ImageGeometry, \
-    AcquisitionGeometry
+    AcquisitionGeometry, ImageData
 from cil.framework.labels import FillType
 from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction, soft_shrinkage
@@ -1528,9 +1528,9 @@ class TestTotalVariation(unittest.TestCase):
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_allclose(x.as_array(), checkp2[i].as_array(), rtol=1e-8, atol=1e-8, err_msg="P2 not initially set to zero")
         test=tv.proximal(data, 1.)
-        print(test)
+        #print(test)
         a=np.sum(np.linalg.norm(test))
-        print(np.linalg.norm(test))
+        #print(np.linalg.norm(test))
         for i, x in enumerate(tv._get_p2()):
                 np.testing.assert_equal(np.any(np.not_equal(x.as_array(), checkp2[i].as_array())), True, err_msg="The stored value of p2 doesn't change after calling proximal")
         np.testing.assert_almost_equal(np.sum(np.linalg.norm(test)),126.3372581, err_msg="Incorrect value of the proximal", decimal=4)
@@ -1858,26 +1858,26 @@ class TestIndicatorBox(unittest.TestCase):
         im = ig.allocate(2)
         ib = IndicatorBox(lower=-2 * mask, accelerated=accelerated)
         for val, res in zip([2, -3], [0, np.inf]):
-            print("test1", val, res)
+            #print("test1", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
         im = ig.allocate(2)
         ib = IndicatorBox(lower=-2 * mask, upper=None, accelerated=accelerated)
         for val, res in zip([2, -3], [0, np.inf]):
-            print("test1", val, res)
+            #print("test1", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
         im = ig.allocate(2)
         ib = IndicatorBox(upper=2 * mask, accelerated=accelerated)
         for val, res in zip([-1, 3], [0, np.inf]):
-            print("test2", val, res)
+            #print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
         ib = IndicatorBox(upper=2 * mask, lower=None, accelerated=accelerated)
         for val, res in zip([-1, 3], [0, np.inf]):
-            print("test2", val, res)
+            #print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
@@ -1885,7 +1885,7 @@ class TestIndicatorBox(unittest.TestCase):
                           lower=-2 * mask,
                           accelerated=accelerated)
         for val, res in zip([-1, 1, 3], [np.inf, np.inf, np.inf]):
-            print("test2", val, res)
+            #print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
@@ -1905,7 +1905,7 @@ class TestIndicatorBox(unittest.TestCase):
         ib = IndicatorBox(lower=-2 * mask, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([2, -3], [0, 0]):
-            print("test1", val, res)
+            #print("test1", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
@@ -1913,14 +1913,14 @@ class TestIndicatorBox(unittest.TestCase):
         ib = IndicatorBox(upper=2 * mask, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([-1, 3], [0, 0]):
-            print("test2", val, res)
+            #print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
         ib = IndicatorBox(lower=-2 * mask, upper=None, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([2, -3], [0, 0]):
-            print("test1", val, res)
+            #print("test1", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
@@ -1928,7 +1928,7 @@ class TestIndicatorBox(unittest.TestCase):
         ib = IndicatorBox(upper=2 * mask, lower=None, accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([-1, 3], [0, 0]):
-            print("test2", val, res)
+            #print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
@@ -1937,7 +1937,7 @@ class TestIndicatorBox(unittest.TestCase):
                           accelerated=accelerated)
         ib.set_suppress_evaluation(True)
         for val, res in zip([-1, 1, 3], [0, 0, 0]):
-            print("test2", val, res)
+            #print("test2", val, res)
             im.fill(val)
             np.testing.assert_equal(ib(im), res)
 
@@ -1965,7 +1965,7 @@ class TestIndicatorBox(unittest.TestCase):
         ib = IndicatorBox(upper=2 * mask, accelerated=accelerated)
         for val, res in zip([-1, 3], [ig.allocate(-1), 2 * mask]):
             # log.info("test1 %r %r", val, res)
-            print("test2", val, res)
+            #print("test2", val, res)
             im.fill(val)
             np.testing.assert_allclose(
                 ib.proximal(im, 1).as_array(), res.as_array())
@@ -1975,7 +1975,7 @@ class TestIndicatorBox(unittest.TestCase):
                           lower=-2 * mask,
                           accelerated=accelerated)
         for val, res in zip([-1, -3, 1], [-1 * mask, -2 * mask, 1 * mask]):
-            print("test3", val, res)
+            #print("test3", val, res)
             im.fill(val)
             np.testing.assert_allclose(
                 ib.proximal(im, 1).as_array(), res.as_array())
@@ -2270,24 +2270,58 @@ class TestHuberLoss(unittest.TestCase):
 
         f1 = HuberLoss(self.A, b,huber_delta, c, weight=weight)
         f2 = HuberLoss(self.A, b,huber_delta, c)
-        # check gradient with weight
-        out = self.ig.allocate(None)
-
 
         huber_delta_array = self.ig.allocate(huber_delta)
 
         # check call with weight
         res1 = (c*huber_delta_array * weight* ((self.A.direct(x) - b).abs() - 0.5*huber_delta_array)).sum()
         res2 = f1(x)
-        print(type(res1), type(res2))
         numpy.testing.assert_almost_equal(res1, res2)
-
 
         # check call without weight
         res1 = (c*huber_delta_array * ((self.A.direct(x) - b).abs() - 0.5*huber_delta_array)).sum()
         res2 = f2(x)
         numpy.testing.assert_almost_equal(res1, res2)
-    
+
+    def test_call_elementwise(self):
+
+        ig = ImageGeometry(2, 2)
+        A = IdentityOperator(ig)
+
+        huber_delta = 0.5
+        numpy.random.seed(1)
+
+        x_array = np.array([[0.2, 0.9], [0.2, 0.9]], dtype=np.float32)
+        x = ImageData(x_array, geometry=ig)
+        
+        b_array = np.array([[0.1, 0.1], [0.1, 0.1]], dtype=np.float32)
+        b = ImageData(b_array, geometry=ig)
+
+        c=2.0
+
+        f1 = HuberLoss(A, b,huber_delta, c)
+
+        # check call without weight
+        # for element 0 it less than huber_delta, so it should be 0.5 * c * (r^2)
+        # for element 1 it greater than huber_delta, so it should be c *huber_delta * (abs(r) - 0.5 * huber_delta)
+        r = self.A.direct(x) - b
+        res = f1(x)
+
+        expected_elem0 = 0.5 *c * (r.array[0][0]**2)
+        expected_elem1 = c * huber_delta * (np.abs(r.array[0][1]) - 0.5 * huber_delta)
+
+        numpy.testing.assert_almost_equal(res, (expected_elem0 + expected_elem1)*2)
+
+        weight = ImageData(np.array([[2.0, 1.0], [2.0, 1.0]], dtype=np.float32), geometry=ig)
+        f2 = HuberLoss(A, b,huber_delta, c, weight=weight)
+        res = f2(x)
+
+        expected_elem0 = 0.5 *c * (r.array[0][0]**2) * weight.array[0][0]
+        expected_elem1 = c * huber_delta * (np.abs(r.array[0][1]) - 0.5 * huber_delta) * weight.array[0][1]
+
+        numpy.testing.assert_almost_equal(res, (expected_elem0 + expected_elem1)*2)
+
+
     def test_gradient_r_less_than_delta(self):
         numpy.random.seed(1)
         b = self.ig.allocate('random', seed=3)
@@ -2436,15 +2470,13 @@ class TestHuberLoss(unittest.TestCase):
         ig = self.ig
         A = self.A
         b = ig.allocate(1)
-        c = 1.
         # Check that negative huber_delta raises an error
         with self.assertRaises(ValueError):
-            HuberLoss(A, b, huber_delta=-1.0, c=c)
+            HuberLoss(A, b, huber_delta=-1.0)
 
     def test_Lipschitz(self):
         numpy.random.seed(1)
         b = self.ig.allocate('random', seed=3)
-        x = self.ig.allocate('random', seed=4)
         c = numpy.float64(0.3)
 
         weight = self.ig.allocate('random', seed=5)

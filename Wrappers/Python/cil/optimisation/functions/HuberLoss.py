@@ -68,7 +68,7 @@ class HuberLoss(Function):
 
         if weight is not None:
             if (self.weight < 0).any():
-                raise ValueError("Weight contains negative values")
+                raise ValueError("weight contains negative values")
 
     def __call__(self, x):
 

@@ -32,7 +32,7 @@ from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2Norm
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          SmoothMixedL21Norm, OperatorCompositionFunction,\
                                          Rosenbrock, IndicatorBox, TotalVariation, ScaledFunction, SumFunction, SumScalarFunction, \
-                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction, L1Sparsity, FunctionOfAbs
+                                         WeightedL2NormSquared, MixedL11Norm, ZeroFunction, L1Sparsity, FunctionOfAbs, HuberLoss
 
 from cil.optimisation.functions import BlockFunction
 
@@ -1614,7 +1614,7 @@ class TestLeastSquares(unittest.TestCase):
         twicels.gradient(x, out=y1)
         np.testing.assert_array_almost_equal(constant * y2.as_array(),
                                              y1.as_array())
-
+   
 
 # tests for OperatorCompositionFunction
 class TestOperatorCompositionFunctionWithWrongInterfaceFunction(
@@ -2226,3 +2226,238 @@ class TestFunctionOfAbs(unittest.TestCase):
         self.assertEqual(self.abs_function.convex_conjugate(self.data_real32), 0.)
 
 
+class TestHuberLoss(unittest.TestCase):
+
+    def setUp(self) -> None:
+        ig = ImageGeometry(40, 30)
+        A = IdentityOperator(ig)
+        self.A = A
+        self.ig = ig
+        return super().setUp()
+
+    def test_call_r_less_than_delta(self):
+        numpy.random.seed(1)
+        b = self.ig.allocate('random', seed=3)
+        x = self.ig.allocate('random', seed=4)
+        c = numpy.float32(0.3)
+        weight = self.ig.allocate('random', seed=5)
+        f1 = HuberLoss(self.A, b,10000, c, weight=weight)
+        f2 = HuberLoss(self.A, b,10000, c)
+
+        # check call with weight
+        res1 = c/2 * (self.A.direct(x) - b).dot(weight * (self.A.direct(x) - b))
+        res2 = f1(x)
+        numpy.testing.assert_almost_equal(res1, res2, decimal=5)
+
+        # check call without weight
+        res1 = c/2 * (self.A.direct(x) - b).squared_norm()
+        res2 = f2(x)
+        numpy.testing.assert_almost_equal(res1, res2, decimal=5)
+    
+    def test_call_r_greater_than_delta(self):
+        huber_delta = 1e-5
+
+        numpy.random.seed(1)
+        
+        b = self.ig.allocate('random', seed=3)
+        x = self.ig.allocate('random', seed=4)
+        # need to allocate random but make sure Ax-b is greater than huber_delta
+        res = self.A.direct(x) - b
+        mask = np.abs(res.as_array()) < huber_delta
+        res.array[mask] = huber_delta + 1e-1
+        b = self.A.direct(x) - res
+        c = numpy.float32(0.3)
+
+        weight = self.ig.allocate('random', seed=5)
+
+        f1 = HuberLoss(self.A, b,huber_delta, c, weight=weight)
+        f2 = HuberLoss(self.A, b,huber_delta, c)
+        # check gradient with weight
+        out = self.ig.allocate(None)
+
+
+        huber_delta_array = self.ig.allocate(huber_delta)
+
+        # check call with weight
+        res1 = (c*huber_delta_array * weight* ((self.A.direct(x) - b).abs() - 0.5*huber_delta_array)).sum()
+        res2 = f1(x)
+        print(type(res1), type(res2))
+        numpy.testing.assert_almost_equal(res1, res2)
+
+
+        # check call without weight
+        res1 = (c*huber_delta_array * ((self.A.direct(x) - b).abs() - 0.5*huber_delta_array)).sum()
+        res2 = f2(x)
+        numpy.testing.assert_almost_equal(res1, res2)
+    
+    def test_gradient_r_less_than_delta(self):
+        numpy.random.seed(1)
+        b = self.ig.allocate('random', seed=3)
+        x = self.ig.allocate('random', seed=4)
+        c = numpy.float64(0.3)
+
+        weight = self.ig.allocate('random', seed=5)
+
+        f1 = HuberLoss(self.A, b,np.inf, c, weight=weight)
+        f2 = HuberLoss(self.A, b,np.inf, c)
+        # check gradient with weight
+        out = self.ig.allocate(None)
+        res1 = f1.gradient(x)
+        f1.gradient(x, out=out)
+        res2 = c * self.A.adjoint(weight * (self.A.direct(x) - b))
+
+        numpy.testing.assert_array_almost_equal(res1.as_array(),
+                                                res2.as_array())
+        numpy.testing.assert_array_almost_equal(out.as_array(),
+                                                res2.as_array())
+
+        #check gradient without weight
+        out = self.ig.allocate()
+        res1 = f2.gradient(x)
+        f2.gradient(x, out=out)
+        res2 = c * self.A.adjoint(self.A.direct(x) - b)
+        numpy.testing.assert_array_almost_equal(res1.as_array(),
+                                                res2.as_array())
+        numpy.testing.assert_array_almost_equal(out.as_array(),
+                                                res2.as_array())
+
+    def test_gradient_r_greater_than_delta(self):
+        huber_delta = 1e-20
+
+        numpy.random.seed(1)
+
+        A = IdentityOperator(self.ig)
+        
+        b = self.ig.allocate('random', seed=3)
+        x = self.ig.allocate('random', seed=4)
+        # need to allocate random but make sure Ax-b is greater than huber_delta
+        res = A.direct(x) - b
+        mask = np.abs(res.as_array()) < huber_delta
+        res.array[mask] = huber_delta + 1e-1
+        b = A.direct(x) - res
+        c = numpy.float64(0.3)
+
+        weight = self.ig.allocate('random', seed=5)
+
+        f1 = HuberLoss(A, b,huber_delta, c, weight=weight)
+        f2 = HuberLoss(A, b,huber_delta, c)
+        # check gradient with weight
+        out = self.ig.allocate(None)
+        res1 = f1.gradient(x)
+        f1.gradient(x, out=out)
+        huber_delta_array = self.ig.allocate(huber_delta)
+        res2 = c * A.adjoint(huber_delta_array)
+
+        numpy.testing.assert_array_almost_equal(res1.as_array(),
+                                                res2.as_array())
+        numpy.testing.assert_array_almost_equal(out.as_array(),
+                                                res2.as_array())
+
+        #check gradient without weight
+        out = self.ig.allocate()
+        res1 = f2.gradient(x)
+        f2.gradient(x, out=out)
+        res2 = c * A.adjoint(huber_delta_array)
+        numpy.testing.assert_array_almost_equal(res1.as_array(),
+                                                res2.as_array())
+        numpy.testing.assert_array_almost_equal(out.as_array(),
+                                                res2.as_array())
+    
+    def test_rmul(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        c = 1.
+        constant = 2.
+        hl = HuberLoss(A, b, huber_delta=1.0, c=c)
+        twice = constant * hl
+
+        assert constant * hl.c == twice.c
+
+    def test_rmul_with_call(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        x = ig.allocate(3)
+        c = 1.
+        constant = 2.
+        hl = HuberLoss(A, b, huber_delta=1.0, c=c)
+        twice = constant * hl
+        np.testing.assert_almost_equal(constant * hl(x), twice(x))
+
+    def test_rmul_with_Lipschitz(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        x = ig.allocate(3)
+        c = 1.
+        constant = 2.
+        hl = HuberLoss(A, b, huber_delta=1.0, c=c)
+        twice = constant * hl
+
+        np.testing.assert_almost_equal(constant * hl.L, twice.L)
+
+    def test_rmul_with_gradient(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        x = ig.allocate(3)
+        c = 1.
+        constant = 2.
+        hl = HuberLoss(A, b, huber_delta=1.0, c=c)
+        twice = constant * hl
+
+        y1 = hl.gradient(x)
+        y2 = twice.gradient(x)
+        np.testing.assert_array_almost_equal(constant * y1.as_array(),
+                                             y2.as_array())
+
+        hl.gradient(x, out=y2)
+        twice.gradient(x, out=y1)
+        np.testing.assert_array_almost_equal(constant * y2.as_array(),
+                                             y1.as_array())
+        
+    def test_weights_input(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        x = ig.allocate(3)
+        c = 1.
+        weights = ig.allocate('random', seed=5)
+        hl = HuberLoss(A, b, huber_delta=1.0, c=c, weight=weights)
+
+        # Check that the weights are correctly set
+        np.testing.assert_array_almost_equal(hl.weight.as_array(), weights.as_array())
+
+        # do negative values in weights and check it raises an error
+        weights_neg = ig.allocate(-1)
+        with self.assertRaises(ValueError):
+            HuberLoss(A, b, huber_delta=1.0, c=c, weight=weights_neg)
+
+    def test_huber_delta_input(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        c = 1.
+        # Check that negative huber_delta raises an error
+        with self.assertRaises(ValueError):
+            HuberLoss(A, b, huber_delta=-1.0, c=c)
+
+    def test_Lipschitz(self):
+        numpy.random.seed(1)
+        b = self.ig.allocate('random', seed=3)
+        x = self.ig.allocate('random', seed=4)
+        c = numpy.float64(0.3)
+
+        weight = self.ig.allocate('random', seed=5)
+
+        D = DiagonalOperator(weight)
+        norm_weight = numpy.float64(D.norm())
+
+        f1 = HuberLoss(self.A, b,10000, c, weight=weight)
+        f2 = HuberLoss(self.A, b,10000, c)
+
+        # check Lipschitz
+        numpy.testing.assert_almost_equal(f2.L,  c * (self.A.norm()**2))
+        numpy.testing.assert_almost_equal(
+            f1.L, c * norm_weight * (self.A.norm()**2))

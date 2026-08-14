@@ -45,7 +45,7 @@ class LeastSquares(Function):
     Note
     --------
 
-    L is the  Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||A||_2^2 = 2 c \sigma_1(A)^2`, or :math:`2 c ||W|| ||A||_2^2 = 2c||W|| \sigma_1(A)^2`, where :math:`\sigma_1(A)` is the largest singular value of :math:`A` and :math:`W=\text{diag}(weight)`.
+    L is the  Lipschitz Constant of the gradient of :math:`F` which is :math:`2 c ||A||_2^2 = 2 c \sigma_1(A)^2`, or :math:`2 c ||W|| ||A||_2^2 = 2c||W|| \sigma_1(A)^2`, where :math:`\sigma_1(A)` is the largest singular value of :math:`A` and :math:`W=\text{diag}(weight)`.
 
     """
 

@@ -16,12 +16,8 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
-
-import warnings
-
 from numbers import Number
 import numpy as np
-from functools import reduce
 from cil.utilities.errors import InPlaceError
 
 
@@ -319,10 +315,7 @@ class SumFunction(Function):
         .. math:: (F_{1} + F_{2} + ... + F_{n})(x) = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)
 
         """
-        ret = 0.
-        for f in self.functions:
-            ret += f(x)
-        return ret
+        return sum(f(x) for f in self.functions)
 
     def gradient(self, x, out=None):
         r"""Returns the value of the sum of the gradient of functions evaluated at :math:`x`, if all of them are differentiable.

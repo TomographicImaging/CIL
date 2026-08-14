@@ -781,7 +781,7 @@ class _ShowGeometry(object):
         world_limits = self.ax.get_w_lims()
         self.ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
-        l = self.ax.plot(np.NaN, np.NaN, '-', color='none', label='')[0]
+        l = self.ax.plot(np.nan, np.nan, '-', color='none', label='')[0]
 
         for i in range(3):
             self.handles.insert(2,l)
@@ -945,8 +945,8 @@ class _ShowGeometry(object):
 
             count = 0
             for x in combos:
-                s = rotation_matrix.dot(np.asarray(x[0]).reshape(3,1))
-                e = rotation_matrix.dot(np.asarray(x[1]).reshape(3,1))
+                s = rotation_matrix.dot(np.asarray(x[0]).reshape(3))
+                e = rotation_matrix.dot(np.asarray(x[1]).reshape(3))
 
                 x_data = float(s[0]) + ro[0], float(e[0]) + ro[0]
                 y_data = float(s[1]) + ro[1], float(e[1]) + ro[1]
@@ -974,7 +974,7 @@ class _ShowGeometry(object):
 
         for i in range(points):
             theta = i * (np.pi * 1.8) /36
-            point_i = np.array([np.sin(theta),-np.cos(theta),0]).reshape(3,1)
+            point_i = np.array([np.sin(theta),-np.cos(theta),0]).reshape(3)
             point_rot = -self.scale*0.5*rotation_matrix.dot(point_i)
 
             x[i] = float(point_rot[0] + ro[0])

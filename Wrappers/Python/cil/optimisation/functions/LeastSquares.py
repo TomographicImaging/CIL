@@ -18,7 +18,6 @@
 
 from cil.optimisation.operators import LinearOperator, DiagonalOperator
 from cil.optimisation.functions import Function
-from cil.framework import DataContainer
 import warnings
 from numbers import Number
 import numpy as np
@@ -121,11 +120,11 @@ class LeastSquares(Function):
         # Compute the Lipschitz parameter from the operator if possible
         # Leave it initialised to None otherwise
         try:
-            self._L = 2.0 * np.abs(self.c) * (self.A.norm()**2)
+            self._L = 2 * np.abs(self.c) * (self.A.norm()**2)
         except AttributeError as ae:
             if self.A.is_linear():
                 Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
-                self._L = 2.0 * np.abs(self.c) * (Anorm*Anorm)
+                self._L = 2 * np.abs(self.c) * (Anorm*Anorm)
             else:
                 warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
                 self.__class__.__name__, ae))

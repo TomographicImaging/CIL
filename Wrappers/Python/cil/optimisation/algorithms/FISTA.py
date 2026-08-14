@@ -79,7 +79,7 @@ class ISTA(Algorithm):
     Note
     ----
     The ISTA algorithm is equivalent to the Proximal Gradient Descent (PGD) algorithm. In CIL, the PGD algorithm is an alias for the ISTA algorithm.
-    
+
     Examples
     --------
 
@@ -117,24 +117,22 @@ class ISTA(Algorithm):
         '''
         Returns the most recently used step size. Note, if the step-size is set by a non-constant step size rule, you must use the algorithm run or update method before this getter will return the most recently used step size. 
         '''
-        
+
         if isinstance(self.step_size_rule, ConstantStepSize):
             return self.step_size_rule.step_size
         else:
-            try: 
+            try:
                 return self._step_size
             except AttributeError:
-                raise NotImplementedError("Note the step-size is set by a step-size rule and could change with each iteration. Call the algorithm run or update method first and then this function will give the most recently used step size.")
+                raise NotImplementedError(
+                    "Note the step-size is set by a step-size rule and could change with each iteration. Call the algorithm run or update method first and then this function will give the most recently used step size.")
 
     # Set default step size
     def _calculate_default_step_size(self):
         """ Calculates the default step size if a step size rule or a step size is not provided. 
         """
 
-        
         return 0.99*2.0/self.f.L
-
-        
 
     def __init__(self, initial, f, g, step_size=None, preconditioner=None, **kwargs):
 
@@ -173,7 +171,7 @@ class ISTA(Algorithm):
             self.step_size_rule = ConstantStepSize(step_size)
         elif isinstance(step_size, StepSizeRule):
             self.step_size_rule = step_size
-        
+
         self.preconditioner = preconditioner
 
         self.configured = True
@@ -195,7 +193,8 @@ class ISTA(Algorithm):
         try:
             self._step_size = self.step_size_rule.get_step_size(self)
         except NameError:
-            raise NameError(msg='`step_size` must be `None`, a real float or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`')
+            raise NameError(
+                msg='`step_size` must be `None`, a real float or a child class of :meth:`cil.optimisation.utilities.StepSizeRule`')
 
         self.x_old.sapyb(1., self.gradient_update, -self._step_size, out=self.x_old)
 
@@ -219,19 +218,21 @@ class ISTA(Algorithm):
         .. math:: f(x) + g(x)
 
         """
-        self.loss.append(self.calculate_objective_function_at_point(self.x_old))
+        self.loss.append(
+            self.calculate_objective_function_at_point(self.x_old))
 
     def calculate_objective_function_at_point(self, x):
         """ Calculates the objective at a given point x
 
         .. math:: f(x) + g(x)
-        
+
         Parameters
         ----------
         x : DataContainer
-        
+
         """
         return self.f(x) + self.g(x)
+
 
 class FISTA(ISTA):
 
@@ -310,8 +311,6 @@ class FISTA(ISTA):
         """
         return 1./self.f.L
 
-
-
     def _provable_convergence_condition(self):
         if self.preconditioner is not None:
             raise NotImplementedError(
@@ -361,4 +360,3 @@ class FISTA(ISTA):
 
         self.x.subtract(self.x_old, out=self.y)
         self.y.sapyb(((self.t_old-1)/self.t), self.x, 1.0, out=self.y)
-

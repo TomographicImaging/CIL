@@ -23,7 +23,6 @@ from numbers import Number
 
 from cil.optimisation.functions import Function
 from cil.optimisation.operators import DiagonalOperator, LinearOperator
-from cil.framework import DataContainer
 
 class HuberLoss(Function):
     r"""
@@ -37,6 +36,9 @@ class HuberLoss(Function):
             0.5 * r^2 & \text{if } |r| \leq \delta \\
             \delta * (|r| - 0.5*\delta) & \text{otherwise}
         \end{cases}
+
+    .. math::
+        HuberLoss_\delta(x) = c * \sum_i w_i \phi_\delta([Ax - b]_i)
 
     Parameters
     ----------

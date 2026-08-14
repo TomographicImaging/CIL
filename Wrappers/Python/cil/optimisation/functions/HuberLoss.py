@@ -38,18 +38,35 @@ class HuberLoss(Function):
         \end{cases}
 
     .. math::
-        HuberLoss_\delta(x) = c * \sum_i w_i \phi_\delta([Ax - b]_i)
+    The (Weighted) Huber loss acts element wise on the residual :math:`r = Ax - b`:. For small values of the residual it acts like a least squares loss and for larger values it acts like an absolute error loss. The idea is that the resulting loss is differentiable and stongly convex close to the minimum while also being robust to outliers far from the minimum.  A positive scalar :math:`\delta` controls the change point between the least squares and absolute error loss. 
+
+    First define a function, acting on  :math:`d\in\mathbb{R}`
+
+    .. math::
+        \phi_\delta(d) =
+        \begin{cases}
+            0.5 * r^2 & \text{if } |d| \leq \delta \\
+            \delta * (|d| - 0.5*\delta) & \text{otherwise.}
+        \end{cases}
+        
+     This is then applied element wise to give the :code: `HuberLoss`:
+
+    .. math::
+        \mathtt{HuberLoss}_\delta(x) = c * \sum_i w_i \phi_\delta([Ax - b]_i).
+
+Note that :math:`c\in\mathbb{R}` is an optional scalar constant and :math:`w` is an optional weighting vector in range of the operator, :math:`A`, which defaults to a vector of 1s. 
+
 
     Parameters
     ----------
     A : LinearOperator
     b : Data, DataContainer
     huber_delta : float
-        Transition point between L2 and L1 behaviour
+        Transition point between L2 and L1 behaviour. Must be positive. 
     c : float, default 1.0
         Scaling constant
     weight : DataContainer, optional
-        Positive diagonal weights
+        DataContainer with all positive elements of size of the range of operator A, default None
     """
 
     def __init__(self, A, b, huber_delta, c=1.0, weight=None):
@@ -100,7 +117,49 @@ class HuberLoss(Function):
 
 
     def gradient(self, x, out=None):
+def gradient(self, x, out=None):
+    r"""
+    Returns the gradient of the Huber loss.
 
+    For the residual
+
+    .. math::
+        r = Ax - b,
+
+    the derivative of the Huber function is
+
+    .. math::
+        \phi_\delta'(r) =
+        \begin{cases}
+            r & \text{if } |r| \leq \delta \\
+            \delta \operatorname{sign}(r) & \text{otherwise}.
+        \end{cases}
+
+    Therefore the gradient with respect to :math:`x` is
+
+    .. math::
+        \nabla f(x) =
+        cA^T\left(
+        w \odot
+        \phi_\delta'(Ax-b)
+        \right),
+
+    where :math:`w` denotes the optional weights and
+    :math:`\odot` denotes element-wise multiplication. If no
+    weights are supplied, :math:`w=1`.
+
+    Parameters
+    ----------
+    x : DataContainer
+        Point at which the gradient is evaluated.
+    out : DataContainer, optional
+        Container in which to store the result.
+
+    Returns
+    -------
+    DataContainer
+        The gradient of the Huber loss evaluated at ``x``.
+    """
         if out is None:
             out = x * 0.0
 
@@ -142,15 +201,49 @@ class HuberLoss(Function):
             raise TypeError("The Lipschitz constant must be non-negative")
 
     def calculate_Lipschitz(self):
-        """
-        Lipschitz constant of gradient.
+        r"""
+Calculate the Lipschitz constant of the gradient.
 
-        For Huber:
-            .. math:: \max \phi'' = 1
-        so:
-            .. math:: L = c * ||A||^2
-        (weighted: multiplied by :math:`||W||`)
-        """
+For the Huber function
+
+.. math::
+
+    \max_r \phi_\delta''(r) = 1.
+
+Therefore, for
+
+.. math::
+
+    f(x) =
+    c \sum_i w_i\,\phi_\delta((Ax-b)_i),
+
+the Hessian satisfies
+
+.. math::
+
+    \nabla^2 f(x)
+    =
+    c\,A^T W D(x) A,
+
+where :math:`D(x)` is a diagonal operator with entries
+:math:`\phi_\delta''((Ax-b)_i)`.
+
+It follows that a Lipschitz constant for the gradient is
+
+.. math::
+
+    L = |c|\,\|A\|^2,
+
+or, in the weighted case,
+
+.. math::
+
+    L = |c|\,\|W\|\,\|A\|^2,
+
+where :math:`W` is the diagonal operator defined by
+``weight``.
+
+"""
         try:
             self._L = np.abs(self.c) * (self.A.norm() ** 2)
         except AttributeError:

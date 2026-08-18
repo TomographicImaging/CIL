@@ -125,6 +125,7 @@ class PD3O(Algorithm):
         Yan, M. A New Primal–Dual Algorithm for Minimizing the Sum of Three Functions with a Linear Operator. J Sci Comput 76, 1698–1717 (2018). https://doi.org/10.1007/s10915-018-0680-3
      """
 
+
     def __init__(self, f, g, h, operator, delta=None, gamma=None, initial=None, **kwargs):
 
         super(PD3O, self).__init__(**kwargs)
@@ -138,8 +139,7 @@ class PD3O(Algorithm):
         logging.info("{} setting up".format(self.__class__.__name__, ))
 
         if isinstance(f, ZeroFunction):
-            warnings.warn(
-                " If f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma ", UserWarning)
+            warnings.warn(" If f is the ZeroFunction, then PD3O = PDHG. Please use PDHG instead. Otherwise, select a relatively small parameter gamma ", UserWarning)
             if gamma is None:
                 gamma = 1.0/operator.norm()
 
@@ -177,12 +177,14 @@ class PD3O(Algorithm):
         self.s_old.sapyb(1, self.s, self.delta, out=self.s_old)
         self.h.proximal_conjugate(self.s_old, self.delta, out=self.s)
 
+
     def update(self):
         r""" Performs a single iteration of the PD3O algorithm
         """
 
         # Following equations 4 in https://link.springer.com/article/10.1007/s10915-018-0680-3
         # in this case order of proximal steps we recover the (primal) PDHG, when f=0
+
 
         tmp = self.x_old
         self.x_old = self.x

@@ -567,8 +567,6 @@ class DataContainer(object):
             return _out
         return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
 
-
-    
     def power(self, other, *args, **kwargs):
         return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)
 
@@ -577,8 +575,6 @@ class DataContainer(object):
 
     def minimum(self,x2, out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
-    
-    
 
 
     def sapyb(self, a, y, b, out=None, num_threads=NUM_THREADS):

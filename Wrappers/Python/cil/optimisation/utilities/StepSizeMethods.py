@@ -127,11 +127,8 @@ def _spdhg_sigma_from_gamma(gamma, rho, norms):
 def _spdhg_tau_from_sigma(sigma, norms, prob_weights, rho):
     """Primal SPDHG step size consistent with the dual step sizes ``sigma``.
 
-    Blocks are skipped only when they impose no constraint at all: a zero operator
-    norm contributes nothing to :math:`\\tau\\sigma_i\\|K_i\\|^2 \\leq \\rho p_i`, and a
-    block with zero probability is never sampled. Every other block must be honoured,
-    however small its candidate value -- discarding small candidates would drop
-    precisely the constraints that bind and return a tau that violates convergence.
+    Under the requirement that :math:`\\tau\\sigma_i\\|K_i\\|^2 \\leq \\rho p_i`, where :math:`p_i` is the probability weight for operator :math:`K_i`, 
+    :math:`\\tau` is returned that satisfies this for all operators.
     """
     values = [rho * pi / (si * ni**2)
               for pi, ni, si in zip(prob_weights, norms, sigma)
@@ -289,13 +286,11 @@ class ArmijoStepSizeRule(StepSizeRule):
             k += 1.
             self.alpha *= self.beta
 
-
         log.info("Armijo rule took %d iterations to find step size", k)
 
         if k == self.max_iterations:
             raise ValueError(
                 'Could not find a proper step_size in {} loops. Consider increasing alpha or max_iterations.'.format(self.max_iterations))
-
 
         return self.alpha
 
@@ -382,7 +377,6 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
             self.store_grad = algorithm.gradient_update.copy()
             return self.initial
 
-
         gradient_norm = algorithm.gradient_update.norm()
         # If the gradient is zero, gradient based algorithms will not update and te step size calculation will divide by zero so we stop iterations.
         if gradient_norm < 1e-8:
@@ -410,7 +404,6 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         # We store the last iterate and gradient in order to calculate the BB step size
         self.store_x.fill(algorithm.x)
         self.store_grad.fill(algorithm.gradient_update)
-
 
         if self.mode == "alternate":
             self.is_short = not self.is_short
@@ -689,14 +682,14 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
                     algorithm._sigma /= (1 - self.alpha)
                     self.alpha *= self.eta
                     self.count = 0
-                    log.debug('p_norm < (s*delta)*d_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
+                    log.debug('p_norm < (s/delta)*d_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
                         algorithm._tau, algorithm._sigma))
                 elif (self.s*self.delta)*self.d_norm < self.p_norm:
                     algorithm._tau /= (1 - self.alpha)
                     algorithm._sigma *= (1 - self.alpha)
                     self.alpha *= self.eta
                     self.count = 0
-                    log.debug('(s*delta)*p_norm < d_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
+                    log.debug('(s*delta)*d_norm < p_norm so rebalancing step sizes, new step sizes are tau = {}, sigma ={}'.format(
                         algorithm._tau, algorithm._sigma))
                 else:
                     log.debug('No change from the rebalancing step, step sizes are tau = {}, sigma ={}'.format(
@@ -885,7 +878,6 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
                     log.warning('Backtracking step did not converge after {} iterations, backtracking value b = {}, step sizes are tau = {}, sigma = {}'.format(
                         self.inner_iterations, b, algorithm._tau, algorithm._sigma))
 
-
                 self._calculate_pnorm_dnorm(algorithm)
                 log.debug('Started the rebalancing step with p_norm = {}, d_norm = {}'.format(
                     self.p_norm, self.d_norm))
@@ -948,9 +940,9 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
         algorithm.operator.adjoint(self.y_resid, out=algorithm.x_tmp)
         algorithm.operator.direct(self.x_resid, out=algorithm.y_tmp)
         self.x_resid.sapyb((1/algorithm._tau),
-                            algorithm.x_tmp, -1.0, out=algorithm.x_tmp)
+                           algorithm.x_tmp, -1.0, out=algorithm.x_tmp)
         self.y_resid.sapyb((1/algorithm._sigma),
-                            algorithm.y_tmp, -1.0, out=algorithm.y_tmp)
+                           algorithm.y_tmp, -1.0, out=algorithm.y_tmp)
         self.p_norm = algorithm.x_tmp.norm()
         self.d_norm = algorithm.operator.norm()*algorithm.y_tmp.norm()
 
@@ -965,6 +957,9 @@ class _BayesOptimisationStepSizeBase(StepSizeRule):
 
     Subclasses implement :meth:`_step_sizes_from_gamma` (the mapping from ``gamma`` to
     the ``(tau, sigma)`` step sizes) and may override :meth:`_default_n_iterations`.
+
+    Once the search has run, the chosen ratio is available as ``gamma`` and the step
+    sizes it produced as ``tau`` and ``sigma``.
     """
 
     def __init__(self, gamma_bounds=None, n_initial_points=5, n_calls=20, n_iterations=None, seed=None, plot=False):
@@ -977,6 +972,21 @@ class _BayesOptimisationStepSizeBase(StepSizeRule):
             if gamma_bounds[0] <= 0 or gamma_bounds[1] <= 0:
                 raise ValueError(
                     "gamma_bounds should be positive and strictly greater than zero, gamma_bounds = {}".format(gamma_bounds))
+            if gamma_bounds[0] >= gamma_bounds[1]:
+                raise ValueError(
+                    "gamma_bounds should be increasing, gamma_bounds = {}".format(gamma_bounds))
+
+        if not (isinstance(n_initial_points, (int, np.integer)) and n_initial_points > 0):
+            raise ValueError(
+                "n_initial_points should be a positive integer, n_initial_points = {}".format(n_initial_points))
+        if not (isinstance(n_calls, (int, np.integer)) and n_calls >= n_initial_points):
+            raise ValueError(
+                "n_calls should be an integer greater than or equal to n_initial_points = {}, n_calls = {}".format(n_initial_points, n_calls))
+        # the objective of each trial is read off after n_iterations-1 updates, so a
+        # single iteration would leave nothing to read
+        if n_iterations is not None and not (isinstance(n_iterations, (int, np.integer)) and n_iterations > 1):
+            raise ValueError(
+                "n_iterations should be an integer greater than one, or None, n_iterations = {}".format(n_iterations))
 
         self.n_initial_points = n_initial_points
         self.n_calls = n_calls
@@ -1020,17 +1030,16 @@ class _BayesOptimisationStepSizeBase(StepSizeRule):
             np.log(self.gamma_bounds[0]), np.log(self.gamma_bounds[1]))
         update_objective_interval = algorithm.update_objective_interval
 
-        
-            
         def objective_function(log_gamma):
+            """ Objective function for the Bayesian optimisation. Evaluates the algorithm for a given log(gamma) and returns the objective function value after n_iterations."""
             gamma = np.exp(log_gamma[0])
             log.debug(
                 "Evaluating objective function for gamma = {}".format(gamma))
             # Set the step sizes based on the current gamma
             tau, sigma = self._step_sizes_from_gamma(algorithm, gamma)
-            
-            self._algorithm_set_up(algorithm, [tau,sigma])
-            
+
+            self._algorithm_set_up(algorithm, [tau, sigma])
+
             try:
                 with np.errstate(over='raise'):
                     algorithm.run(self.n_iterations, callbacks=[])
@@ -1045,20 +1054,18 @@ class _BayesOptimisationStepSizeBase(StepSizeRule):
                 return 1e10  # large penalty
             return algorithm.objective[-1]
 
-
         algorithm.update_objective_interval = self.n_iterations-1
         gp_result = gp_minimize(objective_function, [
-                                    log_gamma_bounds], n_random_starts=self.n_initial_points, n_calls=self.n_calls, initial_point_generator="lhs", random_state=self.seed)
+            log_gamma_bounds], n_random_starts=self.n_initial_points, n_calls=self.n_calls, initial_point_generator="lhs", random_state=self.seed)
 
         algorithm.update_objective_interval = update_objective_interval
-            
 
         # gp_result.x[0] is log(gamma) as the optimisation was over log_gamma_bounds
-        self.tau, self.sigma = self._step_sizes_from_gamma(
-            algorithm, np.exp(gp_result.x[0]))
+        self.gamma = np.exp(gp_result.x[0])
+        self.tau, self.sigma = self._step_sizes_from_gamma(algorithm, self.gamma)
 
         log.debug("Best gamma found: {}, with objective function value: {}".format(
-            np.exp(gp_result.x[0]), gp_result.fun))
+            self.gamma, gp_result.fun))
         log.debug('Initial step sizes are tau = {}, sigma = {}'.format(
             self.tau, self.sigma))
 
@@ -1073,7 +1080,7 @@ class _BayesOptimisationStepSizeBase(StepSizeRule):
             plt.yscale('log')
             plt.xlabel('log gamma')
             plt.title("Best gamma found: {}, with objective function value: {}".format(
-                np.exp(gp_result.x[0]), gp_result.fun))
+                self.gamma, gp_result.fun))
             plt.show()
 
         return self.tau, self.sigma
@@ -1128,15 +1135,14 @@ class PDHGBayesOptimisationStepSize(_BayesOptimisationStepSizeBase):
         tau = 1.0 / (gamma * norm)
         sigma = 1.0 * gamma / norm
         return tau, sigma
-    
+
     def _algorithm_set_up(self, algorithm, step_size):
         """Set up the algorithm with the given step size."""
         algorithm.set_up(initial=algorithm.initial, f=algorithm.f,
-                                     g=algorithm.g, operator=algorithm.operator, step_size=step_size)
+                         g=algorithm.g, operator=algorithm.operator, step_size=step_size)
         algorithm._reset_iteration_state()
 
-    
-      
+
 class PDHGConstantStepSize(StepSizeRule):
     r"""
     Step-size rule that always returns a constant step-size.
@@ -1192,8 +1198,8 @@ class PDHGConstantStepSize(StepSizeRule):
         the primal and dual step sizes as a tuple ``(tau, sigma)``
         """
         return self.tau, self.sigma
-    
-    
+
+
 class SPDHGConstantStepSize(StepSizeRule):
     r"""Step-size rule that always returns a constant step-size for the SPDHG algorithm.
     The user can set either the primal or dual step size, both or none. 
@@ -1221,7 +1227,7 @@ class SPDHGConstantStepSize(StepSizeRule):
         step_size : list or tuple of length two,  default=[None, None]
                 Initial values of the primal and dual step sizes. If both are ``None`` they are set to the default values defined below. If one is ``None`` it is calculated based on the other and the norm of the operator. If both are provided, they are used as they are, as long as sigma is a list or array of positive numbers of length equal to the number of operators and tau is a positive number.
     """
-    
+
     def __init__(self,  step_size=[None, None]):
         '''Initialises the constant step size rule
        '''
@@ -1232,14 +1238,18 @@ class SPDHGConstantStepSize(StepSizeRule):
         self.tau = step_size[0]
         self.sigma = step_size[1]
 
-
     def get_initial_step_size(self, algorithm):
         r""" Sets sigma and tau step-sizes for the SPDHG algorithm after the initial set-up. The step sizes can be either scalar or array-objects.
         """
         gamma = 1.
         rho = .99
+
+        if self.tau is not None and not (isinstance(self.tau, Number) and self.tau > 0):
+            raise ValueError(
+                "The step-sizes of SPDHG must be positive, passed tau = {}".format(self.tau))
+
         if self.sigma is not None:
-            
+
             if not isinstance(self.sigma, Number) and len(self.sigma) == algorithm._ndual_subsets:
                 if all(isinstance(x, Number) and x > 0 for x in self.sigma):
                     pass
@@ -1260,11 +1270,6 @@ class SPDHGConstantStepSize(StepSizeRule):
         if self.tau is None:
             self.tau = _spdhg_tau_from_sigma(
                 self.sigma, algorithm._norms, algorithm._prob_weights, rho)
-
-        else:
-            if not (isinstance(self.tau, Number) and self.tau > 0):
-                raise ValueError(
-                    "The step-sizes of SPDHG must be positive, passed tau = {}".format(self.tau))
 
         return self.tau, self.sigma
 
@@ -1300,6 +1305,7 @@ class SPDHGStepSizesFromRatio(StepSizeRule):
 
 
     """
+
     def __init__(self, gamma, rho):
         """Initialises the step size rule"""
         self.gamma = gamma
@@ -1354,7 +1360,7 @@ class SPDHGBayesOptimisationStepSize(_BayesOptimisationStepSizeBase):
         seed : int, optional, default= None
             Random seed for the Bayesian optimisation. This is used to ensure reproducibility of the results.
         plot : bool, optional, default=False
-            If True, plots the convergence of the Bayesian optimisation and the fitted Gaussian process after the step sizes have been chosen. Requires matplotlib and blocks on ``plt.show()``, so it should be left False for headless/non-interactive runs.
+            If True, plots the convergence of the Bayesian optimisation and the fitted Gaussian process after the step sizes have been chosen. Requires matplotlib and uses ``plt.show()``, so it should be left False for non-interactive runs.
 
         Notes
         -----
@@ -1382,9 +1388,11 @@ class SPDHGBayesOptimisationStepSize(_BayesOptimisationStepSizeBase):
         self._pristine_sampler = None
 
     def _default_n_iterations(self, algorithm):
+        '''Default number of iterations per objective evaluation when ``n_iterations`` is None. Overwrites the base class method.'''
         return 10 * len(algorithm._norms)
 
     def _step_sizes_from_gamma(self, algorithm, gamma):
+        '''Map the scalar ratio ``gamma`` to ``(tau, sigma)``.'''
         sigma = _spdhg_sigma_from_gamma(gamma, self.rho, algorithm._norms)
         tau = _spdhg_tau_from_sigma(
             sigma, algorithm._norms, algorithm._prob_weights, self.rho)
@@ -1407,7 +1415,8 @@ class SPDHGBayesOptimisationStepSize(_BayesOptimisationStepSizeBase):
                          sampler=deepcopy(self._pristine_sampler),
                          prob_weights=algorithm._prob_weights)
         algorithm._reset_iteration_state()
-            
+
+
 class _SPDHGAdaptiveStepSizeBase(StepSizeRule):
     r"""Shared machinery for the adaptive SPDHG step-size rules of :cite:`chambolle2023stochastic`.
 
@@ -1424,27 +1433,25 @@ class _SPDHGAdaptiveStepSizeBase(StepSizeRule):
 
     so the same factor is applied to every dual step size and the products
     :math:`\tau\sigma_i` are preserved. Both rules are *balancing only* — there is no
-    backtracking inner loop (SPDHG has no side-effect-free re-runnable update), so the
+    backtracking inner loop, so the
     step sizes are adjusted once per iteration from quantities measured on the subset that
     was sampled that iteration.
 
     This base class is not meant to be used directly. It owns the buffers required to form
     the per-subset primal/dual increments and defers the actual decision to
-    :meth:`_rebalance`, implemented by each subclass. All state is held by the rule, so the
-    only cooperation required from SPDHG is that it records the sampled subset index in
-    ``algorithm._index`` (see :meth:`~cil.optimisation.algorithms.SPDHG.update`).
+    :meth:`_rebalance`, implemented by each subclass. 
 
     Notes
     -----
-    This rule stores one extra image (the previous primal iterate), a copy of the dual
-    variable, two domain-sized working buffers and one range-sized working buffer. When
+    This rule stores three extra domain copies, and two range copies. When
     ``auto_stop=True`` the adaptive updates are switched off, and the extra storage
     released, once either the step sizes have been unchanged for ``auto_stop_patience``
     consecutive iterations or the adaptation strength :math:`\alpha` has decayed below
-    ``alpha_tolerance``. The second criterion matters because :math:`\alpha` decays
-    geometrically on every rebalance while ``count`` is reset by the same event, so a rule
-    that keeps rebalancing by ever smaller amounts would otherwise never trip the patience
-    counter.
+    ``alpha_tolerance``. 
+
+    This method is memory intensive. It is recommended to use this step size rule where you are more time constrained but less memory constrained. For the opposite case, where you are more memory constrained but less time constrained, we recommend using the :class:`SPDHGBayesOptimisationStepSize` step size rule, which is a Bayesian optimisation step size rule that chooses the best step sizes at the beginning of the algorithm and then keeps them constant throughout the iterations.
+    
+    
     """
 
     def __init__(self, initial_step_size=[None, None], initial_alpha=0.95, eta=0.995,
@@ -1494,19 +1501,17 @@ class _SPDHGAdaptiveStepSizeBase(StepSizeRule):
         return tau, sigma
 
     def get_initial_step_size(self, algorithm):
+        ''' Allocate the buffers required to form the primal and dual increments, and return the initial step sizes.'''
         tau, sigma = self._resolve_initial(algorithm)
-        # buffers owned by the rule; seeded from the initial iterates so the first
-        # increment (x^0 - x^1, y^0 - y^1) is exact.
         self.x_prev = algorithm.x.copy()
         self.y_prev = algorithm._y_old.copy()
         self.adj_tmp = algorithm.operator.domain_geometry().allocate(0)
         self.v_tmp = algorithm.operator.domain_geometry().allocate(0)
-        # one buffer per subset: element i is the range of operator[i], so subclasses
-        # must index it with the sampled subset rather than use it whole.
         self.forward_tmp = algorithm.operator.range_geometry().allocate(0)
         return tau, sigma
 
     def get_step_size(self, algorithm):
+        '''Return the current step sizes, and update them if the adaptive rule is still active.'''
         if self.adaptive:
             i = algorithm._index
             p_i = algorithm._prob_weights[i]
@@ -1520,13 +1525,14 @@ class _SPDHGAdaptiveStepSizeBase(StepSizeRule):
             # back-projected dual increment  A_i^* Delta y_i
             algorithm.operator[i].adjoint(self.y_prev[i], out=self.adj_tmp)
             # primal residual direction  q = Delta x / tau - (1/p_i) A_i^* Delta y_i
-            self.x_prev.sapyb(1.0 / tau, self.adj_tmp, -1.0 / p_i, out=self.v_tmp)
+            self.x_prev.sapyb(1.0 / tau, self.adj_tmp, -
+                              1.0 / p_i, out=self.v_tmp)
 
             # Relative test: the increments scale with the problem, so an absolute
             # threshold would silence the rule entirely on rescaled data.
             if (self.x_prev.norm() > self.tolerance * algorithm.x.norm()
                     and self.y_prev[i].norm()
-                        > self.tolerance * algorithm._y_old[i].norm()):
+                    > self.tolerance * algorithm._y_old[i].norm()):
                 tau_new, sigma_new, changed = self._rebalance(
                     algorithm, i, p_i, tau, sigma)
                 if not changed:
@@ -1603,9 +1609,8 @@ class SPDHGAdaptiveStepSizeBalancing(_SPDHGAdaptiveStepSizeBase):
     :math:`1/p_i` weight makes the quantity measured on the sampled subset an unbiased
     estimate of the corresponding full (deterministic) residual: for :math:`v` it
     reweights the only nonzero block of :math:`A^{*}\Delta y`, and for :math:`d` it
-    reweights the sampled block's contribution to :math:`\sum_j \|d_j\|_1`. With a single
-    operator :math:`p_i = 1` and both reduce to the residuals of
-    :cite:`goldstein2013adaptive`. They are compared using the balancing scale :math:`s`
+    reweights the sampled block's contribution to :math:`\sum_j \|d_j\|_1`. 
+    They are compared using the balancing scale :math:`s`
     and the band parameter :math:`\delta > 1`:
 
     - if :math:`v > s\,\delta\, d` the primal is making less progress, so the primal step
@@ -1636,11 +1641,7 @@ class SPDHGAdaptiveStepSizeBalancing(_SPDHGAdaptiveStepSizeBase):
         factor of 20) and :math:`\alpha` close to zero a gentle one.
     eta : positive :obj:`float`, optional, default=0.95
         The decay factor :math:`\eta \in (0,1)` applied to :math:`\alpha` each time the
-        step sizes are rebalanced. Since :math:`\alpha` decays only on a rebalance, this
-        bounds the total drift of :math:`\tau` through
-        :math:`\sum_k \alpha_k = \alpha_0/(1-\eta)`; values very close to one let
-        :math:`\alpha` persist for hundreds of rebalances and the step sizes then swing
-        over several orders of magnitude.
+        step sizes are rebalanced. 
     delta : positive :obj:`float`, greater than one, optional, default=1.5
         The band parameter :math:`\delta` setting how far apart the primal and dual residuals are allowed to drift before rebalancing.
     s : positive :obj:`float`, optional, default=norm of the operator
@@ -1659,6 +1660,8 @@ class SPDHGAdaptiveStepSizeBalancing(_SPDHGAdaptiveStepSizeBase):
     ``(tau, sigma)``. Computing the residuals costs one extra forward and one extra adjoint
     application per iteration (the overhead discussed in :cite:`chambolle2023stochastic`).
 
+    This is a memory intensive step size rule, as it requires storing three extra domain copies and two extra range copies. It is recommended to use this step size rule where you are more time constrained but less memory constrained. For the opposite case, where you are more memory constrained but less time constrained, we recommend using the :class:`SPDHGBayesOptimisationStepSize` step size rule, which is a Bayesian optimisation step size rule that chooses the best step sizes at the beginning of the algorithm and then keeps them constant throughout the iterations.
+
     See Also
     --------
     SPDHGAdaptiveStepSizeAngle : The companion angle-alignment rule (rule (b)) from the same paper.
@@ -1671,50 +1674,48 @@ class SPDHGAdaptiveStepSizeBalancing(_SPDHGAdaptiveStepSizeBase):
 
     def __init__(self, initial_step_size=[None, None], initial_alpha=0.95, eta=0.95,
                  delta=1.5, s=None, auto_stop=True, auto_stop_patience=None,
-                 alpha_tolerance=1e-3, global_sigma=True):
+                 alpha_tolerance=1e-3):
         '''Initialises the step size rule'''
         super().__init__(initial_step_size=initial_step_size, initial_alpha=initial_alpha,
                          eta=eta, auto_stop=auto_stop, auto_stop_patience=auto_stop_patience,
                          alpha_tolerance=alpha_tolerance)
         self.delta = delta
         self.s = s
-        self.global_sigma = global_sigma
 
     def _rebalance(self, algorithm, i, p_i, tau, sigma):
+        '''Decide and apply the step-size rescaling for one iteration, using the primal/dual residuals to balance the step sizes. Returns the new step sizes and a boolean indicating whether they were changed.'''
         if self.s is None:
             self.s = algorithm.operator.norm()  # default balancing scale, ||A||
 
-
         v = self.v_tmp.abs().sum()
         algorithm.operator[i].direct(self.x_prev, out=self.forward_tmp[i])
-        self.y_prev[i].sapyb(1.0 / (p_i * sigma[i]), self.forward_tmp[i], -1.0/p_i, out=self.y_prev[i])
+        self.y_prev[i].sapyb(1.0 / (p_i * sigma[i]),
+                             self.forward_tmp[i], -1.0/p_i, out=self.y_prev[i])
         d = self.y_prev[i].abs().sum()
 
-        log.debug('SPDHG adaptive balancing: v = {}, d = {}, s = {}'.format(v, d, self.s))
+        log.debug(
+            'SPDHG adaptive balancing: v = {}, d = {}, s = {}'.format(v, d, self.s))
         if v > self.s * self.delta * d:
             factor = 1 - self.alpha
-            tau/= factor
-            if self.global_sigma:
-                sigma = [s * factor for s in sigma]
-            else:
-                sigma[i] *= factor
+            tau /= factor
+            sigma = [s * factor for s in sigma]
             self.alpha *= self.eta
             self.count = 0
-            log.debug('SPDHG adaptive balancing: v > s*delta*d, increasing tau and decreasing sigma, tau = {}, sigma = {}'.format(tau, sigma))
+            log.debug(
+                'SPDHG adaptive balancing: v > s*delta*d, increasing tau and decreasing sigma, tau = {}, sigma = {}'.format(tau, sigma))
             return tau, sigma, True
         elif v < self.s * d / self.delta:
             factor = 1 - self.alpha
-            tau*= factor
-            if self.global_sigma:
-                sigma = [s / factor for s in sigma]
-            else:   
-                sigma[i] /= factor
+            tau *= factor
+            sigma = [s / factor for s in sigma]
             self.alpha *= self.eta
             self.count = 0
-            log.debug('SPDHG adaptive balancing: v < s*d/delta, decreasing tau and increasing sigma, tau = {}, sigma = {}'.format(tau, sigma))
+            log.debug(
+                'SPDHG adaptive balancing: v < s*d/delta, decreasing tau and increasing sigma, tau = {}, sigma = {}'.format(tau, sigma))
             return tau, sigma, True
 
-        log.debug('SPDHG adaptive balancing: v and d within band, no change to step sizes.')
+        log.debug(
+            'SPDHG adaptive balancing: v and d within band, no change to step sizes.')
         return tau, sigma, False
 
 
@@ -1781,6 +1782,8 @@ class SPDHGAdaptiveStepSizeAngle(_SPDHGAdaptiveStepSizeBase):
     ``(tau, sigma)``. Computing the direction costs one extra adjoint application per
     iteration.
 
+    This is a memory intensive step size rule, as it requires storing three extra domain copies and two extra range copies. It is recommended to use this step size rule where you are more time constrained but less memory constrained. For the opposite case, where you are more memory constrained but less time constrained, we recommend using the :class:`SPDHGBayesOptimisationStepSize` step size rule, which is a Bayesian optimisation step size rule that chooses the best step sizes at the beginning of the algorithm and then keeps them constant throughout the iterations.
+
     See Also
     --------
     SPDHGAdaptiveStepSizeBalancing : The companion residual-balancing rule (rule (a)) from the same paper.
@@ -1799,19 +1802,22 @@ class SPDHGAdaptiveStepSizeAngle(_SPDHGAdaptiveStepSizeBase):
         self.c = c
 
     def _rebalance(self, algorithm, i, p_i, tau, sigma):
+        '''Decide and apply the step-size rescaling for one iteration, using the cosine of the angle between successive primal directions. Returns the new step sizes and a boolean indicating whether they were changed.'''
         # cosine of the angle between Delta x (held in x_prev) and the primal
         # residual direction q (held in v_tmp), both set by the base class.
         w = self.x_prev.dot(self.v_tmp) / \
             (self.x_prev.norm() * self.v_tmp.norm())
 
-        log.debug('SPDHG adaptive angle: cos(angle) w = {}, index = {}'.format(w, i))
+        log.debug(
+            'SPDHG adaptive angle: cos(angle) w = {}, index = {}'.format(w, i))
         if w >= self.c:
             factor = 1 + self.alpha
             tau_new = tau * factor
             sigma_new = [si / factor for si in sigma]
             self.alpha *= self.eta
             self.count = 0
-            log.debug('SPDHG adaptive angle: increasing step sizes, tau -> {}, sigma -> {}'.format(tau_new, sigma_new))
+            log.debug(
+                'SPDHG adaptive angle: increasing step sizes, tau -> {}, sigma -> {}'.format(tau_new, sigma_new))
             return tau_new, sigma_new, True
         elif w < 0:
             factor = 1 + self.alpha
@@ -1819,6 +1825,7 @@ class SPDHGAdaptiveStepSizeAngle(_SPDHGAdaptiveStepSizeBase):
             sigma_new = [si * factor for si in sigma]
             self.alpha *= self.eta
             self.count = 0
-            log.debug('SPDHG adaptive angle: decreasing step sizes, tau -> {}, sigma -> {}'.format(tau_new, sigma_new))
+            log.debug(
+                'SPDHG adaptive angle: decreasing step sizes, tau -> {}, sigma -> {}'.format(tau_new, sigma_new))
             return tau_new, sigma_new, True
         return tau, sigma, False

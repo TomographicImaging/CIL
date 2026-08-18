@@ -49,7 +49,7 @@ class HuberLoss(Function):
             \delta * (|d| - 0.5*\delta) & \text{otherwise.}
         \end{cases}
         
-    This is then applied element wise to give the :code: `HuberLoss`:
+    This is then applied element wise to give the :code:`HuberLoss`:
 
     .. math::
         \mathtt{HuberLoss}_\delta(x) = c * \sum_i w_i \phi_\delta([Ax - b]_i).

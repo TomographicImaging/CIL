@@ -38,7 +38,7 @@ class HuberLoss(Function):
         \end{cases}
 
     .. math::
-    The (Weighted) Huber loss acts element wise on the residual :math:`r = Ax - b`:. For small values of the residual it acts like a least squares loss and for larger values it acts like an absolute error loss. The idea is that the resulting loss is differentiable and stongly convex close to the minimum while also being robust to outliers far from the minimum.  A positive scalar :math:`\delta` controls the change point between the least squares and absolute error loss. 
+    The (Weighted) Huber loss acts element wise on the residual :math:`r = Ax - b`. For small values of the residual it acts like a least squares loss and for larger values it acts like an absolute error loss. The idea is that the resulting loss is differentiable and stongly convex close to the minimum while also being robust to outliers far from the minimum.  A positive scalar :math:`\delta` controls the change point between the least squares and absolute error loss. 
 
     First define a function, acting on  :math:`d\in\mathbb{R}`
 
@@ -49,12 +49,12 @@ class HuberLoss(Function):
             \delta * (|d| - 0.5*\delta) & \text{otherwise.}
         \end{cases}
         
-     This is then applied element wise to give the :code: `HuberLoss`:
+    This is then applied element wise to give the :code: `HuberLoss`:
 
     .. math::
         \mathtt{HuberLoss}_\delta(x) = c * \sum_i w_i \phi_\delta([Ax - b]_i).
 
-Note that :math:`c\in\mathbb{R}` is an optional scalar constant and :math:`w` is an optional weighting vector in range of the operator, :math:`A`, which defaults to a vector of 1s. 
+    Note that :math:`c\in\mathbb{R}` is an optional scalar constant and :math:`w` is an optional weighting vector in range of the operator, :math:`A`, which defaults to a vector of 1s. 
 
 
     Parameters
@@ -251,7 +251,8 @@ Note that :math:`c\in\mathbb{R}` is an optional scalar constant and :math:`w` is
                 self._L = np.abs(self.c) * (Anorm * Anorm)
             else:
                 warnings.warn(
-                    f"{self.__class__.__name__} could not calculate Lipschitz Constant."
+                    f"{self.__class__.__name__} could not calculate Lipschitz Constant, "
+                    "likely because it was unable to calculate the norm of operator A."
                 )
 
         if self.weight is not None:

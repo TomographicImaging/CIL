@@ -117,49 +117,48 @@ Note that :math:`c\in\mathbb{R}` is an optional scalar constant and :math:`w` is
 
 
     def gradient(self, x, out=None):
-def gradient(self, x, out=None):
-    r"""
-    Returns the gradient of the Huber loss.
+        r"""
+        Returns the gradient of the Huber loss.
 
-    For the residual
+        For the residual
 
-    .. math::
-        r = Ax - b,
+        .. math::
+            r = Ax - b,
 
-    the derivative of the Huber function is
+        the derivative of the Huber function is
 
-    .. math::
-        \phi_\delta'(r) =
-        \begin{cases}
-            r & \text{if } |r| \leq \delta \\
-            \delta \operatorname{sign}(r) & \text{otherwise}.
-        \end{cases}
+        .. math::
+            \phi_\delta'(r) =
+            \begin{cases}
+                r & \text{if } |r| \leq \delta \\
+                \delta \operatorname{sign}(r) & \text{otherwise}.
+            \end{cases}
 
-    Therefore the gradient with respect to :math:`x` is
+        Therefore the gradient with respect to :math:`x` is
 
-    .. math::
-        \nabla f(x) =
-        cA^T\left(
-        w \odot
-        \phi_\delta'(Ax-b)
-        \right),
+        .. math::
+            \nabla f(x) =
+            cA^T\left(
+            w \odot
+            \phi_\delta'(Ax-b)
+            \right),
 
-    where :math:`w` denotes the optional weights and
-    :math:`\odot` denotes element-wise multiplication. If no
-    weights are supplied, :math:`w=1`.
+        where :math:`w` denotes the optional weights and
+        :math:`\odot` denotes element-wise multiplication. If no
+        weights are supplied, :math:`w=1`.
 
-    Parameters
-    ----------
-    x : DataContainer
-        Point at which the gradient is evaluated.
-    out : DataContainer, optional
-        Container in which to store the result.
+        Parameters
+        ----------
+        x : DataContainer
+            Point at which the gradient is evaluated.
+        out : DataContainer, optional
+            Container in which to store the result.
 
-    Returns
-    -------
-    DataContainer
-        The gradient of the Huber loss evaluated at ``x``.
-    """
+        Returns
+        -------
+        DataContainer
+            The gradient of the Huber loss evaluated at ``x``.
+        """
         if out is None:
             out = x * 0.0
 
@@ -202,48 +201,48 @@ def gradient(self, x, out=None):
 
     def calculate_Lipschitz(self):
         r"""
-Calculate the Lipschitz constant of the gradient.
+        Calculate the Lipschitz constant of the gradient.
 
-For the Huber function
+        For the Huber function
 
-.. math::
+        .. math::
 
-    \max_r \phi_\delta''(r) = 1.
+            \max_r \phi_\delta''(r) = 1.
 
-Therefore, for
+        Therefore, for
 
-.. math::
+        .. math::
 
-    f(x) =
-    c \sum_i w_i\,\phi_\delta((Ax-b)_i),
+            f(x) =
+            c \sum_i w_i\,\phi_\delta((Ax-b)_i),
 
-the Hessian satisfies
+        the Hessian satisfies
 
-.. math::
+        .. math::
 
-    \nabla^2 f(x)
-    =
-    c\,A^T W D(x) A,
+            \nabla^2 f(x)
+            =
+            c\,A^T W D(x) A,
 
-where :math:`D(x)` is a diagonal operator with entries
-:math:`\phi_\delta''((Ax-b)_i)`.
+        where :math:`D(x)` is a diagonal operator with entries
+        :math:`\phi_\delta''((Ax-b)_i)`.
 
-It follows that a Lipschitz constant for the gradient is
+        It follows that a Lipschitz constant for the gradient is
 
-.. math::
+        .. math::
 
-    L = |c|\,\|A\|^2,
+            L = |c|\,\|A\|^2,
 
-or, in the weighted case,
+        or, in the weighted case,
 
-.. math::
+        .. math::
 
-    L = |c|\,\|W\|\,\|A\|^2,
+            L = |c|\,\|W\|\,\|A\|^2,
 
-where :math:`W` is the diagonal operator defined by
-``weight``.
+        where :math:`W` is the diagonal operator defined by
+        ``weight``.
 
-"""
+        """
         try:
             self._L = np.abs(self.c) * (self.A.norm() ** 2)
         except AttributeError:

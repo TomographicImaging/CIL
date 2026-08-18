@@ -50,8 +50,8 @@ class PDHG(Algorithm):
         A convex function with a "simple" proximal. This function must map from the operator domain to the Reals. See below for details.
     operator : LinearOperator
         A Linear Operator.
-    step_size:
-        Either a PDHG compatible step size rule or a `list` or `tuple`  of (tau, sigma) where sigma is the step size for the dual problem and tau is the step size for the primal problem. The step sizes can be either None,  scalar or array-objects. If not provided, default values will be set based on the operator norm as described below.
+    step_size : :class:`~cil.optimisation.utilities.StepSizeRule`, or `list` or `tuple` of length two, optional, default=None
+        Either a PDHG compatible step size rule or a `list` or `tuple`  of (tau, sigma) where sigma is the step size for the dual problem and tau is the step size for the primal problem. The step sizes can be either None,  scalar or array-objects. If not provided, default values will be set based on the operator norm as described below. See the PDHG step-size rules in :mod:`cil.optimisation.utilities.StepSizeMethods` for the adaptive and Bayesian-optimisation alternatives to a fixed step size.
     initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
         Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
 
@@ -67,9 +67,9 @@ class PDHG(Algorithm):
         gamma_fconj : positive :obj:`float`, optional, default=None
             Note: this is being deprecated. Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.
         sigma :  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided
-           Step size for the dual problem. Note: this is being deprecated. In the future, please pass this as part of the `step_size` argument, either as a tuple of (tau,) or using a compatible step size rule.
+           Step size for the dual problem. Note: this is being deprecated. In the future, please pass this as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.
         tau :  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided
-            Step size for the primal problem. In the future, please pass this as part of the `step_size` argument, either as a tuple of (tau,) or using a compatible step size rule.
+            Step size for the primal problem. In the future, please pass this as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.
     Example
     -------
 
@@ -251,8 +251,8 @@ class PDHG(Algorithm):
             A Linear Operator.
         initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
             Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
-        step_size:
-            Either a PDHG compatible step size rule or a `list` or `tuple`  of (tau, sigma) where sigma is the step size for the dual problem and tau is the step size for the primal problem. The step sizes can be either scalar or array-objects. If not provided, default values will be set based on the operator norm as described below.
+        step_size : :class:`~cil.optimisation.utilities.StepSizeRule`, or `list` or `tuple` of length two, optional, default=[None, None]
+            Either a PDHG compatible step size rule or a `list` or `tuple`  of (tau, sigma) where sigma is the step size for the dual problem and tau is the step size for the primal problem. The step sizes can be either scalar or array-objects. If not provided, default values will be set based on the operator norm, as described in the class documentation.
 
 
         """
@@ -355,6 +355,14 @@ class PDHG(Algorithm):
 
     def check_convergence(self):
         """Check whether convergence criterion for PDHG is satisfied with scalar values of tau and sigma
+
+        The criterion :math:`\\tau\\sigma\\|K\\|^{2} < 4/3` is only evaluated for
+        :class:`~cil.optimisation.utilities.PDHGConstantStepSize`, and only when both step sizes are
+        scalars. :class:`~cil.optimisation.utilities.PDHGAdaptiveStepSize2013` and
+        :class:`~cil.optimisation.utilities.PDHGAdaptiveStepSize2015` return ``True`` without a check,
+        because their backtracking step enforces the corresponding condition at every iteration. For
+        any other step-size rule the check is not implemented, so a warning is raised and ``False``
+        returned.
 
         Returns
         -------

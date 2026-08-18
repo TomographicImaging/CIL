@@ -71,6 +71,7 @@ test = [
     "cvxpy",
     "matplotlib-base>=3.3",
     "scikit-image",
+    "scikit-optimize>=0.10",
     "unittest-parametrize",
     "wget",
     "zenodo_get>=1.6",

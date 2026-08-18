@@ -45,8 +45,8 @@ class SPDHG(Algorithm):
         A convex function with a "simple" proximal
     operator : BlockOperator
         BlockOperator must contain Linear Operators
-    step_size : tuple of (tau, sigma), optional
-        A tuple containing the step size parameters for the primal and dual problems. If `None` will be computed by algorithm, see note for details.
+    step_size : :class:`~cil.optimisation.utilities.StepSizeRule`, or `list` or `tuple` of (tau, sigma), optional
+        Either an SPDHG compatible step size rule, or a tuple containing the step size parameters for the primal and dual problems, where `tau` is a positive scalar and `sigma` a list with one positive entry per operator. If `None` will be computed by algorithm, see note for details. See the SPDHG step-size rules in :mod:`cil.optimisation.utilities.StepSizeMethods` for the adaptive and Bayesian-optimisation alternatives to a fixed step size.
     initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
         Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
     sampler: `cil.optimisation.utilities.Sampler`, optional
@@ -96,7 +96,7 @@ class SPDHG(Algorithm):
 
     - Case 1: If neither `sigma` or `tau` are provided then `sigma` is set using the formula:
 
-    .. math:: \sigma_i= \frac{0.99}{\|K_i\|^2}
+    .. math:: \sigma_i= \frac{0.99}{\|K_i\|}
 
     and `tau` is set as per case 2
 
@@ -154,7 +154,24 @@ class SPDHG(Algorithm):
 
     def set_up(self, f, g, operator, step_size=None,
                initial=None,   sampler=None, prob_weights=None):
-        '''set-up of the algorithm
+        '''Initialisation of the algorithm
+
+        Parameters
+        ----------
+        f : BlockFunction
+            Each must be a convex function with a "simple" proximal method of its conjugate.
+        g : Function
+            A convex function with a "simple" proximal.
+        operator : BlockOperator
+            BlockOperator must contain Linear Operators.
+        step_size : :class:`~cil.optimisation.utilities.StepSizeRule`, or `list` or `tuple` of (tau, sigma), optional, default=None
+            Either an SPDHG compatible step size rule, or a tuple containing the step size parameters for the primal and dual problems, where `tau` is a positive scalar and `sigma` a list with one positive entry per operator. If `None`, the step sizes are computed from the operator norms and the sampling probabilities, as described in the class documentation.
+        initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
+            Initial point for the SPDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros. If a list or tuple is passed, the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
+        sampler : `cil.optimisation.utilities.Sampler`, optional
+            A `Sampler` controlling the selection of the next index for the SPDHG update. If `None`, a sampler will be created for uniform random sampling with replacement.
+        prob_weights : list of floats, optional
+            The expected number of times each index would be called, normalised to 1. Should be a list of floats of length `num_indices` that sum to 1. Must not be passed if the provided sampler already has a `prob_weights` attribute with different values.
         '''
         log.info("%s setting up", self.__class__.__name__)
 

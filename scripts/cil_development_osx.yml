@@ -24,6 +24,7 @@ dependencies:
   - cvxpy !=1.8.2
   - python-wget
   - scikit-image
+  - scikit-optimize >=0.10
   - packaging
   - cmake >=3.16
   - setuptools >=64

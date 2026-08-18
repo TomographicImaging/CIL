@@ -742,7 +742,7 @@ For the gradient based algorithms `cil.optimisation.algorithms.GD`, `cil.optimis
 
 PDHG step-size rules
 ~~~~~~~~~~~~~~~~~~~~~~
-For `cil.optimisation.algorithms.PDHG`, the rule's `get_initial_step_size` method sets the initial primal and dual step sizes during set-up, and `get_step_size` is called at the end of each iteration to output the primal and dual step sizes for the next iteration. The rules below span three strategies: a fixed step size (`PDHGConstantStepSize`); acceleration exploiting strong convexity (`PDHGStronglyConvexUpdate`); per-iteration backtracking with residual balancing (`PDHGAdaptiveStepSize2013`, `PDHGAdaptiveStepSize2015`); and a one-off Bayesian-optimisation search for the best step-size ratio (`PDHGBayesOptimisationStepSize`). The two adaptive rules are faster but memory-hungry, while the Bayesian-optimisation rule trades compute time for lower memory use.
+For `cil.optimisation.algorithms.PDHG`, the rule's `get_initial_step_size` method sets the initial primal and dual step sizes during set-up, and `get_step_size` is called at the end of each iteration to output the primal and dual step sizes for the next iteration. The rules below span four strategies: a fixed step size (`PDHGConstantStepSize`); acceleration exploiting strong convexity (`PDHGStronglyConvexUpdate`); per-iteration backtracking with residual balancing (`PDHGAdaptiveStepSize2013`, `PDHGAdaptiveStepSize2015`); and a one-off Bayesian-optimisation search for the best step-size ratio (`PDHGBayesOptimisationStepSize`). The two adaptive rules are faster but memory-hungry, while the Bayesian-optimisation rule trades compute time for lower memory use.
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.PDHGConstantStepSize
    :members:
@@ -758,6 +758,7 @@ For `cil.optimisation.algorithms.PDHG`, the rule's `get_initial_step_size` metho
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.PDHGBayesOptimisationStepSize
    :members:
+   :inherited-members:
 
 .. _SPDHG step-size rules:
 
@@ -773,12 +774,15 @@ For `cil.optimisation.algorithms.SPDHG`, the rule's `get_initial_step_size` meth
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.SPDHGBayesOptimisationStepSize
    :members:
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.SPDHGAdaptiveStepSizeBalancing
    :members:
+   :inherited-members:
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.SPDHGAdaptiveStepSizeAngle
    :members:
+   :inherited-members:
 
 
 

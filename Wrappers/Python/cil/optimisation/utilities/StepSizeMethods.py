@@ -416,7 +416,7 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
             The case where both functions are strongly convex is not available at the moment.
 
 
-            The PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex. In these cases, the step-sizes :math:`\sigma` and :math:`\tau` are updated using the :meth:`update_step_sizes` method. A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
+            The PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex. In these cases, the step-sizes :math:`\sigma` and :math:`\tau` are updated using the :meth:`get_step_size` method. A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
 
         .. math::
 
@@ -449,6 +449,10 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
 
             Parameters
             -------------
+            initial_step_size : list or tuple of length two, optional, default=(None, None)
+                Initial values of the primal and dual step sizes ``(tau, sigma)``. Either, both or neither may be
+                ``None``: any missing value is filled in from the operator norm exactly as in
+                :class:`PDHGConstantStepSize`.
             gamma_g : positive :obj:`float`, optional, default=None
                 Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
             gamma_fconj : positive :obj:`float`, optional, default=None
@@ -485,17 +489,21 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
                 "initial_step_size should be a list or tuple of length two, step_size = {}".format(initial_step_size))
 
     def get_initial_step_size(self, algorithm):
-        """Sets sigma and tau step-sizes for the PDHG algorithm. The step sizes can be either scalar or array-objects.
+        """Sets the initial sigma and tau step-sizes for the PDHG algorithm. The step sizes can be either scalar or array-objects.
+
+        The values come from ``initial_step_size``, where the user can set either, both or none. Values passed by the
+        user are accepted as long as they are positive numbers, or array-like objects of the correct shape; any value
+        left as ``None`` is derived from the operator norm.
 
         Parameters
         ----------
-            sigma : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default=None
-                Step size for the dual problem.
-            tau : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default=None
-                Step size for the primal problem.
+        algorithm : :class:`~cil.optimisation.algorithms.PDHG`
+            The algorithm the rule is attached to, used here for its operator.
 
-        The user can set either, both or none. Values passed by the user will be accepted as long as they are positive numbers,
-        or correct shape array like objects.
+        Returns
+        -------
+        tuple
+            the primal and dual step sizes as a tuple ``(tau, sigma)``
         """
         self.tau = self.initial_step_size[0]
         self.sigma = self.initial_step_size[1]
@@ -505,11 +513,19 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
 
     def get_step_size(self, algorithm):
         """
-        Applies the PDHG strongly convex step size update to calculate the new primal and dual step sizes
+        Applies the PDHG strongly convex step size update to calculate the new primal and dual step sizes.
+
+        The relaxation parameter :math:`\\theta` of ``algorithm`` is updated in place as part of the acceleration.
+
+        Parameters
+        ----------
+        algorithm : :class:`~cil.optimisation.algorithms.PDHG`
+            The algorithm the rule is attached to.
 
         Returns
-        --------
-
+        -------
+        tuple
+            the primal and dual step sizes as a tuple ``(tau, sigma)``
         """
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
@@ -572,8 +588,11 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
     -------------
     initial_step_size : list of two positive :obj:`float`, optional, default=[10/algorithm.operator.norm(), 10/algorithm.operator.norm()]
         Initial values of the primal and dual step sizes used in the adaptive step size method.
-    initial_alpha : positive :obj:`float`, optional, default=0.95
+    initial_alpha : :obj:`float` in :math:`(0,1)`, optional, default=0.95
         Initial value of the adaptation strength :math:`\alpha` controlling the size of the residual-balancing update.
+        Each rebalance multiplies or divides :math:`\tau` by :math:`1-\alpha`, so :math:`\alpha` close to one gives a
+        *large* rescaling (:math:`\alpha = 0.95` changes :math:`\tau` by a factor of 20) and :math:`\alpha` close to
+        zero a gentle one.
     beta : positive :obj:`float`, optional, default=0.95
         The factor :math:`\beta` by which the step sizes are shrunk during backtracking (via :math:`\beta/b`).
     gamma : positive :obj:`float`, optional, default=0.9
@@ -587,14 +606,19 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
     inner_iterations : :obj:`int`, optional, default=50
         The maximum number of inner iterations for the backtracking loop.
     auto_stop : :obj:`boolean`, optional, default=True
-        If True, the adaptive step size method automatically stops updating the step sizes when they have not changed for ``auto_stop_patience`` consecutive iterations.
+        If True, the adaptive step size method automatically stops updating the step sizes once they have not changed for more than ``auto_stop_patience`` consecutive iterations.
     auto_stop_patience : :obj:`int`, optional, default=10
-        Number of consecutive iterations with no change to the step sizes after which the adaptive updates are stopped (only used when ``auto_stop=True``).
+        Number of consecutive iterations with no change to the step sizes that are tolerated before the adaptive updates are stopped (only used when ``auto_stop=True``).
 
 
     Notes
     -----
-    This method is memory expensive, requiring the storage of 2 extra image copies and 2 extra data copies. When ``auto_stop=True`` the adaptive updates are switched off once the step sizes have been unchanged for ``auto_stop_patience`` consecutive iterations; the extra images and data are then released, reducing ongoing memory use and computational cost. For a more time expensive, but less memory expensive method, see :class:`PDHGBayesOptimisationStepSize` which does not require the storage of extra images and data.
+    This method is memory expensive, requiring the storage of 1 extra image copy and 2 extra data copies. When ``auto_stop=True`` the adaptive updates are switched off once the step sizes have been unchanged for more than ``auto_stop_patience`` consecutive iterations; the extra image and data are then released, reducing ongoing memory use and computational cost. For a more time expensive, but less memory expensive method, see :class:`PDHGBayesOptimisationStepSize` which does not require the storage of extra images and data.
+
+    Both mechanisms are skipped for an iteration in which the primal and dual residuals have both fallen below the
+    attribute ``tolerance`` (default ``1e-6``), on the grounds that the iterates have stopped moving and the residuals
+    no longer carry usable information. ``tolerance`` is not a constructor argument but can be set on the rule after
+    construction.
 
     See Also
     --------
@@ -624,6 +648,7 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
         self.y_old = None
         self.x_resid = None
         self.y_resid = None
+        self.x_prev = None
 
         self.adaptive = True
         self.initial_step_size = initial_step_size
@@ -632,6 +657,21 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
                 "initial_step_size should be a list or tuple of length two, step_size = {}".format(initial_step_size))
 
     def get_initial_step_size(self, algorithm):
+        r"""Returns the initial primal and dual step sizes for the PDHG algorithm.
+
+        Values are taken from ``initial_step_size``; each entry left as ``None`` defaults to
+        :math:`10/\|K\|`.
+
+        Parameters
+        ----------
+        algorithm : :class:`~cil.optimisation.algorithms.PDHG`
+            The algorithm the rule is attached to, used here for its operator.
+
+        Returns
+        -------
+        tuple
+            the primal and dual step sizes as a tuple ``(tau, sigma)``
+        """
         tau = self.initial_step_size[0]
         sigma = self.initial_step_size[1]
         if tau is None:
@@ -641,6 +681,22 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
         return tau, sigma
 
     def get_step_size(self, algorithm):
+        """Applies the backtracking and residual-balancing updates for one PDHG iteration.
+
+        Both steps modify ``algorithm._tau`` and ``algorithm._sigma`` in place, and backtracking
+        additionally recomputes the PDHG update. Once the adaptive updates have been stopped by
+        ``auto_stop`` this returns the current step sizes unchanged.
+
+        Parameters
+        ----------
+        algorithm : :class:`~cil.optimisation.algorithms.PDHG`
+            The algorithm the rule is attached to.
+
+        Returns
+        -------
+        tuple
+            the primal and dual step sizes as a tuple ``(tau, sigma)``
+        """
         if self.adaptive:
             if self.s is None:
                 self.s = algorithm.operator.norm()  # default balancing scale, ||A||
@@ -648,6 +704,9 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
                 self.y_old = algorithm.operator.range_geometry().allocate(0)  # Extra range data 1
                 self.x_resid = algorithm.operator.domain_geometry().allocate(0)  # Extra image 1
                 self.y_resid = algorithm.operator.range_geometry().allocate(0)  # Extra range data 2
+                # x^{k-1}, the extrapolation partner of this iteration. On the first call
+                # x^{-1} = x^{0} = algorithm.x_old, which is what set_up copied x from.
+                self.x_prev = algorithm.x_old.copy()  # Extra image 2
             # adaptive step sizes only when above tolerance
             if self.p_norm > self.tolerance and self.d_norm > self.tolerance:
                 log.debug('Before adaptive step-size step, tau = {}, sigma = {}'.format(
@@ -666,6 +725,7 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
                     log.debug(' Backtracking step - multiplying primal and dual step sizes by beta/b = {}, new step sizes are tau = {}, sigma ={}'.format(
                         self.beta / b, algorithm._tau, algorithm._sigma))
 
+                    self._restore_iterate(algorithm)
                     algorithm._pdhg_update()
                     b = self._calculate_backtracking(algorithm)
                     self.count = 0
@@ -700,6 +760,8 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
                     algorithm._tau, algorithm._sigma))
 
             self.y_old.fill(algorithm.y)
+            # algorithm.x_old is x^{k}, the extrapolation partner of iteration k+1
+            self.x_prev.fill(algorithm.x_old)
 
             if self.count > self.auto_stop_patience and self.auto_stop:
                 self.adaptive = False
@@ -708,8 +770,22 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
                 del self.x_resid
                 del self.y_resid
                 del self.y_old
+                del self.x_prev
 
         return algorithm._tau, algorithm._sigma
+
+    def _restore_iterate(self, algorithm):
+        """Restores the iterate to the state it had at the start of the iteration.
+
+        :meth:`~cil.optimisation.algorithms.PDHG._pdhg_update` overwrites ``x`` and ``y``
+        in place, so before the step can be retaken with smaller step sizes both must be
+        put back. Otherwise the retry extrapolates from the rejected trial iterate rather
+        than from :math:`x^{k-1}`, and the dual variable accumulates over successive
+        trials, which can make the iterate overflow before the backtracking loop has had
+        a chance to bring the step sizes down.
+        """
+        algorithm.x.fill(self.x_prev)
+        algorithm.y.fill(self.y_old)
 
     def _calculate_pnorm_dnorm(self, algorithm):
         algorithm.operator.adjoint(self.y_resid, out=algorithm.x_tmp)
@@ -789,8 +865,11 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
     -------------
     initial_step_size : list of two positive :obj:`float`, optional, default= [10/algorithm.operator.norm(), 10/algorithm.operator.norm()]
         Initial values of the primal and dual step sizes used in the adaptive step size method.
-    initial_alpha : positive :obj:`float`, optional, default=0.95
+    initial_alpha : :obj:`float` in :math:`(0,1)`, optional, default=0.95
         Initial value of the adaptation strength :math:`\alpha` controlling the size of the residual-balancing update.
+        Each rebalance multiplies or divides :math:`\tau` by :math:`1-\alpha`, so :math:`\alpha` close to one gives a
+        *large* rescaling (:math:`\alpha = 0.95` changes :math:`\tau` by a factor of 20) and :math:`\alpha` close to
+        zero a gentle one.
     eta : positive :obj:`float`, optional, default=0.95
         The decay factor :math:`\eta \in (0,1)` applied to :math:`\alpha` each time the step sizes are rebalanced.
     c : positive :obj:`float`, optional, default=0.9
@@ -798,14 +877,19 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
     inner_iterations : :obj:`int`, optional, default=50
         The maximum number of inner iterations for the backtracking loop.
     auto_stop : :obj:`boolean`, optional, default=True
-        If True, the adaptive step size method automatically stops updating the step sizes when they have not changed for ``auto_stop_patience`` consecutive iterations.
+        If True, the adaptive step size method automatically stops updating the step sizes once they have not changed for more than ``auto_stop_patience`` consecutive iterations.
     auto_stop_patience : :obj:`int`, optional, default=10
-        Number of consecutive iterations with no change to the step sizes after which the adaptive updates are stopped (only used when ``auto_stop=True``).
+        Number of consecutive iterations with no change to the step sizes that are tolerated before the adaptive updates are stopped (only used when ``auto_stop=True``).
 
 
     Notes
     -----
-    This method is memory expensive, requiring the storage of 2 extra image copies and 2 extra data copies. When ``auto_stop=True`` the adaptive updates are switched off once the step sizes have been unchanged for ``auto_stop_patience`` consecutive iterations; the extra images and data are then released, reducing ongoing memory use and computational cost. For a more time expensive, but less memory expensive method, see :class:`PDHGBayesOptimisationStepSize` which does not require the storage of extra images and data.
+    This method is memory expensive, requiring the storage of 1 extra image copy and 2 extra data copies. When ``auto_stop=True`` the adaptive updates are switched off once the step sizes have been unchanged for more than ``auto_stop_patience`` consecutive iterations; the extra image and data are then released, reducing ongoing memory use and computational cost. For a more time expensive, but less memory expensive method, see :class:`PDHGBayesOptimisationStepSize` which does not require the storage of extra images and data.
+
+    Both mechanisms are skipped for an iteration in which the primal and dual residuals have both fallen below the
+    attribute ``tolerance`` (default ``1e-6``), on the grounds that the iterates have stopped moving and the residuals
+    no longer carry usable information. ``tolerance`` is not a constructor argument but can be set on the rule after
+    construction.
 
     See Also
     --------
@@ -834,12 +918,28 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
         self.y_old = None
         self.x_resid = None
         self.y_resid = None
+        self.x_prev = None
         self.initial_step_size = initial_step_size
         if len(initial_step_size) != 2:
             raise ValueError(
                 "initial_step_size should be a list or tuple of length two, step_size = {}".format(initial_step_size))
 
     def get_initial_step_size(self, algorithm):
+        r"""Returns the initial primal and dual step sizes for the PDHG algorithm.
+
+        Values are taken from ``initial_step_size``; each entry left as ``None`` defaults to
+        :math:`10/\|K\|`.
+
+        Parameters
+        ----------
+        algorithm : :class:`~cil.optimisation.algorithms.PDHG`
+            The algorithm the rule is attached to, used here for its operator.
+
+        Returns
+        -------
+        tuple
+            the primal and dual step sizes as a tuple ``(tau, sigma)``
+        """
         tau = self.initial_step_size[0]
         sigma = self.initial_step_size[1]
         if tau is None:
@@ -849,11 +949,30 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
         return tau, sigma
 
     def get_step_size(self, algorithm):
+        """Applies the backtracking and residual-balancing updates for one PDHG iteration.
+
+        Both steps modify ``algorithm._tau`` and ``algorithm._sigma`` in place, and backtracking
+        additionally recomputes the PDHG update. Once the adaptive updates have been stopped by
+        ``auto_stop`` this returns the current step sizes unchanged.
+
+        Parameters
+        ----------
+        algorithm : :class:`~cil.optimisation.algorithms.PDHG`
+            The algorithm the rule is attached to.
+
+        Returns
+        -------
+        tuple
+            the primal and dual step sizes as a tuple ``(tau, sigma)``
+        """
         if self.adaptive:
             if self.y_old is None:
                 self.y_old = algorithm.operator.range_geometry().allocate(0)  # Extra range data 1
                 self.x_resid = algorithm.operator.domain_geometry().allocate(0)  # Extra image 1
                 self.y_resid = algorithm.operator.range_geometry().allocate(0)  # Extra range data 2
+                # x^{k-1}, the extrapolation partner of this iteration. On the first call
+                # x^{-1} = x^{0} = algorithm.x_old, which is what set_up copied x from.
+                self.x_prev = algorithm.x_old.copy()  # Extra image 2
             if self.p_norm > self.tolerance and self.d_norm > self.tolerance:
                 log.debug('Before adaptive step-size step, tau = {}, sigma = {}'.format(
                     algorithm._tau, algorithm._sigma))
@@ -871,6 +990,7 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
                     log.debug(' Backtracking step - multiplying primal and dual step sizes by 1/2, new step sizes are tau = {}, sigma ={}'.format(
                         algorithm._tau, algorithm._sigma))
 
+                    self._restore_iterate(algorithm)
                     algorithm._pdhg_update()
                     b = self._calculate_backtracking(algorithm)
                     self.count = 0
@@ -903,6 +1023,8 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
                 log.debug('No change from the rebalancing step as pnorm and dnorm are below threshold, step sizes are tau = {}, sigma ={}'.format(
                     algorithm._tau, algorithm._sigma))
             self.y_old.fill(algorithm.y)
+            # algorithm.x_old is x^{k}, the extrapolation partner of iteration k+1
+            self.x_prev.fill(algorithm.x_old)
 
             if self.count > self.auto_stop_patience and self.auto_stop:
                 self.adaptive = False
@@ -911,8 +1033,22 @@ class PDHGAdaptiveStepSize2015(StepSizeRule):
                 del self.y_resid
                 del self.y_old
                 del self.x_resid
+                del self.x_prev
 
         return algorithm._tau, algorithm._sigma
+
+    def _restore_iterate(self, algorithm):
+        """Restores the iterate to the state it had at the start of the iteration.
+
+        :meth:`~cil.optimisation.algorithms.PDHG._pdhg_update` overwrites ``x`` and ``y``
+        in place, so before the step can be retaken with smaller step sizes both must be
+        put back. Otherwise the retry extrapolates from the rejected trial iterate rather
+        than from :math:`x^{k-1}`, and the dual variable accumulates over successive
+        trials, which can make the iterate overflow before the backtracking loop has had
+        a chance to bring the step sizes down.
+        """
+        algorithm.x.fill(self.x_prev)
+        algorithm.y.fill(self.y_old)
 
     def _calculate_backtracking(self, algorithm):
         """ Calculates the backtracking parameter b used to update step sizes in the adaptive PDHG algorithm.
@@ -1092,11 +1228,11 @@ class _BayesOptimisationStepSizeBase(StepSizeRule):
 
 
 class PDHGBayesOptimisationStepSize(_BayesOptimisationStepSizeBase):
-    r"""The ratio between the primal and dual step sizes (gamma) in the PDHG algorithm is chosen using a guassian process Bayesian optimisation, choosing the gamma that gives the best performance after a small number of iterations. The step sizes are chosen at the beginning of the algorithm and then kept constant throughout the iterations.
+    r"""The ratio between the primal and dual step sizes (gamma) in the PDHG algorithm is chosen using a Gaussian process Bayesian optimisation, choosing the gamma that gives the best performance after a small number of iterations. The step sizes are chosen at the beginning of the algorithm and then kept constant throughout the iterations.
         Parameters
         -------------
-        gamma_bounds : list or tuple of length two, optional, the default is an approximation of [1e-5, 1e6]*norm(A)/norm(b) where A is the operator and b is the data, which is a good initial guess for the ratio between the primal and dual step sizes in the PDHG algorithm.
-            Bounds for the ratio between the primal and dual step sizes (gamma) in the Bayesian optimisation. The gamma that gives the best performance after a small number of iterations is chosen as the ratio between the primal and dual step sizes for the PDHG algorithm. The default bounds are (1e-5, 1e5).
+        gamma_bounds : list or tuple of length two, optional, default=``(1e-5/ratio, 1e5/ratio)``
+            Bounds for the ratio between the primal and dual step sizes (gamma) in the Bayesian optimisation. The gamma that gives the best performance after a small number of iterations is chosen as the ratio between the primal and dual step sizes for the PDHG algorithm. If not provided, the bounds span five orders of magnitude either side of ``ratio``, an estimate of the natural scale of gamma given by :math:`\sqrt{f(K0)}/\|K\|`. This is approximately :math:`\|b\|/\|K\|` for a data-fitting term with data :math:`b`, so the default bounds are approximately :math:`[10^{-5}, 10^{5}]\,\|K\|/\|b\|`.
         n_initial_points : int, optional, default=5
             Number of initial random evaluations of the objective function in the Bayesian optimisation.
         n_calls : int, optional, default=20
@@ -1225,7 +1361,7 @@ class SPDHGConstantStepSize(StepSizeRule):
     Parameters
         ----------
         step_size : list or tuple of length two,  default=[None, None]
-                Initial values of the primal and dual step sizes. If both are ``None`` they are set to the default values defined below. If one is ``None`` it is calculated based on the other and the norm of the operator. If both are provided, they are used as they are, as long as sigma is a list or array of positive numbers of length equal to the number of operators and tau is a positive number.
+                Initial values of the primal and dual step sizes. If both are ``None`` they are set to the default values defined above. If one is ``None`` it is calculated based on the other and the norms of the operators. If both are provided, they are used as they are, as long as sigma is a list or array of positive numbers of length equal to the number of operators and tau is a positive number.
     """
 
     def __init__(self,  step_size=[None, None]):
@@ -1346,11 +1482,11 @@ class SPDHGStepSizesFromRatio(StepSizeRule):
 
 
 class SPDHGBayesOptimisationStepSize(_BayesOptimisationStepSizeBase):
-    r"""The ratio between the primal and dual step sizes (gamma) in the SPDHG algorithm is chosen using a guassian process Bayesian optimisation, choosing the gamma that gives the best performance after a small number of iterations. The step sizes are chosen at the beginning of the algorithm and then kept constant throughout the iterations.
+    r"""The ratio between the primal and dual step sizes (gamma) in the SPDHG algorithm is chosen using a Gaussian process Bayesian optimisation, choosing the gamma that gives the best performance after a small number of iterations. The step sizes are chosen at the beginning of the algorithm and then kept constant throughout the iterations.
         Parameters
         -------------
-        gamma_bounds : list or tuple of length two, optional, the default is an approximation of [1e-5, 1e6]*norm(A)/norm(b) where A is the operator and b is the data, which is a good initial guess for the ratio between the primal and dual step sizes in the SPDHG algorithm.
-            Bounds for the ratio between the primal and dual step sizes (gamma) in the Bayesian optimisation. The gamma that gives the best performance after a small number of iterations is chosen as the ratio between the primal and dual step sizes for the SPDHG algorithm. The default bounds are (1e-5, 1e5).
+        gamma_bounds : list or tuple of length two, optional, default=``(1e-5/ratio, 1e5/ratio)``
+            Bounds for the ratio between the primal and dual step sizes (gamma) in the Bayesian optimisation. The gamma that gives the best performance after a small number of iterations is chosen as the ratio between the primal and dual step sizes for the SPDHG algorithm. If not provided, the bounds span five orders of magnitude either side of ``ratio``, an estimate of the natural scale of gamma given by :math:`\sqrt{f(K0)}/\|K\|`. This is approximately :math:`\|b\|/\|K\|` for a data-fitting term with data :math:`b`, so the default bounds are approximately :math:`[10^{-5}, 10^{5}]\,\|K\|/\|b\|`.
         n_initial_points : int, optional, default=5
             Number of initial random evaluations of the objective function in the Bayesian optimisation.
         n_calls : int, optional, default=20
@@ -1445,9 +1581,9 @@ class _SPDHGAdaptiveStepSizeBase(StepSizeRule):
     -----
     This rule stores three extra domain copies, and two range copies. When
     ``auto_stop=True`` the adaptive updates are switched off, and the extra storage
-    released, once either the step sizes have been unchanged for ``auto_stop_patience``
-    consecutive iterations or the adaptation strength :math:`\alpha` has decayed below
-    ``alpha_tolerance``. 
+    released, once either the step sizes have been unchanged for more than
+    ``auto_stop_patience`` consecutive iterations or the adaptation strength
+    :math:`\alpha` has decayed below ``alpha_tolerance``.
 
     This method is memory intensive. It is recommended to use this step size rule where you are more time constrained but less memory constrained. For the opposite case, where you are more memory constrained but less time constrained, we recommend using the :class:`SPDHGBayesOptimisationStepSize` step size rule, which is a Bayesian optimisation step size rule that chooses the best step sizes at the beginning of the algorithm and then keeps them constant throughout the iterations.
     
@@ -1647,9 +1783,9 @@ class SPDHGAdaptiveStepSizeBalancing(_SPDHGAdaptiveStepSizeBase):
     s : positive :obj:`float`, optional, default=norm of the operator
         The balancing scale :math:`s` used to compare the primal and dual residuals. Defaults to the operator norm :math:`\|A\|`, as recommended in :cite:`chambolle2023stochastic`.
     auto_stop : :obj:`bool`, optional, default=True
-        If True, the adaptive updates stop and the extra storage is released once the step sizes have been unchanged for ``auto_stop_patience`` consecutive iterations.
+        If True, the adaptive updates stop and the extra storage is released once either the step sizes have been unchanged for more than ``auto_stop_patience`` consecutive iterations or :math:`\alpha` has decayed below ``alpha_tolerance``.
     auto_stop_patience : :obj:`int`, optional, default=``10 * n_operators``
-        Number of consecutive iterations with no change to the step sizes after which the adaptive updates are stopped (only used when ``auto_stop=True``). If left as ``None`` it is set to ten times the number of operators, so that the patience scales with the number of iterations needed to sample every subset.
+        Number of consecutive iterations with no change to the step sizes that are tolerated before the adaptive updates are stopped (only used when ``auto_stop=True``). If left as ``None`` it is set to ten times the number of operators, so that the patience scales with the number of iterations needed to sample every subset.
     alpha_tolerance : positive :obj:`float`, optional, default=1e-3
         Threshold on the adaptation strength :math:`\alpha` below which the adaptive updates are stopped (only used when ``auto_stop=True``). Once :math:`\alpha` has decayed this far a rebalance changes the step sizes by a relative amount of roughly :math:`\alpha`, so the rule keeps paying for the extra operator applications and storage while making no practical difference. Set to ``0`` to disable this criterion and rely on ``auto_stop_patience`` alone.
 
@@ -1724,8 +1860,8 @@ class SPDHGAdaptiveStepSizeAngle(_SPDHGAdaptiveStepSizeBase):
 
     This is an SPDHG-compatible step-size rule (A-SPDHG rule (b), Algorithm 3.2 of
     :cite:`chambolle2023stochastic`). It is the stochastic extension of the angle-based
-    adaptive PDHG scheme of Yokota and Hontani, and an alternative to the residual-balancing
-    :class:`SPDHGAdaptiveStepSizeBalancing`.
+    adaptive PDHG scheme of :cite:`yokota2017efficient`, and an alternative to the
+    residual-balancing :class:`SPDHGAdaptiveStepSizeBalancing`.
 
     At the end of each iteration, with sampled subset :math:`i`, sampling probability
     :math:`p_i`, primal increment :math:`\Delta x = x^{k} - x^{k+1}` and dual increment
@@ -1769,9 +1905,9 @@ class SPDHGAdaptiveStepSizeAngle(_SPDHGAdaptiveStepSizeBase):
     c : :obj:`float`, optional, default=0.999
         The cosine threshold :math:`c` above which the primal step size is increased. Should be close to one in high-dimensional problems, as recommended in :cite:`chambolle2023stochastic`.
     auto_stop : :obj:`bool`, optional, default=True
-        If True, the adaptive updates stop and the extra storage is released once the step sizes have been unchanged for ``auto_stop_patience`` consecutive iterations.
+        If True, the adaptive updates stop and the extra storage is released once either the step sizes have been unchanged for more than ``auto_stop_patience`` consecutive iterations or :math:`\alpha` has decayed below ``alpha_tolerance``.
     auto_stop_patience : :obj:`int`, optional, default=``10 * n_operators``
-        Number of consecutive iterations with no change to the step sizes after which the adaptive updates are stopped (only used when ``auto_stop=True``). If left as ``None`` it is set to ten times the number of operators, so that the patience scales with the number of iterations needed to sample every subset.
+        Number of consecutive iterations with no change to the step sizes that are tolerated before the adaptive updates are stopped (only used when ``auto_stop=True``). If left as ``None`` it is set to ten times the number of operators, so that the patience scales with the number of iterations needed to sample every subset.
     alpha_tolerance : positive :obj:`float`, optional, default=1e-3
         Threshold on the adaptation strength :math:`\alpha` below which the adaptive updates are stopped (only used when ``auto_stop=True``). Once :math:`\alpha` has decayed this far a rebalance changes the step sizes by a relative amount of roughly :math:`\alpha`, so the rule keeps paying for the extra operator applications and storage while making no practical difference. Set to ``0`` to disable this criterion and rely on ``auto_stop_patience`` alone.
 
@@ -1791,6 +1927,8 @@ class SPDHGAdaptiveStepSizeAngle(_SPDHGAdaptiveStepSizeBase):
     Reference
     ---------
     Chambolle, A., Delplancke, C., Ehrhardt, M.J., Schönlieb, C.-B. and Tang, J., 2023. Stochastic Primal-Dual Hybrid Gradient Algorithm with Adaptive Step-Sizes. arXiv preprint arXiv:2301.02511. :cite:`chambolle2023stochastic`
+
+    Yokota, T. and Hontani, H., 2017. An efficient method for adapting step-size parameters of primal-dual hybrid gradient method in application to total variation regularization. 2017 Asia-Pacific Signal and Information Processing Association Annual Summit and Conference (APSIPA ASC), pp. 973-979. :cite:`yokota2017efficient`
     """
 
     def __init__(self, initial_step_size=[None, None], initial_alpha=1.0, eta=0.995,

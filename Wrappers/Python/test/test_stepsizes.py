@@ -771,6 +771,29 @@ class TestPDHGAdaptive2013(CCPiTestClass):
 
         self.assertEqual(mock_func.call_count, 51)
 
+    def test_first_backtracking_retry_restores_initial_dual(self):
+        # Regression: y_old used to be allocated as zeros on the first get_step_size
+        # call, so a backtracking retry during iteration 0 restored the dual variable
+        # to zero rather than to the dual the algorithm was started from.
+        y0 = self.A.range.allocate(7.0)
+        rule = PDHGAdaptiveStepSize2013(initial_step_size=[50.0, 50.0])
+        pdhg = PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
+                    initial=[self.A.domain.allocate(0.3), y0])
+        self.assertNumpyArrayAlmostEqual(rule.y_old.as_array(), y0.as_array())
+
+        restored = []
+        original_restore = rule._restore_iterate
+
+        def spy(algorithm):
+            original_restore(algorithm)
+            restored.append(algorithm.y.copy())
+        rule._restore_iterate = spy
+
+        pdhg.run(1, verbose=0)
+        # the deliberately oversized step sizes force at least one retry
+        self.assertGreater(len(restored), 0)
+        self.assertNumpyArrayAlmostEqual(restored[0].as_array(), y0.as_array())
+
     def test_stopping_criterion(self):
 
 
@@ -820,6 +843,9 @@ class TestPDHGAdaptive2013(CCPiTestClass):
             rule.y_resid
         with self.assertRaises(AttributeError):
             rule.y_old
+        # the backtracking restore copy is released along with the other three
+        with self.assertRaises(AttributeError):
+            rule.x_prev
 
 
 class TestPDHGAdaptive2015(CCPiTestClass):
@@ -998,6 +1024,29 @@ class TestPDHGAdaptive2015(CCPiTestClass):
 
         self.assertEqual(mock_func.call_count, 51)
 
+    def test_first_backtracking_retry_restores_initial_dual(self):
+        # Regression: y_old used to be allocated as zeros on the first get_step_size
+        # call, so a backtracking retry during iteration 0 restored the dual variable
+        # to zero rather than to the dual the algorithm was started from.
+        y0 = self.A.range.allocate(7.0)
+        rule = PDHGAdaptiveStepSize2015(initial_step_size=[50.0, 50.0])
+        pdhg = PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
+                    initial=[self.A.domain.allocate(0.3), y0])
+        self.assertNumpyArrayAlmostEqual(rule.y_old.as_array(), y0.as_array())
+
+        restored = []
+        original_restore = rule._restore_iterate
+
+        def spy(algorithm):
+            original_restore(algorithm)
+            restored.append(algorithm.y.copy())
+        rule._restore_iterate = spy
+
+        pdhg.run(1, verbose=0)
+        # the deliberately oversized step sizes force at least one retry
+        self.assertGreater(len(restored), 0)
+        self.assertNumpyArrayAlmostEqual(restored[0].as_array(), y0.as_array())
+
     def test_stopping_criterion(self):
 
 
@@ -1044,6 +1093,9 @@ class TestPDHGAdaptive2015(CCPiTestClass):
             rule.y_resid
         with self.assertRaises(AttributeError):
             rule.y_old
+        # the backtracking restore copy is released along with the other three
+        with self.assertRaises(AttributeError):
+            rule.x_prev
 
 
 class TestPDHGBayesOpt(CCPiTestClass):

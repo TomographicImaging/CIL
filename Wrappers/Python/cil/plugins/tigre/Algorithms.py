@@ -19,6 +19,7 @@
 from cil.recon import Reconstructor
 try:
     import tigre.algorithms as algs
+    from tigre.utilities.gpu import GpuIds
 except ModuleNotFoundError:
     algs = None
 from cil.plugins.tigre import CIL2TIGREGeometry
@@ -30,14 +31,9 @@ from cil.framework.labels import AcquisitionDimension
 
 log = logging.getLogger(__name__)
 
-try:
-    from tigre.utilities.gpu import GpuIds
-    has_gpu_sel = True
-except ModuleNotFoundError:
-    has_gpu_sel = False
-    
 import weakref
-    
+
+
 class tigre_algo_wrapper(Reconstructor):
 
     def __init__(self, algorithm_name=None,  initial=None, image_geometry=None,  data=None, number_iterations=0,  **kwargs):
@@ -116,10 +112,7 @@ class tigre_algo_wrapper(Reconstructor):
 
         log.info("%s setting up tigre geometry", self.__class__.__name__)
 
-        if initial is None:
-            initial = image_geometry.allocate(0)
-
-        self.tigre_initial = initial.copy().as_array()
+        self._initial = initial
         ig = image_geometry
         ag = data.geometry
         self.tigre_geom, self.tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(
@@ -147,18 +140,16 @@ class tigre_algo_wrapper(Reconstructor):
 
         if self.tigre_geom.is2D:
             self.tigre_projections = np.expand_dims(self.tigre_projections, axis=1)
-            self.tigre_initial = np.expand_dims(self.tigre_initial, axis=0)
-            
+
         self.tigre_algo = getattr(algs, algorithm_name)
         self.number_iterations = number_iterations
         self.kwargs = kwargs
-        if has_gpu_sel:
-            self.gpuids = self.kwargs.pop('gpuids', None)
-            if self.gpuids is None: 
-                self.gpuids =  GpuIds()
-            log.info("Using GPU ids:", self.gpuids)
-            
-        self._input = None  
+        self.gpuids = self.kwargs.pop('gpuids', None)
+        if self.gpuids is None:
+            self.gpuids = GpuIds()
+        log.info("Using GPU ids: %s", self.gpuids)
+
+        self._input = None
 
         super(tigre_algo_wrapper, self).__init__(data, image_geometry=ig, backend='tigre')
 
@@ -181,7 +172,21 @@ class tigre_algo_wrapper(Reconstructor):
                 
         else:
             raise NotImplementedError("Setting the input after initialisation is not currently supported.")
-    
+
+    def _get_tigre_initial(self):
+        """
+        Build a fresh, TIGRE-shaped float32 initial volume.
+
+        TIGRE binds the array it is given (`self.res = init` in
+        tigre/algorithms/iterative_recon_alg.py) and several algorithms update it in place,
+        so this must return a private buffer each time: it protects the user's `initial` and
+        keeps repeated `run` calls independent of each other.
+        """
+        if self._initial is None:
+            return np.zeros(self.tigre_geom.nVoxel, dtype=np.float32)
+        # astype always copies, so this is both the dtype guard and the defensive copy
+        return self._initial.as_array().astype(np.float32).reshape(self.tigre_geom.nVoxel)
+
     def run(self, out=None):
         """
         Run the specified TIGRE algorithm with the provided parameters.
@@ -190,36 +195,33 @@ class tigre_algo_wrapper(Reconstructor):
         ----------
         out : ImageData, optional
             Output image data to store the result. If None, a new ImageData object is created.
+            Note that, unlike the other reconstructors in `cil.recon`, the result is returned
+            whether or not `out` is passed, because `quality` is returned alongside it.
 
         Returns
         -------
         out : ImageData
-            The reconstructed image data.
+            The reconstructed image data. This is `out` itself if `out` was passed.
         quality : float
             Quality measures computed by the tigre algorithm, if applicable.
+
+        Notes
+        -----
+        `run` may be called repeatedly on the same object; each call restarts from `initial`.
 
         """
 
         log.info("%s passing to the tigre algorithm", self.__class__.__name__)
-        if has_gpu_sel:
-            result = self.tigre_algo(
-                proj=self.tigre_projections,
-                geo=self.tigre_geom,
-                angles=self.tigre_angles,
-                init=self.tigre_initial,
-                niter=self.number_iterations,
-                gpuids=self.gpuids,
-                **self.kwargs
-            )
-        else:
-            result = self.tigre_algo(
-                proj=self.tigre_projections,
-                geo=self.tigre_geom,
-                angles=self.tigre_angles,
-                init=self.tigre_initial,
-                niter=self.number_iterations,
-                **self.kwargs
-            )
+        tigre_initial = self._get_tigre_initial()
+        result = self.tigre_algo(
+            proj=self.tigre_projections,
+            geo=self.tigre_geom,
+            angles=self.tigre_angles,
+            init=tigre_initial,
+            niter=self.number_iterations,
+            gpuids=self.gpuids,
+            **self.kwargs
+        )
         if isinstance(result, tuple):
             img = result[0]
             quality = result[1]
@@ -227,10 +229,15 @@ class tigre_algo_wrapper(Reconstructor):
             img = result
             quality = None
 
-        if out is None:
-            out = self._image_geometry.allocate(0)
+        img = np.squeeze(img)
 
-        out.fill(img)
+        if out is None:
+            # TIGRE hands back a freshly allocated float32 array, so wrap it rather than
+            # allocating a second volume and copying into it
+            out = ImageData(img.astype(self._image_geometry.dtype, copy=False),
+                            deep_copy=False, geometry=self._image_geometry)
+        else:
+            out.fill(img)
 
         log.info("%s completed", self.__class__.__name__)
 

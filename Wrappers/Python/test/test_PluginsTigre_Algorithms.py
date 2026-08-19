@@ -76,7 +76,8 @@ SINGLE_ANGLE_ALGORITHMS = ['sart', 'sart_tv', 'fista']
 class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase):
 
     
-    def get_geometry_data(self, geometry_type):
+    @staticmethod
+    def get_geometry_data(geometry_type):
         if geometry_type == "parallel_2d":
             data = SIMULATED_PARALLEL_BEAM_DATA.get().get_slice(vertical='centre')
             gt = SIMULATED_SPHERE_VOLUME.get().get_slice(vertical='centre')
@@ -132,6 +133,8 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
 
         self.assertIsInstance(img, ImageData)
         self.assertEqual(img.shape, ig.shape)
+        self.assertEqual(img.dtype, ig.dtype)
+        self.assertEqual(img.geometry, ig)
         if qual is not None:
             self.assertTrue(isinstance(qual, (float, int, np.ndarray)))
 
@@ -183,3 +186,54 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
         self.run_algorithm(algorithm_name, geometry_type, expect_warning=expect_warning, **resolved_kwargs)
 
 
+class TestTigreAlgorithmBuffers(ParametrizedTestCase, unittest.TestCase):
+    """
+    TIGRE binds the `init` array it is given rather than copying it (`self.res = init` in
+    tigre/algorithms/iterative_recon_alg.py) and several algorithms, including sirt, update
+    it in place. These tests pin down that the wrapper isolates the caller from that: the
+    user's `initial` is never touched and every `run` starts afresh from it.
+    """
+
+    @staticmethod
+    def _setup(geometry_type, initial_value=None):
+        """Build a cheap sirt wrapper, with a non-zero `initial` if `initial_value` is given."""
+        ig, absorption, _ = TestTigreReconstructionAlgorithms.get_geometry_data(geometry_type)
+        initial = None if initial_value is None else ig.allocate(initial_value)
+        algo = tigre_algo_wrapper(
+            algorithm_name='sirt',
+            initial=initial,
+            image_geometry=ig,
+            data=absorption,
+            number_iterations=2,
+        )
+        return ig, initial, algo
+
+    @parametrize(("geometry_type",), [("parallel_2d",), ("parallel_3d",)])
+    @unittest.skipUnless(has_tigre, "Requires TIGRE")
+    @unittest.skipUnless(has_nvidia, "Requires NVIDIA GPU for TIGRE")
+    def test_run_is_repeatable(self, geometry_type):
+        _, _, algo = self._setup(geometry_type)
+        first, _ = algo.run()
+        second, _ = algo.run()
+        np.testing.assert_allclose(first.as_array(), second.as_array(), atol=1e-8)
+
+    @parametrize(("geometry_type",), [("parallel_2d",), ("parallel_3d",)])
+    @unittest.skipUnless(has_tigre, "Requires TIGRE")
+    @unittest.skipUnless(has_nvidia, "Requires NVIDIA GPU for TIGRE")
+    def test_initial_is_not_modified(self, geometry_type):
+        _, initial, algo = self._setup(geometry_type, initial_value=0.5)
+        before = initial.as_array().copy()
+        algo.run()
+        np.testing.assert_array_equal(initial.as_array(), before)
+
+    @parametrize(("geometry_type",), [("parallel_2d",), ("parallel_3d",)])
+    @unittest.skipUnless(has_tigre, "Requires TIGRE")
+    @unittest.skipUnless(has_nvidia, "Requires NVIDIA GPU for TIGRE")
+    def test_out_matches_return(self, geometry_type):
+        ig, _, algo = self._setup(geometry_type)
+        expected, _ = algo.run()
+
+        out = ig.allocate(0)
+        returned, _ = algo.run(out=out)
+        self.assertIs(returned, out)
+        np.testing.assert_allclose(out.as_array(), expected.as_array(), atol=1e-8)

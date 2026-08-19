@@ -19,9 +19,9 @@
 from cil.recon import Reconstructor
 try:
     import tigre.algorithms as algs
-    from cil.plugins.tigre import CIL2TIGREGeometry
-except ImportError:
-    raise ImportError("TIGRE is not installed. Please install it to use this module.")
+except ModuleNotFoundError:
+    algs = None
+from cil.plugins.tigre import CIL2TIGREGeometry
 from cil.framework import ImageData
 import logging
 import numpy as np
@@ -47,11 +47,12 @@ class tigre_algo_wrapper(Reconstructor):
         Parameters
         ----------
         algorithm_name : str
-            algorithm_Name of the TIGRE algorithm to use (e.g., 'ART', 'SART', 'SIRT', 'OSSART').
+            Name of the TIGRE algorithm to use (e.g., 'art', 'sart', 'sirt', 'ossart').
         initial : ImageData, optional
             Initial guess for the reconstruction. If None, a zero-initialized image is used.
-        image_geometry : ImageGeometry
-            The geometry of the image to be reconstructed.
+        image_geometry : ImageGeometry, optional
+            The geometry of the image to be reconstructed. If None, it is taken from `initial`,
+            or otherwise from a default calculated from the geometry of `data`.
         data : AcquisitionData
             The measured projection data.
         number_iterations : int, default=0
@@ -68,8 +69,10 @@ class tigre_algo_wrapper(Reconstructor):
 
         Raises
         ------
+        ModuleNotFoundError
+            If TIGRE is not installed.
         ValueError
-            If  `data` is None.
+            If `data` is None.
 
         Notes
         -----
@@ -78,27 +81,32 @@ class tigre_algo_wrapper(Reconstructor):
         of CIL geometries to TIGRE geometries and prepares the data for the specified algorithm.
         The `algorithm_name` parameter should match one of the available TIGRE algorithms for example: 'art', 'sirt', 'sart', 'ossart', 'cgls', 'lsmr', 'hybrid_lsqr', 'ista', 'fista', 'sart_tv', 'ossart_tv'.
 
-        Note
-        ----
-        We are aware that running the TIGRE algorithms: ISTA, FISTA, SART_TV, OSSART_TV using 2D data can lead to incorrect restults in the TV denoising step, particularly when using more than one GPU. https://github.com/CERN/TIGRE/issues/681
-        You can change the gpuids by passing the `gpuids` keyword argument, for example:
-        ```python
-        from tigre.utilities.gpu import GpuIds
-        gpuids = GpuIds()
-        gpuids.devices = [0]  # Specify the GPU device IDs you want to use
-        algo = tigre_algo_wrapper(algorithm_name='fista', initial=initial_image, image_geometry=image_geom, data=acquisition_data, number_iterations=10, gpuids=gpuids)
-        ```
-        
-        
+        We are aware that running the TIGRE algorithms: ISTA, FISTA, SART_TV, OSSART_TV using 2D data can lead to
+        incorrect results in the TV denoising step, particularly when using more than one GPU. See
+        https://github.com/CERN/TIGRE/issues/681
+        You can change the GPUs used by passing the `gpuids` keyword argument, for example:
+
+        .. code-block:: python
+
+            from tigre.utilities.gpu import GpuIds
+            gpuids = GpuIds()
+            gpuids.devices = [0]  # Specify the GPU device IDs you want to use
+            algo = tigre_algo_wrapper(algorithm_name='fista', initial=initial_image, image_geometry=image_geom, data=acquisition_data, number_iterations=10, gpuids=gpuids)
+
+
         Example
         -------
-        >>> from cil.plugins.tigre import tigre_algo_wrapping 
-        >>> algo = tigre_algo_wrapper(algorithm_name='SART', initial=initial_image, image_geometry=image_geom, data=acquisition_data, number_iterations=10)
+        >>> from cil.plugins.tigre import tigre_algo_wrapper
+        >>> algo = tigre_algo_wrapper(algorithm_name='sart', initial=initial_image, image_geometry=image_geom, data=acquisition_data, number_iterations=10)
         >>> reconstructed_image, quality = algo.run()
 
         """
 
-        
+        if algs is None:
+            raise ModuleNotFoundError(
+                "This plugin requires the additional package TIGRE\n"
+                "Please install it via conda as tigre from the ccpi channel")
+
         if data is None:
             raise ValueError("`data` is required")
         if image_geometry is None and initial is None:
@@ -117,7 +125,17 @@ class tigre_algo_wrapper(Reconstructor):
         self.tigre_geom, self.tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(
             ig, ag)
         self.tigre_projections = data.as_array()
-        
+
+        # DEVELOPER NOTE: revisit this warning whenever the TIGRE version is updated.
+        # It guards against CERN/TIGRE#681, an out-of-bounds read in the TV denoising step
+        # for single-slice (2D) images, which corrupted the result when the image was split
+        # across more than one GPU. A CUDA-side fix (`image_size[2] > 1` guards in
+        # Common/CUDA/tv_proximal.cu) landed in CERN/TIGRE#699 and is present in TIGRE
+        # v3.1.3, which is CIL's current minimum, so this warning is expected to be
+        # obsolete. It is kept only because the fix has not yet been confirmed on
+        # multi-GPU hardware. Once it has, remove this block, the matching paragraph in
+        # the docstring above, and the `expect_warning` machinery in
+        # test/test_PluginsTigre_Algorithms.py.
         if self.tigre_projections.ndim == 2:
             if any( a==algorithm_name for a in ['ista', 'fista', 'sart_tv', 'ossart_tv']):
                 warnings.warn(

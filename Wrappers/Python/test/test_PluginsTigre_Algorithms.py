@@ -23,7 +23,7 @@ from cil.utilities.dataexample import (
     SIMULATED_CONE_BEAM_DATA,
     SIMULATED_SPHERE_VOLUME
 )
-from cil.processors import TransmissionAbsorptionConverter, Slicer
+from cil.processors import TransmissionAbsorptionConverter
 from cil.framework import ImageData
 
 import numpy as np
@@ -33,12 +33,45 @@ from unittest_parametrize import ParametrizedTestCase
 initialise_tests()
 
 import warnings
-    
-from testclass import CCPiTestClass
 
 if has_tigre:
+    import tigre
     from tigre.utilities.gpu import GpuIds
     from cil.plugins.tigre import ProjectionOperator, tigre_algo_wrapper
+
+
+def _has_tigre_single_angle_bug():
+    """
+    Detect a TIGRE bug that breaks any algorithm projecting one angle at a time.
+
+    `Geometry.__check_and_repmat__` decides whether a field holds a single value to be
+    broadcast purely from its shape, and tests ``shape == (1,)`` before
+    ``shape == (n_proj,)``. When there is exactly one projection those are the same
+    shape, so per-projection fields (COR, and DSD/DSO on a second `check_geo` call) are
+    tiled to ``(1, 1)``. `Ax`/`Atb` re-run `check_geo` on a copy of the geometry, so a
+    single-angle projection then fails in `convert_to_c_geometry` with
+    "only 0-dimensional arrays can be converted to Python scalars".
+
+    Fixed upstream by CERN/TIGRE commits 5f9a52691f and 26d8e2e8ff (2026-06-23), which
+    are not in v3.1.3 (the version CIL pins) or any other release yet. This probe is
+    pure numpy, so it needs no GPU, and the affected tests below start running again by
+    themselves once CIL moves to a TIGRE that contains the fix.
+    """
+    if not has_tigre:
+        return False
+    geo = tigre.geometry(mode='parallel', nVoxel=np.array([1, 4, 4]))
+    angles = np.zeros(1, dtype=np.float32)
+    geo.check_geo(angles)
+    geo.check_geo(angles)
+    return np.shape(geo.DSO) != (1,) or np.shape(geo.COR) != (1,)
+
+
+has_tigre_single_angle_bug = _has_tigre_single_angle_bug()
+
+# TIGRE algorithms that project one angle at a time (blocksize=1) and so cannot run at
+# all while `has_tigre_single_angle_bug` is True.
+SINGLE_ANGLE_ALGORITHMS = ['sart', 'sart_tv', 'fista']
+
 
 class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase):
 
@@ -129,9 +162,14 @@ class TestTigreReconstructionAlgorithms(ParametrizedTestCase,  unittest.TestCase
     @unittest.skipUnless(has_tigre, "Requires TIGRE")
     @unittest.skipUnless(has_nvidia, "Requires NVIDIA GPU for TIGRE")
     def test_tigre_algorithms_with_geometries(self, algorithm_name, kwargs, expect_warning, geometry_type):
+        if has_tigre_single_angle_bug and algorithm_name in SINGLE_ANGLE_ALGORITHMS:
+            self.skipTest(
+                f"TIGRE's {algorithm_name} projects one angle at a time and cannot run with this "
+                "version of TIGRE, see _has_tigre_single_angle_bug")
+
         ig, absorption, _ = self.get_geometry_data(geometry_type)
-        
-        
+
+
         gpuids = GpuIds()
         if expect_warning:
             gpuids.devices = [0]

@@ -1,5 +1,5 @@
 from cil.optimisation.algorithms import SIRT, GD, ISTA, FISTA, PDHG, SPDHG
-from cil.optimisation.functions import BlockFunction, LeastSquares, IndicatorBox, ZeroFunction, L2NormSquared
+from cil.optimisation.functions import BlockFunction, LeastSquares, IndicatorBox, ZeroFunction, L2NormSquared, L1Norm
 from cil.framework import ImageGeometry, VectorGeometry, VectorData
 from cil.optimisation.operators import BlockOperator,  IdentityOperator, MatrixOperator, LinearOperator
 
@@ -1193,14 +1193,42 @@ class TestPDHGBayesOpt(CCPiTestClass):
         PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
 
         self.assertEqual(rule.n_iterations, 10)
-        # the bounds are derived from the data and the operator norm
-        zero = self.A.direct(self.A.domain_geometry().allocate(0))
-        ratio = np.sqrt(self.F(zero)) / self.A.norm()
+        # the bounds are derived from the objective at the zero image and the operator norm
+        zero_x = self.A.domain_geometry().allocate(0)
+        ratio = np.sqrt(self.F(self.A.direct(zero_x)) +
+                        self.G(zero_x)) / self.A.norm()
         bounds = rule.gamma_bounds
         # compared as ratios: the bounds span ten orders of magnitude, so an
         # absolute tolerance would make the lower bound assertion vacuous
         self.assertAlmostEqual(bounds[0] / (1e-5 / ratio), 1.)
         self.assertAlmostEqual(bounds[1] / (1e5 / ratio), 1.)
+
+    @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
+    def test_default_gamma_bounds_when_f_vanishes_at_zero(self):
+
+        f = L1Norm()
+        g = L2NormSquared(b=self.data)
+        rule = PDHGBayesOptimisationStepSize(
+            gamma_bounds=None, n_initial_points=2, n_calls=3,
+            n_iterations=2, seed=42)
+        PDHG(f=f, g=g, operator=self.A, step_size=rule)
+
+        zero_x = self.A.domain_geometry().allocate(0)
+        self.assertEqual(f(self.A.direct(zero_x)), 0.)
+        ratio = np.sqrt(g(zero_x)) / self.A.norm()
+        bounds = rule.gamma_bounds
+        self.assertTrue(np.all(np.isfinite(bounds)))
+        self.assertAlmostEqual(bounds[0] / (1e-5 / ratio), 1.)
+        self.assertAlmostEqual(bounds[1] / (1e5 / ratio), 1.)
+
+    @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
+    def test_default_gamma_bounds_raises_if_objective_vanishes_at_zero(self):
+
+        rule = PDHGBayesOptimisationStepSize(
+            gamma_bounds=None, n_initial_points=2, n_calls=3,
+            n_iterations=2, seed=42)
+        with self.assertRaises(ValueError):
+            PDHG(f=L1Norm(), g=L2NormSquared(), operator=self.A, step_size=rule)
 
     # ------------------------------------------------------------------
     # the gamma -> (tau, sigma) mapping
@@ -1646,13 +1674,45 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
 
         # n_iterations follows the number of operators
         self.assertEqual(rule.n_iterations, 10 * self.subsets)
-        # and the bounds are derived from the data and the operator norm
-        zero = self.A.direct(self.A.domain_geometry().allocate(0))
-        ratio = np.sqrt(self.F(zero)) / self.A.norm()
+        # and the bounds are derived from the objective at the zero image and the operator norm
+        zero_x = self.A.domain_geometry().allocate(0)
+        ratio = np.sqrt(self.F(self.A.direct(zero_x)) +
+                        self.G(zero_x)) / self.A.norm()
         bounds = rule.gamma_bounds
 
         self.assertAlmostEqual(bounds[0] / (1e-5 / ratio), 1.)
         self.assertAlmostEqual(bounds[1] / (1e5 / ratio), 1.)
+
+    @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
+    def test_default_gamma_bounds_when_f_vanishes_at_zero(self):
+
+        f = BlockFunction(*[L1Norm() for _ in range(self.subsets)])
+        g = L2NormSquared(b=self.data)
+        rule = SPDHGBayesOptimisationStepSize(
+            gamma_bounds=None, n_initial_points=2, n_calls=3,
+            n_iterations=2, seed=42)
+        SPDHG(f=f, g=g, operator=self.A, step_size=rule,
+              sampler=Sampler.random_with_replacement(
+                  self.subsets, prob=self.PROB_WEIGHTS, seed=42))
+
+        zero_x = self.A.domain_geometry().allocate(0)
+        self.assertEqual(f(self.A.direct(zero_x)), 0.)
+        ratio = np.sqrt(g(zero_x)) / self.A.norm()
+        bounds = rule.gamma_bounds
+        self.assertTrue(np.all(np.isfinite(bounds)))
+        self.assertAlmostEqual(bounds[0] / (1e-5 / ratio), 1.)
+        self.assertAlmostEqual(bounds[1] / (1e5 / ratio), 1.)
+
+    @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
+    def test_default_gamma_bounds_raises_if_objective_vanishes_at_zero(self):
+        f = BlockFunction(*[L1Norm() for _ in range(self.subsets)])
+        rule = SPDHGBayesOptimisationStepSize(
+            gamma_bounds=None, n_initial_points=2, n_calls=3,
+            n_iterations=2, seed=42)
+        with self.assertRaises(ValueError):
+            SPDHG(f=f, g=self.G, operator=self.A, step_size=rule,
+                  sampler=Sampler.random_with_replacement(
+                      self.subsets, prob=self.PROB_WEIGHTS, seed=42))
         
     # ------------------------------------------------------------------
     # the gamma -> (tau, sigma) mapping

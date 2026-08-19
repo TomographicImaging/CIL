@@ -1175,9 +1175,15 @@ class _BayesOptimisationStepSizeBase(StepSizeRule):
                 "n_iterations not provided, set to {}".format(self.n_iterations))
 
         if self.gamma_bounds is None:
-            ratio = np.sqrt(algorithm.f(algorithm.operator.direct(
-                0*algorithm.x)))/algorithm.operator.norm()
+            zero = 0*algorithm.x
+            ratio = np.sqrt(algorithm.f(algorithm.operator.direct(zero)) +
+                            algorithm.g(zero))/algorithm.operator.norm()
             log.debug("ratio: {}".format(ratio))
+            if not np.isfinite(ratio) or ratio <= 0:
+                raise ValueError(
+                    "Cannot infer default `gamma_bounds` for this problem: the objective "
+                    "evaluated at the zero image is {}, so there is no scale to derive them "
+                    "from. Please pass `gamma_bounds` explicitly.".format(ratio))
             self.gamma_bounds = (1e-5/ratio, 1e5/ratio)
             log.debug(
                 "gamma_bounds not provided, set to (1e-5/ratio, 1e5/ratio) = {}".format(self.gamma_bounds))
@@ -1260,7 +1266,7 @@ class PDHGBayesOptimisationStepSize(_BayesOptimisationStepSizeBase):
         Parameters
         -------------
         gamma_bounds : list or tuple of length two, optional
-            Bounds for the ratio between the primal and dual step sizes (gamma) in the Bayesian optimisation. The gamma that gives the best performance after a small number of iterations is chosen as the ratio between the primal and dual step sizes for the PDHG algorithm. Defaults to ``(1e-5/ratio, 1e5/ratio)``, spanning five orders of magnitude either side of ``ratio``, an estimate of the natural scale of gamma given by :math:`\sqrt{f(K0)}/\|K\|`. This is approximately :math:`\|b\|/\|K\|` for a data-fitting term with data :math:`b`, so the default bounds are approximately :math:`[10^{-5}, 10^{5}]\,\|K\|/\|b\|`.
+            Bounds for the ratio between the primal and dual step sizes (gamma) in the Bayesian optimisation. The gamma that gives the best performance after a small number of iterations is chosen as the ratio between the primal and dual step sizes for the PDHG algorithm. Defaults to ``(1e-5/ratio, 1e5/ratio)``, spanning five orders of magnitude either side of ``ratio``, an estimate of the natural scale of gamma given by :math:`\sqrt{f(K0) + g(0)}/\|K\|`, the objective at the zero image. This is approximately :math:`\|b\|/\|K\|` for a data-fitting term with data :math:`b`, so the default bounds are approximately :math:`[10^{-5}, 10^{5}]\,\|K\|/\|b\|`. If the objective at the zero image is itself zero, or is not finite, there is no scale to work from and a ``ValueError`` is raised asking for explicit bounds.
         n_initial_points : int, optional, default=5
             Number of initial random evaluations of the objective function in the Bayesian optimisation.
         n_calls : int, optional, default=20
@@ -1515,7 +1521,7 @@ class SPDHGBayesOptimisationStepSize(_BayesOptimisationStepSizeBase):
         Parameters
         -------------
         gamma_bounds : list or tuple of length two, optional
-            Bounds for the ratio between the primal and dual step sizes (gamma) in the Bayesian optimisation. The gamma that gives the best performance after a small number of iterations is chosen as the ratio between the primal and dual step sizes for the SPDHG algorithm. Defaults to ``(1e-5/ratio, 1e5/ratio)``, spanning five orders of magnitude either side of ``ratio``, an estimate of the natural scale of gamma given by :math:`\sqrt{f(K0)}/\|K\|`. This is approximately :math:`\|b\|/\|K\|` for a data-fitting term with data :math:`b`, so the default bounds are approximately :math:`[10^{-5}, 10^{5}]\,\|K\|/\|b\|`.
+            Bounds for the ratio between the primal and dual step sizes (gamma) in the Bayesian optimisation. The gamma that gives the best performance after a small number of iterations is chosen as the ratio between the primal and dual step sizes for the SPDHG algorithm. Defaults to ``(1e-5/ratio, 1e5/ratio)``, spanning five orders of magnitude either side of ``ratio``, an estimate of the natural scale of gamma given by :math:`\sqrt{f(K0) + g(0)}/\|K\|`, the objective at the zero image. This is approximately :math:`\|b\|/\|K\|` for a data-fitting term with data :math:`b`, so the default bounds are approximately :math:`[10^{-5}, 10^{5}]\,\|K\|/\|b\|`. If the objective at the zero image is itself zero, or is not finite, there is no scale to work from and a ``ValueError`` is raised asking for explicit bounds.
         n_initial_points : int, optional, default=5
             Number of initial random evaluations of the objective function in the Bayesian optimisation.
         n_calls : int, optional, default=20
@@ -1565,12 +1571,6 @@ class SPDHGBayesOptimisationStepSize(_BayesOptimisationStepSizeBase):
 
     def _algorithm_set_up(self, algorithm, step_size):
         """Set up the algorithm with the given step size.
-
-        The sampler and probability weights are passed back explicitly because
-        ``SPDHG.set_up`` would otherwise reset them to the uniform default. Each trial
-        is given an identical copy of the caller's sampler, so that every gamma is
-        scored on the same sequence of subsets rather than on wherever the previous
-        trial happened to leave the generator.
         """
         if self._pristine_sampler is None:
             self._pristine_sampler = deepcopy(algorithm._sampler)

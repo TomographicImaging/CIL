@@ -15,10 +15,12 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+# Evan Kiely (Warwick Manufacturing Group, University of Warwick)
 
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageGeometry, ImageData
 import os, re
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+import warnings
 
 pilAvailable = True
 try:
@@ -147,7 +149,6 @@ class TIFFWriter(object):
             for sliceno in range(self.data_container.shape[0]):
                 # save single slice
                 # pattern = self.file_name.split('.')
-                dimension = self.data_container.dimension_labels[0]
                 fname = "{}_idx_{:04d}.tiff".format(
                     os.path.join(self.dir_name, self.file_name),
                     sliceno + self.counter_offset)
@@ -164,7 +165,6 @@ class TIFFWriter(object):
             for sliceno1 in range(self.data_container.shape[0]):
                 # save single slice
                 # pattern = self.file_name.split('.')
-                dimension = [ self.data_container.dimension_labels[0] ]
                 for sliceno2 in range(self.data_container.shape[1]):
                     fname = format_string.format(os.path.join(self.dir_name, self.file_name),
                         self.data_container.shape[0], self.data_container.shape[1], self.data_container.shape[2],
@@ -219,6 +219,10 @@ class TIFFStackReader(object):
 
             Note: in general output array size in bin mode != output array size in slice mode
 
+        file_prefix : str, default None
+            Leading string for the tiff files to be read. Used only when the file_name 
+            is a path to a folder, if None all files in the folder are loaded. 
+        
         dtype : numpy type, string, default np.float32
             Requested type of the read image. If set to None it defaults to the type of the saved file.
 
@@ -262,21 +266,23 @@ class TIFFStackReader(object):
         >>> about_original_data = reader.read_rescaled()
     '''
 
-    def __init__(self, file_name=None, roi=None, transpose=False, mode='bin', dtype=np.float32):
-        self.file_name = file_name
-
-        if self.file_name is not None:
-            self.set_up(file_name = self.file_name,
-                        roi = roi,
-                        transpose = transpose,
-                        mode = mode, dtype=dtype)
-
-    def set_up(self,
-               file_name = None,
-               roi = None,
-               transpose = False,
-               mode = 'bin',
-               dtype = np.float32):
+    def __init__(self, file_name=None, roi=None, transpose=False, mode='bin', file_prefix = None, dtype=np.float32):    
+            self.file_name = file_name
+            
+            if self.file_name is not None:
+                self.set_up(file_name = self.file_name,
+                            roi = roi,
+                            transpose = transpose,
+                            file_prefix = file_prefix,
+                            mode = mode, dtype=dtype)
+                
+    def set_up(self, 
+            file_name = None,
+            roi = None,
+            transpose = False,
+            mode = 'bin', 
+            file_prefix = None,
+            dtype = np.float32):
         '''
         Set up method for the TIFFStackReader class
 
@@ -309,6 +315,10 @@ class TIFFStackReader(object):
             are binned together, values of resulting binned pixels are calculated as average.
             In 'slice' mode 'step' defines standard numpy slicing.
             Note: in general output array size in bin mode != output array size in slice mode
+
+        file_prefix : str, default None
+            Leading string for the tiff files to be read. Used only when the file_name 
+            is a path to a folder, if None all files in the folder are loaded. 
 
         dtype : numpy type, string, default np.float32
             Requested type of the read image. If set to None it defaults to the type of the saved file.
@@ -351,17 +361,29 @@ class TIFFStackReader(object):
 
         if isinstance(file_name, list):
             self._tiff_files = file_name
+            if file_prefix is not None:
+                warnings.warn(f"file_prefix: {file_prefix} is not used with a list of tiffs", stacklevel=2)
+        
         elif os.path.isfile(file_name):
             self._tiff_files = [file_name]
+            if file_prefix is not None:
+                warnings.warn(f"file_prefix: {file_prefix} is not used with a single tiff", stacklevel=2)
+        
         elif os.path.isdir(file_name):
-            self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),"*.tif"))
+            if file_prefix == None:
+                file_prefix = ''
+
+            self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),file_prefix + "*.tif"))
+            
+            if not self._tiff_files:
+                self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),file_prefix + "*.tiff"))
 
             if not self._tiff_files:
-                self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),"*.tiff"))
-
-            if not self._tiff_files:
-                raise Exception("No tiff files were found in the directory \n{}".format(file_name))
-
+                if file_prefix == '':
+                    raise Exception("No tiff files were found in the directory \n{}".format(file_name))
+                else:
+                    raise Exception("No tiff files with prefix {} were found in the directory \n{}".format(file_prefix, file_name))
+                
         else:
             raise Exception("file_name expects a tiff file, a list of tiffs, or a directory containing tiffs.\n{}".format(file_name))
 
@@ -509,8 +531,8 @@ class TIFFStackReader(object):
         '''reads the TIFF stack as an ImageData with the provided geometry'''
         data = self.read()
         if len(geometry.shape) == 4:
-            gsize = functools.reduce(lambda x,y: x*y, geometry.shape, 1)
-            dsize = functools.reduce(lambda x,y: x*y, data.shape, 1)
+            gsize = np.prod(geometry.shape)
+            dsize = np.prod(data.shape)
             if gsize != dsize:
                 added_dims = len(geometry.shape) - len(data.shape)
                 if data.shape[0] != functools.reduce(lambda x,y: x*y, geometry.shape[:1+added_dims], 1):

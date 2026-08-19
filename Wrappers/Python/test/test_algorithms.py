@@ -36,15 +36,14 @@ from cil.optimisation.operators import IdentityOperator, AdjointOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
 
 
-from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, ScaledFunction
-from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD
 
+from cil.optimisation.functions import Rosenbrock, MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, ScaledFunction
+from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD , LSQR
 
-from scipy.optimize import minimize, rosen
 
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
-from cil.optimisation.functions import Rosenbrock
+
 from cil.utilities.quality_measures import mae, mse, psnr
 
 import logging
@@ -70,11 +69,6 @@ class TestGD(CCPiTestClass):
         self.x0 = np.array([x0_1, x0_2])
 
         self.initial = VectorData(np.array(self.x0))
-        method = 'Nelder-Mead'  # or "BFGS"
-        # self.scipy_opt_low = minimize(rosen, self.x0, method=method, tol=1e-3, options={"maxiter":50})
-        self.scipy_opt_high = minimize(
-            rosen, self.x0, method=method, tol=1e-2)  # (1., 1.)
-        # fixed (alpha=1, beta=100) same to Scipy, min at (alpha,alpha^2)
         self.f = Rosenbrock(alpha=1, beta=100)
 
     def test_GD(self):
@@ -87,13 +81,11 @@ class TestGD(CCPiTestClass):
 
         step_size = norm2sq.L / 3.
 
-        alg = GD(initial=initial, f=norm2sq, step_size=step_size,
-                 atol=1e-9, rtol=1e-6)
+        alg = GD(initial=initial, f=norm2sq, step_size=step_size)
         alg.run(1000, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
-        alg = GD(initial=initial, f=norm2sq, step_size=step_size,
-                 atol=1e-9, rtol=1e-6, update_objective_interval=2)
+        alg = GD(initial=initial, f=norm2sq, step_size=step_size, update_objective_interval=2)
         self.assertTrue(alg.update_objective_interval == 2)
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -114,8 +106,7 @@ class TestGD(CCPiTestClass):
         norm2sq = LeastSquares(identity, b)
         alg = GD(initial=initial,
                  f=norm2sq,
-                 update_objective_interval=0,
-                 atol=1e-9, rtol=1e-6)
+                 update_objective_interval=0)
         self.assertTrue(alg.update_objective_interval == 0)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -135,13 +126,6 @@ class TestGD(CCPiTestClass):
         with self.assertRaises(NotImplementedError):
             self.assertEqual(gd.step_size,3)
 
-        gd = GD(initial=self.initial,
-                f=self.f, alpha=1e2, beta=0.25)
-        self.assertEqual(gd.step_size_rule.alpha_orig, 1e2)
-        self.assertEqual(gd.step_size_rule.beta, 0.25)
-        self.assertEqual(gd.step_size_rule.max_iterations, np.ceil(
-            2 * np.log10(1e2) / np.log10(2)))
-
 
     def test_gd_constant_step_size_init(self):
         rule = ConstantStepSize(0.4)
@@ -150,16 +134,6 @@ class TestGD(CCPiTestClass):
                 f=self.f, step_size=rule)
         self.assertEqual(gd.step_size_rule.step_size, 0.4)
         self.assertEqual(gd.step_size, 0.4)
-
-    def test_gd_fixed_step_size_rosen(self):
-
-        gd = GD(initial=self.initial, f=self.f, step_size=0.002,
-                update_objective_interval=500)
-        gd.run(3000, verbose=0)
-        np.testing.assert_allclose(
-            gd.solution.array[0], self.scipy_opt_high.x[0], atol=1e-2)
-        np.testing.assert_allclose(
-            gd.solution.array[1], self.scipy_opt_high.x[1], atol=1e-2)
 
     def test_armijo_step_size_init(self):
 
@@ -214,15 +188,7 @@ class TestGD(CCPiTestClass):
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
-    def test_gd_armijo_rosen(self):
-        armj = ArmijoStepSizeRule(alpha=50, max_iterations=50, warmstart=False)
-        gd = GD(initial=self.initial, f=self.f, step_size=armj,
-                update_objective_interval=500)
-        gd.run(3500, verbose=0)
-        np.testing.assert_allclose(
-            gd.solution.array[0], self.scipy_opt_high.x[0], atol=1e-2)
-        np.testing.assert_allclose(
-            gd.solution.array[1], self.scipy_opt_high.x[1], atol=1e-2)
+
 
     def test_gd_run_no_iterations(self):
         gd = GD(initial=self.initial, f=self.f, step_size=0.002)
@@ -246,24 +212,13 @@ class TestGD(CCPiTestClass):
             gd.run(np.inf, callbacks=[StopCallback()])
         self.assertEqual(gd.iteration, 9)
 
-    def test_gd_deprecate_atol_rtol(self):
-        with self.assertWarns(DeprecationWarning):
-            initial=VectorData(np.array([1.1,1.1]))
-            b=VectorData(np.array([1.,1.]))
-            A=IdentityOperator(b.geometry)
-            gd = GD(initial=initial, f=LeastSquares(A,b ), step_size=1, atol=1, rtol=2)
-            
-        self.assertEqual(gd.rtol, 2.)
-        self.assertEqual(gd.atol, 1.)
-        gd.run(10)
-        self.assertEqual(gd.iteration, 0)
         
 class Test_APGD(CCPiTestClass):
     def setUp(self):
         self.ig = ImageGeometry(11,12,13)
         self.initial = self.ig.allocate(0)
         self.b = self.ig.allocate(None)
-        self.b.fill(np.array(range(11*12*13)).reshape(13,12,11))
+        self.b.fill(np.arange(11*12*13).reshape(13,12,11))
         self.identity = IdentityOperator(self.ig)
 
         self.f = OperatorCompositionFunction(L2NormSquared(b=self.b), self.identity)
@@ -745,17 +700,6 @@ class TestCGLS(CCPiTestClass):
         self.alg = CGLS(initial=self.initial, operator=self.operator, data=self.data,
                         update_objective_interval=2)
 
-    # can be deprecated when tolerance is deprecated in CGLS
-    def test_initialization_with_default_tolerance(self):
-
-        self.assertEqual(self.alg.tolerance, 0)
-
-    # can be deprecated when tolerance is deprecated in CGLS
-    def test_initialization_with_custom_tolerance(self):
-        with self.assertWarns(DeprecationWarning):
-            alg = CGLS(initial=self.initial, operator=self.operator,
-                       data=self.data, tolerance=0.01)
-        self.assertEqual(alg.tolerance, 0.01)
 
     def test_set_up(self):
         # Test the set_up method
@@ -788,38 +732,10 @@ class TestCGLS(CCPiTestClass):
             self.alg.r, out=self.alg.s)
 
     def test_convergence(self):
-
         self.alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(
             self.alg.x.as_array(), self.data.as_array())
 
-    # can be deprecated when tolerance is deprecated in CGLS
-    def test_should_stop_flag_false(self):
-        # Mocking norms to ensure tolerance isn't reached
-        self.alg.run(2)
-        self.alg.norms = 10
-        self.alg.norms0 = 99
-        self.alg.tolerance = 0.1
-        self.alg.normx = 0.1
-
-        self.assertFalse(self.alg.flag())
-
-    # can be deprecated when tolerance is deprecated in CGLS
-    def test_should_stop_flag_true(self):
-        # Mocking norms to ensure tolerance is reached
-        self.alg.run(4)
-        self.alg.norms = 1
-        self.alg.norms0 = 10
-        self.alg.tolerance = 0.1
-        self.alg.normx = 10
-
-        self.assertTrue(self.alg.flag())
-
-    # can be deprecated when tolerance is deprecated in CGLS
-    def test_tolerance_reached_immediately(self):
-        alg = CGLS(initial=self.operator.domain_geometry().allocate(
-            0), operator=self.operator, data=self.operator.domain_geometry().allocate(0))
-        alg.run(2)
 
     def test_update_objective(self):
         # Mocking squared_norm to return a finite value
@@ -1528,28 +1444,6 @@ class TestSPDHG(CCPiTestClass):
         with self.assertRaises(IndexError):
             spdhg.run(12)
 
-    def test_spdhg_deprecated_vargs(self):
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, norms=[
-                      1]*len(self.A), prob=[1/(self.subsets-1)]*(self.subsets-1)+[0])
-
-        self.assertListEqual(self.A.get_norms_as_list(), [1]*len(self.A))
-        self.assertListEqual(spdhg._norms, [1]*len(self.A))
-        self.assertListEqual(spdhg._sampler.prob_weights, [
-                             1/(self.subsets-1)]*(self.subsets-1)+[0])
-        self.assertListEqual(spdhg._prob_weights, [
-                             1/(self.subsets-1)]*(self.subsets-1)+[0])
-
-        with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, prob=[1/(self.subsets-1)]*(
-                self.subsets-1)+[0], sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
-
-        with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,  prob=[1/(self.subsets-1)]*(
-                self.subsets-1)+[0], prob_weights=[1/(self.subsets-1)]*(self.subsets-1)+[0])
-
-        with self.assertRaises(ValueError):
-            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, sfdsdf=3,
-                          sampler=Sampler.random_with_replacement(10, list(np.arange(1, 11)/55.)))
 
     def test_spdhg_set_norms(self):
 
@@ -1586,7 +1480,7 @@ class TestSPDHG(CCPiTestClass):
         sampler = Sampler.sequential(5)
         np.random.seed(5)
         initial = VectorData(np.random.standard_normal(25))
-        b = VectorData(np.array(range(25)))
+        b = VectorData(np.arange(25))
         functions = []
         operators=[]
         for i in range(5):
@@ -1641,12 +1535,6 @@ class TestCallbacks(unittest.TestCase):
         def update_objective(self):
             self.loss.append(2 ** getattr(self, 'x', np.nan))
 
-    def test_deprecated_kwargs(self):
-        with self.assertWarnsRegex(DeprecationWarning, 'max_iteration'):
-            self.PrintAlgo(max_iteration=1000)
-
-        with self.assertWarnsRegex(DeprecationWarning, 'log_file'):
-            self.PrintAlgo(log_file="")
 
     def test_progress(self):
         algo = self.PrintAlgo()
@@ -1656,23 +1544,17 @@ class TestCallbacks(unittest.TestCase):
         algo.run(3, callbacks=[callbacks.TextProgressCallback()])  # upto 23
         self.assertListEqual(algo.iterations, [-1, 10, 20])
 
-        with self.assertWarnsRegex(DeprecationWarning, 'print_interval'):
-            algo.run(40, print_interval=2)  # upto 63
-
-        def old_callback(iteration, objective, solution):
-            print(f"Called {iteration} {objective} {solution}")
-
         log = NamedTemporaryFile(delete=False)
         log.close()
         algo.run(20, callbacks=[callbacks.LogfileCallback(
-            log.name)], callback=old_callback)
+            log.name)])
         with open(log.name, 'r') as fd:
             self.assertListEqual(
-                ["64/83", "74/83", "83/83", ""],
+                ["24/43", "34/43", "43/43", ""],
                 [line.lstrip().split(" ", 1)[0] for line in fd.readlines()])
         unlink(log.name)
 
-        its = list(range(10, 90, 10))
+        its = list(range(10, 50, 10))
         self.assertListEqual([-1] + its, algo.iterations)
         np.testing.assert_array_equal(
             [np.nan] + [2 ** (1-i) for i in its], algo.objective)
@@ -1916,7 +1798,7 @@ class Test_PD3O(CCPiTestClass):
     def test_PD3O_stochastic_f(self): 
         sampler=Sampler.sequential(3)
         initial = VectorData(np.zeros(21))
-        b =  VectorData(np.array(range(1,22)))
+        b = VectorData(np.arange(1,22))
         functions=[]
         for i in range(3):
             diagonal=np.zeros(21)
@@ -1929,6 +1811,8 @@ class Test_PD3O(CCPiTestClass):
         G1 = IndicatorBox(lower=0)
 
 
+
+        
         f=SVRGFunction(functions, sampler, snapshot_update_interval=3)
         algo_pd3o = PD3O(f=f, g=G1, h=H1, operator=operator)
         algo_pd3o.run(1)
@@ -2002,3 +1886,132 @@ class Test_PD3O(CCPiTestClass):
         self.assertEqual(f.data_passes[-1], 2/3)
         self.assertEqual(f.data_passes_indices, [[0], [1]])
         
+
+
+
+
+class TestLSQR(CCPiTestClass):
+
+    def setUp(self):
+        # Mock the operator and data containers
+        
+        np.random.seed(10)
+        self.n = 50
+        self.m = 70
+
+        A = np.random.uniform(0, 1, (self.m, self.n)).astype('float32')
+        x = np.arange(self.n, dtype=np.float32)/self.n
+        b = A.dot(x)
+
+        self.Aop = MatrixOperator(A)
+        self.bop = VectorData(b)
+        self.x = VectorData(x)
+        
+
+
+        self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
+        self.g = ZeroFunction()
+        self.h = L1Norm()
+
+        self.ig = self.Aop.domain
+
+        self.initial = self.ig.allocate(None)
+        self.initial.fill(np.ones(self.n)/self.n)
+        
+
+    def test_initialization_defaults(self):
+        lsqr = LSQR(operator=self.Aop, data=self.bop)
+        self.assertEqual(lsqr.regalpha, 0)
+        self.assertNumpyArrayAlmostEqual(lsqr.x.as_array(), np.zeros(self.n))
+        self.assertTrue(lsqr.configured)
+        with self.assertRaises(ValueError):
+            LSQR()
+
+    def test_initialization_with_params(self):
+        lsqr = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+        self.assertEqual(lsqr.regalpha, 0.5)
+        self.assertNumpyArrayAlmostEqual(lsqr.operator.direct(self.x).as_array(), self.bop.as_array())
+        self.assertNumpyArrayAlmostEqual(lsqr.u.as_array(), (-lsqr.operator.direct(self.initial).as_array()+ self.bop.as_array())/lsqr.beta)
+        self.assertTrue(lsqr.configured)
+
+    def test_set_up(self):
+        lsqr = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+        beta =  (self.bop -self.Aop.direct(self.initial)).norm()
+        self.assertAlmostEqual(lsqr.beta,  beta, 4)
+        self.assertAlmostEqual(lsqr.phibar,  beta, 5 )
+        self.assertAlmostEqual(lsqr.normr,  beta, 5 )
+        alpha = self.Aop.adjoint((self.bop -self.Aop.direct(self.initial))/beta).norm()
+        self.assertAlmostEqual(lsqr.alpha, alpha, 5)
+        self.assertAlmostEqual(lsqr.rhobar, alpha, 5)
+        
+        self.assertEqual(lsqr.regalphasq, 0.25)
+
+    def test_update_reg_0(self): 
+        #Compared to algorithm in https://www-leland.stanford.edu/group/SOL/software/lsqr/lsqr-toms82a.pdf
+        
+        lsqr = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0)
+        # update u 
+        u1 = lsqr.u.copy()
+        v1 = lsqr.v.copy()
+        w1 = lsqr.v.copy()
+        alpha1 =  lsqr.alpha
+        beta1  =  lsqr.beta
+        rhobar1 = alpha1
+        phibar1 = beta1
+        x0 = self.initial
+        
+        u2= self.Aop.direct(v1)-alpha1*u1
+        beta2 = u2.norm()
+        u2 /= beta2
+        
+        v2 = self.Aop.adjoint(u2)- beta2*v1
+        alpha2 = v2.norm()
+        v2 /= alpha2
+        rho1 = np.sqrt( rhobar1**2 + beta2**2)
+        c1= rhobar1/rho1
+        s1= beta2/rho1
+        theta2 =s1*alpha2
+        rhobar2= -c1*alpha2
+        phi1 = c1*phibar1
+        phibar2 = s1*phibar1
+        
+        x1 = x0 +(phi1/rho1)*w1
+        w2 = v2- (theta2/rho1)*w1
+        
+        lsqr.run(1)
+        self.assertNumpyArrayAlmostEqual(lsqr.solution.as_array(), x1.as_array())
+        self.assertNumpyArrayAlmostEqual(lsqr.d.as_array(), w2.as_array())
+        self.assertAlmostEqual(lsqr.rhobar, rhobar2)
+        self.assertAlmostEqual(lsqr.phibar, phibar2)
+        self.assertAlmostEqual(lsqr.alpha, alpha2)
+        self.assertAlmostEqual(lsqr.beta, beta2)
+
+
+    def test_update_regularised(self):
+        lsqr_reg = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+        
+        L = IdentityOperator(self.ig)
+        alpha = 0.5
+
+        operator_block = BlockOperator(self.Aop, alpha*L)
+        zero_data = L.range.allocate(0)
+        data_block = BlockDataContainer(self.bop, zero_data)
+        initial_block = self.initial
+        
+        lsqr_block = LSQR (initial=initial_block, operator=operator_block, data=data_block, alpha=0)
+        
+        lsqr_block.run(1)
+        lsqr_reg.run(1)
+        
+        self.assertNumpyArrayAlmostEqual(lsqr_reg.solution.as_array(), lsqr_block.solution.as_array(),4)
+        
+        lsqr_block.run(1)
+        lsqr_reg.run(1)
+        
+        self.assertNumpyArrayAlmostEqual(lsqr_reg.solution.as_array(), lsqr_block.solution.as_array(),4)
+
+
+    def test_update_objective(self):
+        lsqr_reg = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+        lsqr_reg.run(1)
+        self.assertAlmostEqual(lsqr_reg.objective[0], (self.Aop.direct(self.initial)-self.bop).norm()**2 + 0.5*self.initial.norm()**2, 1)

@@ -39,11 +39,14 @@ class LSQR(Algorithm):
 
         \min_x \|Ax - b\|_2^2
 
-    Optionally, with Tikhonov regularisation:
+    Optionally, with Tikhonov regularisation towards the initial guess :math:`x_0`:
 
     .. math::
 
-        \min_x \|Ax - b\|_2^2 + \alpha^2 \|x\|_2^2
+        \min_x \|Ax - b\|_2^2 + \alpha^2 \|x - x_0\|_2^2
+
+    which reduces to the usual :math:`\alpha^2 \|x\|_2^2` penalty for the default zero initial.
+    See the note below.
 
     Parameters
     ----------
@@ -51,10 +54,47 @@ class LSQR(Algorithm):
         Linear operator representing the forward model.
     initial : DataContainer, optional
         Initial guess for the solution. If not provided, a zero-initialised container is used.
+        When `alpha` is non-zero it also sets the point the penalty is applied relative to, see
+        the note below.
     data : DataContainer
         Measured data (right-hand side of the equation).
     alpha : float, optional
-        Non-negative regularisation parameter. If zero, standard LSQR is used.
+        Non-negative regularisation parameter. If zero, standard LSQR is used. Otherwise the
+        penalty is applied relative to `initial`, see the note below.
+
+    Note
+    ----
+    Passing a non-zero `alpha` gives the option for Tikhonov regularisation without building a
+    block operator and data container, and consequently at a lower memory cost.
+
+    Given a non-zero initial guess :math:`x_0`, LSQR solves for the update
+    :math:`\delta = x - x_0` against the initial residual :math:`r_0 = b - Ax_0`. The scalar
+    :math:`\alpha` is applied to whichever variable is being solved for, so it penalises
+    :math:`\delta` and the algorithm minimises
+
+    .. math::
+
+        \min_\delta \|A\delta - r_0\|_2^2 + \alpha^2 \|\delta\|_2^2
+        \quad\Longleftrightarrow\quad
+        \min_x \|Ax - b\|_2^2 + \alpha^2 \|x - x_0\|_2^2 .
+
+    This is Tikhonov regularisation towards :math:`x_0`, which is useful when a prior
+    reconstruction is available, and it coincides with the :math:`\alpha^2 \|x\|_2^2` penalty
+    only when :math:`x_0 = 0`. Since the two objectives differ, a warning is raised when a
+    non-zero `initial` is combined with a non-zero `alpha`.
+
+    To penalise :math:`\|x\|_2^2` from a non-zero starting point, build the block system
+    explicitly and pass it to an unregularised LSQR (or to
+    :class:`~cil.optimisation.algorithms.CGLS`):
+
+    .. code-block:: python
+
+        from cil.framework import BlockDataContainer
+        from cil.optimisation.operators import BlockOperator, IdentityOperator
+
+        block_operator = BlockOperator(A, alpha * IdentityOperator(A.domain_geometry()))
+        block_data = BlockDataContainer(b, A.domain_geometry().allocate(0))
+        lsqr = LSQR(initial=x0, operator=block_operator, data=block_data)
 
     Reference
     ---------
@@ -68,7 +108,8 @@ class LSQR(Algorithm):
         Parameters
         ----------
         initial : DataContainer, optional
-            Initial guess for the solution.
+            Initial guess for the solution. When `alpha` is non-zero it also sets the point the
+            penalty is applied relative to, see the note in the class documentation.
         operator : Operator
             Linear operator representing the forward model.
         data : DataContainer
@@ -96,13 +137,29 @@ class LSQR(Algorithm):
         Parameters
         ----------
         initial : DataContainer
-            Initial guess for the solution.
+            Initial guess for the solution. When `alpha` is non-zero it also sets the point the
+            penalty is applied relative to, see the note in the class documentation.
         operator : Operator
             Linear operator representing the forward model.
         data : DataContainer
             Measured data.
         """
         log.info("%s setting up", self.__class__.__name__)
+
+        # The scalar regularisation is applied to the variable LSQR is solving for. From a
+        # non-zero initial guess that variable is the update, so the penalty is measured from
+        # `initial` rather than from zero.
+        if self.regalpha != 0 and initial.norm() > 0:
+            warnings.warn(
+                "LSQR was passed a non-zero `initial` together with a non-zero `alpha`. The "
+                "scalar regularisation is applied relative to `initial`, so the algorithm "
+                "minimises ||Ax-b||^2 + alpha^2||x-initial||^2, that is, Tikhonov "
+                "regularisation towards `initial` rather than towards zero. Start from zero "
+                "if you intend to penalise ||x||, or penalise ||x|| from a warm start by "
+                "passing the block operator [A; alpha*I] with data [b; 0] to LSQR or CGLS. "
+                "See the LSQR documentation for details.",
+                UserWarning, stacklevel=2)
+
         self.x = initial.copy()  # 1 domain
         self.operator = operator
 

@@ -246,7 +246,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         data = x.as_array()
 
         #if single angle projection add the dimension in for TIGRE
-        if x.dimension_labels[0] != [AcquisitionDimension.ANGLE, AcquisitionDimension.PROJECTION]:
+        if x.dimension_labels[0] != AcquisitionDimension.ANGLE:
             data = np.expand_dims(data, axis=0)
 
         if self.tigre_geom.is2D:

@@ -1,3 +1,9 @@
+* X.X.X
+  - New features:
+    - TIGRE support for tilted rotation axis (laminography) is now avaliable with TIGRE `FBP`, the `matched` back-projector and the `interpolated` forward-projector (#2238)
+  - Bug fixes:
+    - The interpolated TIGRE cone-beam projector now supports tilted rotation axis (laminography): the previously-broken case (axis pointing at the source) no longer returns zeros (#2238)
+
 * 26.0.0
   - New features:
     - `LSQR` algorithm added to the CIL algorithm class (#1975)

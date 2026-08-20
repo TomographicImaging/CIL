@@ -19,6 +19,7 @@
 import unittest
 from utils_projectors import TestCommon_ProjectionOperator_SIM
 from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
+from utils_projectors import TestCommon_ProjectionOperator_Geometry
 from utils import disable_print, enable_prints
 from utils import has_astra, has_nvidia, initialise_tests
 
@@ -51,6 +52,24 @@ class Test_Cone3D_Projectors_GPU_basic(unittest.TestCase, TestCommon_ProjectionO
         setup_parameters(self)
         self.Cone3D()
         self.tolerance_fp=0
+
+
+@unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+class Test_Cone3D_Geometry_GPU(unittest.TestCase, TestCommon_ProjectionOperator_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3D()
+        self.tolerance_fp = 0.02
+        self.tolerance_mass = 0.1
+
+
+@unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+class Test_Parallel3D_Geometry_GPU(unittest.TestCase, TestCommon_ProjectionOperator_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Parallel3D()
+        self.tolerance_fp = 0.02
+        self.tolerance_mass = 0.1
 
 
 @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")

@@ -35,7 +35,6 @@ from unittest.mock import patch
 initialise_tests()
 
 if has_tigre:
-    from cil.plugins.tigre import ProjectionOperator as ProjectionOperator_tigre
     from cil.plugins.tigre import FBP as FBP_tigre
     from tigre.utilities.filtering import ramp_flat, filter
 
@@ -43,14 +42,12 @@ if has_astra:
     from cil.plugins.astra import ProjectionOperator as ProjectionOperator_astra
     from cil.plugins.astra import FBP as FBP_astra
 
-if has_matplotlib:
-    import matplotlib.testing.compare as compare
 
 if has_skimage:
     from skimage.transform.radon_transform import _get_fourier_filter as skimage_get_fourier_filter
 
-@unittest.skipUnless(has_tigre, "TIGRE not installed")
-class Test_Reconstructor_tigre(unittest.TestCase):
+
+class Test_Reconstructor(unittest.TestCase):
 
     def setUp(self):
         #%% Setup Geometry

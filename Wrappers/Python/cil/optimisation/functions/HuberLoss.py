@@ -263,8 +263,7 @@ class HuberLoss(Function):
     def weight_norm(self):
         if self.weight is not None:
             if self._weight_norm is None:
-                D = DiagonalOperator(self.weight)
-                self._weight_norm = D.norm()
+                self._weight_norm = self.weight.abs().max()
         else:
             self._weight_norm = 1.0
         return self._weight_norm

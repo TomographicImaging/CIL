@@ -244,16 +244,17 @@ class HuberLoss(Function):
 
         """
         try:
-            self._L = np.abs(self.c) * (self.A.norm() ** 2)
+            Anorm = self.A.norm()
         except (AttributeError, NotImplementedError):
             if self.A.is_linear():
                 Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
-                self._L = np.abs(self.c) * (Anorm * Anorm)
             else:
                 raise RuntimeError(
                     f"{self.__class__.__name__} could not calculate Lipschitz Constant, "
                     "because there is no method to calculate the norm of operator A."
                 )
+                
+        self._L = np.abs(self.c) * (Anorm** 2)
 
         if self.weight is not None:
             self._L *= self.weight_norm

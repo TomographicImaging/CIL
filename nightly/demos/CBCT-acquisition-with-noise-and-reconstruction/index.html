@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>a gVXR data reader for CIL &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>a gVXR data reader for CIL &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,9 +52,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/CBCT-acquisition-with-noise-and-reconstruction';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Dynamic MR Reconstruction" href="../dynamic_mr_recon/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -604,14 +604,14 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">#  Copyright 2023</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -678,7 +678,7 @@ anthropomorphic phantom used is from the pEdiatRic dosimetRy personalized platfO
 </pre></div>
 </div>
 <p>or</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">root_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">globals</span><span class="p">()[</span><span class="s1">&#39;_dh&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">root_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">globals</span><span class="p">()[</span><span class="s1">'_dh'</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>to locate the path of the notebbok. This is useful to save output files.</p>
@@ -686,7 +686,7 @@ anthropomorphic phantom used is from the pEdiatRic dosimetRy personalized platfO
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">root_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">globals</span><span class="p">()[</span><span class="s1">&#39;_dh&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">root_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">globals</span><span class="p">()[</span><span class="s1">'_dh'</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -707,9 +707,9 @@ anthropomorphic phantom used is from the pEdiatRic dosimetRy personalized platfO
         <span class="c1"># Create the directory</span>
         <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">directory</span><span class="p">))</span>
 
-<span class="n">createDirectory</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/input_data&quot;</span><span class="p">)</span>
-<span class="n">createDirectory</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/input_data/meshes&quot;</span><span class="p">)</span>
-<span class="n">createDirectory</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/output&quot;</span><span class="p">)</span>
+<span class="n">createDirectory</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/input_data"</span><span class="p">)</span>
+<span class="n">createDirectory</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/input_data/meshes"</span><span class="p">)</span>
+<span class="n">createDirectory</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/output"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -742,13 +742,13 @@ anthropomorphic phantom used is from the pEdiatRic dosimetRy personalized platfO
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span> <span class="c1"># To plot images</span>
 
-<span class="n">font</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;family&#39;</span> <span class="p">:</span> <span class="s1">&#39;serif&#39;</span><span class="p">,</span>
-         <span class="s1">&#39;size&#39;</span>   <span class="p">:</span> <span class="mi">10</span>
+<span class="n">font</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'family'</span> <span class="p">:</span> <span class="s1">'serif'</span><span class="p">,</span>
+         <span class="s1">'size'</span>   <span class="p">:</span> <span class="mi">10</span>
        <span class="p">}</span>
-<span class="n">matplotlib</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;font&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">font</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">'font'</span><span class="p">,</span> <span class="o">**</span><span class="n">font</span><span class="p">)</span>
 
 <span class="c1"># Uncomment the line below to use LaTeX fonts</span>
-<span class="c1"># matplotlib.rc(&#39;text&#39;, usetex=True)</span>
+<span class="c1"># matplotlib.rc('text', usetex=True)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">tzip</span>
 
@@ -804,17 +804,17 @@ Tigre detected
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">json_fname</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/Noise-CBCT.json&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">json_fname</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/Noise-CBCT.json"</span>
 
 <span class="c1"># MS Windows</span>
-<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;nt&quot;</span><span class="p">:</span>
-    <span class="n">json2gvxr</span><span class="o">.</span><span class="n">initGVXR</span><span class="p">(</span><span class="n">json_fname</span><span class="p">,</span> <span class="n">renderer</span><span class="o">=</span><span class="s2">&quot;EGL&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"nt"</span><span class="p">:</span>
+    <span class="n">json2gvxr</span><span class="o">.</span><span class="n">initGVXR</span><span class="p">(</span><span class="n">json_fname</span><span class="p">,</span> <span class="n">renderer</span><span class="o">=</span><span class="s2">"EGL"</span><span class="p">)</span>
 <span class="c1"># MacOS</span>
-<span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">uname</span><span class="p">())</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Darwin&quot;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
-    <span class="n">json2gvxr</span><span class="o">.</span><span class="n">initGVXR</span><span class="p">(</span><span class="n">json_fname</span><span class="p">,</span> <span class="n">renderer</span><span class="o">=</span><span class="s2">&quot;OPENGL&quot;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">uname</span><span class="p">())</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"Darwin"</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">json2gvxr</span><span class="o">.</span><span class="n">initGVXR</span><span class="p">(</span><span class="n">json_fname</span><span class="p">,</span> <span class="n">renderer</span><span class="o">=</span><span class="s2">"OPENGL"</span><span class="p">)</span>
 <span class="c1"># GNU/Linux</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">json2gvxr</span><span class="o">.</span><span class="n">initGVXR</span><span class="p">(</span><span class="n">json_fname</span><span class="p">,</span> <span class="n">renderer</span><span class="o">=</span><span class="s2">&quot;EGL&quot;</span><span class="p">)</span>
+    <span class="n">json2gvxr</span><span class="o">.</span><span class="n">initGVXR</span><span class="p">(</span><span class="n">json_fname</span><span class="p">,</span> <span class="n">renderer</span><span class="o">=</span><span class="s2">"EGL"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -883,9 +883,9 @@ Thu Nov  9 10:42:59 2023 ---- Initialise the X-ray renderer if needed and if pos
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">raw_projection_output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">json2gvxr</span><span class="o">.</span><span class="n">getFilePath</span><span class="p">(</span><span class="n">json2gvxr</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;Scan&quot;</span><span class="p">][</span><span class="s2">&quot;OutFolder&quot;</span><span class="p">]))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The raw projections were saved in&quot;</span><span class="p">,</span> <span class="n">raw_projection_output_dir</span><span class="p">)</span>
-<span class="n">createDirectory</span><span class="p">(</span><span class="n">raw_projection_output_dir</span> <span class="o">+</span> <span class="s2">&quot;/..&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">raw_projection_output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">json2gvxr</span><span class="o">.</span><span class="n">getFilePath</span><span class="p">(</span><span class="n">json2gvxr</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">"Scan"</span><span class="p">][</span><span class="s2">"OutFolder"</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"The raw projections were saved in"</span><span class="p">,</span> <span class="n">raw_projection_output_dir</span><span class="p">)</span>
+<span class="n">createDirectory</span><span class="p">(</span><span class="n">raw_projection_output_dir</span> <span class="o">+</span> <span class="s2">"/.."</span><span class="p">)</span>
 <span class="n">createDirectory</span><span class="p">(</span><span class="n">raw_projection_output_dir</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -927,8 +927,8 @@ Set up the detector
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">number_of_rows</span> <span class="o">=</span> <span class="n">json2gvxr</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;Detector&quot;</span><span class="p">][</span><span class="s2">&quot;NumberOfPixels&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">number_of_cols</span> <span class="o">=</span> <span class="n">json2gvxr</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;Detector&quot;</span><span class="p">][</span><span class="s2">&quot;NumberOfPixels&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">number_of_rows</span> <span class="o">=</span> <span class="n">json2gvxr</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">"Detector"</span><span class="p">][</span><span class="s2">"NumberOfPixels"</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">number_of_cols</span> <span class="o">=</span> <span class="n">json2gvxr</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">"Detector"</span><span class="p">][</span><span class="s2">"NumberOfPixels"</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -975,9 +975,9 @@ Thu Nov  9 10:43:00 2023 ---- Initialise the renderer
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy_set</span><span class="p">,</span> <span class="n">bin_sets</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Energy [&quot;</span> <span class="o">+</span> <span class="n">unit_of_energy</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Photon count&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Corresponding spectra&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Energy ["</span> <span class="o">+</span> <span class="n">unit_of_energy</span> <span class="o">+</span> <span class="s2">"]"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Photon count"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Corresponding spectra"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1005,13 +1005,13 @@ Text(0.5, 1.0, &#39;Corresponding spectra&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;input_data/Pediatric phantom.zip&quot;</span><span class="p">):</span>
-    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="s2">&quot;https://drive.uca.fr/f/384a08b5f73244cf9ead/?dl=1&quot;</span><span class="p">,</span>
-                               <span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/input_data/Pediatric phantom.zip&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"input_data/Pediatric phantom.zip"</span><span class="p">):</span>
+    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="s2">"https://drive.uca.fr/f/384a08b5f73244cf9ead/?dl=1"</span><span class="p">,</span>
+                               <span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/input_data/Pediatric phantom.zip"</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;input_data/Pediatric phantom&quot;</span><span class="p">):</span>
-    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/input_data/Pediatric phantom.zip&quot;</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
-        <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/input_data&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"input_data/Pediatric phantom"</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/input_data/Pediatric phantom.zip"</span><span class="p">,</span><span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
+        <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/input_data"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1023,7 +1023,7 @@ Text(0.5, 1.0, &#39;Corresponding spectra&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">phantom</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">ReadImage</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/input_data/Pediatric phantom/Pediatric_model.mhd&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">phantom</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">ReadImage</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/input_data/Pediatric phantom/Pediatric_model.mhd"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1032,7 +1032,7 @@ Text(0.5, 1.0, &#39;Corresponding spectra&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/input_data/labels.dat&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/input_data/labels.dat"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1043,13 +1043,13 @@ Text(0.5, 1.0, &#39;Corresponding spectra&#39;)
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">meshes</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="k">for</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">organ</span> <span class="ow">in</span> <span class="n">tzip</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Label&quot;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Organs&quot;</span><span class="p">],</span>
-                         <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Processing anatomy&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">organ</span> <span class="ow">in</span> <span class="n">tzip</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">"Label"</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">"Organs"</span><span class="p">],</span>
+                         <span class="n">desc</span><span class="o">=</span><span class="s2">"Processing anatomy"</span><span class="p">):</span>
 
     <span class="c1"># Ignore air</span>
-    <span class="k">if</span> <span class="n">organ</span> <span class="o">!=</span> <span class="s2">&quot;Air&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">organ</span> <span class="o">!=</span> <span class="s2">"Air"</span><span class="p">:</span>
 
-        <span class="n">mesh_fname</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/input_data/meshes/&quot;</span> <span class="o">+</span> <span class="n">organ</span> <span class="o">+</span> <span class="s2">&quot;.stl&quot;</span>
+        <span class="n">mesh_fname</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/input_data/meshes/"</span> <span class="o">+</span> <span class="n">organ</span> <span class="o">+</span> <span class="s2">".stl"</span>
         <span class="n">meshes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mesh_fname</span><span class="p">)</span>
 
         <span class="c1"># Only create the mesh if it does not exist</span>
@@ -1129,14 +1129,14 @@ Thu Nov  9 10:43:02 2023 ---- file_name:        /home/fpvidal/PROGRAMMING/GitHub
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gvxr</span><span class="o">.</span><span class="n">moveToCentre</span><span class="p">()</span>
 
-<span class="n">ID</span> <span class="o">=</span> <span class="s2">&quot;root&quot;</span>
-<span class="n">min_x</span><span class="p">,</span> <span class="n">min_y</span><span class="p">,</span> <span class="n">min_z</span><span class="p">,</span> <span class="n">max_x</span><span class="p">,</span> <span class="n">max_y</span><span class="p">,</span> <span class="n">max_z</span> <span class="o">=</span> <span class="n">gvxr</span><span class="o">.</span><span class="n">getNodeAndChildrenBoundingBox</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">)</span>
+<span class="n">ID</span> <span class="o">=</span> <span class="s2">"root"</span>
+<span class="n">min_x</span><span class="p">,</span> <span class="n">min_y</span><span class="p">,</span> <span class="n">min_z</span><span class="p">,</span> <span class="n">max_x</span><span class="p">,</span> <span class="n">max_y</span><span class="p">,</span> <span class="n">max_z</span> <span class="o">=</span> <span class="n">gvxr</span><span class="o">.</span><span class="n">getNodeAndChildrenBoundingBox</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="s2">"mm"</span><span class="p">)</span>
 <span class="n">centre_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_x</span> <span class="o">+</span> <span class="n">max_x</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
 <span class="n">centre_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_y</span> <span class="o">+</span> <span class="n">max_y</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
 <span class="n">centre_z</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_z</span> <span class="o">+</span> <span class="n">max_z</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bounding box:&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">min_x</span><span class="p">,</span> <span class="n">min_y</span><span class="p">,</span> <span class="n">min_z</span><span class="p">],</span> <span class="p">[</span><span class="n">max_x</span><span class="p">,</span> <span class="n">max_y</span><span class="p">,</span> <span class="n">max_z</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bounding box centre:&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">centre_x</span><span class="p">,</span> <span class="n">centre_y</span><span class="p">,</span> <span class="n">centre_z</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Bounding box:"</span><span class="p">,</span> <span class="p">[</span><span class="n">min_x</span><span class="p">,</span> <span class="n">min_y</span><span class="p">,</span> <span class="n">min_z</span><span class="p">],</span> <span class="p">[</span><span class="n">max_x</span><span class="p">,</span> <span class="n">max_y</span><span class="p">,</span> <span class="n">max_z</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Bounding box centre:"</span><span class="p">,</span> <span class="p">[</span><span class="n">centre_x</span><span class="p">,</span> <span class="n">centre_y</span><span class="p">,</span> <span class="n">centre_z</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1159,7 +1159,7 @@ Bounding box centre: [0.0, 7.62939453125e-06, 0.0]
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">projection_in_MeV</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gvxr</span><span class="o">.</span><span class="n">computeXRayImage</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">single</span><span class="p">)</span>
-<span class="n">projection_in_keV</span> <span class="o">=</span> <span class="n">projection_in_MeV</span> <span class="o">/</span> <span class="n">gvxr</span><span class="o">.</span><span class="n">getUnitOfEnergy</span><span class="p">(</span><span class="s2">&quot;keV&quot;</span><span class="p">)</span>
+<span class="n">projection_in_keV</span> <span class="o">=</span> <span class="n">projection_in_MeV</span> <span class="o">/</span> <span class="n">gvxr</span><span class="o">.</span><span class="n">getUnitOfEnergy</span><span class="p">(</span><span class="s2">"keV"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1184,7 +1184,7 @@ Bounding box centre: [0.0, 7.62939453125e-06, 0.0]
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/output/visualisation.png&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/output/visualisation.png"</span>
 
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
 
@@ -1214,7 +1214,7 @@ Bounding box centre: [0.0, 7.62939453125e-06, 0.0]
         <span class="n">plot</span><span class="o">.</span><span class="n">fetch_screenshot</span><span class="p">()</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">screenshot</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span><span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1234,14 +1234,14 @@ Bounding box centre: [0.0, 7.62939453125e-06, 0.0]
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig_plot</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">chooseNumberOfPhotonsPerPixel</span><span class="p">(</span><span class="n">xray_image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">number_of_photons_per_pixel</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">15000</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)):</span>
 
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Use Matplotlib and a Jupyter widget to display the X-ray image with Poisson noise.</span>
 <span class="sd">    The number of photons per pixel can be change interactively.</span>
 
 <span class="sd">    @param xray_image: The image to display</span>
 <span class="sd">    @number_of_photons_per_pixel: the number of photons per pixel (default: 15000)</span>
 <span class="sd">    @gamma figsize: the size of the figure (default: (10, 5))</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">global</span> <span class="n">target_number_of_photons_per_pixel</span><span class="p">,</span> <span class="n">fig_plot</span>
     <span class="n">target_number_of_photons_per_pixel</span> <span class="o">=</span> <span class="n">number_of_photons_per_pixel</span>
@@ -1255,16 +1255,16 @@ Bounding box centre: [0.0, 7.62939453125e-06, 0.0]
     <span class="n">ax_img</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
 
     <span class="n">ax_plt</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">ax_img</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">noisy_image</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">ax_img</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">noisy_image</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">)</span>
     <span class="n">ax_img</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">noisy_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">noisy_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
     <span class="n">profile</span><span class="p">,</span> <span class="o">=</span> <span class="n">ax_plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">noisy_image</span><span class="p">))</span>
 
-    <span class="c1"># cbar = fig_plot.colorbar(img, orientation=&#39;vertical&#39;)</span>
-    <span class="n">title_str</span> <span class="o">=</span> <span class="s2">&quot;Photons per pixels: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_of_photons_per_pixel</span><span class="p">)</span>
+    <span class="c1"># cbar = fig_plot.colorbar(img, orientation='vertical')</span>
+    <span class="n">title_str</span> <span class="o">=</span> <span class="s2">"Photons per pixels: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_of_photons_per_pixel</span><span class="p">)</span>
     <span class="n">ax_img</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title_str</span><span class="p">)</span>
-    <span class="n">ax_plt</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Diagonal profile&quot;</span><span class="p">)</span>
-    <span class="n">ax_plt</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Pixel position&quot;</span><span class="p">)</span>
-    <span class="n">ax_plt</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Integrated energy in MeV&quot;</span><span class="p">)</span>
+    <span class="n">ax_plt</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Diagonal profile"</span><span class="p">)</span>
+    <span class="n">ax_plt</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Pixel position"</span><span class="p">)</span>
+    <span class="n">ax_plt</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Integrated energy in MeV"</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
 
@@ -1275,10 +1275,10 @@ Bounding box centre: [0.0, 7.62939453125e-06, 0.0]
         <span class="k">global</span> <span class="n">target_number_of_photons_per_pixel</span>
         <span class="n">target_number_of_photons_per_pixel</span> <span class="o">=</span> <span class="n">number_of_photons_per_pixel</span>
         <span class="n">noisy_image</span> <span class="o">=</span> <span class="n">getNoisyImage</span><span class="p">(</span><span class="n">xray_image</span><span class="p">,</span> <span class="n">number_of_photons_per_pixel</span><span class="p">)</span>
-        <span class="n">img</span> <span class="o">=</span> <span class="n">ax_img</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">noisy_image</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
-        <span class="n">title_str</span> <span class="o">=</span> <span class="s2">&quot;Photons per pixels: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_of_photons_per_pixel</span><span class="p">)</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">ax_img</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">noisy_image</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">)</span>
+        <span class="n">title_str</span> <span class="o">=</span> <span class="s2">"Photons per pixels: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_of_photons_per_pixel</span><span class="p">)</span>
         <span class="n">ax_img</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title_str</span><span class="p">)</span>
-        <span class="c1"># fig_plot.colorbar(img, cax=cbar.ax, orientation=&#39;vertical&#39;)</span>
+        <span class="c1"># fig_plot.colorbar(img, cax=cbar.ax, orientation='vertical')</span>
 
         <span class="n">profile_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">noisy_image</span><span class="p">)</span>
         <span class="n">profile</span><span class="o">.</span><span class="n">set_ydata</span><span class="p">(</span><span class="n">profile_data</span><span class="p">)</span>
@@ -1287,7 +1287,7 @@ Bounding box centre: [0.0, 7.62939453125e-06, 0.0]
         <span class="n">display</span><span class="p">(</span><span class="n">fig_plot</span><span class="p">)</span>
 
     <span class="n">interact</span><span class="p">(</span><span class="n">update_plot</span><span class="p">,</span>
-             <span class="n">number_of_photons_per_pixel</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">number_of_photons_per_pixel</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">50000</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Photons/pixels&quot;</span><span class="p">))</span>
+             <span class="n">number_of_photons_per_pixel</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">number_of_photons_per_pixel</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">50000</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Photons/pixels"</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1325,7 +1325,7 @@ Bounding box centre: [0.0, 7.62939453125e-06, 0.0]
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig_plot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/output/noisy-projection.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">72</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig_plot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/output/noisy-projection.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">72</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1333,7 +1333,7 @@ Bounding box centre: [0.0, 7.62939453125e-06, 0.0]
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Photons per pixels:&quot;</span><span class="p">,</span> <span class="n">target_number_of_photons_per_pixel</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"Photons per pixels:"</span><span class="p">,</span> <span class="n">target_number_of_photons_per_pixel</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1359,7 +1359,7 @@ beam’s photon count.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">white_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Number of flat images:&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">white_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">'Number of flat images:'</span><span class="p">)</span>
 <span class="n">white_slider</span>
 </pre></div>
 </div>
@@ -1374,8 +1374,8 @@ beam’s photon count.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of flat images:&quot;</span><span class="p">,</span> <span class="n">white_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-<span class="n">json2gvxr</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;Scan&quot;</span><span class="p">][</span><span class="s2">&quot;NumberOfWhiteImages&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">white_slider</span><span class="o">.</span><span class="n">value</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"Number of flat images:"</span><span class="p">,</span> <span class="n">white_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="n">json2gvxr</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">"Scan"</span><span class="p">][</span><span class="s2">"NumberOfWhiteImages"</span><span class="p">]</span> <span class="o">=</span> <span class="n">white_slider</span><span class="o">.</span><span class="n">value</span>
 </pre></div>
 </div>
 </div>
@@ -1391,7 +1391,7 @@ Number of flat images: 50
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/output/flat.tif&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/output/flat.tif"</span>
 
 <span class="n">flats</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -1400,7 +1400,7 @@ Number of flat images: 50
 
 <span class="n">flat_field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">flats</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="n">imwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">flat_field</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">single</span><span class="p">),</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;zlib&#39;</span><span class="p">)</span>
+<span class="n">imwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">flat_field</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">single</span><span class="p">),</span> <span class="n">compression</span><span class="o">=</span><span class="s1">'zlib'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1412,11 +1412,11 @@ Number of flat images: 50
 
 
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Average flat image</span><span class="se">\n</span><span class="s2">(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">white_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; images, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">target_number_of_photons_per_pixel</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; photons per pixel)&quot;</span><span class="p">)</span>
-<span class="n">img</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">flat_field</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Average flat image</span><span class="se">\n</span><span class="s2">("</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">white_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s2">" images, "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">target_number_of_photons_per_pixel</span><span class="p">)</span> <span class="o">+</span> <span class="s2">" photons per pixel)"</span><span class="p">)</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">flat_field</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/output/average-flat-field.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">72</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/output/average-flat-field.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">72</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1450,7 +1450,7 @@ Set up the CT Scan
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">number_of_angles</span> <span class="o">=</span> <span class="n">json2gvxr</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;Scan&quot;</span><span class="p">][</span><span class="s2">&quot;NumberOfProjections&quot;</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">number_of_angles</span> <span class="o">=</span> <span class="n">json2gvxr</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">"Scan"</span><span class="p">][</span><span class="s2">"NumberOfProjections"</span><span class="p">]</span>
 <span class="n">angles</span> <span class="o">=</span> <span class="n">json2gvxr</span><span class="o">.</span><span class="n">doCTScan</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1461,8 +1461,8 @@ Set up the CT Scan
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">json2gvxr</span><span class="o">.</span><span class="n">white_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">white_image</span> <span class="o">=</span> <span class="n">json2gvxr</span><span class="o">.</span><span class="n">white_image</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">&quot;/output/flat.tif&quot;</span>
-    <span class="n">imwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">flat_field</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">single</span><span class="p">),</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;zlib&#39;</span><span class="p">)</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">root_path</span> <span class="o">+</span> <span class="s2">"/output/flat.tif"</span>
+    <span class="n">imwrite</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">flat_field</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">single</span><span class="p">),</span> <span class="n">compression</span><span class="o">=</span><span class="s1">'zlib'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1470,9 +1470,9 @@ Set up the CT Scan
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First angle:&quot;</span><span class="p">,</span> <span class="n">angles</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Last angle:&quot;</span><span class="p">,</span> <span class="n">angles</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of angles:&quot;</span><span class="p">,</span> <span class="n">number_of_angles</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"First angle:"</span><span class="p">,</span> <span class="n">angles</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Last angle:"</span><span class="p">,</span> <span class="n">angles</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Number of angles:"</span><span class="p">,</span> <span class="n">number_of_angles</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1495,7 +1495,7 @@ Number of angles: 600
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reader</span> <span class="o">=</span> <span class="n">JSON2gVXRDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">json_fname</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="n">reconstruction</span> <span class="o">=</span> <span class="n">reconstruct</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;CONEBEAM&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">reconstruction</span> <span class="o">=</span> <span class="n">reconstruct</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">"CONEBEAM"</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1560,7 +1560,7 @@ Reconstruction Options:
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">has_cil</span><span class="p">:</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">show_geometry</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">root_path</span>  <span class="o">+</span> <span class="s2">&quot;/Noise-CBCT/CT-geometry.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">72</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">root_path</span>  <span class="o">+</span> <span class="s2">"/Noise-CBCT/CT-geometry.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">72</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1591,7 +1591,7 @@ Unable to save image
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">islicer</span><span class="p">(</span><span class="n">reconstruction</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">islicer</span><span class="p">(</span><span class="n">reconstruction</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'vertical'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1605,7 +1605,7 @@ Unable to save image
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">islicer</span><span class="p">(</span><span class="n">reconstruction</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">islicer</span><span class="p">(</span><span class="n">reconstruction</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'horizontal_x'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1628,12 +1628,12 @@ Unable to save image
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">ax3</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;CBCT reconstruction with noise and polychromatism&quot;</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="p">[</span> <span class="nb">int</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="p">[</span> <span class="p">:,</span> <span class="nb">int</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.25</span><span class="p">),</span> <span class="p">:],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
-<span class="n">ax3</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="p">[</span> <span class="p">:,</span> <span class="p">:,</span> <span class="nb">int</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"CBCT reconstruction with noise and polychromatism"</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="p">[</span> <span class="nb">int</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="p">[</span> <span class="p">:,</span> <span class="nb">int</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.25</span><span class="p">),</span> <span class="p">:],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="p">[</span> <span class="p">:,</span> <span class="p">:,</span> <span class="nb">int</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">1.25</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">root_path</span>  <span class="o">+</span> <span class="s2">&quot;/output/plotCT.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">72</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">root_path</span>  <span class="o">+</span> <span class="s2">"/output/plotCT.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">72</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1651,7 +1651,7 @@ Unable to save image
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="n">root_path</span>  <span class="o">+</span> <span class="s2">&quot;/output/CT_in_mu.mha&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="n">root_path</span>  <span class="o">+</span> <span class="s2">"/output/CT_in_mu.mha"</span>
 </pre></div>
 </div>
 </div>
@@ -1659,11 +1659,11 @@ Unable to save image
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">detector_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gvxr</span><span class="o">.</span><span class="n">getDetectorSize</span><span class="p">(</span><span class="s2">&quot;mm&quot;</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">detector_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gvxr</span><span class="o">.</span><span class="n">getDetectorSize</span><span class="p">(</span><span class="s2">"mm"</span><span class="p">))</span>
 <span class="n">number_of_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gvxr</span><span class="o">.</span><span class="n">getDetectorNumberOfPixels</span><span class="p">())</span>
 <span class="n">spacing</span> <span class="o">=</span> <span class="n">detector_size</span> <span class="o">/</span> <span class="n">number_of_pixels</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CT volume saved in&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"CT volume saved in"</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
 <span class="n">sitk_image</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">reconstruction_as_array</span><span class="p">)</span>
 <span class="n">sitk_image</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">([</span><span class="n">spacing</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spacing</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spacing</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
 <span class="n">sitk</span><span class="o">.</span><span class="n">WriteImage</span><span class="p">(</span><span class="n">sitk_image</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">useCompression</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1750,8 +1750,8 @@ Thu Nov  9 10:44:28 2023 ---- Destroy window 0(0x56254dcf3470)
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

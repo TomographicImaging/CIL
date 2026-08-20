@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Read/ write AcquisitionData and ImageData &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>Read/ write AcquisitionData and ImageData &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../_static/documentation_options.js?v=8959950e"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,9 +49,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'io';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Framework" href="../framework/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -568,14 +568,14 @@ as NeXuS files.</p>
 <span class="c1"># initialise NEXUS Writer</span>
 <span class="n">writer</span> <span class="o">=</span> <span class="n">NEXUSDataWriter</span><span class="p">()</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">my_data</span><span class="p">,</span>
-            <span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;tmp_nexus.nxs&#39;</span><span class="p">)</span>
+            <span class="n">file_name</span><span class="o">=</span><span class="s1">'tmp_nexus.nxs'</span><span class="p">)</span>
 <span class="c1"># write data</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
 
 <span class="c1"># read data</span>
 <span class="c1"># initialize NEXUS reader</span>
 <span class="n">reader</span> <span class="o">=</span> <span class="n">NEXUSDataReader</span><span class="p">()</span>
-<span class="n">reader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;tmp_nexus.nxs&#39;</span><span class="p">)</span>
+<span class="n">reader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">'tmp_nexus.nxs'</span><span class="p">)</span>
 <span class="c1"># load data</span>
 <span class="n">ad1</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 <span class="c1"># get AcquisitionGeometry</span>
@@ -770,10 +770,10 @@ to <code class="docutils literal notranslate"><span class="pre">start</span> <sp
 Start and end also can be negative. i.e. {‘axis_name1’:(10, -10)} will
 crop the dimension symmetrically</p>
 <p>The following two examples are equivalent, if the size of the horizontal dimension is 2000:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader1</span> <span class="o">=</span> <span class="n">NikonDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">)})</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader1</span> <span class="o">=</span> <span class="n">NikonDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">'horizontal'</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">)})</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader2</span> <span class="o">=</span> <span class="n">NikonDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1990</span><span class="p">)})</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader2</span> <span class="o">=</span> <span class="n">NikonDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">'horizontal'</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1990</span><span class="p">)})</span>
 </pre></div>
 </div>
 <p>For more info on negative indexing in python see: <a class="reference external" href="https://numpy.org/doc/stable/user/basics.indexing.html">https://numpy.org/doc/stable/user/basics.indexing.html</a></p>
@@ -834,10 +834,10 @@ to <code class="docutils literal notranslate"><span class="pre">start</span> <sp
 <p>The ROI accepts negative indexing. i.e. {‘axis_name1’:(10, -10)} will
 crop the dimension symmetrically
 The following two examples are equivalent, if the size of the horizontal dimension is 2000:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader1</span> <span class="o">=</span> <span class="n">ZeissDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">)})</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader1</span> <span class="o">=</span> <span class="n">ZeissDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">'horizontal'</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">)})</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader2</span> <span class="o">=</span> <span class="n">ZeissDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1990</span><span class="p">)})</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader2</span> <span class="o">=</span> <span class="n">ZeissDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">'horizontal'</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1990</span><span class="p">)})</span>
 </pre></div>
 </div>
 <p>For more info on negative indexing in python see: <a class="reference external" href="https://numpy.org/doc/stable/user/basics.indexing.html">https://numpy.org/doc/stable/user/basics.indexing.html</a></p>
@@ -947,15 +947,15 @@ to <code class="docutils literal notranslate"><span class="pre">start</span> <sp
 <section id="example">
 <h3>Example:<a class="headerlink" href="#example" title="Link to this heading">#</a></h3>
 <p>You can rescale the read data as <cite>rescaled_data = (read_data - offset)/scale</cite> with the following code:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;/path/to/folder&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">'/path/to/folder'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rescaled_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_rescaled</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Alternatively, if TIFFWriter has been used to save data with lossy compression, then you can rescale the
 read data to approximately the original data with the following code:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">TIFFWriter</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;/path/to/folder&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">original_data</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">TIFFWriter</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">'/path/to/folder'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">original_data</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;/path/to/folder&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reader</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span> <span class="o">=</span> <span class="s1">'/path/to/folder'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">about_original_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_rescaled</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1091,22 +1091,22 @@ read as numpy dtype with <code class="docutils literal notranslate"><span class=
 <p class="rubric">Example</p>
 <p>Example of using the writer with compression to <code class="docutils literal notranslate"><span class="pre">uint8</span></code>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">RAWFileWriter</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">RAWFileWriter</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">RAWFileWriter</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
 </pre></div>
 </div>
 <p class="rubric">Example</p>
 <p>Example of reading the data from the ini file:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">inifname</span> <span class="o">=</span> <span class="s2">&quot;file_name.ini&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inifname</span> <span class="o">=</span> <span class="s2">"file_name.ini"</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">inifname</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">read_dtype</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MINIMAL INFO&#39;</span><span class="p">][</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">read_dtype</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">'MINIMAL INFO'</span><span class="p">][</span><span class="s1">'data_type'</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">read_dtype</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fname</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MINIMAL INFO&#39;</span><span class="p">][</span><span class="s1">&#39;file_name&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fname</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">'MINIMAL INFO'</span><span class="p">][</span><span class="s1">'file_name'</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">read_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">read_dtype</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">read_shape</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;MINIMAL INFO&#39;</span><span class="p">][</span><span class="s1">&#39;shape&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;COMPRESSION&#39;</span><span class="p">][</span><span class="s1">&#39;scale&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">offset</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;COMPRESSION&#39;</span><span class="p">][</span><span class="s1">&#39;offset&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">read_shape</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">'MINIMAL INFO'</span><span class="p">][</span><span class="s1">'shape'</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">'COMPRESSION'</span><span class="p">][</span><span class="s1">'scale'</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">offset</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">'COMPRESSION'</span><span class="p">][</span><span class="s1">'offset'</span><span class="p">])</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -1286,8 +1286,8 @@ in the <code class="docutils literal notranslate"><span class="pre">ini</span></
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

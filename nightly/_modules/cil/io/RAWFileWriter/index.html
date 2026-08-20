@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.io.RAWFileWriter &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.io.RAWFileWriter &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/io/RAWFileWriter';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2023 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -545,7 +545,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">compress_and_save</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">compress</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Compress and save numpy array to file</span>
+<span class="w">    </span><span class="sd">'''Compress and save numpy array to file</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -559,14 +559,14 @@
 <span class="sd">    Note:</span>
 <span class="sd">    -----</span>
 <span class="sd">    Data is always written in ‘C’ order, independent of the order of d.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="k">if</span> <span class="n">compress</span><span class="p">:</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">compress_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">data</span>
 
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-        <span class="s2">&quot;Data is always written in ‘C’ order, independent of the order of d.&quot;</span><span class="p">)</span>
+        <span class="s2">"Data is always written in ‘C’ order, independent of the order of d."</span><span class="p">)</span>
     <span class="n">d</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
 
     <span class="c1"># return shape, fortran order, dtype</span>
@@ -576,7 +576,7 @@
 <div class="viewcode-block" id="RAWFileWriter">
 <a class="viewcode-back" href="../../../../io/#cil.io.RAWFileWriter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RAWFileWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''</span>
 <span class="sd">        Writer to write DataContainer (or subclass AcquisitionData, ImageData) to disk as a binary blob</span>
 
 <span class="sd">        Parameters</span>
@@ -585,9 +585,9 @@
 <span class="sd">            This represents the data to save to TIFF file(s)</span>
 <span class="sd">        file_name : string</span>
 <span class="sd">            This defines the file name prefix, i.e. the file name without the extension.</span>
-<span class="sd">        compression : str, default None. Accepted values None, &#39;uint8&#39;, &#39;uint16&#39;</span>
+<span class="sd">        compression : str, default None. Accepted values None, 'uint8', 'uint16'</span>
 <span class="sd">            The lossy compression to apply. The default None will not compress data.</span>
-<span class="sd">            &#39;uint8&#39; or &#39;unit16&#39; will compress to unsigned int 8 and 16 bit respectively.</span>
+<span class="sd">            'uint8' or 'unit16' will compress to unsigned int 8 and 16 bit respectively.</span>
 
 
 <span class="sd">        This writer will also write a text file with the minimal information necessary to</span>
@@ -606,7 +606,7 @@
 <span class="sd">            offset = -0.0</span>
 
 <span class="sd">        The ``data_type`` describes the data layout when packing and unpacking data. This can be</span>
-<span class="sd">        read as numpy dtype with ``np.dtype(&#39;&lt;u2&#39;)``.</span>
+<span class="sd">        read as numpy dtype with ``np.dtype('&lt;u2')``.</span>
 
 
 <span class="sd">        Example</span>
@@ -615,7 +615,7 @@
 <span class="sd">        Example of using the writer with compression to ``uint8``:</span>
 
 <span class="sd">        &gt;&gt;&gt; from cil.io import RAWFileWriter</span>
-<span class="sd">        &gt;&gt;&gt; writer = RAWFileWriter(data=data, file_name=fname, compression=&#39;uint8&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; writer = RAWFileWriter(data=data, file_name=fname, compression='uint8')</span>
 <span class="sd">        &gt;&gt;&gt; writer.write()</span>
 
 <span class="sd">        Example</span>
@@ -624,21 +624,21 @@
 <span class="sd">        Example of reading the data from the ini file:</span>
 
 <span class="sd">        &gt;&gt;&gt; config = configparser.ConfigParser()</span>
-<span class="sd">        &gt;&gt;&gt; inifname = &quot;file_name.ini&quot;</span>
+<span class="sd">        &gt;&gt;&gt; inifname = "file_name.ini"</span>
 <span class="sd">        &gt;&gt;&gt; config.read(inifname)</span>
-<span class="sd">        &gt;&gt;&gt; read_dtype = config[&#39;MINIMAL INFO&#39;][&#39;data_type&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; read_dtype = config['MINIMAL INFO']['data_type']</span>
 <span class="sd">        &gt;&gt;&gt; dtype = np.dtype(read_dtype)</span>
-<span class="sd">        &gt;&gt;&gt; fname = config[&#39;MINIMAL INFO&#39;][&#39;file_name&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; fname = config['MINIMAL INFO']['file_name']</span>
 <span class="sd">        &gt;&gt;&gt; read_array = np.fromfile(fname, dtype=read_dtype)</span>
-<span class="sd">        &gt;&gt;&gt; read_shape = eval(config[&#39;MINIMAL INFO&#39;][&#39;shape&#39;])</span>
-<span class="sd">        &gt;&gt;&gt; scale = float(config[&#39;COMPRESSION&#39;][&#39;scale&#39;])</span>
-<span class="sd">        &gt;&gt;&gt; offset = float(config[&#39;COMPRESSION&#39;][&#39;offset&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; read_shape = eval(config['MINIMAL INFO']['shape'])</span>
+<span class="sd">        &gt;&gt;&gt; scale = float(config['COMPRESSION']['scale'])</span>
+<span class="sd">        &gt;&gt;&gt; offset = float(config['COMPRESSION']['offset'])</span>
 
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 
 <span class="sd">          If compression ``uint8`` or ``unit16`` are used, the scale and offset used to compress the data are saved</span>
-<span class="sd">          in the ``ini`` file in the same directory as the raw file, in the &quot;COMPRESSION&quot; section .</span>
+<span class="sd">          in the ``ini`` file in the same directory as the raw file, in the "COMPRESSION" section .</span>
 
 <span class="sd">          The original data can be obtained by: ``original_data = (compressed_data - offset) / scale``</span>
 
@@ -649,21 +649,21 @@
 <span class="sd">          https://numpy.org/doc/stable/reference/generated/numpy.ndarray.tofile.html#numpy.ndarray.tofile,</span>
 
 
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">DataContainer</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Writer supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
-                            <span class="s1">&#39;DataContainer - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">'Writer supports only following data types:</span><span class="se">\n</span><span class="s1">'</span> <span class="o">+</span>
+                            <span class="s1">'DataContainer - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData'</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">data_container</span> <span class="o">=</span> <span class="n">data</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_name</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;dir_name </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">)</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;file_name </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"dir_name </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"file_name </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span>
 
         <span class="c1"># Deal with compression</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compress</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_compress</span><span class="p">(</span><span class="n">compression</span><span class="p">)</span>
@@ -675,11 +675,11 @@
 <div class="viewcode-block" id="RAWFileWriter.write">
 <a class="viewcode-back" href="../../../../io/#cil.io.RAWFileWriter.write">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Write data to disk&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Write data to disk'''</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">)</span>
 
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.raw&#39;</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">+</span> <span class="s1">'.raw'</span><span class="p">)</span>
 
         <span class="c1"># write to disk</span>
         <span class="n">header</span> <span class="o">=</span> \
@@ -691,24 +691,24 @@
 
         <span class="c1"># save information about the file we just saved</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
-        <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MINIMAL INFO&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;file_name&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname</span><span class="p">),</span>
-            <span class="s1">&#39;data_type&#39;</span><span class="p">:</span> <span class="n">read_dtype</span><span class="p">,</span>
-            <span class="s1">&#39;shape&#39;</span><span class="p">:</span> <span class="n">shape</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">[</span><span class="s1">'MINIMAL INFO'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">'file_name'</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname</span><span class="p">),</span>
+            <span class="s1">'data_type'</span><span class="p">:</span> <span class="n">read_dtype</span><span class="p">,</span>
+            <span class="s1">'shape'</span><span class="p">:</span> <span class="n">shape</span><span class="p">,</span>
             <span class="c1"># Data is always written in ‘C’ order, independent of the order of d.</span>
-            <span class="s1">&#39;is_fortran&#39;</span><span class="p">:</span> <span class="n">fortran_order</span>
+            <span class="s1">'is_fortran'</span><span class="p">:</span> <span class="n">fortran_order</span>
         <span class="p">}</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress</span><span class="p">:</span>
-            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;COMPRESSION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span>
-                <span class="s1">&#39;offset&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">'COMPRESSION'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">'scale'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span>
+                <span class="s1">'offset'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
             <span class="p">}</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Saving to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Saving to </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
         <span class="c1"># write the configuration to an ini file</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.ini&#39;</span><span class="p">),</span>
-                  <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">configfile</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">+</span> <span class="s1">'.ini'</span><span class="p">),</span>
+                  <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">configfile</span><span class="p">:</span>
             <span class="n">config</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">configfile</span><span class="p">)</span></div>
 </div>
 
@@ -741,8 +741,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

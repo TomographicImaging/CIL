@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>microCT reconstruction with Bruker data &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>microCT reconstruction with Bruker data &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,9 +52,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/bruker2cil';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Cone-beam offset reconstruction" href="../Apple_offset_reconstruction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -598,14 +598,14 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">#  Copyright 2024 Till Leissner</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -690,12 +690,12 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">datadir</span> <span class="o">=</span> <span class="s1">&#39;./samples/01-switch-small&#39;</span> <span class="c1"># Path to the dataset</span>
-<span class="n">dataset_prefix</span> <span class="o">=</span> <span class="s1">&#39;001_&#39;</span> <span class="c1"># Filename prefix</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">datadir</span> <span class="o">=</span> <span class="s1">'./samples/01-switch-small'</span> <span class="c1"># Path to the dataset</span>
+<span class="n">dataset_prefix</span> <span class="o">=</span> <span class="s1">'001_'</span> <span class="c1"># Filename prefix</span>
 
 <span class="c1"># Usually you do not need to change the following.</span>
-<span class="n">infofile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="o">+</span><span class="s1">&#39;.info&#39;</span><span class="p">)</span>
-<span class="n">logfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="o">+</span><span class="s1">&#39;.log&#39;</span><span class="p">)</span>
+<span class="n">infofile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="o">+</span><span class="s1">'.info'</span><span class="p">)</span>
+<span class="n">logfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="o">+</span><span class="s1">'.log'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -740,7 +740,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filelist</span> <span class="o">=</span> <span class="n">bc</span><span class="o">.</span><span class="n">get_filelist</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">filelist</span><span class="p">)</span>
 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ag</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">filelist</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Warning: Number of files does not correspond to number of rotational steps!&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Warning: Number of files does not correspond to number of rotational steps!'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -765,7 +765,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">show2D</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">))],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">60000</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20000</span><span class="p">)])</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">show2D</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">'angle'</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="s1">'vertical'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">))],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">60000</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20000</span><span class="p">)])</span>
 </pre></div>
 </div>
 </div>
@@ -790,10 +790,10 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><br/><span></span><span class="c1">### Turn this on for more info</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
-<span class="n">cil_log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;cil.processors&#39;</span><span class="p">)</span>
+<span class="n">cil_log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'cil.processors'</span><span class="p">)</span>
 <span class="n">cil_log_level</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
-<span class="n">processor</span> <span class="o">=</span> <span class="n">CentreOfRotationCorrector</span><span class="o">.</span><span class="n">image_sharpness</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">)</span>
+<span class="n">processor</span> <span class="o">=</span> <span class="n">CentreOfRotationCorrector</span><span class="o">.</span><span class="n">image_sharpness</span><span class="p">(</span><span class="n">slice_index</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'tigre'</span><span class="p">)</span>
 <span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">proj</span><span class="p">)</span>
 <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">proj</span><span class="p">)</span>
 </pre></div>
@@ -863,7 +863,7 @@ INFO:cil.processors.CofR_image_sharpness:Return new dataset with centred geometr
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="mi">300</span><span class="p">,</span><span class="o">-</span><span class="mi">300</span><span class="p">),</span><span class="s1">&#39;angle&#39;</span><span class="p">:(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)}</span> <span class="c1"># The first and the last slice (0, and 360 deg) are equal. To avoid artefacts, the last slice is removed.</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">roi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'horizontal'</span><span class="p">:(</span><span class="mi">300</span><span class="p">,</span><span class="o">-</span><span class="mi">300</span><span class="p">),</span><span class="s1">'angle'</span><span class="p">:(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)}</span> <span class="c1"># The first and the last slice (0, and 360 deg) are equal. To avoid artefacts, the last slice is removed.</span>
 <span class="n">processor</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
 <span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">proj</span><span class="p">)</span>
 <span class="n">proj</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
@@ -877,7 +877,7 @@ INFO:cil.processors.CofR_image_sharpness:Return new dataset with centred geometr
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#processor = RingRemover(decNum=4, wname=&#39;db35&#39;, sigma=1.5, info=True)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#processor = RingRemover(decNum=4, wname='db35', sigma=1.5, info=True)</span>
 <span class="c1">#processor.set_input(proj)</span>
 <span class="c1">#proj = processor.get_output()</span>
 </pre></div>
@@ -891,7 +891,7 @@ INFO:cil.processors.CofR_image_sharpness:Return new dataset with centred geometr
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1">#roi = {&#39;horizontal&#39;:(None,None,4),&#39;vertical&#39;:(None,None,4)}</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1">#roi = {'horizontal':(None,None,4),'vertical':(None,None,4)}</span>
 <span class="c1">#processor = Binner(roi)</span>
 <span class="c1">#processor.set_input(proj)</span>
 <span class="c1">#proj = processor.get_output()</span>
@@ -903,7 +903,7 @@ INFO:cil.processors.CofR_image_sharpness:Return new dataset with centred geometr
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">show2D</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">))],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">60000</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20000</span><span class="p">)])</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">show2D</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">'angle'</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="s1">'vertical'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">))],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">60000</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20000</span><span class="p">)])</span>
 </pre></div>
 </div>
 </div>
@@ -933,8 +933,8 @@ INFO:cil.processors.CofR_image_sharpness:Return new dataset with centred geometr
 <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span><span class="n">bins</span><span class="o">=</span><span class="mi">256</span><span class="p">);</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Min grey value </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Max grey value </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Min grey value </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Max grey value </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -970,7 +970,7 @@ Max grey value 56836.0
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Prepare data for reconstruction</span>
 <span class="n">proj</span> <span class="o">=</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">(</span><span class="n">min_intensity</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)(</span><span class="n">proj</span><span class="p">)</span>
-<span class="n">proj</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">)</span>
+<span class="n">proj</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">'tigre'</span><span class="p">)</span>
 <span class="n">ig</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -982,10 +982,10 @@ Max grey value 56836.0
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s summarize the used geometries before we start the reconstruction.</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Acquisition geometry:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">ag</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Projection geometry:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">proj</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Image geometry:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">ig</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let's summarize the used geometries before we start the reconstruction.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Acquisition geometry:</span><span class="se">\n</span><span class="s1">'</span><span class="p">,</span><span class="n">ag</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">'</span><span class="se">\n\n</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Projection geometry:</span><span class="se">\n</span><span class="s1">'</span><span class="p">,</span><span class="n">proj</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">'</span><span class="se">\n\n</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Image geometry:</span><span class="se">\n</span><span class="s1">'</span><span class="p">,</span><span class="n">ig</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1035,9 +1035,9 @@ center : x0,y0,z0
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Min grey value </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Max grey value </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="n">show2D</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">))],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Min grey value </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Max grey value </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">'angle'</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="s1">'vertical'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">))],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1128,11 +1128,11 @@ Reconstruction Options:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span> \
-       <span class="p">[(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="mi">2</span><span class="p">)),</span> \
-        <span class="p">(</span><span class="s1">&#39;horizontal_y&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">)),</span> \
-        <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">2</span><span class="p">))],</span> \
+       <span class="p">[(</span><span class="s1">'horizontal_x'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="mi">2</span><span class="p">)),</span> \
+        <span class="p">(</span><span class="s1">'horizontal_y'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">2</span><span class="p">)),</span> \
+        <span class="p">(</span><span class="s1">'vertical'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">2</span><span class="p">))],</span> \
         <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> \
-        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">"grey"</span><span class="p">,</span>
         <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">2.7</span><span class="p">),</span>
         <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
 </pre></div>
@@ -1162,11 +1162,11 @@ Reconstruction Options:
 
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_results</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
     <span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span> \
-       <span class="p">[(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> \
-        <span class="p">(</span><span class="s1">&#39;horizontal_y&#39;</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> \
-        <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="n">z</span><span class="p">)],</span> \
+       <span class="p">[(</span><span class="s1">'horizontal_x'</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> \
+        <span class="p">(</span><span class="s1">'horizontal_y'</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> \
+        <span class="p">(</span><span class="s1">'vertical'</span><span class="p">,</span> <span class="n">z</span><span class="p">)],</span> \
         <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> \
-        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">"grey"</span><span class="p">,</span>
         <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">2.7</span><span class="p">),</span>
         <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
 
@@ -1201,8 +1201,8 @@ Reconstruction Options:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Save data to a subfolder of the data folder</span>
-<span class="n">subfolder</span> <span class="o">=</span> <span class="n">dataset_prefix</span><span class="o">+</span><span class="s1">&#39;Rec&#39;</span>
-<span class="n">TIFFWriter</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">recon</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">subfolder</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="p">),</span><span class="n">compression</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+<span class="n">subfolder</span> <span class="o">=</span> <span class="n">dataset_prefix</span><span class="o">+</span><span class="s1">'Rec'</span>
+<span class="n">TIFFWriter</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">recon</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">subfolder</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="p">),</span><span class="n">compression</span><span class="o">=</span><span class="s1">'uint8'</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1215,7 +1215,7 @@ Reconstruction Options:
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="c1"># Save to a JSON file</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">subfolder</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="o">+</span><span class="s1">&#39;_params.json&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">subfolder</span><span class="p">,</span><span class="n">dataset_prefix</span><span class="o">+</span><span class="s1">'_params.json'</span><span class="p">),</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
     <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">bc</span><span class="o">.</span><span class="n">get_scanparams</span><span class="p">(</span><span class="n">logfile</span><span class="p">),</span> <span class="n">fp</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1277,8 +1277,8 @@ Reconstruction Options:
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

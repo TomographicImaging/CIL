@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.processors &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.framework.processors &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/framework/processors';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2018 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2018 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -544,7 +544,7 @@
 <a class="viewcode-back" href="../../../../framework/#cil.framework.Processor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Processor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Defines a generic DataContainer processor</span>
+<span class="w">    </span><span class="sd">'''Defines a generic DataContainer processor</span>
 
 <span class="sd">    accepts a DataContainer as input</span>
 <span class="sd">    returns a DataContainer</span>
@@ -552,63 +552,63 @@
 
 <span class="sd">    `store_output` boolian defining whether a copy of the output is stored. Default is False.</span>
 <span class="sd">    If no attributes are modified get_output will return this stored copy bypassing `process`</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">attributes</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;store_output&#39;</span> <span class="ow">in</span> <span class="n">attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;store_output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">'store_output'</span> <span class="ow">in</span> <span class="n">attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="s1">'store_output'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;shouldRun&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;_shape_out&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">attributes</span><span class="p">[</span><span class="s1">'output'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">attributes</span><span class="p">[</span><span class="s1">'shouldRun'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">attributes</span><span class="p">[</span><span class="s1">'input'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">attributes</span><span class="p">[</span><span class="s1">'_shape_out'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">attributes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">'input'</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;shouldRun&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">'shouldRun'</span><span class="p">:</span>
                 <span class="k">pass</span>
-            <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;shouldRun&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">'output'</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">'shouldRun'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;shouldRun&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">'shouldRun'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Attribute </span><span class="si">{0}</span><span class="s1"> not found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">'Attribute </span><span class="si">{0}</span><span class="s1"> not found'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Configure processor attributes that require the data to setup</span>
 <span class="sd">        Must set _shape_out</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">shape</span>
 
 <div class="viewcode-block" id="Processor.set_input">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.Processor.set_input">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Set the input data to the processor</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        input : DataContainer</span>
 <span class="sd">            The input DataContainer</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_input</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;shouldRun&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">'input'</span><span class="p">]</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">'shouldRun'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input data not compatible&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Input data not compatible'</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input type mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">&quot;</span> \
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Input type mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">"</span> \
                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">))</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_up</span><span class="p">()</span></div>
@@ -617,18 +617,18 @@
 <div class="viewcode-block" id="Processor.check_input">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.Processor.check_input">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Checks parameters of the input DataContainer</span>
+<span class="w">        </span><span class="sd">'''Checks parameters of the input DataContainer</span>
 
 <span class="sd">        Should raise an Error if the DataContainer does not match expectation, e.g.</span>
 <span class="sd">        if the expected input DataContainer is 3D and the Processor expects 2D.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Implement basic checks for input DataContainer&#39;</span><span class="p">)</span></div>
+<span class="sd">        '''</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Implement basic checks for input DataContainer'</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Processor.get_output">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.Processor.get_output">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Runs the configured processor and returns the processed data</span>
 
 <span class="sd">        Parameters</span>
@@ -640,9 +640,9 @@
 <span class="sd">        -------</span>
 <span class="sd">        DataContainer</span>
 <span class="sd">            The processed data</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Output data not compatible with processor&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Output data not compatible with processor'</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">shouldRun</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
@@ -661,32 +661,32 @@
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input type mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">&quot;</span>\
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Input type mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">"</span>\
                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
             
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span> <span class="o">!=</span> <span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;out size mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">&quot;</span>\
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"out size mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">"</span>\
                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out</span><span class="p">))</span>
          
         <span class="k">return</span> <span class="kc">True</span>
     
     <span class="k">def</span><span class="w"> </span><span class="nf">set_input_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processor</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">processor</span><span class="p">),</span> <span class="n">DataProcessor</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">processor</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">'input'</span><span class="p">]</span> <span class="o">=</span>  <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">processor</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input type mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">&quot;</span>\
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Input type mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">"</span>\
                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">processor</span><span class="p">),</span> <span class="n">DataProcessor</span><span class="p">))</span>
 
 <div class="viewcode-block" id="Processor.get_input">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.Processor.get_input">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the input DataContainer</span>
+<span class="w">        </span><span class="sd">'''returns the input DataContainer</span>
 
 <span class="sd">        It is useful in the case the user has provided a DataProcessor as</span>
 <span class="sd">        input</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input has been deallocated externally&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Input has been deallocated externally"</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">()),</span> <span class="n">DataProcessor</span><span class="p">):</span>
             <span class="n">dsi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">()</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -695,7 +695,7 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;process must be implemented&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'process must be implemented'</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
@@ -706,31 +706,31 @@
 <div class="viewcode-block" id="DataProcessor">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.DataProcessor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DataProcessor</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Basically an alias of Processor Class&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Basically an alias of Processor Class'''</span>
     <span class="k">pass</span></div>
 
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">DataProcessor23D</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Regularizers DataProcessor</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Regularizers DataProcessor</span>
+<span class="sd">    '''</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Checks number of dimensions input DataContainer</span>
+<span class="w">        </span><span class="sd">'''Checks number of dimensions input DataContainer</span>
 
 <span class="sd">        Expected input is 2D or 3D</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">number_of_dimensions</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> \
            <span class="n">dataset</span><span class="o">.</span><span class="n">number_of_dimensions</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected input dimensions is 2 or 3, got </span><span class="si">{0}</span><span class="s2">&quot;</span>\
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Expected input dimensions is 2 or 3, got </span><span class="si">{0}</span><span class="s2">"</span>\
                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">number_of_dimensions</span><span class="p">))</span>
 
 <span class="c1">###### Example of DataProcessors</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">AX</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Example DataProcessor</span>
+<span class="w">    </span><span class="sd">'''Example DataProcessor</span>
 <span class="sd">    The AXPY routines perform a vector multiplication operation defined as</span>
 
 <span class="sd">    y := a*x</span>
@@ -739,11 +739,11 @@
 <span class="sd">    a is a scalar</span>
 
 <span class="sd">    x a DataContainer.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;scalar&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
-                  <span class="s1">&#39;input&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'scalar'</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="s1">'input'</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                   <span class="p">}</span>
 
         <span class="c1">#DataProcessor.__init__(self, **kwargs)</span>
@@ -771,7 +771,7 @@
 <span class="c1">###### Example of DataProcessors</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">CastDataContainer</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Example DataProcessor</span>
+<span class="w">    </span><span class="sd">'''Example DataProcessor</span>
 <span class="sd">    Cast a DataContainer array to a different type.</span>
 
 <span class="sd">    y := a*x</span>
@@ -780,11 +780,11 @@
 <span class="sd">    a is a scalar</span>
 
 <span class="sd">    x a DataContainer.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span><span class="n">dtype</span><span class="p">,</span>
-                  <span class="s1">&#39;input&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'dtype'</span><span class="p">:</span><span class="n">dtype</span><span class="p">,</span>
+                  <span class="s1">'input'</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                   <span class="p">}</span>
 
         <span class="c1">#DataProcessor.__init__(self, **kwargs)</span>
@@ -809,18 +809,18 @@
             <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dsi</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">))</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">PixelByPixelDataProcessor</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Example DataProcessor</span>
+<span class="w">    </span><span class="sd">'''Example DataProcessor</span>
 
 <span class="sd">    This processor applies a python function to each pixel of the DataContainer</span>
 
 <span class="sd">    f is a python function</span>
 
 <span class="sd">    x a DataSet.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pyfunc&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
-                  <span class="s1">&#39;input&#39;</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'pyfunc'</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="s1">'input'</span><span class="p">:</span><span class="kc">None</span><span class="p">,</span>
                   <span class="p">}</span>
         <span class="c1">#DataProcessor.__init__(self, **kwargs)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PixelByPixelDataProcessor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -868,8 +868,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

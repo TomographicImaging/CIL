@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.functions.SAGFunction &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.optimisation.functions.SAGFunction &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/functions/SAGFunction';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2024 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2024 The University of Manchester</span>
 <span class="c1"># </span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1"># </span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1"># </span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -548,7 +548,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGFunction">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SAGFunction</span><span class="p">(</span><span class="n">ApproximateGradientSumFunction</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    The stochastic average gradient (SAG) function takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=0}^{n-1}f_i` at iteration :math:`x_k` as</span>
 <span class="sd">    </span>
 <span class="sd">    .. math ::</span>
@@ -585,10 +585,10 @@
 <span class="sd">    Note</span>
 <span class="sd">    ------  </span>
 
-<span class="sd">    This function&#39;s memory requirements are `n + 3` times the image space, that is with 100 subsets the memory requirement is 103 images, which is huge.</span>
+<span class="sd">    This function's memory requirements are `n + 3` times the image space, that is with 100 subsets the memory requirement is 103 images, which is huge.</span>
 <span class="sd">    </span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span>  <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span> <span class="o">=</span> <span class="kc">None</span>
@@ -604,7 +604,7 @@
 <div class="viewcode-block" id="SAGFunction.approximate_gradient">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGFunction.approximate_gradient">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">approximate_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">function_num</span><span class="p">,</span>  <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; SAG approximate gradient, calculated at the point :math:`x` and updated using the function index given by `function_num`.  </span>
+<span class="w">        </span><span class="sd">""" SAG approximate gradient, calculated at the point :math:`x` and updated using the function index given by `function_num`.  </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -613,7 +613,7 @@
 <span class="sd">        function_num: `int` </span>
 <span class="sd">            Between 0 and the number of functions in the list  </span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># Initialise the stored gradients on the first call of gradient unless using warm start.  </span>
@@ -624,7 +624,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_stochastic_grad_difference</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_num</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_functions</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_num</span><span class="o">&lt;</span><span class="mi">0</span> <span class="p">:</span> <span class="c1"># check the sampler and raise an error if needed</span>
-            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The sampler has produced the index </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">function_num</span><span class="si">}</span><span class="s2"> which does not match the expected range of available functions to sample from. Please ensure your sampler only selects from [0,1,...,len(functions)-1] &quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The sampler has produced the index </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">function_num</span><span class="si">}</span><span class="s2"> which does not match the expected range of available functions to sample from. Please ensure your sampler only selects from [0,1,...,len(functions)-1] "</span><span class="p">)</span>
 
             
         <span class="c1"># Calculate the gradient of the sampled function at the current iterate </span>
@@ -650,7 +650,7 @@
 
     
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_approx_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal function used to differentiate between the SAG and SAGA calculations. This is the SAG approximation: &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Internal function used to differentiate between the SAG and SAGA calculations. This is the SAG approximation: """</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stochastic_grad_difference</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span>  
                 <span class="mf">1.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_full_gradient_at_iterate</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>  
 
@@ -659,7 +659,7 @@
 <div class="viewcode-block" id="SAGFunction.warm_start_approximate_gradients">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGFunction.warm_start_approximate_gradients">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">warm_start_approximate_gradients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0 = \nabla f_i(x_0)` for initial point :math:`x_0`. </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""A function to warm start SAG or SAGA algorithms by initialising all the gradients at an initial point. Equivalently setting :math:`g_i^0 = \nabla f_i(x_0)` for initial point :math:`x_0`. </span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -671,7 +671,7 @@
 <span class="sd">        When using SAG or SAGA with a deterministic algorithm, you should warm start the SAG-SAGA Function with the same initial point that you initialise the algorithm</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">fi</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">initial</span><span class="p">)</span> <span class="k">for</span> <span class="n">fi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_full_gradient_at_iterate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_list_stored_gradients</span><span class="p">)</span>
@@ -682,9 +682,9 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">data_passes_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The property :code:`data_passes_indices` is a list of lists holding the indices of the functions that are processed in each call of `gradient`. This list is updated each time `gradient` is called by appending a list of the indices of the functions used to calculate the gradient.  </span>
+<span class="w">        </span><span class="sd">""" The property :code:`data_passes_indices` is a list of lists holding the indices of the functions that are processed in each call of `gradient`. This list is updated each time `gradient` is called by appending a list of the indices of the functions used to calculate the gradient.  </span>
 <span class="sd">        This is overwritten from the base class to first check to see if the approximate gradient was warm started and, if it was, ensure that the first element of `data_passes_indices` contains each index used to warm start and the index used in the first call to `gradient`. Thus the length of `data_passes_indices` is always equal to the number of calls to `gradient`. </span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_passes_indices</span><span class="p">[:]</span>  
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_functions</span><span class="p">:</span>  
             <span class="n">a</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  
@@ -696,7 +696,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.SAGAFunction">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SAGAFunction</span><span class="p">(</span><span class="n">SAGFunction</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    SAGA (SAG-Ameliore) is an accelerated version of the stochastic average gradient (SAG) function which takes a index :math:`i_k` and calculates the approximate gradient of :math:`\sum_{i=0}^{n-1}f_i` at iteration :math:`x_k` as</span>
 <span class="sd">    </span>
 <span class="sd">    .. math ::</span>
@@ -716,7 +716,7 @@
 <span class="sd">    Note  </span>
 <span class="sd">    ------  </span>
 
-<span class="sd">    This function&#39;s memory requirements are `n + 3` times the image space, that is with 100 subsets the memory requirement is 103 images, which is huge.</span>
+<span class="sd">    This function's memory requirements are `n + 3` times the image space, that is with 100 subsets the memory requirement is 103 images, which is huge.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 <span class="sd">    Note</span>
@@ -736,14 +736,14 @@
 <span class="sd">    The user has the option of calling the class method `warm_start_approximate_gradients` after initialising this class. This will compute and store the gradient for each function at an initial point, equivalently setting :math:`g_i^0=\nabla f_i(x_0)` for initial point :math:`x_0`. If this method is not called, the gradients are initialised with zeros. </span>
 
 <span class="sd">  </span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span>  <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SAGAFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">functions</span><span class="p">,</span> <span class="n">sampler</span><span class="p">)</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_approx_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal function used to differentiate between the SAG and SAGA calculations. This is the SAGA approximation and differs in the constants multiplying the gradients: &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Internal function used to differentiate between the SAG and SAGA calculations. This is the SAGA approximation and differs in the constants multiplying the gradients: """</span>
 
         <span class="c1"># Due to the convention that we follow: without the 1/n factor</span>
         <span class="n">out</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stochastic_grad_difference</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span>  
@@ -780,8 +780,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

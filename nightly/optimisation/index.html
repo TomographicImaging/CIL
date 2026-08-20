@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>Optimisation framework &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../_static/documentation_options.js?v=8959950e"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,9 +51,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'optimisation';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -64,7 +64,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -2969,13 +2969,13 @@ Each iteration considers just one index of the sum, potentially reducing computa
 </div>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_PARALLEL_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">'astra'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_partitioned</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">num_batches</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;staggered&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">A_partitioned</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data_partitioned</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_partitioned</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">num_batches</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'staggered'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A_partitioned</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data_partitioned</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="s2">"cpu"</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">data_partitioned</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
@@ -3307,8 +3307,8 @@ For example, when <span class="math notranslate nohighlight">\(g(x)=0\)</span>, 
 
 <span class="c1"># get the data</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_PARALLEL_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">'astra'</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">)</span>
 
 <span class="c1"># create the geometries</span>
 <span class="n">ag</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span>
@@ -3316,8 +3316,8 @@ For example, when <span class="math notranslate nohighlight">\(g(x)=0\)</span>, 
 
 <span class="c1"># partition the data and build the projectors</span>
 <span class="n">n_subsets</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">partitioned_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">n_subsets</span><span class="p">,</span> <span class="s1">&#39;sequential&#39;</span><span class="p">)</span>
-<span class="n">A_partitioned</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">partitioned_data</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="n">partitioned_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">n_subsets</span><span class="p">,</span> <span class="s1">'sequential'</span><span class="p">)</span>
+<span class="n">A_partitioned</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">partitioned_data</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="s2">"cpu"</span><span class="p">)</span>
 
 <span class="c1"># create the list of functions for the stochastic sum</span>
 <span class="n">list_of_functions</span> <span class="o">=</span> <span class="p">[</span><span class="n">LeastSquares</span><span class="p">(</span><span class="n">Ai</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">bi</span><span class="p">)</span> <span class="k">for</span> <span class="n">Ai</span><span class="p">,</span><span class="n">bi</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">A_partitioned</span><span class="p">,</span> <span class="n">partitioned_data</span><span class="p">)]</span>
@@ -3757,7 +3757,7 @@ by creating instead a BlockOperator of ChannelwiseOperators.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">DiagonalOperator</span><span class="p">(</span><span class="n">diag</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">ChannelwiseOperator</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">channels</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The original image data is:&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">'The original image data is:'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
 <span class="go">The original image data is:</span>
 <span class="go">[[[1. 1. 1.]</span>
@@ -3766,13 +3766,13 @@ by creating instead a BlockOperator of ChannelwiseOperators.</p>
 <span class="go">[[2. 2. 2.]</span>
 <span class="go">[2. 2. 2.]</span>
 <span class="go">[2. 2. 2.]]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The channel wise operator multiplies each channel element wise by:&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">'The channel wise operator multiplies each channel element wise by:'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">diag</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
 <span class="go">The channel wise operator multiplies each channel element wise by:</span>
 <span class="go">[[0. 1. 2.]</span>
 <span class="go">[3. 4. 5.]</span>
 <span class="go">[6. 7. 8.]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The result of applying the channel wise operator is:&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">'The result of applying the channel wise operator is:'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
 <span class="go">The result of applying the channel wise operator is:</span>
 <span class="go">[[[ 0.  1.  2.]</span>
@@ -3912,8 +3912,8 @@ its adjoint <span class="math notranslate nohighlight">\(A^{*}: Y \to X\)</span>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">div</span> <span class="o">=</span> <span class="n">AdjointOperator</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>     <span class="c1"># represents G*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s2">&quot;random_int&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s2">&quot;random_int&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s2">"random_int"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s2">"random_int"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lhs</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>     <span class="c1"># &lt;Gx, y&gt;_Y</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rhs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">div</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>   <span class="c1"># &lt;x, G* y&gt;_X</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lhs</span> <span class="o">==</span> <span class="n">rhs</span>
@@ -5892,7 +5892,7 @@ The methods of the <a class="reference internal" href="#cil.optimisation.functio
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">KullbackLeibler</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageGeometry</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">'random'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">KullbackLeibler</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -9062,7 +9062,7 @@ For a small number of samples (e.g. <cite>&lt;5*num_indices</cite>) the user may
 <p>A list of <code class="code docutils literal notranslate"><span class="pre">Callback</span></code> s to be executed each iteration can be passed to <cite>Algorithm</cite>’s <code class="code docutils literal notranslate"><span class="pre">run</span></code> method.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.utilities.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogfileCallback</span>
 <span class="o">...</span>
-<span class="n">algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">LogfileCallback</span><span class="p">(</span><span class="s2">&quot;log.txt&quot;</span><span class="p">)])</span>
+<span class="n">algorithm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">LogfileCallback</span><span class="p">(</span><span class="s2">"log.txt"</span><span class="p">)])</span>
 </pre></div>
 </div>
 <dl class="py class">
@@ -10270,8 +10270,8 @@ Otherwise it is a BlockGeometry.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

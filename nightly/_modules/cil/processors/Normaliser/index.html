@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.Normaliser &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.processors.Normaliser &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/processors/Normaliser';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2019 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -543,7 +543,7 @@
 <div class="viewcode-block" id="Normaliser">
 <a class="viewcode-back" href="../../../../processors/#cil.processors.Normaliser">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Normaliser</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; This processor can be used to normalise data with flat-field and dark-field images.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">""" This processor can be used to normalise data with flat-field and dark-field images.</span>
 
 <span class="sd">    The dark-field image is used to remove the offset from the input data, and the flat-field image is used to scale the data. </span>
 
@@ -582,14 +582,14 @@
 <span class="sd">    &gt;&gt;&gt; normaliser.set_input(data)</span>
 <span class="sd">    &gt;&gt;&gt; normaliser.get_output(out=data)</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_field</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dark_field</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">):</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
-                  <span class="s1">&#39;flat_field&#39;</span>  <span class="p">:</span> <span class="n">flat_field</span><span class="p">,</span>
-                  <span class="s1">&#39;dark_field&#39;</span>  <span class="p">:</span> <span class="n">dark_field</span><span class="p">,</span>
+                  <span class="s1">'flat_field'</span>  <span class="p">:</span> <span class="n">flat_field</span><span class="p">,</span>
+                  <span class="s1">'dark_field'</span>  <span class="p">:</span> <span class="n">dark_field</span><span class="p">,</span>
                   <span class="c1"># very small number. Used when there is a division by zero</span>
-                  <span class="s1">&#39;tolerance&#39;</span>   <span class="p">:</span> <span class="n">tolerance</span>
+                  <span class="s1">'tolerance'</span>   <span class="p">:</span> <span class="n">tolerance</span>
                   <span class="p">}</span>
 
         <span class="c1">#DataProcessor.__init__(self, **kwargs)</span>
@@ -604,13 +604,13 @@
            <span class="n">dataset</span><span class="o">.</span><span class="n">number_of_dimensions</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected input dimensions is 2 or 3, got </span><span class="si">{0}</span><span class="s2">&quot;</span>\
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Expected input dimensions is 2 or 3, got </span><span class="si">{0}</span><span class="s2">"</span>\
                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">number_of_dimensions</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">set_dark_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="ow">is</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">df</span><span class="p">))</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dark Field should be 2D&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Dark Field should be 2D'</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">df</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span> <span class="o">=</span> <span class="n">df</span>
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">):</span>
@@ -619,7 +619,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">set_flat_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="ow">is</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">df</span><span class="p">))</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Flat Field should be 2D&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Flat Field should be 2D'</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">df</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="o">=</span> <span class="n">df</span>
         <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">):</span>
@@ -630,11 +630,11 @@
 <a class="viewcode-back" href="../../../../processors/#cil.processors.Normaliser.estimate_normalised_error">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">estimate_normalised_error</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">delta_flat</span><span class="p">,</span> <span class="n">delta_dark</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the estimated relative error of the normalised projection</span>
+<span class="w">        </span><span class="sd">'''returns the estimated relative error of the normalised projection</span>
 
 <span class="sd">        n = (projection - dark) / (flat - dark)</span>
 <span class="sd">        Dn/n = (flat-dark + projection-dark)/((flat-dark)*(projection-dark))*(Df/f + Dd/d)</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">projection</span> <span class="o">-</span> <span class="n">dark</span><span class="p">)</span>
         <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat</span><span class="o">-</span><span class="n">dark</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">delta_flat</span> <span class="o">/</span> <span class="n">flat</span>
@@ -653,25 +653,25 @@
         <span class="n">out_array</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">array</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No flat or dark field provided. Please provide at least one.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'No flat or dark field provided. Please provide at least one.'</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">input_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span><span class="o">.</span><span class="n">shape</span><span class="p">)::]</span><span class="o">!=</span><span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dark field and projections size do not match.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Dark field and projections size do not match.'</span><span class="p">)</span>
             <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark_field</span>
 
         <span class="n">zero_err</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">input_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span><span class="o">.</span><span class="n">shape</span><span class="p">)::]</span><span class="o">!=</span><span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Flat field and projections size do not match.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Flat field and projections size do not match.'</span><span class="p">)</span>
             
             <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="o">-</span> <span class="n">offset</span>
 
-            <span class="n">numpy</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">)</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">'warn'</span><span class="p">)</span>
             <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">"always"</span><span class="p">)</span>
 
                 <span class="n">denom_inv</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">scale</span>
                 <span class="c1"># Check if any warnings were raised and handle these later</span>
@@ -686,7 +686,7 @@
             <span class="n">numpy</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">input_arr</span><span class="p">,</span> <span class="n">denom_inv</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out_array</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">zero_err</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Divide by zero detected. These values will be substituted by the set tolerance. Please check your data for bad pixels.&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"Divide by zero detected. These values will be substituted by the set tolerance. Please check your data for bad pixels."</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="c1"># create map of zeros in scale array</span>
             <span class="n">zero_map</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">scale</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
             <span class="c1"># set these to the tolerance value in all projections</span>
@@ -724,8 +724,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.Binner &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.processors.Binner &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/processors/Binner';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2021 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2021 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -553,7 +553,7 @@
 <a class="viewcode-back" href="../../../../processors/#cil.processors.Binner">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Binner</span><span class="p">(</span><span class="n">Slicer</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;This creates a Binner processor.</span>
+<span class="w">    </span><span class="sd">"""This creates a Binner processor.</span>
 
 <span class="sd">    The processor will crop the data, and then average together n input pixels along a dimension from the starting index.</span>
 
@@ -563,7 +563,7 @@
 <span class="sd">    ----------</span>
 
 <span class="sd">    roi : dict</span>
-<span class="sd">        The region-of-interest to bin {&#39;axis_name1&#39;:(start,stop,step), &#39;axis_name2&#39;:(start,stop,step)}</span>
+<span class="sd">        The region-of-interest to bin {'axis_name1':(start,stop,step), 'axis_name2':(start,stop,step)}</span>
 <span class="sd">        The `key` being the axis name to apply the processor to, the `value` holding a tuple containing the ROI description</span>
 
 <span class="sd">        Start: Starting index of input data. Must be an integer, or `None` defaults to index 0.</span>
@@ -578,7 +578,7 @@
 <span class="sd">    -------</span>
 
 <span class="sd">    &gt;&gt;&gt; from cil.processors import Binner</span>
-<span class="sd">    &gt;&gt;&gt; roi = {&#39;horizontal&#39;:(10,-10,2),&#39;vertical&#39;:(10,-10,2)}</span>
+<span class="sd">    &gt;&gt;&gt; roi = {'horizontal':(10,-10,2),'vertical':(10,-10,2)}</span>
 <span class="sd">    &gt;&gt;&gt; processor = Binner(roi)</span>
 <span class="sd">    &gt;&gt;&gt; processor.set_input(data)</span>
 <span class="sd">    &gt;&gt;&gt; data_binned = processor.get_output()</span>
@@ -587,7 +587,7 @@
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
 <span class="sd">    &gt;&gt;&gt; from cil.processors import Binner</span>
-<span class="sd">    &gt;&gt;&gt; roi = {&#39;horizontal&#39;:(None,None,2),&#39;vertical&#39;:(None,None,2)}</span>
+<span class="sd">    &gt;&gt;&gt; roi = {'horizontal':(None,None,2),'vertical':(None,None,2)}</span>
 <span class="sd">    &gt;&gt;&gt; processor = Binner(roi)</span>
 <span class="sd">    &gt;&gt;&gt; processor.set_input(data.geometry)</span>
 <span class="sd">    &gt;&gt;&gt; geometry_binned = processor.get_output()</span>
@@ -597,33 +597,33 @@
 <span class="sd">    ----</span>
 <span class="sd">    The indices provided are start inclusive, stop exclusive.</span>
 
-<span class="sd">    All elements along a dimension will be included if the axis does not appear in the roi dictionary, or if passed as {&#39;axis_name&#39;,-1}</span>
+<span class="sd">    All elements along a dimension will be included if the axis does not appear in the roi dictionary, or if passed as {'axis_name',-1}</span>
 
-<span class="sd">    If only one number is provided, then it is interpreted as Stop. i.e. {&#39;axis_name1&#39;:(stop)}</span>
-<span class="sd">    If two numbers are provided, then they are interpreted as Start and Stop  i.e. {&#39;axis_name1&#39;:(start, stop)}</span>
+<span class="sd">    If only one number is provided, then it is interpreted as Stop. i.e. {'axis_name1':(stop)}</span>
+<span class="sd">    If two numbers are provided, then they are interpreted as Start and Stop  i.e. {'axis_name1':(start, stop)}</span>
 
-<span class="sd">    Negative indexing can be used to specify the index. i.e. {&#39;axis_name1&#39;:(10, -10)} will crop the dimension symmetrically</span>
+<span class="sd">    Negative indexing can be used to specify the index. i.e. {'axis_name1':(10, -10)} will crop the dimension symmetrically</span>
 
 <span class="sd">    If Stop - Start is not multiple of Step, then</span>
 <span class="sd">    the resulted dimension will have (Stop - Start) // Step</span>
 <span class="sd">    elements, i.e. (Stop - Start) % Step elements will be ignored</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">accelerated</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">accelerated</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">has_ipp</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot run accelerated Binner without the IPP libraries.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Cannot run accelerated Binner without the IPP libraries."</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">Binner</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">roi</span> <span class="o">=</span> <span class="n">roi</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_accelerated</span> <span class="o">=</span> <span class="n">accelerated</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_configure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Once the ROI has been parsed this configures the input specifically for use with Binner</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1">#as binning we only include bins that are inside boundaries</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_shape_out_full</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">stop</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">start</span><span class="p">)</span><span class="o">//</span><span class="n">x</span><span class="o">.</span><span class="n">step</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">]</span>
@@ -644,30 +644,30 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_slice_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return the vertical position to extract a single slice for binned geometry</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">roi</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="o">/</span><span class="mi">2</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns the binned angles according to the roi</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">n_elements</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">roi</span><span class="o">.</span><span class="n">start</span><span class="p">:</span><span class="n">roi</span><span class="o">.</span><span class="n">start</span><span class="o">+</span><span class="n">n_elements</span><span class="o">*</span><span class="n">roi</span><span class="o">.</span><span class="n">step</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_bin_array_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array_in</span><span class="p">,</span> <span class="n">array_binned</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Bins the array using numpy. This method is slower and less memory efficient than self._bin_array_acc</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">shape_object</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">slice_object</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
-            <span class="c1"># reshape the data to add each &#39;bin&#39; dimensions</span>
+            <span class="c1"># reshape the data to add each 'bin' dimensions</span>
             <span class="n">shape_object</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape_out_full</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
             <span class="n">shape_object</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
 
@@ -684,9 +684,9 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_bin_array_acc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array_in</span><span class="p">,</span> <span class="n">array_binned</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Bins the array using the accelerated CIL backend</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">indices_start</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">start</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">]</span>
         <span class="n">bins</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">step</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_ordered</span><span class="p">]</span>
 
@@ -694,15 +694,15 @@
 
         <span class="n">res</span> <span class="o">=</span> <span class="n">binner_ipp</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="n">array_in</span><span class="p">,</span> <span class="n">array_binned</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Call failed&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Call failed"</span><span class="p">)</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dc_in</span><span class="p">,</span> <span class="n">dc_out</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Bin the data array</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dc_in</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">)</span> <span class="ow">and</span> <span class="n">dc_in</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cone-Flex geometry is not supported by this processor&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Cone-Flex geometry is not supported by this processor"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_accelerated</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_bin_array_acc</span><span class="p">(</span><span class="n">dc_in</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">dc_out</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -737,8 +737,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

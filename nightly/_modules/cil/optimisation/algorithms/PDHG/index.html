@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.PDHG &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.optimisation.algorithms.PDHG &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/algorithms/PDHG';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2019 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -550,7 +550,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.PDHG">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PDHG</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Primal Dual Hybrid Gradient (PDHG) algorithm, see :cite:`CP2011`, :cite:`EZXC2010`.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Primal Dual Hybrid Gradient (PDHG) algorithm, see :cite:`CP2011`, :cite:`EZXC2010`.</span>
 
 <span class="sd">    PDHG minimises objectives of the form: </span>
 <span class="sd">    </span>
@@ -562,15 +562,15 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    f : Function</span>
-<span class="sd">        A convex function with a &quot;simple&quot; proximal method of its conjugate. This function must map from the operator range to the Reals, as :math: `f(Kx)` will be the contribution to the total objective. See below for details.</span>
+<span class="sd">        A convex function with a "simple" proximal method of its conjugate. This function must map from the operator range to the Reals, as :math: `f(Kx)` will be the contribution to the total objective. See below for details.</span>
 <span class="sd">    g : Function</span>
-<span class="sd">        A convex function with a &quot;simple&quot; proximal. This function must map from the operator domain to the Reals. See below for details.</span>
+<span class="sd">        A convex function with a "simple" proximal. This function must map from the operator domain to the Reals. See below for details.</span>
 <span class="sd">    operator : LinearOperator</span>
 <span class="sd">        A Linear Operator.</span>
 <span class="sd">    sigma : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided</span>
 <span class="sd">        Step size for the dual problem. Needs to obey constraints with tau and operator norm to satisfy convergence guarantees, see below for details.</span>
 <span class="sd">    tau : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided</span>
-<span class="sd">        Step size for the primal problem. Needs to obey constraints with sigma and operator&#39;s norm to satisfy convergence guarantees, see below for details.</span>
+<span class="sd">        Step size for the primal problem. Needs to obey constraints with sigma and operator's norm to satisfy convergence guarantees, see below for details.</span>
 <span class="sd">    initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables</span>
 <span class="sd">        Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.</span>
 <span class="sd">    gamma_g : positive :obj:`float`, optional, default=None</span>
@@ -609,7 +609,7 @@
 
 <span class="sd">    .. math:: \min_{x\in X}\max_{y\in Y} \langle Kx, y \rangle + g(x) - f^{*}(y)</span>
 
-<span class="sd">    where :math:`f` and :math:`g` are convex functions with &quot;simple&quot; proximal operators.</span>
+<span class="sd">    where :math:`f` and :math:`g` are convex functions with "simple" proximal operators.</span>
 
 <span class="sd">    :math:`X` and :math:`Y` are two two finite-dimensional vector spaces with an inner product and representing the domain of :math:`g` and :math:`f^{*}`, the convex conjugate of :math:`f`, respectively.</span>
 
@@ -742,17 +742,17 @@
 <span class="sd">    ----</span>
 <span class="sd">    The case where both functions are strongly convex is not available at the moment.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gamma_g</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gamma_fconj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialisation of the PDHG algorithm&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Initialisation of the PDHG algorithm"""</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_theta</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;theta&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_theta</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'theta'</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theta</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theta</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;The relaxation parameter theta must be in the range [0,1], passed theta = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">))</span>
+                <span class="s2">"The relaxation parameter theta must be in the range [0,1], passed theta = </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">))</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_convergence</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;check_convergence&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_convergence</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'check_convergence'</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -770,90 +770,90 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tau</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The primal step-size &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The primal step-size """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The dual step-size &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The dual step-size """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">theta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The relaxation parameter for the over-relaxation of the primal variable &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The relaxation parameter for the over-relaxation of the primal variable """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theta</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">gamma_g</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The strongly convex constant for the function g &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The strongly convex constant for the function g """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gamma_g</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">gamma_fconj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The strongly convex constant for the convex conjugate of the function f &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The strongly convex constant for the convex conjugate of the function f """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gamma_fconj</span>
 
 <div class="viewcode-block" id="PDHG.set_gamma_g">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.PDHG.set_gamma_g">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_gamma_g</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Set the value of the strongly convex constant for function `g`</span>
+<span class="w">        </span><span class="sd">'''Set the value of the strongly convex constant for function `g`</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">            value : a positive number or None</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_fconj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment.&quot;</span> <span class="o">+</span>
-                             <span class="s2">&quot;Currently the strongly convex constant of the convex conjugate of the function f has been specified as &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_fconj</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment."</span> <span class="o">+</span>
+                             <span class="s2">"Currently the strongly convex constant of the convex conjugate of the function f has been specified as "</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_fconj</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Strongly convex constant is a positive number, </span><span class="si">{}</span><span class="s2"> is passed for the strongly convex function g.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+                    <span class="s2">"Strongly convex constant is a positive number, </span><span class="si">{}</span><span class="s2"> is passed for the strongly convex function g."</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_gamma_g</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Positive float is expected for the strongly convex constant of function g, </span><span class="si">{}</span><span class="s2"> is passed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+                <span class="s2">"Positive float is expected for the strongly convex constant of function g, </span><span class="si">{}</span><span class="s2"> is passed"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="PDHG.set_gamma_fconj">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.PDHG.set_gamma_fconj">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_gamma_fconj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Set the value of the strongly convex constant for the convex conjugate of function `f`</span>
+<span class="w">        </span><span class="sd">'''Set the value of the strongly convex constant for the convex conjugate of function `f`</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">            value : a positive number or None</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_g</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment.&quot;</span> <span class="o">+</span>
-                             <span class="s2">&quot;Currently the strongly convex constant of the function g has been specified as &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_g</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment."</span> <span class="o">+</span>
+                             <span class="s2">"Currently the strongly convex constant of the function g has been specified as "</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_g</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Strongly convex constant is positive, </span><span class="si">{}</span><span class="s2"> is passed for the strongly convex conjugate function of f.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+                    <span class="s2">"Strongly convex constant is positive, </span><span class="si">{}</span><span class="s2"> is passed for the strongly convex conjugate function of f."</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_gamma_fconj</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Positive float is expected for the strongly convex constant of the convex conjugate of function f, </span><span class="si">{}</span><span class="s2"> is passed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+                <span class="s2">"Positive float is expected for the strongly convex constant of the convex conjugate of function f, </span><span class="si">{}</span><span class="s2"> is passed"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="PDHG.set_up">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.PDHG.set_up">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialisation of the algorithm</span>
+<span class="w">        </span><span class="sd">"""Initialisation of the algorithm</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        f : Function</span>
-<span class="sd">            A convex function with a &quot;simple&quot; proximal method of its conjugate.</span>
+<span class="sd">            A convex function with a "simple" proximal method of its conjugate.</span>
 <span class="sd">        g : Function</span>
-<span class="sd">            A convex function with a &quot;simple&quot; proximal.</span>
+<span class="sd">            A convex function with a "simple" proximal.</span>
 <span class="sd">        operator : LinearOperator</span>
 <span class="sd">            A Linear Operator.</span>
 <span class="sd">        sigma : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided</span>
@@ -863,8 +863,8 @@
 <span class="sd">        initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables</span>
 <span class="sd">            Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> setting up&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="s2"> setting up"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
 
         <span class="c1"># Triplet (f, g, K)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span>
@@ -899,20 +899,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_g</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Primal Acceleration of PDHG: The function g is assumed to be strongly convex with positive parameter `gamma_g`. You need to be sure that gamma_g = </span><span class="si">{}</span><span class="s2"> is the correct strongly convex constant for g. &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma_g</span><span class="p">))</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"Primal Acceleration of PDHG: The function g is assumed to be strongly convex with positive parameter `gamma_g`. You need to be sure that gamma_g = </span><span class="si">{}</span><span class="s2"> is the correct strongly convex constant for g. "</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma_g</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_fconj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Dual Acceleration of PDHG: The convex conjugate of function f is assumed to be strongly convex with positive parameter `gamma_fconj`. You need to be sure that gamma_fconj = </span><span class="si">{}</span><span class="s2"> is the correct strongly convex constant&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma_fconj</span><span class="p">))</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"Dual Acceleration of PDHG: The convex conjugate of function f is assumed to be strongly convex with positive parameter `gamma_fconj`. You need to be sure that gamma_fconj = </span><span class="si">{}</span><span class="s2"> is the correct strongly convex constant"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma_fconj</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">configured</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> configured&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="s2"> configured"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_previous_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Swaps the references to current and previous solution based on the</span>
 <span class="sd">        :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">tmp</span>
@@ -920,14 +920,14 @@
 <div class="viewcode-block" id="PDHG.get_output">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.PDHG.get_output">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot; Returns the current solution. &quot;</span>
+        <span class="s2">" Returns the current solution. "</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span></div>
 
 
 <div class="viewcode-block" id="PDHG.update">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.PDHG.update">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Performs a single iteration of the PDHG algorithm&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Performs a single iteration of the PDHG algorithm"""</span>
         <span class="c1"># calculate x-bar and store in self.x_tmp</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="o">.</span><span class="n">sapyb</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span>
                          <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">)</span>
@@ -956,7 +956,7 @@
 <div class="viewcode-block" id="PDHG.check_convergence">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.PDHG.check_convergence">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">check_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check whether convergence criterion for PDHG is satisfied with scalar values of tau and sigma</span>
+<span class="w">        </span><span class="sd">"""Check whether convergence criterion for PDHG is satisfied with scalar values of tau and sigma</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -967,22 +967,22 @@
 <span class="sd">        ----------</span>
 <span class="sd">        Li, Y. and Yan, M., 2022. On the improved conditions for some primal-dual algorithms. arXiv preprint arXiv:2201.00139.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="o">/</span><span class="mi">3</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;Convergence criterion of PDHG for scalar step-sizes is not satisfied.&quot;</span><span class="p">)</span>
+                    <span class="s2">"Convergence criterion of PDHG for scalar step-sizes is not satisfied."</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Convergence criterion can only be checked for scalar values of tau and sigma.&quot;</span><span class="p">)</span>
+            <span class="s2">"Convergence criterion can only be checked for scalar values of tau and sigma."</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
 
 <div class="viewcode-block" id="PDHG.set_step_sizes">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.PDHG.set_step_sizes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_step_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets sigma and tau step-sizes for the PDHG algorithm. The step sizes can be either scalar or array-objects.</span>
+<span class="w">        </span><span class="sd">"""Sets sigma and tau step-sizes for the PDHG algorithm. The step sizes can be either scalar or array-objects.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -993,24 +993,24 @@
 
 <span class="sd">        The user can set either, both or none. Values passed by the user will be accepted as long as they are positive numbers,</span>
 <span class="sd">        or correct shape array like objects.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Check acceptable values of the primal-dual step-sizes</span>
         <span class="k">if</span> <span class="n">tau</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">tau</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;The step-sizes of PDHG must be positive, passed tau = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tau</span><span class="p">))</span>
+                        <span class="s2">"The step-sizes of PDHG must be positive, passed tau = </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tau</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">tau</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot; The shape of tau = </span><span class="si">{0}</span><span class="s2"> is not the same as the shape of the domain_geometry = </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">" The shape of tau = </span><span class="si">{0}</span><span class="s2"> is not the same as the shape of the domain_geometry = </span><span class="si">{1}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">tau</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">sigma</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;The step-sizes of PDHG are positive, passed sigma = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span>
+                        <span class="s2">"The step-sizes of PDHG are positive, passed sigma = </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">sigma</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot; The shape of sigma = </span><span class="si">{0}</span><span class="s2"> is not the same as the shape of the range_geometry = </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">" The shape of sigma = </span><span class="si">{0}</span><span class="s2"> is not the same as the shape of the range_geometry = </span><span class="si">{1}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">sigma</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 
         <span class="c1"># Default sigma and tau step-sizes</span>
@@ -1028,16 +1028,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_tau</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;If using arrays for sigma or tau both must arrays must be provided.&quot;</span><span class="p">)</span></div>
+                <span class="s2">"If using arrays for sigma or tau both must arrays must be provided."</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="PDHG.update_step_sizes">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.PDHG.update_step_sizes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_step_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Updates step sizes in the cases of primal or dual acceleration using the strongly convexity property.</span>
 <span class="sd">        The case where both functions are strongly convex is not available at the moment.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Update sigma and tau based on the strong convexity of G</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_g</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_theta</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">)</span>
@@ -1055,7 +1055,7 @@
 <div class="viewcode-block" id="PDHG.update_objective">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.PDHG.update_objective">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluates the primal objective, the dual objective and the primal-dual gap.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Evaluates the primal objective, the dual objective and the primal-dual gap."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span><span class="p">)</span>
         <span class="n">f_eval_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span><span class="p">)</span>
         <span class="n">g_eval_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="p">)</span>
@@ -1112,8 +1112,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

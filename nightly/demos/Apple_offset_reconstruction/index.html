@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Cone-beam offset reconstruction &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>Cone-beam offset reconstruction &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,9 +52,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/Apple_offset_reconstruction';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Comparison between the Least Square and the Weighted Least Square and the Kullback Leibler Divergence" href="../LS_WLS_KL_TotalVariation/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -596,14 +596,14 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -694,8 +694,8 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
     <span class="n">rotation_axis_direction</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
 <span class="p">)</span>
 <span class="n">ag</span><span class="o">.</span><span class="n">set_centre_of_rotation</span><span class="p">(</span><span class="o">-</span><span class="n">COR</span><span class="o">*</span><span class="n">pixel_size</span><span class="p">)</span>
-<span class="n">ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="n">angles_arr</span><span class="p">,</span> <span class="n">angle_unit</span><span class="o">=</span><span class="s1">&#39;radian&#39;</span> <span class="p">)</span>
-<span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">],</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixel_size</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;top-left&#39;</span><span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="n">angles_arr</span><span class="p">,</span> <span class="n">angle_unit</span><span class="o">=</span><span class="s1">'radian'</span> <span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">],</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixel_size</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'top-left'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -740,7 +740,7 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proj_folder</span> <span class="o">=</span> <span class="s1">&#39;./Apple_offset/raw/projections&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proj_folder</span> <span class="o">=</span> <span class="s1">'./Apple_offset/raw/projections'</span>
 <span class="n">n_projs</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c1"># and starts with idx 0</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">proj_folder</span><span class="p">)</span><span class="o">.</span><span class="n">read_as_AcquisitionData</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
 </pre></div>
@@ -761,7 +761,7 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="mi">15</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="p">])</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">'angle'</span><span class="p">,</span><span class="mi">15</span><span class="p">),</span> <span class="p">(</span><span class="s1">'vertical'</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="p">])</span>
 <br/></pre></div>
 </div>
 </div>
@@ -789,11 +789,11 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proj_folder</span> <span class="o">=</span> <span class="s1">&#39;./Apple_offset/raw/reconstruction&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">proj_folder</span> <span class="o">=</span> <span class="s1">'./Apple_offset/raw/reconstruction'</span>
 <span class="n">n_projs</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c1"># and starts with idx 0</span>
 <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">472</span><span class="p">)</span>
 <span class="n">recon_scanner</span> <span class="o">=</span> <span class="n">TIFFStackReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">proj_folder</span><span class="p">)</span><span class="o">.</span><span class="n">read_as_ImageData</span><span class="p">(</span><span class="n">ig</span> <span class="p">)</span>
-<span class="n">show2D</span><span class="p">(</span><span class="n">recon_scanner</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="mi">302</span><span class="p">)],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">10000</span><span class="p">,</span> <span class="mi">60000</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">recon_scanner</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">'vertical'</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">'horizontal_x'</span><span class="p">,</span> <span class="mi">302</span><span class="p">)],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">10000</span><span class="p">,</span> <span class="mi">60000</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'upper-left'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -822,12 +822,12 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">'astra'</span><span class="p">)</span>
 <span class="n">ig</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
-<span class="n">fbp</span> <span class="o">=</span>  <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">)</span>
+<span class="n">fbp</span> <span class="o">=</span>  <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">"gpu"</span><span class="p">)</span>
 <span class="n">recon</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-<span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="mi">302</span><span class="p">)],</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">'vertical'</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">'horizontal_x'</span><span class="p">,</span> <span class="mi">302</span><span class="p">)],</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'upper-left'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -854,7 +854,7 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Padding the data</span>
 <span class="n">Npad</span> <span class="o">=</span> <span class="mi">300</span>
-<span class="n">data_padded</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:(</span><span class="n">Npad</span><span class="p">,</span> <span class="n">Npad</span><span class="p">)})(</span><span class="n">data</span><span class="p">)</span> <span class="c1"># Padding in horizontal direction</span>
+<span class="n">data_padded</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="p">{</span><span class="s1">'horizontal'</span><span class="p">:(</span><span class="n">Npad</span><span class="p">,</span> <span class="n">Npad</span><span class="p">)})(</span><span class="n">data</span><span class="p">)</span> <span class="c1"># Padding in horizontal direction</span>
 </pre></div>
 </div>
 </div>
@@ -870,7 +870,7 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fbp</span> <span class="o">=</span>  <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data_padded</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fbp</span> <span class="o">=</span>  <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data_padded</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">"gpu"</span><span class="p">)</span>
 <span class="n">recon</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">data_padded</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -879,7 +879,7 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="mi">302</span><span class="p">)],</span><span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">'vertical'</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">'horizontal_x'</span><span class="p">,</span> <span class="mi">302</span><span class="p">)],</span><span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'upper-left'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -909,7 +909,7 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 <span class="n">processor</span> <span class="o">=</span> <span class="n">CentreOfRotationCorrector</span><span class="o">.</span><span class="n">image_sharpness</span><span class="p">(</span><span class="n">search_range</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 <span class="n">processor</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">data_padded</span><span class="p">)</span>
 <span class="n">data_centred</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
-<span class="n">data_centred</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_centre_of_rotation</span><span class="p">(</span><span class="n">distance_units</span><span class="o">=</span><span class="s1">&#39;pixels&#39;</span><span class="p">)</span>
+<span class="n">data_centred</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_centre_of_rotation</span><span class="p">(</span><span class="n">distance_units</span><span class="o">=</span><span class="s1">'pixels'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -927,10 +927,10 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span><span class="o">.</span><span class="n">set_centre_of_rotation</span><span class="p">(</span><span class="o">-</span><span class="n">COR</span><span class="o">*</span><span class="n">pixel_size</span><span class="o">+</span><span class="n">data_centred</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_centre_of_rotation</span><span class="p">()[</span><span class="s1">&#39;offset&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">pixel_size</span><span class="p">)</span>
-<span class="n">fbp</span> <span class="o">=</span>  <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data_padded</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span><span class="o">.</span><span class="n">set_centre_of_rotation</span><span class="p">(</span><span class="o">-</span><span class="n">COR</span><span class="o">*</span><span class="n">pixel_size</span><span class="o">+</span><span class="n">data_centred</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_centre_of_rotation</span><span class="p">()[</span><span class="s1">'offset'</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">pixel_size</span><span class="p">)</span>
+<span class="n">fbp</span> <span class="o">=</span>  <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data_padded</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">"gpu"</span><span class="p">)</span>
 <span class="n">recon</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">data_padded</span><span class="p">)</span>
-<span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="mi">302</span><span class="p">)],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">'vertical'</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">'horizontal_x'</span><span class="p">,</span> <span class="mi">302</span><span class="p">)],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'upper-left'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -955,7 +955,7 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span> <span class="mi">210</span><span class="p">)],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.06</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s1">'vertical'</span><span class="p">,</span><span class="mi">200</span><span class="p">),</span> <span class="p">(</span><span class="s1">'horizontal_x'</span><span class="p">,</span> <span class="mi">210</span><span class="p">)],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.06</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'upper-left'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -982,9 +982,9 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Visualise the results using a line plot</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">recon</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">0.15</span> <span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">recon</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">0.15</span> <span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="p">(</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="s1">&#39;red&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="p">(</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="s1">'red'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 
@@ -992,11 +992,11 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
-        <span class="n">total</span><span class="o">=</span><span class="n">recon</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+        <span class="n">total</span><span class="o">=</span><span class="n">recon</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">total</span><span class="o">+=</span><span class="n">recon</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+        <span class="n">total</span><span class="o">+=</span><span class="n">recon</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recon</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -1025,13 +1025,13 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span> <span class="c1"># Change the order of the variables in the array</span>
-<span class="n">data2D</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">'astra'</span><span class="p">)</span> <span class="c1"># Change the order of the variables in the array</span>
+<span class="n">data2D</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">)</span>
 <span class="n">ag2D</span> <span class="o">=</span> <span class="n">data2D</span><span class="o">.</span><span class="n">geometry</span>
 <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="mi">580</span><span class="p">,</span> <span class="mi">580</span><span class="p">,</span><span class="mi">400</span> <span class="p">,</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">)</span>
-<span class="n">ig2D</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+<span class="n">ig2D</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">)</span>
 <span class="c1"># Set up linear operator representing forward and backward projections</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig2D</span><span class="p">,</span> <span class="n">ag2D</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig2D</span><span class="p">,</span> <span class="n">ag2D</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"gpu"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1063,11 +1063,11 @@ so we used CIL to set up the offset geometry. This notebook showcases three diff
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># run gradient descent algorithm</span>
-<span class="n">show2D</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;5 iterations&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">'5 iterations'</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'upper-left'</span><span class="p">)</span>
 
 
 <span class="n">myGD_LS</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># run gradient descent algorithm</span>
-<span class="n">show2D</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;30 iterations&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">'30 iterations'</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'upper-left'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1128,7 +1128,7 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">965</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># run gradient descent algorithm</span>
-<span class="n">show2D</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.15</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'upper-left'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1178,9 +1178,9 @@ Stop criterion has been reached.
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Visualise the results using a line plot</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="p">(</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="s1">&#39;red&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="p">(</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="s1">'red'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 
@@ -1192,7 +1192,7 @@ Stop criterion has been reached.
     <span class="k">else</span><span class="p">:</span>
         <span class="n">total</span><span class="o">+=</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -1236,9 +1236,9 @@ Stop criterion has been reached.
 
 <span class="c1">#Visualise the results using a line plot</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">myGD_LS_TIK</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">myGD_LS_TIK</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="p">(</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="s1">&#39;red&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="p">(</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">580</span><span class="p">),</span> <span class="s1">'red'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 
@@ -1250,7 +1250,7 @@ Stop criterion has been reached.
     <span class="k">else</span><span class="p">:</span>
         <span class="n">total</span><span class="o">+=</span><span class="n">myGD_LS_TIK</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">myGD_LS_TIK</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="mi">375</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -1347,8 +1347,8 @@ Stop criterion has been reached.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

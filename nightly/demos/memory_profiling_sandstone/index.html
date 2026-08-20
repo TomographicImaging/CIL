@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>Memory and Performance Profiling CIL Algorithms: CGLS vs. LSQR &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,9 +52,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/memory_profiling_sandstone';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels" href="../Simulation_and_CPU_reconstruction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -602,14 +602,14 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">#  Copyright 2025 United Kingdom Research and Innovation</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -648,8 +648,8 @@
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;./Algorithms&quot;</span><span class="p">)</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;./Scripts&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"./Algorithms"</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"./Scripts"</span><span class="p">)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">LSQR</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">LSQR_Tikhonov</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
@@ -713,7 +713,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataexample</span><span class="o">.</span><span class="n">SANDSTONE</span><span class="o">.</span><span class="n">download_data</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataexample</span><span class="o">.</span><span class="n">SANDSTONE</span><span class="o">.</span><span class="n">download_data</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="s1">'.'</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -729,9 +729,9 @@ Dataset folder already exists in .
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">datapath</span> <span class="o">=</span> <span class="s1">&#39;./sandstone&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">datapath</span> <span class="o">=</span> <span class="s1">'./sandstone'</span>
 
-<span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;slice_0270_data.mat&quot;</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s2">"slice_0270_data.mat"</span>
 <span class="n">all_data</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datapath</span><span class="p">,</span><span class="n">filename</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -740,7 +740,7 @@ Dataset folder already exists in .
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sandstone</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s1">&#39;X_proj&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sandstone</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s1">'X_proj'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="n">sandstone</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
@@ -761,11 +761,11 @@ Dataset folder already exists in .
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Parallel2D</span><span class="p">()</span>  \
          <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">(</span><span class="mi">2560</span><span class="p">))</span>        \
          <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">180</span><span class="p">,</span><span class="mi">1500</span><span class="p">,</span><span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> \
-         <span class="o">.</span><span class="n">set_labels</span><span class="p">([</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span><span class="s1">&#39;angle&#39;</span><span class="p">])</span>
+         <span class="o">.</span><span class="n">set_labels</span><span class="p">([</span><span class="s1">'horizontal'</span><span class="p">,</span><span class="s1">'angle'</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span>
 
 <span class="n">sandstone</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">sandstone</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ag</span><span class="p">,</span> <span class="n">deep_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">sandstone</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
+<span class="n">sandstone</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">'astra'</span><span class="p">)</span>
 
 <span class="n">show2D</span><span class="p">(</span><span class="n">sandstone</span><span class="p">)</span>
 </pre></div>
@@ -804,10 +804,10 @@ Dataset folder already exists in .
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">flats</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s1">&#39;X_flat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">flats</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s1">'X_flat'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="n">flats</span><span class="o">.</span><span class="n">shape</span>
 
-<span class="n">darks</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s1">&#39;X_dark&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">darks</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s1">'X_dark'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="n">darks</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
@@ -836,7 +836,7 @@ Dataset folder already exists in .
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">sandstone</span><span class="p">,</span> <span class="n">sandstone_norm</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Sandstone&#39;</span><span class="p">,</span> <span class="s1">&#39;Sandstone Normalised&#39;</span><span class="p">])</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">sandstone</span><span class="p">,</span> <span class="n">sandstone_norm</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Sandstone'</span><span class="p">,</span> <span class="s1">'Sandstone Normalised'</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -861,7 +861,7 @@ Dataset folder already exists in .
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">padsize</span> <span class="o">=</span> <span class="mi">600</span>
-<span class="n">sandstone_pad</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal&#39;</span><span class="p">:</span> <span class="n">padsize</span><span class="p">})(</span><span class="n">sandstone_norm</span><span class="p">)</span>
+<span class="n">sandstone_pad</span> <span class="o">=</span> <span class="n">Padder</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="p">{</span><span class="s1">'horizontal'</span><span class="p">:</span> <span class="n">padsize</span><span class="p">})(</span><span class="n">sandstone_norm</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -893,8 +893,8 @@ Dataset folder already exists in .
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sandstone_cor</span> <span class="o">=</span> <span class="n">CentreOfRotationCorrector</span><span class="o">.</span><span class="n">image_sharpness</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span> <span class="n">search_range</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)(</span><span class="n">sandstone_pad</span><span class="p">)</span>
-<span class="n">sandstone_cor</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_centre_of_rotation</span><span class="p">(</span><span class="n">distance_units</span><span class="o">=</span><span class="s1">&#39;pixels&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sandstone_cor</span> <span class="o">=</span> <span class="n">CentreOfRotationCorrector</span><span class="o">.</span><span class="n">image_sharpness</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s1">'astra'</span><span class="p">,</span> <span class="n">search_range</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)(</span><span class="n">sandstone_pad</span><span class="p">)</span>
+<span class="n">sandstone_cor</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_centre_of_rotation</span><span class="p">(</span><span class="n">distance_units</span><span class="o">=</span><span class="s1">'pixels'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -915,7 +915,7 @@ Dataset folder already exists in .
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ig</span> <span class="o">=</span> <span class="n">sandstone_norm</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
-<span class="n">recon</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">sandstone_cor</span><span class="p">,</span> <span class="n">ig</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="n">recon</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">sandstone_cor</span><span class="p">,</span> <span class="n">ig</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'astra'</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -950,7 +950,7 @@ Reconstructing in 1 chunk(s):
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Sandstone Reconstruction (Ground Truth)&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">(</span><span class="n">recon</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'Sandstone Reconstruction (Ground Truth)'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -993,7 +993,7 @@ Reconstructing in 1 chunk(s):
 <span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">sand_noisy_data</span><span class="p">)</span>
 
 <span class="n">plots</span> <span class="o">=</span> <span class="p">[</span><span class="n">sandstone_cor</span><span class="p">,</span> <span class="n">sandstone_noisy</span><span class="p">]</span>
-<span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sandstone sinogram&quot;</span><span class="p">,</span> <span class="s2">&quot;sandstone sinogram noisy&quot;</span><span class="p">]</span>
+<span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"sandstone sinogram"</span><span class="p">,</span> <span class="s2">"sandstone sinogram noisy"</span><span class="p">]</span>
 <span class="n">show2D</span><span class="p">(</span><span class="n">plots</span><span class="p">,</span> <span class="n">titles</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1032,11 +1032,11 @@ Reconstructing in 1 chunk(s):
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">'astra'</span><span class="p">)</span>
 <span class="n">ig</span> <span class="o">=</span> <span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
 <span class="n">ag</span> <span class="o">=</span> <span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">geometry</span> <span class="c1"># ig and ag need to be same</span>
 
-<span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;gpu&quot;</span>
+<span class="n">device</span> <span class="o">=</span> <span class="s2">"gpu"</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 
 <span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -1080,16 +1080,16 @@ Reconstructing in 1 chunk(s):
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">rel_res_vec_cgls</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">rel_res_vec_lsqr</span><span class="p">,</span> <span class="s1">&#39;b.--&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Residual&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">&#39;CGLS&#39;</span><span class="p">,</span><span class="s1">&#39;LSQR&#39;</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">rel_res_vec_cgls</span><span class="p">,</span> <span class="s1">'r-'</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">rel_res_vec_lsqr</span><span class="p">,</span> <span class="s1">'b.--'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Iteration'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Residual'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">'CGLS'</span><span class="p">,</span><span class="s1">'LSQR'</span><span class="p">))</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">rel_err_vec_cgls</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">rel_err_vec_lsqr</span><span class="p">,</span> <span class="s1">&#39;b.--&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Error&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">&#39;CGLS&#39;</span><span class="p">,</span><span class="s1">&#39;LSQR&#39;</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">rel_err_vec_cgls</span><span class="p">,</span> <span class="s1">'r-'</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">rel_err_vec_lsqr</span><span class="p">,</span> <span class="s1">'b.--'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Iteration'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Error'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">'CGLS'</span><span class="p">,</span><span class="s1">'LSQR'</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1108,10 +1108,10 @@ mathematically. This graph shows that the algorithms’ reconstructions match th
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">times_cgls</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">times_lsqr</span><span class="p">,</span> <span class="s1">&#39;b.--&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">&#39;CGLS&#39;</span><span class="p">,</span><span class="s1">&#39;LSQR&#39;</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">times_cgls</span><span class="p">,</span> <span class="s1">'r-'</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">times_lsqr</span><span class="p">,</span> <span class="s1">'b.--'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Iteration'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Time (s)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">'CGLS'</span><span class="p">,</span><span class="s1">'LSQR'</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1165,7 +1165,7 @@ mathematically. This graph shows that the algorithms’ reconstructions match th
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">cgls_mem_prof</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[:</span><span class="mi">117</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># Print set_up, __init__ &amp; run 1</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">cgls_mem_prof</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[:</span><span class="mi">117</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span> <span class="c1"># Print set_up, __init__ &amp; run 1</span>
 </pre></div>
 </div>
 </div>
@@ -1298,8 +1298,8 @@ Line #    Mem usage    Increment  Occurrences   Line Contents
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ImageData and AcquisitionData Sizes</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimate of &#39;initial&#39; (ImageData) size: </span><span class="si">{</span><span class="n">initial</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimate of &#39;sandstone_noisy&#39; (AcquisitionData) size: </span><span class="si">{</span><span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Estimate of 'initial' (ImageData) size: </span><span class="si">{</span><span class="n">initial</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Estimate of 'sandstone_noisy' (AcquisitionData) size: </span><span class="si">{</span><span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1328,8 +1328,8 @@ Estimate of &#39;sandstone_noisy&#39; (AcquisitionData) size: 21.5 MB
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cgls_mp</span> <span class="o">=</span> <span class="n">mem_prof_process</span><span class="p">(</span><span class="n">cgls_mem_prof</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">cgls_mp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">&#39;background-color: turquoise&#39;</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">200</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Total Memory Usage (MiB)&#39;</span><span class="p">)</span>\
-                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">cgls_mp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">'background-color: turquoise'</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">200</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">'Total Memory Usage (MiB)'</span><span class="p">)</span>\
+                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1460,8 +1460,8 @@ Estimate of &#39;sandstone_noisy&#39; (AcquisitionData) size: 21.5 MB
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cgls_lp</span> <span class="o">=</span> <span class="n">line_prof_process</span><span class="p">(</span><span class="n">cgls_line_prof</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">cgls_lp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">&#39;background-color: turquoise&#39;</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">200</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Total Memory Usage (MiB)&#39;</span><span class="p">)</span>\
-                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">cgls_lp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">'background-color: turquoise'</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">200</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">'Total Memory Usage (MiB)'</span><span class="p">)</span>\
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1585,9 +1585,9 @@ Estimate of &#39;sandstone_noisy&#39; (AcquisitionData) size: 21.5 MB
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cgls_lp</span> <span class="o">=</span> <span class="n">line_peak_process</span><span class="p">(</span><span class="n">cgls_line_prof</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">cgls_lp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;background-color: pink&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="mi">58</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="p">)],</span>
-    <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Peak Memory Increase (MiB)&#39;</span><span class="p">)</span>\
-    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="s1">'background-color: pink'</span> <span class="k">if</span> <span class="p">(</span><span class="mi">58</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">''</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="p">)],</span>
+    <span class="n">subset</span><span class="o">=</span><span class="s1">'Peak Memory Increase (MiB)'</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1845,7 +1845,7 @@ Estimate of &#39;sandstone_noisy&#39; (AcquisitionData) size: 21.5 MB
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_mem</span><span class="p">((</span><span class="n">cgls_lp</span><span class="p">,),</span> <span class="p">(</span><span class="s2">&quot;CGLS&quot;</span><span class="p">,))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_mem</span><span class="p">((</span><span class="n">cgls_lp</span><span class="p">,),</span> <span class="p">(</span><span class="s2">"CGLS"</span><span class="p">,))</span>
 </pre></div>
 </div>
 </div>
@@ -1876,11 +1876,11 @@ Estimate of &#39;sandstone_noisy&#39; (AcquisitionData) size: 21.5 MB
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lsqr_lp</span> <span class="o">=</span> <span class="n">line_peak_process</span><span class="p">(</span><span class="n">lsqr_line_prof</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">lsqr_lp</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;background-color: pink&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="mi">58</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="p">)],</span>
-    <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Peak Memory Increase (MiB)&#39;</span><span class="p">)</span>\
-    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">&#39;background-color: turquoise&#39;</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">200</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Total Memory Usage (MiB)&#39;</span><span class="p">)</span>\
-    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">&#39;background-color: orange&#39;</span> <span class="k">if</span> <span class="mi">58</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">50</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Total Memory Usage (MiB)&#39;</span><span class="p">)</span>\
-    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="s1">'background-color: pink'</span> <span class="k">if</span> <span class="p">(</span><span class="mi">58</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">''</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="p">)],</span>
+    <span class="n">subset</span><span class="o">=</span><span class="s1">'Peak Memory Increase (MiB)'</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">'background-color: turquoise'</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">200</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">'Total Memory Usage (MiB)'</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">'background-color: orange'</span> <span class="k">if</span> <span class="mi">58</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">50</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">'Total Memory Usage (MiB)'</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2153,7 +2153,7 @@ Estimate of &#39;sandstone_noisy&#39; (AcquisitionData) size: 21.5 MB
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uncomment to view line-by-line &amp; peak usage output:</span>
-<span class="n">print_output_subset</span><span class="p">(</span><span class="n">lsqr_line_prof</span><span class="p">,</span> <span class="s1">&#39;run 1&#39;</span><span class="p">)</span> <span class="c1"># Truncated to show run 1 &amp; update 1</span>
+<span class="n">print_output_subset</span><span class="p">(</span><span class="n">lsqr_line_prof</span><span class="p">,</span> <span class="s1">'run 1'</span><span class="p">)</span> <span class="c1"># Truncated to show run 1 &amp; update 1</span>
 </pre></div>
 </div>
 </div>
@@ -2289,7 +2289,7 @@ End of run | Memory Usage: 941.27 MB | line:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">print_output_subset</span><span class="p">(</span><span class="n">lsqr_line_prof</span><span class="p">,</span> <span class="s1">&#39;run 2&#39;</span><span class="p">)</span> <span class="c1"># Truncated to show run 2 &amp; update 2</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">print_output_subset</span><span class="p">(</span><span class="n">lsqr_line_prof</span><span class="p">,</span> <span class="s1">'run 2'</span><span class="p">)</span> <span class="c1"># Truncated to show run 2 &amp; update 2</span>
 </pre></div>
 </div>
 </div>
@@ -2415,7 +2415,7 @@ End of run | Memory Usage: 941.32 MB | line:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_mem</span><span class="p">(</span><span class="n">dfs</span><span class="o">=</span><span class="p">(</span><span class="n">cgls_lp</span><span class="p">,</span> <span class="n">lsqr_lp</span><span class="p">),</span> <span class="n">algNms</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;CGLS&quot;</span><span class="p">,</span> <span class="s2">&quot;LSQR&quot;</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_mem</span><span class="p">(</span><span class="n">dfs</span><span class="o">=</span><span class="p">(</span><span class="n">cgls_lp</span><span class="p">,</span> <span class="n">lsqr_lp</span><span class="p">),</span> <span class="n">algNms</span><span class="o">=</span><span class="p">(</span><span class="s2">"CGLS"</span><span class="p">,</span> <span class="s2">"LSQR"</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -2443,8 +2443,8 @@ resulting in a net increase of ~0 MB. This is consistent across all ‘run’ ca
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uncomment to see memory_profiler breakdown:</span>
-<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">lsqr_mem_prof</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[:</span><span class="mi">42</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># Print set_up</span>
-<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">lsqr_mem_prof</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">77</span><span class="p">:</span><span class="mi">135</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># Print run 1</span>
+<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">lsqr_mem_prof</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[:</span><span class="mi">42</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span> <span class="c1"># Print set_up</span>
+<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">lsqr_mem_prof</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">77</span><span class="p">:</span><span class="mi">135</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span> <span class="c1"># Print run 1</span>
 </pre></div>
 </div>
 </div>
@@ -2631,16 +2631,16 @@ Line #    Mem usage    Increment  Occurrences   Line Contents
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">rel_res_vec_lsqr_tik_block</span><span class="p">,</span> <span class="s1">&#39;*-&#39;</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">rel_res_vec_cgls_tik_block</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">rel_res_vec_lsqr_tik_simple</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteratons&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Residuals&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">&#39;LSQR Block&#39;</span><span class="p">,</span> <span class="s1">&#39;CGLS Block&#39;</span><span class="p">,</span> <span class="s1">&#39;LSQR Tik&#39;</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">rel_res_vec_lsqr_tik_block</span><span class="p">,</span> <span class="s1">'*-'</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">rel_res_vec_cgls_tik_block</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">rel_res_vec_lsqr_tik_simple</span><span class="p">,</span> <span class="s1">'--'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Iteratons'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Residuals'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">'LSQR Block'</span><span class="p">,</span> <span class="s1">'CGLS Block'</span><span class="p">,</span> <span class="s1">'LSQR Tik'</span><span class="p">))</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">rel_err_vec_lsqr_tik_block</span><span class="p">,</span> <span class="s1">&#39;*-&#39;</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">rel_err_vec_cgls_tik_block</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">rel_err_vec_lsqr_tik_simple</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteratons&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Error&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">&#39;LSQR Block&#39;</span><span class="p">,</span> <span class="s1">&#39;CGLS Block&#39;</span><span class="p">,</span> <span class="s1">&#39;LSQR Tik&#39;</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">rel_err_vec_lsqr_tik_block</span><span class="p">,</span> <span class="s1">'*-'</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">rel_err_vec_cgls_tik_block</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">rel_err_vec_lsqr_tik_simple</span><span class="p">,</span> <span class="s1">'--'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Iteratons'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Error'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">'LSQR Block'</span><span class="p">,</span> <span class="s1">'CGLS Block'</span><span class="p">,</span> <span class="s1">'LSQR Tik'</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -2659,10 +2659,10 @@ This graph shows that the algorithms’ reconstructions match the FBP reconstruc
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">times_cgls_tik_block</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">times_lsqr_tik_block</span><span class="p">,</span> <span class="s1">&#39;b.--&#39;</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">times_lsqr_tik_simple</span><span class="p">,</span> <span class="s1">&#39;g.-&#39;</span> <span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">&#39;CGLS Block&#39;</span><span class="p">,</span> <span class="s1">&#39;LSQR Block&#39;</span><span class="p">,</span> <span class="s1">&#39;LSQR Tik&#39;</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">times_cgls_tik_block</span><span class="p">,</span> <span class="s1">'r-'</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">times_lsqr_tik_block</span><span class="p">,</span> <span class="s1">'b.--'</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">times_lsqr_tik_simple</span><span class="p">,</span> <span class="s1">'g.-'</span> <span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Iteration'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Time (s)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">'CGLS Block'</span><span class="p">,</span> <span class="s1">'LSQR Block'</span><span class="p">,</span> <span class="s1">'LSQR Tik'</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -2742,9 +2742,9 @@ This graph shows that the algorithms’ reconstructions match the FBP reconstruc
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ImageData and AcquisitionData Sizes</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimate of &#39;initial&#39; (ImageData) size: </span><span class="si">{</span><span class="n">initial</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimate of &#39;sandstone_noisy&#39; (AcquisitionData) size: </span><span class="si">{</span><span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimate of &#39;data_block&#39; (Block AcquisitionData) size: </span><span class="si">{</span><span class="p">(</span><span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">size</span><span class="o">+</span><span class="n">zero_data</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Estimate of 'initial' (ImageData) size: </span><span class="si">{</span><span class="n">initial</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Estimate of 'sandstone_noisy' (AcquisitionData) size: </span><span class="si">{</span><span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Estimate of 'data_block' (Block AcquisitionData) size: </span><span class="si">{</span><span class="p">(</span><span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">size</span><span class="o">+</span><span class="n">zero_data</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2777,11 +2777,11 @@ Estimate of &#39;data_block&#39; (Block AcquisitionData) size: 75.4 MB
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cgls_block_lp</span> <span class="o">=</span> <span class="n">line_peak_process</span><span class="p">(</span><span class="n">cgls_block_prof</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">cgls_block_lp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;background-color: pink&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="mi">134</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">126</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="p">)],</span>
-    <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Peak Memory Increase (MiB)&#39;</span><span class="p">)</span>\
-    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">&#39;background-color: turquoise&#39;</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">300</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Total Memory Usage (MiB)&#39;</span><span class="p">)</span>\
-    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">&#39;background-color: orange&#39;</span> <span class="k">if</span> <span class="mi">24</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">18</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Total Memory Usage (MiB)&#39;</span><span class="p">)</span>\
-    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="s1">'background-color: pink'</span> <span class="k">if</span> <span class="p">(</span><span class="mi">134</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">126</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">''</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="p">)],</span>
+    <span class="n">subset</span><span class="o">=</span><span class="s1">'Peak Memory Increase (MiB)'</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">'background-color: turquoise'</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">300</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">'Total Memory Usage (MiB)'</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">'background-color: orange'</span> <span class="k">if</span> <span class="mi">24</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">18</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">'Total Memory Usage (MiB)'</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2957,11 +2957,11 @@ Estimate of &#39;data_block&#39; (Block AcquisitionData) size: 75.4 MB
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lsqr_block_lp</span> <span class="o">=</span> <span class="n">line_peak_process</span><span class="p">(</span><span class="n">lsqr_block_prof</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">lsqr_block_lp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;background-color: pink&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="mi">190</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">175</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="p">)],</span>
-    <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Peak Memory Increase (MiB)&#39;</span><span class="p">)</span>\
-    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">&#39;background-color: turquoise&#39;</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">255</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Total Memory Usage (MiB)&#39;</span><span class="p">)</span>\
-    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">&#39;background-color: orange&#39;</span> <span class="k">if</span> <span class="mi">134</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">126</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Total Memory Usage (MiB)&#39;</span><span class="p">)</span>\
-    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="s1">'background-color: pink'</span> <span class="k">if</span> <span class="p">(</span><span class="mi">190</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">175</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">''</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="p">)],</span>
+    <span class="n">subset</span><span class="o">=</span><span class="s1">'Peak Memory Increase (MiB)'</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">'background-color: turquoise'</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">255</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">'Total Memory Usage (MiB)'</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">'background-color: orange'</span> <span class="k">if</span> <span class="mi">134</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">126</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">'Total Memory Usage (MiB)'</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -3123,8 +3123,8 @@ Estimate of &#39;data_block&#39; (Block AcquisitionData) size: 75.4 MB
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ImageData and AcquisitionData Sizes</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimate of &#39;initial&#39; (ImageData) size: </span><span class="si">{</span><span class="n">initial</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Estimate of &#39;sandstone_noisy&#39; (AcquisitionData) size: </span><span class="si">{</span><span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Estimate of 'initial' (ImageData) size: </span><span class="si">{</span><span class="n">initial</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Estimate of 'sandstone_noisy' (AcquisitionData) size: </span><span class="si">{</span><span class="n">sandstone_noisy</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="n">dtypeSize</span><span class="o">*</span><span class="n">MB</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -3149,8 +3149,8 @@ Estimate of &#39;sandstone_noisy&#39; (AcquisitionData) size: 21.5 MB
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uncomment to see memory_profiler breakdown:</span>
-<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">lsqr_tik_mp</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[:</span><span class="mi">49</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># Print set_up</span>
-<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">lsqr_tik_mp</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">77</span><span class="p">:</span><span class="mi">135</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># Print run 1</span>
+<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">lsqr_tik_mp</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[:</span><span class="mi">49</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span> <span class="c1"># Print set_up</span>
+<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">lsqr_tik_mp</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">77</span><span class="p">:</span><span class="mi">135</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span> <span class="c1"># Print run 1</span>
 </pre></div>
 </div>
 </div>
@@ -3273,7 +3273,7 @@ Line #    Mem usage    Increment  Occurrences   Line Contents
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">print_output_subset</span><span class="p">(</span><span class="n">lsqr_tik_prof</span><span class="p">,</span> <span class="s1">&#39;run 1&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">print_output_subset</span><span class="p">(</span><span class="n">lsqr_tik_prof</span><span class="p">,</span> <span class="s1">'run 1'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -3407,9 +3407,9 @@ End of run | Memory Usage: 942.09 MB | line:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lsqr_tik_lp</span> <span class="o">=</span> <span class="n">line_peak_process</span><span class="p">(</span><span class="n">lsqr_tik_prof</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">lsqr_tik_lp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">&#39;background-color: turquoise&#39;</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">204</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Total Memory Usage (MiB)&#39;</span><span class="p">)</span>\
-    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">&#39;background-color: orange&#39;</span> <span class="k">if</span> <span class="mi">58</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">50</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Total Memory Usage (MiB)&#39;</span><span class="p">)</span>\
-    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">lsqr_tik_lp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">'background-color: turquoise'</span> <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">204</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">'Total Memory Usage (MiB)'</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="s1">'background-color: orange'</span> <span class="k">if</span> <span class="mi">58</span> <span class="o">&gt;</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">50</span> <span class="k">else</span> <span class="s1">''</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="s1">'Total Memory Usage (MiB)'</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -3571,7 +3571,7 @@ End of run | Memory Usage: 942.09 MB | line:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_mem</span><span class="p">(</span><span class="n">dfs</span><span class="o">=</span><span class="p">(</span><span class="n">cgls_block_lp</span><span class="p">,</span> <span class="n">lsqr_block_lp</span><span class="p">,</span> <span class="n">lsqr_tik_lp</span><span class="p">),</span> <span class="n">algNms</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;CGLS Block&quot;</span><span class="p">,</span> <span class="s2">&quot;LSQR Block&quot;</span><span class="p">,</span> <span class="s2">&quot;LSQR Tik&quot;</span><span class="p">),</span> <span class="n">linestyles</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span><span class="s2">&quot;-&quot;</span><span class="p">,</span><span class="s2">&quot;-&quot;</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_mem</span><span class="p">(</span><span class="n">dfs</span><span class="o">=</span><span class="p">(</span><span class="n">cgls_block_lp</span><span class="p">,</span> <span class="n">lsqr_block_lp</span><span class="p">,</span> <span class="n">lsqr_tik_lp</span><span class="p">),</span> <span class="n">algNms</span><span class="o">=</span><span class="p">(</span><span class="s2">"CGLS Block"</span><span class="p">,</span> <span class="s2">"LSQR Block"</span><span class="p">,</span> <span class="s2">"LSQR Tik"</span><span class="p">),</span> <span class="n">linestyles</span><span class="o">=</span><span class="p">(</span><span class="s2">"-"</span><span class="p">,</span><span class="s2">"-"</span><span class="p">,</span><span class="s2">"-"</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -3648,8 +3648,8 @@ memory, and LSQR Tikhonov uses the least.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

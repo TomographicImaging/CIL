@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.image_data &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.framework.image_data &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/framework/image_data';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2018 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2018 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -542,7 +542,7 @@
 <div class="viewcode-block" id="ImageData">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.ImageData">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ImageData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    DataContainer for holding 2D or 3D image data</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
@@ -558,7 +558,7 @@
 <span class="sd">        dtype : numpy.dtype</span>
 <span class="sd">            Specify the data type of the ImageData array, this is useful if you pass None to array and want to over-ride the dtype of the geometry. </span>
 <span class="sd">            If an array is passed, dtype must match the dtype of the array.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     
     <span class="n">__container_priority__</span> <span class="o">=</span> <span class="mi">1</span>
 
@@ -577,7 +577,7 @@
     <span class="nd">@dimension_labels</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dimension_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unable to set the dimension_labels directly. Use geometry.set_labels() instead&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Unable to set the dimension_labels directly. Use geometry.set_labels() instead"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">array</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -585,13 +585,13 @@
                  <span class="n">geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'dtype'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">array</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">dtype</span> <span class="o">!=</span> <span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;dtype must match the array dtype got </span><span class="si">{}</span><span class="s1"> expected </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'dtype must match the array dtype got </span><span class="si">{}</span><span class="s1"> expected </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;ImageData requires a geometry&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">"ImageData requires a geometry"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">array</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -606,21 +606,21 @@
             <span class="n">array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;array must be a CIL type DataContainer or numpy.ndarray got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">array</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'array must be a CIL type DataContainer or numpy.ndarray got </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">array</span><span class="p">)))</span>
 
         <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Shape mismatch </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Shape mismatch </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Number of dimensions are not 2 or 3 or 4 : </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Number of dimensions are not 2 or 3 or 4 : </span><span class="si">{0}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">ImageData</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">deep_copy</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unused keyword arguments: </span><span class="si">{</span><span class="n">kwargs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unused keyword arguments: </span><span class="si">{</span><span class="n">kwargs</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Check if two ImageData objects are equal. This is done by checking if the geometry, data and dtype are equal.</span>
 <span class="sd">        Also, if the other object is a numpy.ndarray, it will check if the data and dtype are equal.</span>
 <span class="sd">        </span>
@@ -633,7 +633,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
 <span class="sd">            True if the two objects are equal, False otherwise.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">other</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span> \
@@ -648,20 +648,20 @@
 <div class="viewcode-block" id="ImageData.get_slice">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.ImageData.get_slice">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Returns a new ImageData of a single slice of in the requested direction.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">geometry_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="n">vertical</span><span class="p">,</span> <span class="n">horizontal_x</span><span class="o">=</span><span class="n">horizontal_x</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="n">horizontal_y</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
                 <span class="n">geometry_new</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span> <span class="p">(</span><span class="s2">&quot;Unable to return slice of requested ImageData. Use &#39;force=True&#39; to return DataContainer instead.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span> <span class="p">(</span><span class="s2">"Unable to return slice of requested ImageData. Use 'force=True' to return DataContainer instead."</span><span class="p">)</span>
 
-        <span class="c1">#if vertical = &#39;centre&#39; slice convert to index and subset, this will interpolate 2 rows to get the center slice value</span>
-        <span class="k">if</span> <span class="n">vertical</span> <span class="o">==</span> <span class="s1">&#39;centre&#39;</span><span class="p">:</span>
-            <span class="n">dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
+        <span class="c1">#if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value</span>
+        <span class="k">if</span> <span class="n">vertical</span> <span class="o">==</span> <span class="s1">'centre'</span><span class="p">:</span>
+            <span class="n">dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">'vertical'</span><span class="p">)</span>
             <span class="n">centre_slice_pos</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span>
             <span class="n">ind0</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">centre_slice_pos</span><span class="p">))</span>
 
@@ -684,7 +684,7 @@
 <div class="viewcode-block" id="ImageData.apply_circular_mask">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.ImageData.apply_circular_mask">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply_circular_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 
 <span class="sd">        Apply a circular mask to the horizontal_x and horizontal_y slices. Values outside this mask will be set to zero.</span>
 
@@ -704,7 +704,7 @@
 <span class="sd">        ImageData</span>
 <span class="sd">            If `in_place = False` returns a new ImageData object with the masked data</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">ig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span>
 
         <span class="c1"># grid</span>
@@ -741,14 +741,14 @@
         <span class="c1"># rescale the data 0 - 1</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="n">mask</span> <span class="o">*</span> <span class="mf">0.5</span>
 
-        <span class="c1"># reorder dataset so &#39;horizontal_y&#39; and &#39;horizontal_x&#39; are the final dimensions</span>
+        <span class="c1"># reorder dataset so 'horizontal_y' and 'horizontal_x' are the final dimensions</span>
         <span class="n">labels_orig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels_orig</span><span class="p">)</span>
 
-        <span class="n">labels</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;horizontal_y&#39;</span><span class="p">)</span>
-        <span class="n">labels</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">)</span>
-        <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;horizontal_y&#39;</span><span class="p">)</span>
-        <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">)</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">'horizontal_y'</span><span class="p">)</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">'horizontal_x'</span><span class="p">)</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'horizontal_y'</span><span class="p">)</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'horizontal_x'</span><span class="p">)</span>
 
 
         <span class="k">if</span> <span class="n">in_place</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
@@ -768,14 +768,14 @@
 <div class="viewcode-block" id="ImageData.reorder">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.ImageData.reorder">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reorder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Reorders the data in memory as requested. This is an in-place operation.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        order: list or str</span>
-<span class="sd">            Ordered list of labels from self.dimension_labels, or string &#39;astra&#39; or &#39;tigre&#39;.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">            Ordered list of labels from self.dimension_labels, or string 'astra' or 'tigre'.</span>
+<span class="sd">        '''</span>
         <span class="k">if</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">Backend</span><span class="p">:</span>
             <span class="n">order</span> <span class="o">=</span> <span class="n">ImageDimension</span><span class="o">.</span><span class="n">get_order_for_engine</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
 
@@ -811,8 +811,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.utilities.callbacks &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.optimisation.utilities.callbacks &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/utilities/callbacks';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2024 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2024 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -548,13 +548,13 @@
 <div class="viewcode-block" id="Callback">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.callbacks.Callback">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Callback</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Base Callback to inherit from for use in :code:`Algorithm.run(callbacks: list[Callback])`.</span>
+<span class="w">    </span><span class="sd">'''Base Callback to inherit from for use in :code:`Algorithm.run(callbacks: list[Callback])`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    verbose: int, choice of 0,1,2, default 1</span>
 <span class="sd">        0=quiet, 1=info, 2=debug.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
@@ -567,14 +567,14 @@
 <div class="viewcode-block" id="ProgressCallback">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.callbacks.ProgressCallback">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ProgressCallback</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;:code:`tqdm`-based progress bar.</span>
+<span class="w">    </span><span class="sd">''':code:`tqdm`-based progress bar.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    tqdm_class: default :code:`tqdm.auto.tqdm`</span>
 <span class="sd">    **tqdm_kwargs:</span>
 <span class="sd">        Passed to :code:`tqdm_class`.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tqdm_class</span><span class="o">=</span><span class="n">tqdm_auto</span><span class="p">,</span> <span class="o">**</span><span class="n">tqdm_kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tqdm_class</span> <span class="o">=</span> <span class="n">tqdm_class</span>
@@ -582,11 +582,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_obj_len</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># number of objective updates</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;pbar&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'pbar'</span><span class="p">):</span>
             <span class="n">tqdm_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tqdm_kwargs</span>
-            <span class="n">tqdm_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">_total_iterations</span><span class="p">)</span>
-            <span class="n">tqdm_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
-            <span class="n">tqdm_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;initial&#39;</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">iteration</span><span class="p">))</span>
+            <span class="n">tqdm_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">'total'</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">_total_iterations</span><span class="p">)</span>
+            <span class="n">tqdm_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">'disable'</span><span class="p">,</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="n">tqdm_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">'initial'</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">iteration</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pbar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tqdm_class</span><span class="p">(</span><span class="o">**</span><span class="n">tqdm_kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">obj_len</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">objective</span><span class="p">))</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj_len</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pbar</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">objective_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;=</span><span class="mi">2</span><span class="p">),</span> <span class="n">refresh</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -596,7 +596,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_TqdmText</span><span class="p">(</span><span class="n">tqdm_std</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;:code:`tqdm`-based progress but text-only updates on separate lines.</span>
+<span class="w">    </span><span class="sd">''':code:`tqdm`-based progress but text-only updates on separate lines.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -604,51 +604,51 @@
 <span class="sd">        Format spec for postfix numbers (i.e. objective values).</span>
 <span class="sd">    bar_format: str</span>
 <span class="sd">        Passed to :code:`tqdm`.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">num_format</span><span class="o">=</span><span class="s1">&#39;+8.3e&#39;</span><span class="p">,</span> <span class="n">bar_format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{n:&gt;6d}</span><span class="s2">/</span><span class="si">{total_fmt:&lt;6}</span><span class="s2"> </span><span class="si">{rate_fmt:&gt;9}{postfix}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="sd">    '''</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">num_format</span><span class="o">=</span><span class="s1">'+8.3e'</span><span class="p">,</span> <span class="n">bar_format</span><span class="o">=</span><span class="s2">"</span><span class="si">{n:&gt;6d}</span><span class="s2">/</span><span class="si">{total_fmt:&lt;6}</span><span class="s2"> </span><span class="si">{rate_fmt:&gt;9}{postfix}</span><span class="s2">"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_format</span> <span class="o">=</span> <span class="n">num_format</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">bar_format</span><span class="o">=</span><span class="n">bar_format</span><span class="p">,</span> <span class="n">mininterval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxinterval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_instances</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># don&#39;t interfere with external progress bars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instances</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># don't interfere with external progress bars</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">status_printer</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-        <span class="n">fp_flush</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;flush&#39;</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">fp_flush</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">'flush'</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">fp_write</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">fp_flush</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">fp_write</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">format_num</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">n</span><span class="si">:{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_format</span><span class="si">}}</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">n</span><span class="si">:{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_format</span><span class="si">}}</span><span class="s1">'</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Clears :code:`postfix` if :code:`super().display()` succeeds</span>
 <span class="sd">        (if display updates are more frequent than objective updates, users should not think the objective has stabilised).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">updated</span> <span class="o">:=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_postfix_str</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_postfix_str</span><span class="p">(</span><span class="s1">''</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">updated</span>
 
 
 <div class="viewcode-block" id="TextProgressCallback">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.callbacks.TextProgressCallback">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TextProgressCallback</span><span class="p">(</span><span class="n">ProgressCallback</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;:code:`ProgressCallback` but printed on separate lines to screen.</span>
+<span class="w">    </span><span class="sd">''':code:`ProgressCallback` but printed on separate lines to screen.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    miniters: int, default :code:`Algorithm.update_objective_interval`</span>
 <span class="sd">        Number of algorithm iterations between screen prints.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="fm">__init__</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">ProgressCallback</span><span class="o">.</span><span class="fm">__init__</span><span class="p">,</span> <span class="n">tqdm_class</span><span class="o">=</span><span class="n">_TqdmText</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;pbar&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tqdm_kwargs</span><span class="p">[</span><span class="s1">&#39;miniters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">tqdm_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;miniters&#39;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">update_objective_interval</span><span class="p">),</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'pbar'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tqdm_kwargs</span><span class="p">[</span><span class="s1">'miniters'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tqdm_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'miniters'</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">update_objective_interval</span><span class="p">),</span>
                 <span class="n">algorithm</span><span class="o">.</span><span class="n">update_objective_interval</span><span class="p">))</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">algorithm</span><span class="p">)</span></div>
 
@@ -657,7 +657,7 @@
 <div class="viewcode-block" id="LogfileCallback">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.callbacks.LogfileCallback">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LogfileCallback</span><span class="p">(</span><span class="n">TextProgressCallback</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;:code:`TextProgressCallback` but to a file instead of screen.</span>
+<span class="w">    </span><span class="sd">''':code:`TextProgressCallback` but to a file instead of screen.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -665,8 +665,8 @@
 <span class="sd">        Passed to :code:`open()`.</span>
 <span class="sd">    mode: str</span>
 <span class="sd">        Passed to :code:`open()`.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="sd">    '''</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'a'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -674,7 +674,7 @@
 <div class="viewcode-block" id="EarlyStoppingObjectiveValue">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.callbacks.EarlyStoppingObjectiveValue">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EarlyStoppingObjectiveValue</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Callback that stops iterations if the change in the objective value is less than a provided threshold value.</span>
+<span class="w">    </span><span class="sd">'''Callback that stops iterations if the change in the objective value is less than a provided threshold value.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -684,7 +684,7 @@
 <span class="sd">    -----</span>
 <span class="sd">    This callback only compares the last two calculated objective values. If `update_objective_interval` is greater than 1, the objective value is not calculated at each iteration (which is the default behaviour), only every `update_objective_interval` iterations.</span>
 
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span>
 
@@ -698,7 +698,7 @@
 <div class="viewcode-block" id="CGLSEarlyStopping">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.callbacks.CGLSEarlyStopping">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CGLSEarlyStopping</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Callback to work with CGLS. It causes the algorithm to terminate if  :math:`||A^T(Ax-b)||_2 &lt; \epsilon||A^T(Ax_0-b)||_2` where `epsilon` is set to default as &#39;1e-6&#39;, :math:`x` is the current iterate and :math:`x_0` is the initial value.</span>
+<span class="w">    </span><span class="sd">'''Callback to work with CGLS. It causes the algorithm to terminate if  :math:`||A^T(Ax-b)||_2 &lt; \epsilon||A^T(Ax_0-b)||_2` where `epsilon` is set to default as '1e-6', :math:`x` is the current iterate and :math:`x_0` is the initial value.</span>
 <span class="sd">    It will also terminate if the algorithm begins to diverge i.e. if :math:`||x||_2&gt; \omega`, where `omega` is set to default as 1e6.</span>
 
 <span class="sd">    Parameters</span>
@@ -711,7 +711,7 @@
 <span class="sd">    Note</span>
 <span class="sd">    -----</span>
 <span class="sd">    This callback is implemented to replicate the automatic behaviour of CGLS in CIL versions &lt;=24. It also replicates the behaviour of https://web.stanford.edu/group/SOL/software/cgls/.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">omega</span><span class="o">=</span><span class="mf">1e6</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="o">=</span><span class="n">omega</span>
@@ -720,11 +720,11 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">norms</span> <span class="o">&lt;=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">norms0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The norm of the residual is less than </span><span class="si">{}</span><span class="s1"> times the norm of the initial residual and so the algorithm is terminated&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">'The norm of the residual is less than </span><span class="si">{}</span><span class="s1"> times the norm of the initial residual and so the algorithm is terminated'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">))</span>
             <span class="k">raise</span> <span class="ne">StopIteration</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">normx</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normx</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The norm of the solution is greater than </span><span class="si">{}</span><span class="s1"> and so the algorithm is terminated&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">'The norm of the solution is greater than </span><span class="si">{}</span><span class="s1"> and so the algorithm is terminated'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="p">))</span>
             <span class="k">raise</span> <span class="ne">StopIteration</span></div>
 
 </pre></div>
@@ -756,8 +756,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

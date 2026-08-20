@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.utilities.preconditioner &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.optimisation.utilities.preconditioner &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/utilities/preconditioner';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2024 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2024 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -543,7 +543,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.preconditioner.Preconditioner">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Preconditioner</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Abstract base class for Preconditioner objects. The `apply` method of this class takes an initialised CIL function as an argument and modifies a provided  `gradient`.</span>
 
 
@@ -551,18 +551,18 @@
 <span class="sd">    -------</span>
 <span class="sd">    apply(x)</span>
 <span class="sd">        Abstract method to call the preconditioner.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Initialises the preconditioner</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Initialises the preconditioner</span>
+<span class="sd">        '''</span>
         <span class="k">pass</span>
 
 <div class="viewcode-block" id="Preconditioner.apply">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.preconditioner.Preconditioner.apply">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Abstract method to apply the preconditioner.</span>
 
 <span class="sd">        Parameters</span>
@@ -584,7 +584,7 @@
 <span class="sd">        DataContainer</span>
 <span class="sd">            The modified gradient</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 </div>
 
@@ -594,7 +594,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.preconditioner.Sensitivity">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Sensitivity</span><span class="p">(</span><span class="n">Preconditioner</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Sensitivity preconditioner class. </span>
 
 <span class="sd">    In each call to the preconditioner the `gradient` is multiplied by :math:`1/(A^T \mathbf{1})` where :math:`A` is an operator, :math:`\mathbf{1}` is an object in the range of the operator filled with ones.</span>
@@ -604,7 +604,7 @@
 <span class="sd">    operator : CIL Operator </span>
 <span class="sd">        The operator used for sensitivity computation.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">):</span>
 
@@ -616,10 +616,10 @@
 <div class="viewcode-block" id="Sensitivity.compute_preconditioner_matrix">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.preconditioner.Sensitivity.compute_preconditioner_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_preconditioner_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Compute the sensitivity. :math:`A^T \mathbf{1}` where :math:`A` is the operator and :math:`\mathbf{1}` is an object in the range of the operator filled with ones.        </span>
 <span class="sd">        Then perform safe division by the sensitivity to store the preconditioner array :math:`1/(A^T \mathbf{1})`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>
 
@@ -637,7 +637,7 @@
 <div class="viewcode-block" id="Sensitivity.apply">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.preconditioner.Sensitivity.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Update the preconditioner.</span>
 
 <span class="sd">        Parameters</span>
@@ -654,7 +654,7 @@
 <span class="sd">        DataContainer</span>
 <span class="sd">            The modified gradient</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">gradient</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">gradient</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span>
@@ -668,7 +668,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.preconditioner.AdaptiveSensitivity">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdaptiveSensitivity</span><span class="p">(</span><span class="n">Sensitivity</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Adaptive Sensitivity preconditioner class. </span>
 
 <span class="sd">    In each call to the preconditioner the `gradient` is multiplied by :math:`(x+\delta) /(A^T \mathbf{1})` where :math:`A` is an operator,  :math:`\mathbf{1}` is an object in the range of the operator filled with ones.</span>
@@ -690,7 +690,7 @@
 <span class="sd">    ----</span>
 <span class="sd">    A reference for the freezing of the preconditioner can be found: Twyman R., Arridge S., Kereta Z., Jin B., Brusaferri L., Ahn S., Stearns CW., Hutton B.F., Burger I.A., Kotasidis F., Thielemans K.. An Investigation of Stochastic Variance Reduction Algorithms for Relative Difference Penalized 3D PET Image Reconstruction. IEEE Trans Med Imaging. 2023 Jan;42(1):29-41. doi: 10.1109/TMI.2022.3203237. Epub 2022 Dec 29. PMID: 36044488.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
@@ -710,7 +710,7 @@
 <div class="viewcode-block" id="AdaptiveSensitivity.apply">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.preconditioner.AdaptiveSensitivity.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Update the preconditioner.</span>
 
 <span class="sd">        Parameters</span>
@@ -726,7 +726,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        DataContainer</span>
 <span class="sd">            The modified gradient</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">gradient</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -773,8 +773,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

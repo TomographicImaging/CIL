@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.block &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.framework.block &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/framework/block';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2019 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -546,12 +546,12 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">BackwardCompat</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">RANDOM</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use FillType.RANDOM instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"use FillType.RANDOM instead"</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">FillType</span><span class="o">.</span><span class="n">RANDOM</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">RANDOM_INT</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use FillType.RANDOM_INT instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"use FillType.RANDOM_INT instead"</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">FillType</span><span class="o">.</span><span class="n">RANDOM_INT</span>
 
 
@@ -562,10 +562,10 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dtype</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">)</span>
 
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Class to hold Geometry as column vector&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Class to hold Geometry as column vector'''</span>
     <span class="c1">#__array_priority__ = 1</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">''''''</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span> <span class="o">=</span> <span class="n">args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
@@ -574,13 +574,13 @@
         <span class="n">n_elements</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_elements</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s1">&#39;Dimension and size do not match: expected </span><span class="si">{}</span><span class="s1"> got </span><span class="si">{}</span><span class="s1">&#39;</span>
+                    <span class="s1">'Dimension and size do not match: expected </span><span class="si">{}</span><span class="s1"> got </span><span class="si">{}</span><span class="s1">'</span>
                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="BlockGeometry.get_item">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.BlockGeometry.get_item">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns the Geometry in the BlockGeometry located at position index&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''returns the Geometry in the BlockGeometry located at position index'''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
 
 
@@ -588,9 +588,9 @@
 <a class="viewcode-back" href="../../../../framework/#cil.framework.BlockGeometry.allocate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Allocates a BlockDataContainer according to geometries contained in the BlockGeometry&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Allocates a BlockDataContainer according to geometries contained in the BlockGeometry'''</span>
 
-        <span class="n">symmetry</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;symmetry&#39;</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">symmetry</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'symmetry'</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">containers</span> <span class="o">=</span> <span class="p">[</span><span class="n">geom</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">symmetry</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
@@ -632,11 +632,11 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;BlockGeometry is an iterable&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''BlockGeometry is an iterable'''</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;BlockGeometry is an iterable&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''BlockGeometry is an iterable'''</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">):</span>
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -655,9 +655,9 @@
 <div class="viewcode-block" id="BlockDataContainer">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BlockDataContainer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Class to hold DataContainers as column vector</span>
+<span class="w">    </span><span class="sd">'''Class to hold DataContainers as column vector</span>
 
-<span class="sd">    Provides basic algebra between BlockDataContainer&#39;s, DataContainer&#39;s and</span>
+<span class="sd">    Provides basic algebra between BlockDataContainer's, DataContainer's and</span>
 <span class="sd">    subclasses and Numbers</span>
 
 <span class="sd">    1) algebra between `BlockDataContainer`s will be element-wise, only if</span>
@@ -675,19 +675,19 @@
 <span class="sd">    A = [ [B,C] , D]</span>
 <span class="sd">    A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</span>
 
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">ADD</span>       <span class="o">=</span> <span class="s1">&#39;add&#39;</span>
-    <span class="n">SUBTRACT</span>  <span class="o">=</span> <span class="s1">&#39;subtract&#39;</span>
-    <span class="n">MULTIPLY</span>  <span class="o">=</span> <span class="s1">&#39;multiply&#39;</span>
-    <span class="n">DIVIDE</span>    <span class="o">=</span> <span class="s1">&#39;divide&#39;</span>
-    <span class="n">POWER</span>     <span class="o">=</span> <span class="s1">&#39;power&#39;</span>
-    <span class="n">SAPYB</span>     <span class="o">=</span> <span class="s1">&#39;sapyb&#39;</span>
-    <span class="n">MAXIMUM</span>   <span class="o">=</span> <span class="s1">&#39;maximum&#39;</span>
-    <span class="n">MINIMUM</span>   <span class="o">=</span> <span class="s1">&#39;minimum&#39;</span>
-    <span class="n">ABS</span>       <span class="o">=</span> <span class="s1">&#39;abs&#39;</span>
-    <span class="n">SIGN</span>      <span class="o">=</span> <span class="s1">&#39;sign&#39;</span>
-    <span class="n">SQRT</span>      <span class="o">=</span> <span class="s1">&#39;sqrt&#39;</span>
-    <span class="n">CONJUGATE</span> <span class="o">=</span> <span class="s1">&#39;conjugate&#39;</span>
+<span class="sd">    '''</span>
+    <span class="n">ADD</span>       <span class="o">=</span> <span class="s1">'add'</span>
+    <span class="n">SUBTRACT</span>  <span class="o">=</span> <span class="s1">'subtract'</span>
+    <span class="n">MULTIPLY</span>  <span class="o">=</span> <span class="s1">'multiply'</span>
+    <span class="n">DIVIDE</span>    <span class="o">=</span> <span class="s1">'divide'</span>
+    <span class="n">POWER</span>     <span class="o">=</span> <span class="s1">'power'</span>
+    <span class="n">SAPYB</span>     <span class="o">=</span> <span class="s1">'sapyb'</span>
+    <span class="n">MAXIMUM</span>   <span class="o">=</span> <span class="s1">'maximum'</span>
+    <span class="n">MINIMUM</span>   <span class="o">=</span> <span class="s1">'minimum'</span>
+    <span class="n">ABS</span>       <span class="o">=</span> <span class="s1">'abs'</span>
+    <span class="n">SIGN</span>      <span class="o">=</span> <span class="s1">'sign'</span>
+    <span class="n">SQRT</span>      <span class="o">=</span> <span class="s1">'sqrt'</span>
+    <span class="n">CONJUGATE</span> <span class="o">=</span> <span class="s1">'conjugate'</span>
     <span class="n">__array_priority__</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">__container_priority__</span> <span class="o">=</span> <span class="mi">2</span>
 
@@ -696,13 +696,13 @@
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dtype</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">''''''</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">containers</span> <span class="o">=</span> <span class="n">args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c1">#if len(set([i.shape for i in self.containers])):</span>
         <span class="c1">#    self.geometry = self.containers[0].geometry</span>
 
-        <span class="n">shape</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'shape'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
            <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
 <span class="c1">#        shape = (len(args),1)</span>
@@ -711,21 +711,21 @@
         <span class="n">n_elements</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_elements</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s1">&#39;Dimension and size do not match: expected </span><span class="si">{}</span><span class="s1"> got </span><span class="si">{}</span><span class="s1">&#39;</span>
+                    <span class="s1">'Dimension and size do not match: expected </span><span class="si">{}</span><span class="s1"> got </span><span class="si">{}</span><span class="s1">'</span>
                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
 
 
 <div class="viewcode-block" id="BlockDataContainer.__iter__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__iter__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;BlockDataContainer is Iterable&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''BlockDataContainer is Iterable'''</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="BlockDataContainer.next">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.next">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;python2 backwards compatibility&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''python2 backwards compatibility'''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__next__</span><span class="p">()</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -739,14 +739,14 @@
 <div class="viewcode-block" id="BlockDataContainer.is_compatible">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.is_compatible">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;basic check if the size of the 2 objects fit&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''basic check if the size of the 2 objects fit'''</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="p">:</span>
             <span class="k">for</span> <span class="n">ot</span> <span class="ow">in</span> <span class="n">other</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ot</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;List/ numpy array can only contain numbers </span><span class="si">{}</span><span class="s1">&#39;</span>\
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'List/ numpy array can only contain numbers </span><span class="si">{}</span><span class="s1">'</span>\
                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ot</span><span class="p">)))</span>
             <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
@@ -767,7 +767,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">row</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Requested row </span><span class="si">{}</span><span class="s1"> &gt; max </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Requested row </span><span class="si">{}</span><span class="s1"> &gt; max </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">[</span><span class="n">row</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
@@ -776,46 +776,46 @@
 <div class="viewcode-block" id="BlockDataContainer.add">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.add">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: add method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">'''Algebra: add method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        out : BlockDataContainer, optional</span>
 <span class="sd">            Provides a placeholder for the result</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">ADD</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlockDataContainer.subtract">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.subtract">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">subtract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: subtract method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">'''Algebra: subtract method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        out : BlockDataContainer, optional</span>
 <span class="sd">            Provides a placeholder for the result</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SUBTRACT</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlockDataContainer.multiply">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.multiply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">'''Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        out : BlockDataContainer, optional</span>
 <span class="sd">            Provides a placeholder for the result</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MULTIPLY</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlockDataContainer.divide">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.divide">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">'''Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -823,39 +823,39 @@
 <span class="sd">        out : BlockDataContainer, optional</span>
 <span class="sd">            Provides a placeholder for the result</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">DIVIDE</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlockDataContainer.power">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.power">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">'''Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        out : BlockDataContainer, optional</span>
 <span class="sd">            Provides a placeholder for the result</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">POWER</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlockDataContainer.maximum">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.maximum">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: maximum method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">'''Algebra: maximum method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        other : number, DataContainer or subclasses or BlockDataContainer</span>
 <span class="sd">        out : BlockDataContainer, optional</span>
 <span class="sd">            Provides a placeholder for the result</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MAXIMUM</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlockDataContainer.minimum">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.minimum">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: minimum method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">'''Algebra: minimum method of BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -863,14 +863,14 @@
 <span class="sd">        out : BlockDataContainer, optional</span>
 <span class="sd">            Provides a placeholder for the result</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MINIMUM</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BlockDataContainer.sapyb">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.sapyb">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;performs axpby element-wise on the BlockDataContainer containers</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">'''performs axpby element-wise on the BlockDataContainer containers</span>
 
 <span class="sd">        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self</span>
 
@@ -892,10 +892,10 @@
 <span class="sd">        &gt;&gt;&gt; bdc1 = BlockDataContainer(2*x, y)</span>
 <span class="sd">        &gt;&gt;&gt; bdc2 = BlockDataContainer(x, 2*y)</span>
 <span class="sd">        &gt;&gt;&gt; out = bdc1.sapyb(a,bdc2,b)</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">*</span> <span class="mi">0</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s1">&#39;out&#39;</span><span class="p">:</span><span class="n">out</span><span class="p">,</span> <span class="s1">&#39;num_threads&#39;</span><span class="p">:</span> <span class="n">NUM_THREADS</span><span class="p">}</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'a'</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s1">'out'</span><span class="p">:</span><span class="n">out</span><span class="p">,</span> <span class="s1">'num_threads'</span><span class="p">:</span> <span class="n">NUM_THREADS</span><span class="p">}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
@@ -903,17 +903,17 @@
 <div class="viewcode-block" id="BlockDataContainer.binary_operations">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.binary_operations">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">binary_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer</span>
+<span class="w">        </span><span class="sd">'''Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer</span>
 
 <span class="sd">        Provides commutativity with DataContainer and subclasses, i.e. this</span>
-<span class="sd">        class&#39;s reverse algebraic methods take precedence w.r.t. direct algebraic</span>
+<span class="sd">        class's reverse algebraic methods take precedence w.r.t. direct algebraic</span>
 <span class="sd">        methods of DataContainer and subclasses.</span>
 
 <span class="sd">        This method is not to be used directly</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Incompatible for operation </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">operation</span><span class="p">))</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Incompatible for operation </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">operation</span><span class="p">))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'out'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
             <span class="c1"># try to do algebra with one DataContainer. Will raise error if not compatible</span>
             <span class="n">kw</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -934,9 +934,9 @@
                 <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MINIMUM</span><span class="p">:</span>
                     <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">minimum</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported operation&#39;</span><span class="p">,</span> <span class="n">operation</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Unsupported operation'</span><span class="p">,</span> <span class="n">operation</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;out&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="n">kw</span><span class="p">[</span><span class="s1">'out'</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                     <span class="n">op</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">))</span>
@@ -971,26 +971,26 @@
                     <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">minimum</span>
                 <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> cannot handle </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"</span><span class="si">{}</span><span class="s2"> cannot handle </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
                     <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">sapyb</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported operation&#39;</span><span class="p">,</span> <span class="n">operation</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Unsupported operation'</span><span class="p">,</span> <span class="n">operation</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kw</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-                            <span class="n">a</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kw</span><span class="p">[</span><span class="s1">'a'</span><span class="p">],</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
+                            <span class="n">a</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">'a'</span><span class="p">]</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">a</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
+                            <span class="n">a</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">'a'</span><span class="p">]</span>
 
-                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kw</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">],</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-                            <span class="n">b</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kw</span><span class="p">[</span><span class="s1">'b'</span><span class="p">],</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
+                            <span class="n">b</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">'b'</span><span class="p">]</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">b</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
+                            <span class="n">b</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">'b'</span><span class="p">]</span>
 
-                        <span class="n">el</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">ot</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">kw</span><span class="p">[</span><span class="s1">&#39;num_threads&#39;</span><span class="p">])</span>
+                        <span class="n">el</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">ot</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">kw</span><span class="p">[</span><span class="s1">'num_threads'</span><span class="p">])</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;out&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="n">kw</span><span class="p">[</span><span class="s1">'out'</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                         <span class="n">op</span><span class="p">(</span><span class="n">ot</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="n">ot</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">))</span>
@@ -1003,7 +1003,7 @@
             <span class="n">kw</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">operation</span> <span class="o">!=</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">:</span>
                 <span class="c1"># remove keyworded argument related to SAPYB</span>
-                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;num_threads&#39;</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">,</span><span class="s1">'b'</span><span class="p">,</span><span class="s1">'y'</span><span class="p">,</span> <span class="s1">'num_threads'</span><span class="p">,</span> <span class="s1">'dtype'</span><span class="p">]:</span>
                     <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kw</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                         <span class="n">kw</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
 
@@ -1025,25 +1025,25 @@
                     <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">minimum</span>
                 <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">:</span>
 
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kw</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-                        <span class="n">a</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kw</span><span class="p">[</span><span class="s1">'a'</span><span class="p">],</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
+                        <span class="n">a</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">'a'</span><span class="p">]</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">a</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
+                        <span class="n">a</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">'a'</span><span class="p">]</span>
 
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kw</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">],</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-                        <span class="n">b</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kw</span><span class="p">[</span><span class="s1">'b'</span><span class="p">],</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
+                        <span class="n">b</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">'b'</span><span class="p">]</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">b</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
+                        <span class="n">b</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">'b'</span><span class="p">]</span>
 
-                    <span class="n">el</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;num_threads&#39;</span><span class="p">])</span>
+                    <span class="n">el</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">kw</span><span class="p">[</span><span class="s1">'num_threads'</span><span class="p">])</span>
 
                     <span class="c1"># As axpyb cannot return anything we `continue` to skip the rest of the code block</span>
                     <span class="k">continue</span>
 
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported operation&#39;</span><span class="p">,</span> <span class="n">operation</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Unsupported operation'</span><span class="p">,</span> <span class="n">operation</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;out&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="n">kw</span><span class="p">[</span><span class="s1">'out'</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                     <span class="n">op</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">))</span>
@@ -1059,13 +1059,13 @@
 <div class="viewcode-block" id="BlockDataContainer.unary_operations">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.unary_operations">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">unary_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Unary operation on BlockDataContainer:</span>
+<span class="w">        </span><span class="sd">'''Unary operation on BlockDataContainer:</span>
 
 <span class="sd">        generic method of unary operation with BlockDataContainer: abs, sign, sqrt and conjugate</span>
 
 <span class="sd">        This method is not to be used directly</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="sd">        '''</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'out'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">kw</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1081,7 +1081,7 @@
                 <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">kw</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">)</span>
+            <span class="n">kw</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'out'</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">elout</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">ABS</span><span class="p">:</span>
                     <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">abs</span>
@@ -1091,7 +1091,7 @@
                     <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">sqrt</span>
                 <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">CONJUGATE</span><span class="p">:</span>
                     <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">conjugate</span>
-                <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;out&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">elout</span>
+                <span class="n">kw</span><span class="p">[</span><span class="s1">'out'</span><span class="p">]</span> <span class="o">=</span> <span class="n">elout</span>
                 <span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
 
 
@@ -1128,19 +1128,19 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">pnorm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
         <span class="c1"># See https://github.com/TomographicImaging/CIL/issues/1525#issuecomment-1757413803</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">y</span><span class="p">,</span> <span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">],</span> <span class="kc">True</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;pnorm: Incompatible shapes - each container in the BlockDataContainer must have the same shape in order to calculate the pnorm&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'pnorm: Incompatible shapes - each container in the BlockDataContainer must have the same shape in order to calculate the pnorm'</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">p</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">abs</span><span class="p">())</span>
         <span class="k">elif</span> <span class="n">p</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span><span class="o">*</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">0</span> <span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">tmp</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Not implemented'</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BlockDataContainer.copy">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.copy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;alias of clone&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''alias of clone'''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1148,11 +1148,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">fill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Incompatible containers&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Incompatible containers'</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
                 <span class="n">el</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">ot</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot fill with object provided </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Cannot fill with object provided </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
@@ -1178,12 +1178,12 @@
 <div class="viewcode-block" id="BlockDataContainer.__radd__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__radd__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse addition</span>
+<span class="w">        </span><span class="sd">'''Reverse addition</span>
 
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
 <span class="sd">        the class constant __array_priority__ must be set &gt; 0</span>
 <span class="sd">        https://docs.scipy.org/doc/numpy-1.15.1/reference/arrays.classes.html#numpy.class.__array_priority__</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="n">other</span></div>
 
     <span class="c1"># __radd__</span>
@@ -1191,12 +1191,12 @@
 <div class="viewcode-block" id="BlockDataContainer.__rsub__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rsub__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse subtraction</span>
+<span class="w">        </span><span class="sd">'''Reverse subtraction</span>
 
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
 <span class="sd">        the class constant __array_priority__ must be set &gt; 0</span>
 <span class="sd">        https://docs.scipy.org/doc/numpy-1.15.1/reference/arrays.classes.html#numpy.class.__array_priority__</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="n">other</span></div>
 
     <span class="c1"># __rsub__</span>
@@ -1204,12 +1204,12 @@
 <div class="viewcode-block" id="BlockDataContainer.__rmul__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rmul__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse multiplication</span>
+<span class="w">        </span><span class="sd">'''Reverse multiplication</span>
 
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
 <span class="sd">        the class constant __array_priority__ must be set &gt; 0</span>
 <span class="sd">        https://docs.scipy.org/doc/numpy-1.15.1/reference/arrays.classes.html#numpy.class.__array_priority__</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="bp">self</span> <span class="o">*</span> <span class="n">other</span></div>
 
     <span class="c1"># __rmul__</span>
@@ -1217,43 +1217,43 @@
 <div class="viewcode-block" id="BlockDataContainer.__rdiv__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rdiv__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">__rdiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse division</span>
+<span class="w">        </span><span class="sd">'''Reverse division</span>
 
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
 <span class="sd">        the class constant __array_priority__ must be set &gt; 0</span>
 <span class="sd">        https://docs.scipy.org/doc/numpy-1.15.1/reference/arrays.classes.html#numpy.class.__array_priority__</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="nb">pow</span><span class="p">(</span><span class="bp">self</span> <span class="o">/</span> <span class="n">other</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
 
     <span class="c1"># __rdiv__</span>
 <div class="viewcode-block" id="BlockDataContainer.__rtruediv__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rtruediv__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse truedivision</span>
+<span class="w">        </span><span class="sd">'''Reverse truedivision</span>
 
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
 <span class="sd">        the class constant __array_priority__ must be set &gt; 0</span>
 <span class="sd">        https://docs.scipy.org/doc/numpy-1.15.1/reference/arrays.classes.html#numpy.class.__array_priority__</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rdiv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BlockDataContainer.__rpow__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__rpow__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Reverse power</span>
+<span class="w">        </span><span class="sd">'''Reverse power</span>
 
 <span class="sd">        to make sure that this method is called rather than the __mul__ of a numpy array</span>
 <span class="sd">        the class constant __array_priority__ must be set &gt; 0</span>
 <span class="sd">        https://docs.scipy.org/doc/numpy-1.15.1/reference/arrays.classes.html#numpy.class.__array_priority__</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BlockDataContainer.__iadd__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__iadd__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline addition&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Inline addition'''</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">+=</span> <span class="n">ot</span>
@@ -1262,7 +1262,7 @@
                 <span class="n">el</span> <span class="o">+=</span> <span class="n">other</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Incompatible for __iadd__&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Incompatible for __iadd__'</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">+=</span> <span class="n">ot</span>
         <span class="k">return</span> <span class="bp">self</span></div>
@@ -1272,7 +1272,7 @@
 <div class="viewcode-block" id="BlockDataContainer.__isub__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__isub__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline subtraction&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Inline subtraction'''</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">-=</span> <span class="n">ot</span>
@@ -1281,7 +1281,7 @@
                 <span class="n">el</span> <span class="o">-=</span> <span class="n">other</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Incompatible for __isub__&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Incompatible for __isub__'</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">-=</span> <span class="n">ot</span>
         <span class="k">return</span> <span class="bp">self</span></div>
@@ -1291,7 +1291,7 @@
 <div class="viewcode-block" id="BlockDataContainer.__imul__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__imul__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline multiplication&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Inline multiplication'''</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">*=</span> <span class="n">ot</span>
@@ -1300,7 +1300,7 @@
                 <span class="n">el</span> <span class="o">*=</span> <span class="n">other</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Incompatible for __imul__&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Incompatible for __imul__'</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">*=</span> <span class="n">ot</span>
         <span class="k">return</span> <span class="bp">self</span></div>
@@ -1310,7 +1310,7 @@
 <div class="viewcode-block" id="BlockDataContainer.__idiv__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__idiv__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">__idiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline division&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Inline division'''</span>
         <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">/=</span> <span class="n">ot</span>
@@ -1319,7 +1319,7 @@
                 <span class="n">el</span> <span class="o">/=</span> <span class="n">other</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Incompatible for __idiv__&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Incompatible for __idiv__'</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">el</span><span class="p">,</span><span class="n">ot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
                 <span class="n">el</span> <span class="o">/=</span> <span class="n">ot</span>
         <span class="k">return</span> <span class="bp">self</span></div>
@@ -1328,14 +1328,14 @@
 <div class="viewcode-block" id="BlockDataContainer.__itruediv__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__itruediv__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__itruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Inline truedivision&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Inline truedivision'''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__idiv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BlockDataContainer.__neg__">
 <a class="viewcode-back" href="../../../../optimisation/#cil.framework.BlockDataContainer.__neg__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return - self &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">""" Return - self """</span>
         <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span></div>
 
 
@@ -1382,8 +1382,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

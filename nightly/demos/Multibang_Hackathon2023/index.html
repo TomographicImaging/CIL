@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Multibang Regularisation in CIL &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>Multibang Regularisation in CIL &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,9 +52,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/Multibang_Hackathon2023';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="User showcase" href="../../usershowcase/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -601,14 +601,14 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -698,7 +698,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;../htc2022_td_full.mat&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span><span class="o">=</span><span class="s1">'../htc2022_td_full.mat'</span>
 </pre></div>
 </div>
 </div>
@@ -714,7 +714,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="n">utemp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">))</span>
+        <span class="n">utemp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'u'</span><span class="p">))</span>
         <span class="c1">#self.u = np.concatenate(([-np.inf],utemp,[np.inf]))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">utemp</span> <span class="c1">#u should be numpty array</span>
@@ -802,8 +802,8 @@
 <span class="n">phantom2D</span> <span class="o">=</span> <span class="n">cilTomoPhantom</span><span class="o">.</span><span class="n">get_ImageData</span><span class="p">(</span><span class="n">num_model</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ig</span><span class="p">)</span>
 <span class="n">phantom2D</span><span class="o">-=</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">phantom2D</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Multibang evaluated on the  Shepp-Logan phandom:&quot;</span><span class="p">,</span> <span class="n">MB</span><span class="p">(</span><span class="n">phantom2D</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Multibang evaluated on a random noisy image:&quot;</span><span class="p">,</span> <span class="n">MB</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Multibang evaluated on the  Shepp-Logan phandom:"</span><span class="p">,</span> <span class="n">MB</span><span class="p">(</span><span class="n">phantom2D</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Multibang evaluated on a random noisy image:"</span><span class="p">,</span> <span class="n">MB</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">'random'</span><span class="p">)))</span>
 </pre></div>
 </div>
 </div>
@@ -828,12 +828,12 @@ Multibang evaluated on a random noisy image: 2406.184244750844
                    <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="n">num_angles</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>  \
                    <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="n">n</span><span class="p">)</span>
 
-<span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;gpu&quot;</span>
+<span class="n">device</span> <span class="o">=</span> <span class="s2">"gpu"</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 
 <span class="n">sinogram</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">phantom2D</span><span class="p">)</span>
 
-<span class="n">show2D</span><span class="p">([</span><span class="n">phantom2D</span><span class="p">,</span><span class="n">sinogram</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Shepp-Logan Phantom&quot;</span><span class="p">,</span><span class="s2">&quot;Shepp-Logan Synthetic Sinogram&quot;</span><span class="p">])</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">phantom2D</span><span class="p">,</span><span class="n">sinogram</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s2">"Shepp-Logan Phantom"</span><span class="p">,</span><span class="s2">"Shepp-Logan Synthetic Sinogram"</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -926,7 +926,7 @@ Multibang evaluated on a random noisy image: 2406.184244750844
 <span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">Plainsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
 
-<span class="n">show2D</span><span class="p">([</span><span class="n">MBsol</span><span class="p">,</span><span class="n">Plainsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Multibang Regularised&#39;</span><span class="p">,</span><span class="s1">&#39;Not Multibang Regularised&#39;</span><span class="p">])</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">MBsol</span><span class="p">,</span><span class="n">Plainsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Multibang Regularised'</span><span class="p">,</span><span class="s1">'Not Multibang Regularised'</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1009,7 +1009,7 @@ Stop criterion has been reached.
 <span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">TVsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
 
-<span class="n">show2D</span><span class="p">([</span><span class="n">TVsol</span><span class="p">,</span><span class="n">TVMBsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TV regularisation only&#39;</span><span class="p">,</span><span class="s1">&#39;TV and Multibang&#39;</span><span class="p">])</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">TVsol</span><span class="p">,</span><span class="n">TVMBsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'TV regularisation only'</span><span class="p">,</span><span class="s1">'TV and Multibang'</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1065,27 +1065,27 @@ Stop criterion has been reached.
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Function to load htc data, copied from CIL github Algorthm 2  (https://github.com/TomographicImaging/CIL-HTC2022-Algo2/blob/main/util.py)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">load_htc2022data</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dataset_name</span><span class="o">=</span><span class="s1">&#39;CtDataFull&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_htc2022data</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">dataset_name</span><span class="o">=</span><span class="s1">'CtDataFull'</span><span class="p">):</span>
 
     <span class="c1">#read in matlab file</span>
     <span class="n">mat</span> <span class="o">=</span> <span class="n">loadmat</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    <span class="n">scan_parameters</span><span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">][</span><span class="s1">&#39;parameters&#39;</span><span class="p">]</span>
+    <span class="n">scan_parameters</span><span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">][</span><span class="s1">'parameters'</span><span class="p">]</span>
 
     <span class="c1">#read important parameters</span>
-    <span class="n">source_center</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">&#39;distanceSourceOrigin&#39;</span><span class="p">]</span>
-    <span class="n">source_detector</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">&#39;distanceSourceDetector&#39;</span><span class="p">]</span>
-    <span class="n">pixel_size</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">&#39;pixelSizePost&#39;</span><span class="p">]</span> <span class="c1">#data is binned</span>
-    <span class="n">num_dets</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">&#39;numDetectorsPost&#39;</span><span class="p">]</span>
-    <span class="n">angles</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">&#39;angles&#39;</span><span class="p">]</span>
+    <span class="n">source_center</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">'distanceSourceOrigin'</span><span class="p">]</span>
+    <span class="n">source_detector</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">'distanceSourceDetector'</span><span class="p">]</span>
+    <span class="n">pixel_size</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">'pixelSizePost'</span><span class="p">]</span> <span class="c1">#data is binned</span>
+    <span class="n">num_dets</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">'numDetectorsPost'</span><span class="p">]</span>
+    <span class="n">angles</span> <span class="o">=</span> <span class="n">scan_parameters</span><span class="p">[</span><span class="s1">'angles'</span><span class="p">]</span>
 
     <span class="c1">#create CIL data from meta data</span>
     <span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">(</span><span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">source_center</span><span class="p">],</span>
                                         <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">source_detector</span><span class="o">-</span><span class="n">source_center</span><span class="p">])</span>\
         <span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="n">num_dets</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixel_size</span><span class="p">)</span>\
-        <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=-</span><span class="n">angles</span><span class="p">,</span> <span class="n">angle_unit</span><span class="o">=</span><span class="s1">&#39;degree&#39;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=-</span><span class="n">angles</span><span class="p">,</span> <span class="n">angle_unit</span><span class="o">=</span><span class="s1">'degree'</span><span class="p">)</span>
 
     <span class="c1">#%% read data</span>
-    <span class="n">scan_sinogram</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">][</span><span class="s1">&#39;sinogram&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+    <span class="n">scan_sinogram</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">][</span><span class="s1">'sinogram'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'float32'</span><span class="p">)</span>
 
     <span class="c1">#create CIL data</span>
 
@@ -1098,29 +1098,29 @@ Stop criterion has been reached.
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">spio</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">loadmat</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''</span>
 <span class="sd">    this function should be called instead of direct spio.loadmat</span>
 <span class="sd">    as it cures the problem of not properly recovering python dictionaries</span>
 <span class="sd">    from mat files. It calls the function check keys to cure all entries</span>
 <span class="sd">    which are still mat-objects</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">spio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">struct_as_record</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">squeeze_me</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_check_keys</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_check_keys</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''</span>
 <span class="sd">    checks if entries in dictionary are mat-objects. If yes</span>
 <span class="sd">    todict is called to change them to nested dictionaries</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">spio</span><span class="o">.</span><span class="n">matlab</span><span class="o">.</span><span class="n">mio5_params</span><span class="o">.</span><span class="n">mat_struct</span><span class="p">):</span>
             <span class="nb">dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_todict</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
     <span class="k">return</span> <span class="nb">dict</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_todict</span><span class="p">(</span><span class="n">matobj</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''</span>
 <span class="sd">    A recursive function which constructs from matobjects nested dictionaries</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">strg</span> <span class="ow">in</span> <span class="n">matobj</span><span class="o">.</span><span class="n">_fieldnames</span><span class="p">:</span>
         <span class="n">elem</span> <span class="o">=</span> <span class="n">matobj</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">strg</span><span class="p">]</span>
@@ -1152,11 +1152,11 @@ Stop criterion has been reached.
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ig</span> <span class="o">=</span> <span class="n">testdata</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
 <span class="n">ag</span> <span class="o">=</span> <span class="n">testdata</span><span class="o">.</span><span class="n">geometry</span>
-<span class="n">devive</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span>
+<span class="n">devive</span><span class="o">=</span><span class="s2">"gpu"</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span><span class="n">ag</span><span class="p">,</span><span class="n">device</span><span class="p">)</span>
 <span class="n">Grad</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
 
-<span class="n">show2D</span><span class="p">(</span><span class="n">testdata</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Full angle sinogram&#39;</span><span class="p">])</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">testdata</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Full angle sinogram'</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1213,7 +1213,7 @@ Stop criterion has been reached.
 <span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">TVsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
 
-<span class="n">show2D</span><span class="p">([</span><span class="n">TVsol</span><span class="p">,</span><span class="n">TVMBsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TV only reconstruction&#39;</span><span class="p">,</span><span class="s1">&#39;TV and Multibang&#39;</span><span class="p">])</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">TVsol</span><span class="p">,</span><span class="n">TVMBsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'TV only reconstruction'</span><span class="p">,</span><span class="s1">'TV and Multibang'</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1277,13 +1277,13 @@ Stop criterion has been reached.
 
 <span class="n">testdatareduce</span> <span class="o">=</span> <span class="n">generate_reduced_data</span><span class="p">(</span><span class="n">testdata</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">60</span><span class="p">)</span>
 
-<span class="n">show2D</span><span class="p">(</span><span class="n">testdatareduce</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Angularly reduced data&#39;</span><span class="p">])</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">testdatareduce</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Angularly reduced data'</span><span class="p">])</span>
 
 <span class="c1">#Reset geometry for reduced htc data</span>
 
 <span class="n">ig</span> <span class="o">=</span> <span class="n">testdatareduce</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
 <span class="n">ag</span> <span class="o">=</span> <span class="n">testdatareduce</span><span class="o">.</span><span class="n">geometry</span>
-<span class="n">devive</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span>
+<span class="n">devive</span><span class="o">=</span><span class="s2">"gpu"</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span><span class="n">ag</span><span class="p">,</span><span class="n">device</span><span class="p">)</span>
 <span class="n">Grad</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
 </pre></div>
@@ -1329,7 +1329,7 @@ Stop criterion has been reached.
 <span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">TVsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
 
-<span class="n">show2D</span><span class="p">([</span><span class="n">TVsol</span><span class="p">,</span><span class="n">TVMBsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TV only&#39;</span><span class="p">,</span><span class="s1">&#39;TV and Multibang&#39;</span><span class="p">])</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">TVsol</span><span class="p">,</span><span class="n">TVMBsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'TV only'</span><span class="p">,</span><span class="s1">'TV and Multibang'</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1404,7 +1404,7 @@ Stop criterion has been reached.
 <span class="n">fista_mb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">TVsol</span> <span class="o">=</span> <span class="n">fista_mb</span><span class="o">.</span><span class="n">solution</span>
 
-<span class="n">show2D</span><span class="p">([</span><span class="n">TVsol</span><span class="p">,</span><span class="n">TVMBsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;TV only&#39;</span><span class="p">,</span><span class="s1">&#39;TV and Multibang&#39;</span><span class="p">])</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">TVsol</span><span class="p">,</span><span class="n">TVMBsol</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'TV only'</span><span class="p">,</span><span class="s1">'TV and Multibang'</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1506,8 +1506,8 @@ Stop criterion has been reached.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

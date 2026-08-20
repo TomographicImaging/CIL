@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Showcase of the algorithms for deblurring and denoising &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>Showcase of the algorithms for deblurring and denoising &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,9 +52,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/Showcase_of_the_algorithms_for_deblurring_and_denoising';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Multibang Regularisation in CIL" href="../Multibang_Hackathon2023/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -601,14 +601,14 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -718,7 +718,7 @@ Axis labels: (&#39;horizontal_y&#39;, &#39;horizontal_x&#39;)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">myshow</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">image</span> <span class="p">:</span> <span class="n">show2D</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">myshow</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">image</span> <span class="p">:</span> <span class="n">show2D</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
 <span class="n">myshow</span><span class="p">(</span><span class="n">im_gray_cil</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -854,9 +854,9 @@ Axis labels: (&#39;horizontal_y&#39;, &#39;horizontal_x&#39;)
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s_x</span> <span class="o">=</span> <span class="mi">50</span>
 <span class="n">s_y</span> <span class="o">=</span> <span class="mi">60</span>
-<span class="n">slices</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">,</span><span class="n">s_x</span><span class="p">),(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="n">s_y</span><span class="p">)]</span>
+<span class="n">slices</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">'horizontal_x'</span><span class="p">,</span><span class="n">s_x</span><span class="p">),(</span><span class="s1">'vertical'</span><span class="p">,</span><span class="n">s_y</span><span class="p">)]</span>
 
-<span class="n">show2D</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x0</span><span class="p">),</span><span class="n">slice_list</span><span class="o">=</span><span class="n">slices</span><span class="p">,</span><span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span>  <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x0</span><span class="p">),</span><span class="n">slice_list</span><span class="o">=</span><span class="n">slices</span><span class="p">,</span><span class="n">origin</span><span class="o">=</span><span class="s1">'upper-left'</span><span class="p">,</span>  <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -934,7 +934,7 @@ Stop criterion has been reached.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39; The range of the solution is &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">' The range of the solution is '</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -967,7 +967,7 @@ Stop criterion has been reached.
 <span class="n">myFISTANN</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">myshow</span><span class="p">(</span><span class="n">myFISTANN</span><span class="o">.</span><span class="n">solution</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39; The range of the solution is &#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">myFISTANN</span><span class="o">.</span><span class="n">solution</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">myFISTANN</span><span class="o">.</span><span class="n">solution</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">' The range of the solution is '</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">myFISTANN</span><span class="o">.</span><span class="n">solution</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">myFISTANN</span><span class="o">.</span><span class="n">solution</span><span class="p">))</span>
 <br/><br/></pre></div>
 </div>
 </div>
@@ -1023,7 +1023,7 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">)</span>
-<span class="n">D</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">backend</span> <span class="o">=</span> <span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">backend</span> <span class="o">=</span> <span class="s1">'numpy'</span><span class="p">)</span>
 <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.5</span>
 <span class="n">F_reg</span> <span class="o">=</span> <span class="n">OperatorCompositionFunction</span><span class="p">(</span><span class="n">L2NormSquared</span><span class="p">(),</span><span class="n">D</span><span class="p">)</span>
 <span class="n">Full</span> <span class="o">=</span> <span class="n">F</span> <span class="o">+</span> <span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">F_reg</span>
@@ -1090,7 +1090,7 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.01</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'numpy'</span><span class="p">)</span>
 <span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">)</span>
 
 <span class="n">deblur_TV</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">G</span><span class="p">,</span>
@@ -1123,8 +1123,8 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">deblur_TV</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;Deblurred -TV&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'Noisy Data (Gaussian)'</span><span class="p">,</span> <span class="s1">'Deblurred -TV'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1152,8 +1152,8 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">myGD_LS</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myFISTANN</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">myGD_tikh</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span>  <span class="n">deblur_TV</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;GD_LS&#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA_indicator&#39;</span><span class="p">,</span>  <span class="s1">&#39;GD_Tikh&#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA_TV&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">1.2</span><span class="p">))</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'Noisy Data (Gaussian)'</span><span class="p">,</span> <span class="s1">'GD_LS'</span><span class="p">,</span> <span class="s1">'FISTA_indicator'</span><span class="p">,</span>  <span class="s1">'GD_Tikh'</span><span class="p">,</span> <span class="s1">'FISTA_TV'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">1.2</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1211,7 +1211,7 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.0001</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'numpy'</span><span class="p">)</span>
 <span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">im_blur_noise_saltnpepper</span><span class="p">)</span>
 
 <span class="n">fista_saltnpepper_small</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">G</span><span class="p">,</span>
@@ -1219,8 +1219,8 @@ Stop criterion has been reached.
 <span class="n">fista_saltnpepper_small</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
 <span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_saltnpepper</span><span class="p">,</span> <span class="n">fista_saltnpepper_small</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Salt and Pepper)&#39;</span><span class="p">,</span> <span class="s1">&#39;Deblurred&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">))</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'Noisy Data (Salt and Pepper)'</span><span class="p">,</span> <span class="s1">'Deblurred'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1264,7 +1264,7 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'numpy'</span><span class="p">)</span>
 <span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">im_blur_noise_saltnpepper</span><span class="p">)</span>
 
 <span class="n">fista_saltnpepper_large</span><span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">G</span><span class="p">,</span>
@@ -1272,8 +1272,8 @@ Stop criterion has been reached.
 <span class="n">fista_saltnpepper_large</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
 <span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_saltnpepper</span><span class="p">,</span> <span class="n">fista_saltnpepper_large</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Salt and Pepper)&#39;</span><span class="p">,</span> <span class="s1">&#39;Deblurred&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">))</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'Noisy Data (Salt and Pepper)'</span><span class="p">,</span> <span class="s1">'Deblurred'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1317,7 +1317,7 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.01</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'numpy'</span><span class="p">)</span>
 <span class="n">F</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">im_blur_noise_saltnpepper</span><span class="p">)</span>
 
 <span class="n">fista_saltnpepper_middle</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">G</span><span class="p">,</span>
@@ -1325,8 +1325,8 @@ Stop criterion has been reached.
 <span class="n">fista_saltnpepper_middle</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
 <span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_saltnpepper</span><span class="p">,</span> <span class="n">fista_saltnpepper_middle</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Salt and Pepper)&#39;</span><span class="p">,</span> <span class="s1">&#39;Deblurred&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">))</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'Noisy Data (Salt and Pepper)'</span><span class="p">,</span> <span class="s1">'Deblurred'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1369,8 +1369,8 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span><span class="n">fista_saltnpepper_small</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fista_saltnpepper_middle</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span> <span class="n">fista_saltnpepper_large</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 0.00001&#39;</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 0.01&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 0.1&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'</span><span class="se">\u03B1</span><span class="s1"> = 0.00001'</span><span class="p">,</span><span class="s1">'</span><span class="se">\u03B1</span><span class="s1"> = 0.01'</span><span class="p">,</span> <span class="s1">'</span><span class="se">\u03B1</span><span class="s1"> = 0.1'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1411,12 +1411,12 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.00001</span>
-<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'numpy'</span><span class="p">)</span>
 <span class="n">proxTV_1</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">proxTV_1</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 0.00001)&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'Noisy Data (Gaussian)'</span><span class="p">,</span> <span class="s1">'Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 0.00001)'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <br/></pre></div>
 </div>
 </div>
@@ -1442,12 +1442,12 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.001</span>
-<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'numpy'</span><span class="p">)</span>
 <span class="n">proxTV_2</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 
 <span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">proxTV_2</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 0.001)&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'Noisy Data (Gaussian)'</span><span class="p">,</span> <span class="s1">'Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 0.001)'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <br/></pre></div>
 </div>
 </div>
@@ -1473,12 +1473,12 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span>
-<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'numpy'</span><span class="p">)</span>
 <span class="n">proxTV_3</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">proxTV_3</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 0.1)&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'Noisy Data (Gaussian)'</span><span class="p">,</span> <span class="s1">'Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 0.1)'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <br/></pre></div>
 </div>
 </div>
@@ -1504,12 +1504,12 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'numpy'</span><span class="p">)</span>
 <span class="n">proxTV_4</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">proxTV_4</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 10)&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'Noisy Data (Gaussian)'</span><span class="p">,</span> <span class="s1">'Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 10)'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <br/></pre></div>
 </div>
 </div>
@@ -1535,12 +1535,12 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mi">1000</span>
-<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'numpy'</span><span class="p">)</span>
 <span class="n">proxTV_5</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur_noise_gaussian</span><span class="p">,</span> <span class="n">proxTV_5</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Noisy Data (Gaussian)&#39;</span><span class="p">,</span> <span class="s1">&#39;Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 1000)&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'Noisy Data (Gaussian)'</span><span class="p">,</span> <span class="s1">'Denoising (</span><span class="se">\u03B1</span><span class="s1"> = 1000)'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <br/></pre></div>
 </div>
 </div>
@@ -1566,8 +1566,8 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span><span class="n">proxTV_1</span><span class="p">,</span> <span class="n">proxTV_2</span><span class="p">,</span> <span class="n">proxTV_3</span><span class="p">,</span> <span class="n">proxTV_4</span><span class="p">,</span> <span class="n">proxTV_5</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 0.00001&#39;</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 0.001&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 0.1&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 10&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\u03B1</span><span class="s1"> = 1000&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'</span><span class="se">\u03B1</span><span class="s1"> = 0.00001'</span><span class="p">,</span><span class="s1">'</span><span class="se">\u03B1</span><span class="s1"> = 0.001'</span><span class="p">,</span> <span class="s1">'</span><span class="se">\u03B1</span><span class="s1"> = 0.1'</span><span class="p">,</span> <span class="s1">'</span><span class="se">\u03B1</span><span class="s1"> = 10'</span><span class="p">,</span> <span class="s1">'</span><span class="se">\u03B1</span><span class="s1"> = 1000'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">fix_range</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1639,7 +1639,7 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.05</span>
-<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'numpy'</span><span class="p">)</span>
 <span class="n">proxTV</span> <span class="o">=</span> <span class="n">TV</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">im_blur</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="c1">#we can change tau and see the differences.</span>
 </pre></div>
@@ -1650,8 +1650,8 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">im_gray_cil</span><span class="p">,</span> <span class="n">im_blur</span><span class="p">,</span> <span class="n">proxTV</span><span class="p">],</span>
-       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Blurred&#39;</span><span class="p">,</span> <span class="s1">&#39;Denoising&#39;</span><span class="p">],</span>
-       <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+       <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Ground truth'</span><span class="p">,</span> <span class="s1">'Blurred'</span><span class="p">,</span> <span class="s1">'Denoising'</span><span class="p">],</span>
+       <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1720,8 +1720,8 @@ Stop criterion has been reached.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

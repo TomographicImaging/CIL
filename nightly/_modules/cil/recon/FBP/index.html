@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.recon.FBP &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.recon.FBP &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/recon/FBP';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2021 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2021 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -570,9 +570,9 @@
                                     <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">]</span> <span class="c1">#pix_x</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">GenericFilteredBackProjection</span><span class="p">(</span><span class="n">Reconstructor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Abstract Base Class GenericFilteredBackProjection holding common and virtual methods for FBP and FDK</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -586,17 +586,17 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">fft_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">'ram-lak'</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'tigre'</span><span class="p">):</span>
 
         <span class="c1">#call parent initialiser</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">has_ipp</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;IPP libraries not found. Cannot use CIL FBP&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">"IPP libraries not found. Cannot use CIL FBP"</span><span class="p">)</span>
 
         <span class="c1">#additional check</span>
-        <span class="k">if</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">in</span> <span class="nb">input</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input data cannot be multi-channel&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">'channel'</span> <span class="ow">in</span> <span class="nb">input</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Input data cannot be multi-channel"</span><span class="p">)</span>
 
 
         <span class="c1">#define defaults</span>
@@ -607,7 +607,7 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">set_filter_inplace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        False (default) will allocate temporary memory for filtered projections.</span>
 <span class="sd">        True will filter projections in-place.</span>
 
@@ -615,11 +615,11 @@
 <span class="sd">        ----------</span>
 <span class="sd">        inplace: boolean</span>
 <span class="sd">            Sets the inplace filtering of projections</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">inplace</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">bool</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="o">=</span> <span class="n">inplace</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;set_filter_inplace expected a boolean. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inplace</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"set_filter_inplace expected a boolean. Got </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inplace</span><span class="p">)))</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_default_fft_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -633,7 +633,7 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">set_fft_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        The width of the fourier transform N=2^order.</span>
 
 <span class="sd">        Parameters</span>
@@ -645,7 +645,7 @@
 <span class="sd">        -----</span>
 <span class="sd">        If `None` the default used is the power-of-2 greater than 2 * detector width, or 8, whichever is greater</span>
 <span class="sd">        Higher orders will yield more accurate results but increase computation time.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">min_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_fft_order</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -654,35 +654,35 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">fft_order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;fft order expected type `int`. Got</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">order</span><span class="p">)))</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"fft order expected type `int`. Got</span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">order</span><span class="p">)))</span>
 
         <span class="k">if</span> <span class="n">fft_order</span> <span class="o">&lt;</span> <span class="n">min_order</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Minimum fft width 2^order is order = </span><span class="si">{0}</span><span class="s2">. Got</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">min_order</span><span class="p">,</span><span class="n">order</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Minimum fft width 2^order is order = </span><span class="si">{0}</span><span class="s2">. Got</span><span class="si">{1}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">min_order</span><span class="p">,</span><span class="n">order</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">fft_order</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span> <span class="o">=</span> <span class="n">fft_order</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="o">==</span><span class="s1">&#39;custom&#39;</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Filter length changed - please update your custom filter&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="o">==</span><span class="s1">'custom'</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"Filter length changed - please update your custom filter"</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1">#create default filter type of new length</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">preset_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="s1">&#39;shepp-logan&#39;</span><span class="p">,</span> <span class="s1">&#39;cosine&#39;</span><span class="p">,</span> <span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="s1">&#39;hann&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">'ram-lak'</span><span class="p">,</span> <span class="s1">'shepp-logan'</span><span class="p">,</span> <span class="s1">'cosine'</span><span class="p">,</span> <span class="s1">'hamming'</span><span class="p">,</span> <span class="s1">'hann'</span><span class="p">]</span>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">'ram-lak'</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Set the filter used by the reconstruction.</span>
 
 <span class="sd">        Pre-set filters are constructed in the frequency domain.</span>
-<span class="sd">        Pre-set filters are: &#39;ram-lak&#39;, &#39;shepp-logan&#39;, &#39;cosine&#39;, &#39;hamming&#39;, &#39;hann&#39;</span>
+<span class="sd">        Pre-set filters are: 'ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann'</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        filter : string, numpy.ndarray, default=&#39;ram-lak&#39;</span>
+<span class="sd">        filter : string, numpy.ndarray, default='ram-lak'</span>
 <span class="sd">            Pass a string selecting from the list of pre-set filters, or pass a numpy.ndarray with a custom filter.</span>
 <span class="sd">        cutoff : float, default = 1</span>
 <span class="sd">            The cut-off frequency of the filter between 0 - 1 pi rads/pixel. The filter will be 0 outside the range rect(-frequency_cutoff, frequency_cutoff)</span>
@@ -696,7 +696,7 @@
 <span class="sd">        - [0] The DC frequency component</span>
 <span class="sd">        - [1:N/2] positive frequencies</span>
 <span class="sd">        - [N/2:N-1] negative frequencies</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span> <span class="ow">and</span> <span class="nb">filter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">preset_filters</span><span class="p">:</span>
@@ -708,15 +708,15 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">filter_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_filter_array</span> <span class="o">=</span> <span class="n">filter_array</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">=</span> <span class="s1">&#39;custom&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">=</span> <span class="s1">'custom'</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Custom filter not compatible with input.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Custom filter not compatible with input."</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Filter not recognised&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Filter not recognised"</span><span class="p">)</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_filter_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns the filter array in the frequency domain.</span>
 
 <span class="sd">        Returns</span>
@@ -745,9 +745,9 @@
 
 <span class="sd">        Plantagie, L. Algebraic filters for filtered backprojection, 2017</span>
 <span class="sd">        https://hdl.handle.net/1887/48289</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">'custom'</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_array</span>
 
         <span class="n">filter_length</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span>
@@ -760,22 +760,22 @@
         <span class="n">ramp</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
         <span class="n">ramp</span><span class="p">[</span><span class="n">ramp</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;ram-lak&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">'ram-lak'</span><span class="p">:</span>
             <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;shepp-logan&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">'shepp-logan'</span><span class="p">:</span>
             <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sinc</span><span class="p">(</span><span class="n">freq</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;cosine&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">'cosine'</span><span class="p">:</span>
             <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">freq</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;hamming&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">'hamming'</span><span class="p">:</span>
             <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.54</span> <span class="o">+</span> <span class="mf">0.46</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">freq</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">&#39;hann&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">==</span> <span class="s1">'hann'</span><span class="p">:</span>
             <span class="n">filter_array</span> <span class="o">=</span> <span class="n">ramp</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">freq</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">filter_array</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">)</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns a plot of the filter array.</span>
 
 <span class="sd">        Requires matplotlib-base (or matplotlib) to be installed.</span>
@@ -784,7 +784,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        matplotlib.pyplot</span>
 <span class="sd">            A plot of the filter</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
         <span class="n">filter_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filter_array</span><span class="p">()</span>
@@ -793,13 +793,15 @@
         <span class="n">freq</span> <span class="o">*=</span> <span class="mi">2</span>
         <span class="n">ind_sorted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq</span><span class="p">[</span><span class="n">ind_sorted</span><span class="p">],</span> <span class="n">filter_array</span><span class="p">[</span><span class="n">ind_sorted</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;magenta&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (rads/pixel)&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Magnitude&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq</span><span class="p">[</span><span class="n">ind_sorted</span><span class="p">],</span> <span class="n">filter_array</span><span class="p">[</span><span class="n">ind_sorted</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'magenta'</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Frequency (rads/pixel)'</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Magnitude'</span><span class="p">)</span>
         <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;-π&#39;</span><span class="p">,</span> <span class="s1">&#39;-3π/4&#39;</span><span class="p">,</span> <span class="s1">&#39;-π/2&#39;</span><span class="p">,</span> <span class="s1">&#39;-π/4&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;π/4&#39;</span><span class="p">,</span> <span class="s1">&#39;π/2&#39;</span><span class="p">,</span> <span class="s1">&#39;3π/4&#39;</span><span class="p">,</span> <span class="s1">&#39;π&#39;</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="p">[</span><span class="s1">'-π'</span><span class="p">,</span> <span class="s1">'-3π/4'</span><span class="p">,</span> <span class="s1">'-π/2'</span><span class="p">,</span> <span class="s1">'-π/4'</span><span class="p">,</span> <span class="s1">'0'</span><span class="p">,</span> <span class="s1">'π/4'</span><span class="p">,</span> <span class="s1">'π/2'</span><span class="p">,</span> <span class="s1">'3π/4'</span><span class="p">,</span> <span class="s1">'π'</span><span class="p">])</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">plt</span>
+        <span class="n">fig2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span> 
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> 
+        <span class="k">return</span> <span class="n">fig2</span> 
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -807,7 +809,7 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_pre_filtering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">acquistion_data</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Filters and weights the projections inplace</span>
 
 <span class="sd">        Parameters</span>
@@ -819,16 +821,16 @@
 <span class="sd">        -----</span>
 <span class="sd">        self.input is not used to allow processing in smaller chunks</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">acquistion_data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">pixel_num_v</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_weights</span><span class="p">(</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> <span class="c1">#horizontal</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Weights not compatible&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Weights not compatible"</span><span class="p">)</span>
 
         <span class="n">filter_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filter_array</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">filter_array</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Custom filter has length </span><span class="si">{0}</span><span class="s2"> and is not compatible with requested fft_order </span><span class="si">{1}</span><span class="s2">. Expected filter length 2^</span><span class="si">{1}</span><span class="s2">&quot;</span>\
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Custom filter has length </span><span class="si">{0}</span><span class="s2"> and is not compatible with requested fft_order </span><span class="si">{1}</span><span class="s2">. Expected filter length 2^</span><span class="si">{1}</span><span class="s2">"</span>\
                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filter_array</span><span class="o">.</span><span class="n">size</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">))</span>
 
         <span class="c1">#call ext function</span>
@@ -837,22 +839,22 @@
         <span class="n">weights_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_float_p</span><span class="p">)</span>
 
         <span class="n">ag</span> <span class="o">=</span> <span class="n">acquistion_data</span><span class="o">.</span><span class="n">geometry</span>
-        <span class="k">if</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">'angle'</span><span class="p">,</span><span class="s1">'vertical'</span><span class="p">,</span><span class="s1">'horizontal'</span><span class="p">):</span>
             <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">'vertical'</span><span class="p">,</span><span class="s1">'angle'</span><span class="p">,</span><span class="s1">'horizontal'</span><span class="p">):</span>
             <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_vah</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">'angle'</span><span class="p">,</span><span class="s1">'horizontal'</span><span class="p">):</span>
             <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_vah</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">'vertical'</span><span class="p">,</span><span class="s1">'horizontal'</span><span class="p">):</span>
             <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span> <span class="p">(</span><span class="s2">&quot;Could not determine correct function call from dimension labels&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span> <span class="p">(</span><span class="s2">"Could not determine correct function call from dimension labels"</span><span class="p">)</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Resets all optional configuration parameters to their default values</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_filter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_fft_order</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_filter_inplace</span><span class="p">()</span>
@@ -868,7 +870,7 @@
 <a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FDK">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FDK</span><span class="p">(</span><span class="n">GenericFilteredBackProjection</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Creates an FDK reconstructor based on your cone-beam acquisition data using TIGRE as a backend.</span>
 
 <span class="sd">    Parameters</span>
@@ -879,8 +881,8 @@
 <span class="sd">    image_geometry : ImageGeometry, default used if None</span>
 <span class="sd">        A description of the area/volume to reconstruct</span>
 
-<span class="sd">    filter : string, numpy.ndarray, default=&#39;ram-lak&#39;</span>
-<span class="sd">        The filter to be applied. Can be a string from: {&#39;`ram-lak`&#39;, &#39;`shepp-logan`&#39;, &#39;`cosine`&#39;, &#39;`hamming`&#39;, &#39;`hann`&#39;}, or a numpy array.</span>
+<span class="sd">    filter : string, numpy.ndarray, default='ram-lak'</span>
+<span class="sd">        The filter to be applied. Can be a string from: {'`ram-lak`', '`shepp-logan`', '`cosine`', '`hamming`', '`hann`'}, or a numpy array.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
@@ -892,16 +894,16 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The reconstructor can be futher customised using additional &#39;set&#39; methods provided.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_backends</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tigre&#39;</span><span class="p">]</span>
+<span class="sd">    The reconstructor can be futher customised using additional 'set' methods provided.</span>
+<span class="sd">    """</span>
+    <span class="n">supported_backends</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'tigre'</span><span class="p">]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">'ram-lak'</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE</span> <span class="o">&amp;</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This reconstructor can only be used with standard cone-beam data, got </span><span class="si">{</span><span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"This reconstructor can only be used with standard cone-beam data, got </span><span class="si">{</span><span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'tigre'</span><span class="p">)</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">):</span>
@@ -918,7 +920,7 @@
 <div class="viewcode-block" id="FDK.run">
 <a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FDK.run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Runs the configured FDK recon and returns the reconstruction.</span>
 
 <span class="sd">        Parameters</span>
@@ -932,7 +934,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        ImageData</span>
 <span class="sd">            The reconstructed volume. Suppressed if `out` is passed</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -943,7 +945,7 @@
             <span class="n">proj_filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_pre_filtering</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
-        <span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PO_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="p">,</span><span class="n">adjoint_weights</span><span class="o">=</span><span class="s1">&#39;FDK&#39;</span><span class="p">)</span>
+        <span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PO_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="p">,</span><span class="n">adjoint_weights</span><span class="o">=</span><span class="s1">'FDK'</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
@@ -954,17 +956,17 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="n">repres</span> <span class="o">=</span> <span class="s2">&quot;FDK recon</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">repres</span> <span class="o">=</span> <span class="s2">"FDK recon</span><span class="se">\n</span><span class="s2">"</span>
 
         <span class="n">repres</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_data_size</span><span class="p">()</span>
 
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstruction Options:</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Backend: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">)</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">!=</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
-            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter cut-off frequency: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">)</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">FFT order: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span><span class="p">)</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter_inplace: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">Reconstruction Options:</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">Backend: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">Filter: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">!=</span> <span class="s1">'custom'</span><span class="p">:</span>
+            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">Filter cut-off frequency: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">FFT order: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">Filter_inplace: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">repres</span></div>
 
@@ -973,7 +975,7 @@
 <a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FBP">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FBP</span><span class="p">(</span><span class="n">GenericFilteredBackProjection</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Creates an FBP reconstructor based on your parallel-beam acquisition data.</span>
 
 <span class="sd">    Parameters</span>
@@ -984,11 +986,11 @@
 <span class="sd">    image_geometry : ImageGeometry, default used if None</span>
 <span class="sd">        A description of the area/volume to reconstruct</span>
 
-<span class="sd">    filter : string, numpy.ndarray, default=&#39;ram-lak&#39;</span>
-<span class="sd">        The filter to be applied. Can be a string from: {&#39;`ram-lak`&#39;, &#39;`shepp-logan`&#39;, &#39;`cosine`&#39;, &#39;`hamming`&#39;, &#39;`hann`&#39;}, or a numpy array.</span>
+<span class="sd">    filter : string, numpy.ndarray, default='ram-lak'</span>
+<span class="sd">        The filter to be applied. Can be a string from: {'`ram-lak`', '`shepp-logan`', '`cosine`', '`hamming`', '`hann`'}, or a numpy array.</span>
 
 <span class="sd">    backend : string</span>
-<span class="sd">        The backend to use, can be &#39;astra&#39; or &#39;tigre&#39;. Data must be in the correct order for requested backend.</span>
+<span class="sd">        The backend to use, can be 'astra' or 'tigre'. Data must be in the correct order for requested backend.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
@@ -1000,20 +1002,20 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The reconstructor can be further customised using additional &#39;set&#39; methods provided.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    The reconstructor can be further customised using additional 'set' methods provided.</span>
+<span class="sd">    """</span>
 
-    <span class="n">supported_backends</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="s1">&#39;astra&#39;</span><span class="p">]</span>
+    <span class="n">supported_backends</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'tigre'</span><span class="p">,</span> <span class="s1">'astra'</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">slices_per_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">'ram-lak'</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'tigre'</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">PARALLEL</span> <span class="o">&amp;</span> <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;This reconstructor is for parallel-beam data only.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"This reconstructor is for parallel-beam data only."</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_split_processing</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
@@ -1021,7 +1023,7 @@
 <div class="viewcode-block" id="FBP.set_split_processing">
 <a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FBP.set_split_processing">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_split_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slices_per_chunk</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Splits the processing in to chunks. Default, 0 will process the data in a single call.</span>
 
 <span class="sd">        Parameters</span>
@@ -1035,7 +1037,7 @@
 <span class="sd">        It is recommended to tune it too your hardware requirements using 8, 16 or 32 slices.</span>
 
 <span class="sd">        This can only be used on simple and offset data-geometries.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">num_slices</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">slices_per_chunk</span><span class="p">)</span>
@@ -1054,7 +1056,7 @@
         <span class="n">ag</span> <span class="o">=</span> <span class="n">acquisition_geometry</span>
         <span class="n">scaling</span> <span class="o">=</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">num_projections</span><span class="p">)</span> <span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">==</span><span class="s1">&#39;astra&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">==</span><span class="s1">'astra'</span><span class="p">:</span>
             <span class="n">scaling</span> <span class="o">/=</span>  <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_v</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_v</span><span class="p">,</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_h</span><span class="p">),</span><span class="n">scaling</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
@@ -1072,7 +1074,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PO_class</span><span class="p">(</span><span class="n">ig_slice</span><span class="p">,</span><span class="n">ag_slice</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_process_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="n">step</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get_dimension_axis</span><span class="p">(</span><span class="s2">&quot;vertical&quot;</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_slice</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="n">step</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get_dimension_axis</span><span class="p">(</span><span class="s2">"vertical"</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_slice</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_inplace</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_pre_filtering</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_slice</span><span class="p">)</span>
 
@@ -1082,7 +1084,7 @@
 <div class="viewcode-block" id="FBP.run">
 <a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FBP.run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Runs the configured FBP recon and returns the reconstruction</span>
 
 <span class="sd">        Parameters</span>
@@ -1097,17 +1099,17 @@
 <span class="sd">        -------</span>
 <span class="sd">        ImageData</span>
 <span class="sd">            The reconstructed volume. Suppressed if `out` is passed</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM2</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only 3D datasets can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">!=</span> <span class="s1">&#39;simple&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">!=</span> <span class="s1">&#39;offset&#39;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only simple and offset geometries can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Only 3D datasets can be processed in chunks with `set_split_processing`"</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">!=</span> <span class="s1">'simple'</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">!=</span> <span class="s1">'offset'</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Only simple and offset geometries can be processed in chunks with `set_split_processing`"</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only default image geometries can be processed in chunks `set_split_processing`&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Only default image geometries can be processed in chunks `set_split_processing`"</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
@@ -1128,7 +1130,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_PO_for_chunks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tot_slices</span><span class="o">-</span><span class="n">remainder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">):</span>
 
-                <span class="k">if</span> <span class="s1">&#39;bottom&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">'bottom'</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
                     <span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
                     <span class="n">end</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -1144,7 +1146,7 @@
             <span class="k">if</span> <span class="n">remainder</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_setup_PO_for_chunks</span><span class="p">(</span><span class="n">remainder</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="s1">&#39;bottom&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">'bottom'</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
                     <span class="n">start</span> <span class="o">=</span> <span class="n">tot_slices</span><span class="o">-</span><span class="n">remainder</span>
                     <span class="n">end</span> <span class="o">=</span> <span class="n">tot_slices</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -1183,9 +1185,9 @@
 <div class="viewcode-block" id="FBP.reset">
 <a class="viewcode-back" href="../../../../recon/#cil.recon.FBP.FBP.reset">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Resets all optional configuration parameters to their default values</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_split_processing</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
 
@@ -1193,25 +1195,25 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="n">repres</span> <span class="o">=</span> <span class="s2">&quot;FBP recon</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">repres</span> <span class="o">=</span> <span class="s2">"FBP recon</span><span class="se">\n</span><span class="s2">"</span>
 
         <span class="n">repres</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_str_data_size</span><span class="p">()</span>
 
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstruction Options:</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Backend: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">)</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">!=</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
-            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter cut-off frequency: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">)</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">FFT order: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span><span class="p">)</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Filter_inplace: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="p">)</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Split processing: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">Reconstruction Options:</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">Backend: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">Filter: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter</span> <span class="o">!=</span> <span class="s1">'custom'</span><span class="p">:</span>
+            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">Filter cut-off frequency: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_cutoff</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">FFT order: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">Filter_inplace: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_inplace</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">Split processing: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">:</span>
             <span class="n">num_chunks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">num_chunks</span> <span class="o">=</span> <span class="mi">1</span>
 
-        <span class="n">repres</span> <span class="o">+=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reconstructing in </span><span class="si">{}</span><span class="s2"> chunk(s):</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_chunks</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Reconstructing in </span><span class="si">{}</span><span class="s2"> chunk(s):</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_chunks</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">repres</span></div>
 
@@ -1244,8 +1246,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

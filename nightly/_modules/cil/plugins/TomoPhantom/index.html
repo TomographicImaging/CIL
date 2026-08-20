@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.plugins.TomoPhantom &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.plugins.TomoPhantom &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/plugins/TomoPhantom';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2021 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2021 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -545,11 +545,11 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">tomophantom.ctypes.external</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">external</span>
 
 <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">tomophantom</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
-<span class="n">path_library2D</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;phantomlib&quot;</span><span class="p">,</span> <span class="s2">&quot;Phantom2DLibrary.dat&quot;</span><span class="p">)</span>
-<span class="n">path_library3D</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;phantomlib&quot;</span><span class="p">,</span> <span class="s2">&quot;Phantom3DLibrary.dat&quot;</span><span class="p">)</span>
+<span class="n">path_library2D</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"phantomlib"</span><span class="p">,</span> <span class="s2">"Phantom2DLibrary.dat"</span><span class="p">)</span>
+<span class="n">path_library3D</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"phantomlib"</span><span class="p">,</span> <span class="s2">"Phantom3DLibrary.dat"</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">is_model_temporal</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns whether a model in the TomoPhantom library is temporal</span>
+<span class="w">    </span><span class="sd">'''Returns whether a model in the TomoPhantom library is temporal</span>
 
 <span class="sd">    This will go to check the installed library files from TomoPhantom</span>
 <span class="sd">    https://github.com/dkazanc/TomoPhantom/tree/master/PhantomLibrary/models</span>
@@ -558,11 +558,11 @@
 <span class="sd">    :type num_model: int</span>
 <span class="sd">    :param num_dims: dimensionality of the phantom, 2D or 3D</span>
 <span class="sd">    :type num_dims: int, default 2</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="k">return</span> <span class="n">get_model_num_channels</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_model_num_channels</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns number of temporal steps (channels) the model has</span>
+<span class="w">    </span><span class="sd">'''Returns number of temporal steps (channels) the model has</span>
 
 <span class="sd">    This will go to check the installed library files from TomoPhantom</span>
 <span class="sd">    https://github.com/dkazanc/TomoPhantom/tree/master/PhantomLibrary/models</span>
@@ -574,12 +574,12 @@
 <span class="sd">    :type num_model: int</span>
 <span class="sd">    :param num_dims: dimensionality of the phantom, 2D or 3D</span>
 <span class="sd">    :type num_dims: int, default 2</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
 
     <span class="k">return</span> <span class="n">check_model_params</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="n">num_dims</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">check_model_params</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns params_switch array from the C TomoPhantom library in function checkParams2D or checkParams3D</span>
+<span class="w">    </span><span class="sd">'''Returns params_switch array from the C TomoPhantom library in function checkParams2D or checkParams3D</span>
 
 <span class="sd">    This will go to check the installed library files from TomoPhantom</span>
 <span class="sd">    https://github.com/dkazanc/TomoPhantom/tree/master/PhantomLibrary/models</span>
@@ -591,7 +591,7 @@
 <span class="sd">    :type num_model: int</span>
 <span class="sd">    :param num_dims: dimensionality of the phantom, 2D or 3D</span>
 <span class="sd">    :type num_dims: int, default 2</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="k">if</span> <span class="n">num_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">external</span><span class="o">.</span><span class="n">c_checkParams2D</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">),</span>  <span class="c1"># pointer to the params array</span>
                                   <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">,</span>                                   <span class="c1"># model number selector (int)</span>
@@ -611,12 +611,12 @@
         <span class="k">return</span> <span class="n">params</span>
 
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported dimensionality. Expected 2 or 3, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dims</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Unsupported dimensionality. Expected 2 or 3, got </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dims</span><span class="p">))</span>
 
 <div class="viewcode-block" id="get_ImageData">
 <a class="viewcode-back" href="../../../../plugins/#cil.plugins.TomoPhantom.get_ImageData">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_ImageData</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">geometry</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns an ImageData relative to geometry with the model num_model from tomophantom</span>
+<span class="w">    </span><span class="sd">'''Returns an ImageData relative to geometry with the model num_model from tomophantom</span>
 
 <span class="sd">    :param num_model: model number</span>
 <span class="sd">    :type num_model: int</span>
@@ -648,32 +648,32 @@
 <span class="sd">      phantom = TomoPhantom.get_ImageData(num_model=num_model, geometry=ig)</span>
 
 
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="n">ig</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">ig</span><span class="o">.</span><span class="n">set_labels</span><span class="p">(</span><span class="n">ImageDimension</span><span class="o">.</span><span class="n">get_order_for_engine</span><span class="p">(</span><span class="s1">&#39;cil&#39;</span><span class="p">))</span>
+    <span class="n">ig</span><span class="o">.</span><span class="n">set_labels</span><span class="p">(</span><span class="n">ImageDimension</span><span class="o">.</span><span class="n">get_order_for_engine</span><span class="p">(</span><span class="s1">'cil'</span><span class="p">))</span>
     <span class="n">num_dims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">ImageDimension</span><span class="o">.</span><span class="n">CHANNEL</span> <span class="ow">in</span> <span class="n">ig</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_model_temporal</span><span class="p">(</span><span class="n">num_model</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Selected model </span><span class="si">{}</span><span class="s1"> is not a temporal model, please change your selection&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_model</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Selected model </span><span class="si">{}</span><span class="s1"> is not a temporal model, please change your selection'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_model</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">num_dims</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
             <span class="c1"># 3D+time for tomophantom</span>
             <span class="c1"># output dimensions channel and then spatial,</span>
-            <span class="c1"># e.g. [ &#39;channel&#39;, &#39;vertical&#39;, &#39;horizontal_y&#39;, &#39;horizontal_x&#39; ]</span>
+            <span class="c1"># e.g. [ 'channel', 'vertical', 'horizontal_y', 'horizontal_x' ]</span>
             <span class="n">num_model</span> <span class="o">=</span> <span class="n">num_model</span>
             <span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
             <span class="n">phantom_arr</span> <span class="o">=</span> <span class="n">TomoP3D</span><span class="o">.</span><span class="n">ModelTemporal</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">path_library3D</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">num_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="c1"># 2D+time for tomophantom</span>
             <span class="c1"># output dimensions channel and then spatial,</span>
-            <span class="c1"># e.g. [ &#39;channel&#39;, &#39;horizontal_y&#39;, &#39;horizontal_x&#39; ]</span>
+            <span class="c1"># e.g. [ 'channel', 'horizontal_y', 'horizontal_x' ]</span>
             <span class="n">N</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">num_model</span> <span class="o">=</span> <span class="n">num_model</span>
             <span class="n">phantom_arr</span> <span class="o">=</span> <span class="n">TomoP2D</span><span class="o">.</span><span class="n">ModelTemporal</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">path_library2D</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Wrong ImageGeometry&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Wrong ImageGeometry'</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ig</span><span class="o">.</span><span class="n">channels</span> <span class="o">!=</span> <span class="n">phantom_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The required model </span><span class="si">{}</span><span class="s1"> has </span><span class="si">{}</span><span class="s1"> channels. The ImageGeometry you passed has </span><span class="si">{}</span><span class="s1">. Please update your ImageGeometry.&#39;</span>\
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'The required model </span><span class="si">{}</span><span class="s1"> has </span><span class="si">{}</span><span class="s1"> channels. The ImageGeometry you passed has </span><span class="si">{}</span><span class="s1">. Please update your ImageGeometry.'</span>\
                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">ig</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span> <span class="n">phantom_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">num_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
@@ -683,12 +683,12 @@
         <span class="k">elif</span> <span class="n">num_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="c1"># 2D</span>
             <span class="k">if</span> <span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Can only handle square ImageData, got shape&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Can only handle square ImageData, got shape'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
             <span class="n">N</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">num_model</span> <span class="o">=</span> <span class="n">num_model</span>
             <span class="n">phantom_arr</span> <span class="o">=</span> <span class="n">TomoP2D</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">num_model</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">path_library2D</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Wrong ImageGeometry&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Wrong ImageGeometry'</span><span class="p">)</span>
 
 
     <span class="n">im_data</span> <span class="o">=</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">phantom_arr</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ig</span><span class="p">)</span>
@@ -724,8 +724,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

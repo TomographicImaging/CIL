@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Reconstruction and regularisation for a hyperspectral dataset &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>Reconstruction and regularisation for a hyperspectral dataset &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,9 +52,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/Hyperspectral_regularisation';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="a gVXR data reader for CIL" href="../CBCT-acquisition-with-noise-and-reconstruction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -600,14 +600,14 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -5567,9 +5567,9 @@ bha4WeBmgZsFbhb4zyzwF0pq8hz9GnyzAAAAAElFTkSuQmCC</p>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#detector parameters</span>
 <span class="n">ndet</span><span class="o">=</span><span class="mi">256</span>                                 <span class="c1"># Number of detector pixels, excluding gaps</span>
 <span class="n">nElem</span><span class="o">=</span><span class="mi">2</span>                                  <span class="c1"># Number of detector modules</span>
-<span class="n">pixel_size</span><span class="o">=</span><span class="mf">0.077</span>                         <span class="c1"># Pixels&#39; size (Pitch)</span>
+<span class="n">pixel_size</span><span class="o">=</span><span class="mf">0.077</span>                         <span class="c1"># Pixels' size (Pitch)</span>
 
-<span class="n">Sep</span><span class="o">=</span><span class="mf">0.153</span>                                <span class="c1"># Pixels&#39; gap length (cm)</span>
+<span class="n">Sep</span><span class="o">=</span><span class="mf">0.153</span>                                <span class="c1"># Pixels' gap length (cm)</span>
 <span class="n">det_space</span><span class="o">=</span><span class="p">(</span><span class="n">ndet</span><span class="p">)</span><span class="o">*</span><span class="n">pixel_size</span><span class="o">+</span><span class="n">Sep</span>          <span class="c1"># Size of detector in cm (pixels*pixel_size), including the gap</span>
 
 <span class="c1"># acquisition parameters</span>
@@ -5589,10 +5589,10 @@ bha4WeBmgZsFbhb4zyzwF0pq8hz9GnyzAAAAAElFTkSuQmCC</p>
     <span class="n">source_position</span><span class="o">=</span><span class="p">[</span><span class="n">sourceCentShift</span><span class="p">,</span> <span class="o">-</span><span class="n">SAD</span><span class="p">],</span>
     <span class="n">detector_position</span><span class="o">=</span><span class="p">[</span><span class="n">detectCentShift</span><span class="p">,</span> <span class="n">SDD</span><span class="o">-</span><span class="n">SAD</span><span class="p">],</span>
     <span class="n">rotation_axis_position</span><span class="o">=</span><span class="p">[</span><span class="n">rot_axis_x</span><span class="p">,</span> <span class="n">rot_axis_y</span><span class="p">])</span>
-<span class="n">ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">range_angle</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">nproj</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">))),</span> <span class="n">angle_unit</span><span class="o">=</span><span class="s1">&#39;degree&#39;</span><span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">range_angle</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">nproj</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">))),</span> <span class="n">angle_unit</span><span class="o">=</span><span class="s1">'degree'</span><span class="p">)</span>
 <span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="n">ndet</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pixel_size</span><span class="o">=</span><span class="p">[</span><span class="n">pixel_size</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">])</span>
 <span class="n">ag</span><span class="o">.</span><span class="n">set_channels</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span> <span class="c1"># Set energy channels</span>
-<span class="n">ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">([</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">,</span> <span class="s1">&#39;channel&#39;</span><span class="p">])</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">([</span><span class="s1">'angle'</span><span class="p">,</span> <span class="s1">'horizontal'</span><span class="p">,</span> <span class="s1">'channel'</span><span class="p">])</span>
 <br/></pre></div>
 </div>
 </div>
@@ -5636,15 +5636,15 @@ bha4WeBmgZsFbhb4zyzwF0pq8hz9GnyzAAAAAElFTkSuQmCC</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load sinogram using h5 reader</span>
-<span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;sino25_interpol_line.h5&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-<span class="n">data_set</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][:])</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">'sino25_interpol_line.h5'</span><span class="p">,</span><span class="s1">'r'</span><span class="p">)</span>
+<span class="n">data_set</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][:])</span>
 
 <span class="c1"># The sinograms have been preprocessed and more pixels have been added to compensate</span>
 <span class="c1"># for a gap in the detector. So the panel size has to be increased.</span>
 <span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="o">=</span><span class="p">[</span><span class="n">ndet</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pixel_size</span><span class="o">=</span><span class="p">[</span><span class="n">pixel_size</span><span class="p">,</span> <span class="n">pixel_size</span><span class="p">])</span>
 
 <span class="c1"># Change labels to astra ordering.</span>
-<span class="n">ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">([</span><span class="s1">&#39;channel&#39;</span><span class="p">,</span> <span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">])</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">([</span><span class="s1">'channel'</span><span class="p">,</span> <span class="s1">'angle'</span><span class="p">,</span> <span class="s1">'horizontal'</span><span class="p">])</span>
 
 <span class="c1"># Look at the data dimensions &lt;channel&gt;&lt;angle&gt;&lt;horizontal&gt;</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data_set</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -7189,7 +7189,7 @@ AAAAAAAAAKACSLgDAAAAAAAAAFABJNwBAAAAAAAAAKgAEu4AAAAAAAAAAFQACXcAAAAAAAAAACrg
 <span class="c1"># Define projection operator</span>
 <span class="n">ag2D</span><span class="o">=</span><span class="n">ag</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">ig2D</span><span class="o">=</span><span class="n">ag2D</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
-<span class="n">A_2D</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig2D</span><span class="p">,</span> <span class="n">ag2D</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<span class="n">A_2D</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig2D</span><span class="p">,</span> <span class="n">ag2D</span><span class="p">,</span> <span class="s1">'gpu'</span><span class="p">)</span>
 
 <span class="c1"># Loop over all the channels and reconstruct each channel</span>
 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ig</span><span class="o">.</span><span class="n">channels</span><span class="p">):</span>
@@ -8399,17 +8399,17 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">solution_arr</span><span class="o">=</span><span class="n">recon_data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">50</span><span class="p">,</span><span class="mi">125</span><span class="p">],</span><span class="s1">&#39;r&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Alu&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">125</span><span class="p">,</span><span class="mi">150</span><span class="p">],</span><span class="s1">&#39;m&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;H2O2&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">200</span><span class="p">,</span><span class="mi">140</span><span class="p">],</span><span class="s1">&#39;g&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;pvc&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">&#39;c&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Sugar&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">160</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Water&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">50</span><span class="p">,</span><span class="mi">125</span><span class="p">],</span><span class="s1">'r'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Alu'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">125</span><span class="p">,</span><span class="mi">150</span><span class="p">],</span><span class="s1">'m'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'H2O2'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">200</span><span class="p">,</span><span class="mi">140</span><span class="p">],</span><span class="s1">'g'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'pvc'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">'c'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Sugar'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">160</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">'b'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Water'</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Energy [keV]&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Attenuation [1/cm]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Energy [keV]'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Attenuation [1/cm]'</span><span class="p">)</span>
 <span class="n">extent</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">21.20</span><span class="p">,</span><span class="mf">153.53</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span>
-<span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extent</span><span class="p">]</span>
+<span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"</span><span class="si">%.2f</span><span class="s2">"</span> <span class="o">%</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extent</span><span class="p">]</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">ticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">127</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span><span class="n">labels</span><span class="o">=</span><span class="n">extent</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -8430,11 +8430,11 @@ Stop criterion has been reached.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">'gpu'</span><span class="p">)</span>
 <span class="n">f1</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
 <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.001</span>
-<span class="n">GTV</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">TotalVariation</span><span class="p">(</span><span class="n">correlation</span><span class="o">=</span><span class="s1">&#39;SpaceChannels&#39;</span><span class="p">,</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">GTV</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">TotalVariation</span><span class="p">(</span><span class="n">correlation</span><span class="o">=</span><span class="s1">'SpaceChannels'</span><span class="p">,</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="n">myFISTATV</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f1</span><span class="p">,</span>
                   <span class="n">g</span><span class="o">=</span><span class="n">GTV</span><span class="p">,</span>
@@ -8502,17 +8502,17 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">solution_arr</span><span class="o">=</span><span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">50</span><span class="p">,</span><span class="mi">125</span><span class="p">],</span><span class="s1">&#39;r&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Alu&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">125</span><span class="p">,</span><span class="mi">150</span><span class="p">],</span><span class="s1">&#39;m&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;H2O2&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">200</span><span class="p">,</span><span class="mi">140</span><span class="p">],</span><span class="s1">&#39;g&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;pvc&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">&#39;c&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Sugar&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">160</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Water&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">50</span><span class="p">,</span><span class="mi">125</span><span class="p">],</span><span class="s1">'r'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Alu'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">125</span><span class="p">,</span><span class="mi">150</span><span class="p">],</span><span class="s1">'m'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'H2O2'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">200</span><span class="p">,</span><span class="mi">140</span><span class="p">],</span><span class="s1">'g'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'pvc'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">'c'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Sugar'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">160</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">'b'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Water'</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Energy [keV]&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Attenuation [1/cm]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Energy [keV]'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Attenuation [1/cm]'</span><span class="p">)</span>
 <span class="n">extent</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">21.20</span><span class="p">,</span><span class="mf">153.53</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span>
-<span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extent</span><span class="p">]</span>
+<span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"</span><span class="si">%.2f</span><span class="s2">"</span> <span class="o">%</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extent</span><span class="p">]</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">ticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">127</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span><span class="n">labels</span><span class="o">=</span><span class="n">extent</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 <br/></pre></div>
@@ -8565,11 +8565,11 @@ D
 <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.5</span>
 
 <span class="c1"># Projection operator</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">'gpu'</span><span class="p">)</span>
 
-<span class="c1"># Use the gradient operator to calculate the gradient. &quot;Correlation=&#39;Space&quot; ensures that the gradient is computed only in the spatial dimensions.</span>
-<span class="c1">#&#39;split=True&#39; returns a BlockDataContainer with grouped spatial domains</span>
-<span class="n">D</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">correlation</span><span class="o">=</span><span class="s1">&#39;SpaceChannels&#39;</span><span class="p">,</span><span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># Use the gradient operator to calculate the gradient. "Correlation='Space" ensures that the gradient is computed only in the spatial dimensions.</span>
+<span class="c1">#'split=True' returns a BlockDataContainer with grouped spatial domains</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">correlation</span><span class="o">=</span><span class="s1">'SpaceChannels'</span><span class="p">,</span><span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">K</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
 <span class="n">h</span><span class="o">=</span><span class="n">BlockFunction</span><span class="p">(</span><span class="n">beta</span><span class="o">*</span><span class="mf">0.5</span><span class="o">*</span><span class="n">L2NormSquared</span><span class="p">(),</span> <span class="n">alpha</span><span class="o">*</span><span class="n">MixedL21Norm</span><span class="p">())</span>
 <span class="n">f</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">data</span><span class="p">),</span><span class="n">h</span><span class="p">)</span>
@@ -8640,17 +8640,17 @@ Stop criterion has been reached.
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Tik_TV_sol</span><span class="o">=</span><span class="n">PDHG_Tik_TV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Tik_TV_sol</span><span class="p">[:,</span><span class="mi">50</span><span class="p">,</span><span class="mi">125</span><span class="p">],</span><span class="s1">&#39;r&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Alu&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Tik_TV_sol</span><span class="p">[:,</span><span class="mi">125</span><span class="p">,</span><span class="mi">150</span><span class="p">],</span><span class="s1">&#39;m&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;H2O2&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Tik_TV_sol</span><span class="p">[:,</span><span class="mi">200</span><span class="p">,</span><span class="mi">140</span><span class="p">],</span><span class="s1">&#39;g&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;pvc&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Tik_TV_sol</span><span class="p">[:,</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">&#39;c&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Sugar&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Tik_TV_sol</span><span class="p">[:,</span><span class="mi">160</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Water&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Tik_TV_sol</span><span class="p">[:,</span><span class="mi">50</span><span class="p">,</span><span class="mi">125</span><span class="p">],</span><span class="s1">'r'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Alu'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Tik_TV_sol</span><span class="p">[:,</span><span class="mi">125</span><span class="p">,</span><span class="mi">150</span><span class="p">],</span><span class="s1">'m'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'H2O2'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Tik_TV_sol</span><span class="p">[:,</span><span class="mi">200</span><span class="p">,</span><span class="mi">140</span><span class="p">],</span><span class="s1">'g'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'pvc'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Tik_TV_sol</span><span class="p">[:,</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">'c'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Sugar'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Tik_TV_sol</span><span class="p">[:,</span><span class="mi">160</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">'b'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Water'</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Energy [keV]&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Attenuation [1/cm]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Energy [keV]'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Attenuation [1/cm]'</span><span class="p">)</span>
 <span class="n">extent</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">21.20</span><span class="p">,</span><span class="mf">153.53</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span>
-<span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extent</span><span class="p">]</span>
+<span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"</span><span class="si">%.2f</span><span class="s2">"</span> <span class="o">%</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extent</span><span class="p">]</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">ticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">127</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span><span class="n">labels</span><span class="o">=</span><span class="n">extent</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -8671,19 +8671,19 @@ Stop criterion has been reached.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">recon_data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">40</span><span class="p">),</span><span class="n">recon_data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span><span class="n">recon_data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">80</span><span class="p">),</span> <span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">40</span><span class="p">),</span><span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span><span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">80</span><span class="p">),</span> <span class="n">PDHG_Tik_TV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">40</span><span class="p">),</span> <span class="n">PDHG_Tik_TV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span> <span class="n">PDHG_Tik_TV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">80</span><span class="p">)],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;FISTA-TV&#39;</span><span class="p">,</span><span class="s1">&#39;FISTA-TV&#39;</span><span class="p">,</span><span class="s1">&#39;FISTA-TV&#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA-TV+TV&#39;</span><span class="p">,</span><span class="s1">&#39;FISTA-TV+TV&#39;</span><span class="p">,</span><span class="s1">&#39;FISTA-TV+TV&#39;</span><span class="p">,</span> <span class="s1">&#39;PDHG-TIK+TV&#39;</span><span class="p">,</span><span class="s1">&#39;PDHG-TIK+TV&#39;</span><span class="p">,</span><span class="s1">&#39;PDHG-TIK+TV&#39;</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">recon_data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">40</span><span class="p">),</span><span class="n">recon_data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span><span class="n">recon_data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">80</span><span class="p">),</span> <span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">40</span><span class="p">),</span><span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span><span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">80</span><span class="p">),</span> <span class="n">PDHG_Tik_TV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">40</span><span class="p">),</span> <span class="n">PDHG_Tik_TV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span> <span class="n">PDHG_Tik_TV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">80</span><span class="p">)],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'FISTA-TV'</span><span class="p">,</span><span class="s1">'FISTA-TV'</span><span class="p">,</span><span class="s1">'FISTA-TV'</span><span class="p">,</span> <span class="s1">'FISTA-TV+TV'</span><span class="p">,</span><span class="s1">'FISTA-TV+TV'</span><span class="p">,</span><span class="s1">'FISTA-TV+TV'</span><span class="p">,</span> <span class="s1">'PDHG-TIK+TV'</span><span class="p">,</span><span class="s1">'PDHG-TIK+TV'</span><span class="p">,</span><span class="s1">'PDHG-TIK+TV'</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_materials</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">):</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">50</span><span class="p">,</span><span class="mi">125</span><span class="p">],</span><span class="s1">&#39;r&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Alu&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">125</span><span class="p">,</span><span class="mi">150</span><span class="p">],</span><span class="s1">&#39;m&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;H2O2&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">200</span><span class="p">,</span><span class="mi">140</span><span class="p">],</span><span class="s1">&#39;g&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;pvc&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">&#39;c&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Sugar&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">160</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Water&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">50</span><span class="p">,</span><span class="mi">125</span><span class="p">],</span><span class="s1">'r'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Alu'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">125</span><span class="p">,</span><span class="mi">150</span><span class="p">],</span><span class="s1">'m'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'H2O2'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">200</span><span class="p">,</span><span class="mi">140</span><span class="p">],</span><span class="s1">'g'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'pvc'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">'c'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Sugar'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">[:,</span><span class="mi">160</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span><span class="s1">'b'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">'Water'</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Energy [keV]&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Attenuation [1/cm]&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Energy [keV]'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Attenuation [1/cm]'</span><span class="p">)</span>
     <span class="n">extent</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">21.20</span><span class="p">,</span><span class="mf">153.53</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span>
-    <span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extent</span><span class="p">]</span>
+    <span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"</span><span class="si">%.2f</span><span class="s2">"</span> <span class="o">%</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extent</span><span class="p">]</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">ticks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">127</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span><span class="n">labels</span><span class="o">=</span><span class="n">extent</span><span class="p">)</span>
 
 
@@ -8692,17 +8692,17 @@ Stop criterion has been reached.
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">131</span><span class="p">)</span>
 <span class="n">solution_arr</span><span class="o">=</span><span class="n">recon_data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
 <span class="n">plot_materials</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;FISTA-TV&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'FISTA-TV'</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">132</span><span class="p">)</span>
 <span class="n">solution_arr</span><span class="o">=</span><span class="n">myFISTATV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
 <span class="n">plot_materials</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;FISTA-TV+TV&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'FISTA-TV+TV'</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">133</span><span class="p">)</span>
 <span class="n">solution_arr</span><span class="o">=</span><span class="n">PDHG_Tik_TV</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
 <span class="n">plot_materials</span><span class="p">(</span><span class="n">solution_arr</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;PDHG-TV+TV&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'PDHG-TV+TV'</span><span class="p">)</span>
 <br/><br/></pre></div>
 </div>
 </div>
@@ -8794,8 +8794,8 @@ Text(0.5, 1.0, &#39;PDHG-TV+TV&#39;)
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.ChannelwiseOperator &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.optimisation.operators.ChannelwiseOperator &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/operators/ChannelwiseOperator';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2020 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2020 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -542,7 +542,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.ChannelwiseOperator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ChannelwiseOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;The ChannelwiseOperator  takes in an operator  and the number of channels to be used, and creates a new multi-channel</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">'''The ChannelwiseOperator  takes in an operator  and the number of channels to be used, and creates a new multi-channel</span>
 <span class="sd">    `ChannelwiseOperator`, which will apply the operator  independently on each channel for the number of channels specified.</span>
 
 <span class="sd">    ChannelwiseOperator does not currently support BlockOperators. Typically, if such behaviour is desired, it can be achieved</span>
@@ -555,7 +555,7 @@
 <span class="sd">    channels : int</span>
 <span class="sd">        Number of channels</span>
 <span class="sd">    dimension : str, optional</span>
-<span class="sd">        &#39;prepend&#39; (default) or &#39;append&#39; channel dimension onto existing dimensions</span>
+<span class="sd">        'prepend' (default) or 'append' channel dimension onto existing dimensions</span>
 <span class="sd">        </span>
 <span class="sd">    Example</span>
 <span class="sd">    --------</span>
@@ -570,7 +570,7 @@
 <span class="sd">    &gt;&gt;&gt; D = DiagonalOperator(diag)</span>
 <span class="sd">    &gt;&gt;&gt; C = ChannelwiseOperator(D,channels)</span>
 <span class="sd">    &gt;&gt;&gt; y = C.direct(x)</span>
-<span class="sd">    &gt;&gt;&gt; print(&#39;The original image data is:&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print('The original image data is:')</span>
 <span class="sd">    &gt;&gt;&gt; print(x.as_array())</span>
 <span class="sd">    The original image data is:</span>
 <span class="sd">    [[[1. 1. 1.]</span>
@@ -579,13 +579,13 @@
 <span class="sd">    [[2. 2. 2.]</span>
 <span class="sd">    [2. 2. 2.]</span>
 <span class="sd">    [2. 2. 2.]]]</span>
-<span class="sd">    &gt;&gt;&gt; print(&#39;The channel wise operator multiplies each channel element wise by:&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print('The channel wise operator multiplies each channel element wise by:')</span>
 <span class="sd">    &gt;&gt;&gt; print(diag.as_array())</span>
 <span class="sd">    The channel wise operator multiplies each channel element wise by:</span>
 <span class="sd">    [[0. 1. 2.]</span>
 <span class="sd">    [3. 4. 5.]</span>
 <span class="sd">    [6. 7. 8.]]</span>
-<span class="sd">    &gt;&gt;&gt; print(&#39;The result of applying the channel wise operator is:&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print('The result of applying the channel wise operator is:')</span>
 <span class="sd">    &gt;&gt;&gt; print(y.as_array())</span>
 <span class="sd">    The result of applying the channel wise operator is:</span>
 <span class="sd">    [[[ 0.  1.  2.]</span>
@@ -595,9 +595,9 @@
 <span class="sd">    [ 6.  8. 10.]</span>
 <span class="sd">    [12. 14. 16.]]]</span>
 <span class="sd">    </span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="s1">&#39;prepend&#39;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="s1">'prepend'</span><span class="p">):</span>
 
         <span class="n">dom_op</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span>
         <span class="n">ran_op</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span>
@@ -606,14 +606,14 @@
 
         <span class="c1"># Create multi-channel domain and range geometries: Clones of the</span>
         <span class="c1"># input single-channel geometries but with the specified number of</span>
-        <span class="c1"># channels and additional dimension_label &#39;channel&#39;.</span>
+        <span class="c1"># channels and additional dimension_label 'channel'.</span>
         <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="p">[</span><span class="n">dom_op</span><span class="p">,</span><span class="n">ran_op</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;prepend&#39;</span><span class="p">:</span>
-                <span class="n">new_dimension_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;append&#39;</span><span class="p">:</span>
-                <span class="n">new_dimension_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">dimension</span> <span class="o">==</span> <span class="s1">'prepend'</span><span class="p">:</span>
+                <span class="n">new_dimension_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'channel'</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">dimension</span> <span class="o">==</span> <span class="s1">'append'</span><span class="p">:</span>
+                <span class="n">new_dimension_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">)</span><span class="o">+</span><span class="p">[</span><span class="s1">'channel'</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;dimension must be either &#39;prepend&#39; or &#39;append&#39;&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"dimension must be either 'prepend' or 'append'"</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">):</span>
 
                 <span class="n">geom_channels</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -629,7 +629,7 @@
                 <span class="n">geom_mc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">geom_channels</span><span class="p">)</span>
 
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span><span class="n">BlockGeometry</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;ChannelwiseOperator does not support BlockOperator as input. Consider making a BlockOperator of ChannelwiseOperators instead.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"ChannelwiseOperator does not support BlockOperator as input. Consider making a BlockOperator of ChannelwiseOperators instead."</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">pass</span>
 
@@ -642,7 +642,7 @@
 <div class="viewcode-block" id="ChannelwiseOperator.direct">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.ChannelwiseOperator.direct">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Returns :math:`D(x)` where :math:`D` is the ChannelwiseOperator and :math:`x` is the input data.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -656,9 +656,9 @@
 <span class="sd">        -------</span>
 <span class="sd">        out : DataContainer</span>
 <span class="sd">            Output data</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="c1"># Loop over channels, extract single-channel data, apply single-channel</span>
-        <span class="c1"># operator&#39;s direct method and fill into multi-channel output data set.</span>
+        <span class="c1"># operator's direct method and fill into multi-channel output data set.</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
         <span class="n">cury</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
@@ -671,7 +671,7 @@
 <div class="viewcode-block" id="ChannelwiseOperator.adjoint">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.ChannelwiseOperator.adjoint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Returns :math:`D^{*}(x)` where :math:`D` is the ChannelwiseOperator and :math:`x` is the input data.</span>
+<span class="w">        </span><span class="sd">'''Returns :math:`D^{*}(x)` where :math:`D` is the ChannelwiseOperator and :math:`x` is the input data.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -685,9 +685,9 @@
 <span class="sd">        out : DataContainer</span>
 <span class="sd">            Output data</span>
 <span class="sd">        </span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="c1"># Loop over channels, extract single-channel data, apply single-channel</span>
-        <span class="c1"># operator&#39;s adjoint method and fill into multi-channel output data set.</span>
+        <span class="c1"># operator's adjoint method and fill into multi-channel output data set.</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
         <span class="n">cury</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
@@ -700,7 +700,7 @@
 <div class="viewcode-block" id="ChannelwiseOperator.calculate_norm">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.operators.ChannelwiseOperator.calculate_norm">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Evaluates operator norm of ChannelWiseOperator&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Evaluates operator norm of ChannelWiseOperator'''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span></div>
 </div>
 
@@ -733,8 +733,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

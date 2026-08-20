@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Framework &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>Framework &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../_static/documentation_options.js?v=8959950e"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,9 +49,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'framework';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Introduction" href="../introduction/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -1242,8 +1242,8 @@ will copy the data in new_data into the data container.</p>
 If new_order is a list of length number_of_dimensions, returns a list
 with the indices of the axes in new_order with respect to those in
 self.dimension_labels: i.e.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">&#39;vertical&#39;</span><span class="p">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">'horizontal'</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">'vertical'</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'vertical'</span><span class="p">,</span><span class="s1">'horizontal'</span><span class="p">]</span>
 <span class="go">returns [1,0]</span>
 </pre></div>
 </div>
@@ -1545,8 +1545,8 @@ will copy the data in new_data into the data container.</p>
 If new_order is a list of length number_of_dimensions, returns a list
 with the indices of the axes in new_order with respect to those in
 self.dimension_labels: i.e.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">&#39;vertical&#39;</span><span class="p">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">'horizontal'</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">'vertical'</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'vertical'</span><span class="p">,</span><span class="s1">'horizontal'</span><span class="p">]</span>
 <span class="go">returns [1,0]</span>
 </pre></div>
 </div>
@@ -1971,8 +1971,8 @@ will copy the data in new_data into the data container.</p>
 If new_order is a list of length number_of_dimensions, returns a list
 with the indices of the axes in new_order with respect to those in
 self.dimension_labels: i.e.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">&#39;vertical&#39;</span><span class="p">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">'horizontal'</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">'vertical'</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'vertical'</span><span class="p">,</span><span class="s1">'horizontal'</span><span class="p">]</span>
 <span class="go">returns [1,0]</span>
 </pre></div>
 </div>
@@ -2288,8 +2288,8 @@ will copy the data in new_data into the data container.</p>
 If new_order is a list of length number_of_dimensions, returns a list
 with the indices of the axes in new_order with respect to those in
 self.dimension_labels: i.e.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">&#39;vertical&#39;</span><span class="p">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">'horizontal'</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="s1">'vertical'</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'vertical'</span><span class="p">,</span><span class="s1">'horizontal'</span><span class="p">]</span>
 <span class="go">returns [1,0]</span>
 </pre></div>
 </div>
@@ -2713,24 +2713,24 @@ We consider a <strong>batch</strong> to be a subset of the <code class="code doc
 
 <span class="c1"># get the data</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_PARALLEL_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="s1">'astra'</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">)</span>
 
 <span class="c1"># create the geometries</span>
 <span class="n">ag</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span>
 <span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
 
 <span class="c1"># partition the data into batches contained in the elements of a BlockDataContainer</span>
-<span class="n">data_partitioned</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">num_batches</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;staggered&#39;</span><span class="p">)</span> <span class="c1"># Choose mode from `sequential`, `staggered` or `random_permutation`</span>
+<span class="n">data_partitioned</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">num_batches</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'staggered'</span><span class="p">)</span> <span class="c1"># Choose mode from `sequential`, `staggered` or `random_permutation`</span>
 <span class="c1"># From the partitioned data build a BlockOperator container the projectors for each batch</span>
-<span class="n">A_partitioned</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data_partitioned</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="n">A_partitioned</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">data_partitioned</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="s2">"cpu"</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The total number of angles is &#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The first 30 angles are &#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[:</span><span class="mi">30</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'The total number of angles is '</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'The first 30 angles are '</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">[:</span><span class="mi">30</span><span class="p">])</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;In batch zero the number of angles is &#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_partitioned</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The angles in batch zero are &#39;</span><span class="p">,</span> <span class="n">data_partitioned</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The angles in batch one are &#39;</span><span class="p">,</span> <span class="n">data_partitioned</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'In batch zero the number of angles is '</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_partitioned</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'The angles in batch zero are '</span><span class="p">,</span> <span class="n">data_partitioned</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'The angles in batch one are '</span><span class="p">,</span> <span class="n">data_partitioned</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-RST notranslate"><div class="highlight"><pre><span></span>The total number of angles is  300
@@ -2805,7 +2805,7 @@ generator will not be seeded.</p></li>
 <dd><p>Available dimension labels for image data.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">([</span><span class="n">ImageDimension</span><span class="o">.</span><span class="n">HORIZONTAL_X</span><span class="p">,</span> <span class="n">ImageDimension</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">([</span><span class="s2">&quot;horizontal_x&quot;</span><span class="p">,</span> <span class="s2">&quot;vertical&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">([</span><span class="s2">"horizontal_x"</span><span class="p">,</span> <span class="s2">"vertical"</span><span class="p">])</span>
 </pre></div>
 </div>
 <dl class="py attribute">
@@ -2838,7 +2838,7 @@ generator will not be seeded.</p></li>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">([</span><span class="n">AcquisitionDimension</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">,</span>
 <span class="go">              AcquisitionDimension.ANGLE,</span>
 <span class="go">              AcquisitionDimension.HORIZONTAL])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">([</span><span class="s2">&quot;channel&quot;</span><span class="p">,</span> <span class="s2">&quot;angle&quot;</span><span class="p">,</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">reorder</span><span class="p">([</span><span class="s2">"channel"</span><span class="p">,</span> <span class="s2">"angle"</span><span class="p">,</span> <span class="s2">"horizontal"</span><span class="p">])</span>
 </pre></div>
 </div>
 <dl class="py attribute">
@@ -2898,7 +2898,7 @@ generator will not be seeded.</p></li>
 
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">FillType</span><span class="o">.</span><span class="n">RANDOM</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s2">"random"</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -2909,7 +2909,7 @@ generator will not be seeded.</p></li>
 <dd><p>Available units for angles.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angle_data</span><span class="p">,</span> <span class="n">angle_units</span><span class="o">=</span><span class="n">AngleUnit</span><span class="o">.</span><span class="n">DEGREE</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angle_data</span><span class="p">,</span> <span class="n">angle_units</span><span class="o">=</span><span class="s2">&quot;degree&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angle_data</span><span class="p">,</span> <span class="n">angle_units</span><span class="o">=</span><span class="s2">"degree"</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py attribute">
@@ -3132,8 +3132,8 @@ input</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

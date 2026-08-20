@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Utilities &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>Utilities &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../_static/documentation_options.js?v=8959950e"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,9 +49,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'utilities';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Recon" href="../recon/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -831,7 +831,7 @@ from that data directory using <cite>get(data_dir)</cite>.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.utilities.dataexample.</span></span><span class="sig-name descname"><span class="pre">WALNUT</span></span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#WALNUT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.WALNUT" title="Link to this definition">#</a></dt>
 <dd><p>A microcomputed tomography dataset of a walnut from <a class="reference external" href="https://zenodo.org/records/4822516">https://zenodo.org/records/4822516</a></p>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;my_PC/data_folder&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">'my_PC/data_folder'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">WALNUT</span><span class="o">.</span><span class="n">download_data</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># download the data</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">WALNUT</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># load the data</span>
 </pre></div>
@@ -876,7 +876,7 @@ If unspecified, tries to use the CIL_DATA_DIR environment variable.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.utilities.dataexample.</span></span><span class="sig-name descname"><span class="pre">USB</span></span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#USB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.USB" title="Link to this definition">#</a></dt>
 <dd><p>A microcomputed tomography dataset of a usb memory stick from <a class="reference external" href="https://zenodo.org/records/4822516">https://zenodo.org/records/4822516</a></p>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;my_PC/data_folder&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">'my_PC/data_folder'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">USB</span><span class="o">.</span><span class="n">download_data</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># download the data</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">USB</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># load the data</span>
 </pre></div>
@@ -921,7 +921,7 @@ If unspecified, tries to use the CIL_DATA_DIR environment variable.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">cil.utilities.dataexample.</span></span><span class="sig-name descname"><span class="pre">KORN</span></span><a class="reference internal" href="../_modules/cil/utilities/dataexample/#KORN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.utilities.dataexample.KORN" title="Link to this definition">#</a></dt>
 <dd><p>A microcomputed tomography dataset of a sunflower seeds in a box from <a class="reference external" href="https://zenodo.org/records/6874123">https://zenodo.org/records/6874123</a></p>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;my_PC/data_folder&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">'my_PC/data_folder'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">KORN</span><span class="o">.</span><span class="n">download_data</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># download the data</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">KORN</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># load the data</span>
 </pre></div>
@@ -967,7 +967,7 @@ If unspecified, tries to use the CIL_DATA_DIR environment variable.</p>
 <dd><p>A synchrotron x-ray tomography dataset of sandstone from <a class="reference external" href="https://zenodo.org/records/4912435">https://zenodo.org/records/4912435</a>
 A small subset of the data containing selected projections and 4 slices of the reconstruction</p>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;my_PC/data_folder&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">'my_PC/data_folder'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">SANDSTONE</span><span class="o">.</span><span class="n">download_data</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># download the data</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataexample</span><span class="o">.</span><span class="n">SANDSTONE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="c1"># load the data</span>
 </pre></div>
@@ -1096,8 +1096,8 @@ length of datacontainers, allows to set a different color map for each dataconta
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The figure can be saved using the <cite>save</cite> method . i.e:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show2D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;My Plot&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/output.png&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show2D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'My Plot'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">'/path/to/output.png'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1139,8 +1139,8 @@ To plot multiple slices, pass a list of slices.</p></li>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The figure can be saved using the <cite>save</cite> method . i.e:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;My Plot&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/output.png&#39;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'My Plot'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">'/path/to/output.png'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1157,14 +1157,14 @@ displays 3 subplots with the centre line profile shown along each axis.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show1D</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Horizontal_x&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">),(</span><span class="s2">&quot;Horizontal_y&quot;</span><span class="p">,</span> <span class="mi">40</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s2">"Horizontal_x"</span><span class="p">,</span> <span class="mi">30</span><span class="p">),(</span><span class="s2">"Horizontal_y"</span><span class="p">,</span> <span class="mi">40</span><span class="p">)])</span>
 </pre></div>
 </div>
 <p>The following example shows multiple line profiles from a 3D dataset along the vertical axis.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">show1D</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[[(</span><span class="s2">&quot;Vertical&quot;</span><span class="p">,</span><span class="mi">62</span><span class="p">),(</span><span class="s2">&quot;Horizontal_y&quot;</span><span class="p">,</span><span class="mi">70</span><span class="p">)],[(</span><span class="s2">&quot;Vertical&quot;</span><span class="p">,</span><span class="mi">61</span><span class="p">),(</span><span class="s2">&quot;Horizontal_y&quot;</span><span class="p">,</span><span class="mi">70</span><span class="p">)],[(</span><span class="s2">&quot;Vertical&quot;</span><span class="p">,</span><span class="mi">67</span><span class="p">),(</span><span class="s2">&quot;Horizontal_x&quot;</span><span class="p">,</span><span class="mi">70</span><span class="p">)]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[[(</span><span class="s2">"Vertical"</span><span class="p">,</span><span class="mi">62</span><span class="p">),(</span><span class="s2">"Horizontal_y"</span><span class="p">,</span><span class="mi">70</span><span class="p">)],[(</span><span class="s2">"Vertical"</span><span class="p">,</span><span class="mi">61</span><span class="p">),(</span><span class="s2">"Horizontal_y"</span><span class="p">,</span><span class="mi">70</span><span class="p">)],[(</span><span class="s2">"Vertical"</span><span class="p">,</span><span class="mi">67</span><span class="p">),(</span><span class="s2">"Horizontal_x"</span><span class="p">,</span><span class="mi">70</span><span class="p">)]])</span>
 </pre></div>
 </div>
 <p>The following example plots the same line profile from two datasets on the same plot.</p>
@@ -1172,7 +1172,7 @@ displays 3 subplots with the centre line profile shown along each axis.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data2</span> <span class="o">=</span> <span class="n">data</span><span class="o">*</span><span class="mf">0.9</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">([</span><span class="n">data</span><span class="p">,</span> <span class="n">data2</span><span class="p">],</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Horizontal_x&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">),(</span><span class="s2">&quot;Horizontal_y&quot;</span><span class="p">,</span> <span class="mi">40</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show1D</span><span class="p">([</span><span class="n">data</span><span class="p">,</span> <span class="n">data2</span><span class="p">],</span> <span class="n">slice_list</span><span class="o">=</span><span class="p">[(</span><span class="s2">"Horizontal_x"</span><span class="p">,</span> <span class="mi">30</span><span class="p">),(</span><span class="s2">"Horizontal_y"</span><span class="p">,</span> <span class="mi">40</span><span class="p">)])</span>
 </pre></div>
 </div>
 <p>The following example shows the case where the input data is a numpy array.
@@ -1188,7 +1188,7 @@ The slice_list can be provided as (axis, index), where axis is an integer.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataexample</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_SPHERE_VOLUME</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show1D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/output.png&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">'/path/to/output.png'</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -1228,7 +1228,7 @@ for 2D geometries elevation and azimuthal cannot be changed</p>
 <p class="admonition-title">Note</p>
 <p>The figure can be saved using the <cite>save</cite> method . i.e:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">show_geometry</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/output.png&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">'/path/to/output.png'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1357,22 +1357,22 @@ cropping the reconstruction volume. Default is None.</p></li>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vs</span> <span class="o">=</span> <span class="n">VolumeShrinker</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">recon_backend</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ig_reduced</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;manual&#39;</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;horizontal_x&#39;</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">150</span><span class="p">)})</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vs</span> <span class="o">=</span> <span class="n">VolumeShrinker</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">recon_backend</span><span class="o">=</span><span class="s1">'astra'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig_reduced</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">'manual'</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="p">{</span><span class="s1">'horizontal_x'</span><span class="p">:(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">150</span><span class="p">)})</span>
 </pre></div>
 </div>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cil_log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cil_log_level</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">vs</span> <span class="o">=</span> <span class="n">VolumeShrinker</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">recon_backend</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ig_reduced</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;threshold&#39;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vs</span> <span class="o">=</span> <span class="n">VolumeShrinker</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">recon_backend</span><span class="o">=</span><span class="s1">'astra'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig_reduced</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">'threshold'</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cil_log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cil_log_level</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">vs</span> <span class="o">=</span> <span class="n">VolumeShrinker</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">recon_backend</span><span class="o">=</span><span class="s1">&#39;astra&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ig_reduced</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;otsu&#39;</span><span class="p">,</span> <span class="n">otsu_classes</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vs</span> <span class="o">=</span> <span class="n">VolumeShrinker</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">recon_backend</span><span class="o">=</span><span class="s1">'astra'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ig_reduced</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">'otsu'</span><span class="p">,</span> <span class="n">otsu_classes</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -1436,8 +1436,8 @@ on the reconstruction.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

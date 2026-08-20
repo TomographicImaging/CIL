@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.SIRT &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.optimisation.algorithms.SIRT &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/algorithms/SIRT';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2019 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -547,7 +547,7 @@
 <div class="viewcode-block" id="SIRT">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.SIRT">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SIRT</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Simultaneous Iterative Reconstruction Technique, see :cite:`Kak2001`.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Simultaneous Iterative Reconstruction Technique, see :cite:`Kak2001`.</span>
 
 <span class="sd">    Simultaneous Iterative Reconstruction Technique (SIRT) solves</span>
 <span class="sd">    the following problem</span>
@@ -604,10 +604,10 @@
 
 <span class="sd">    &gt;&gt;&gt; sirt = SIRT(initial = ig.allocate(0), operator = A, data = d)</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor of SIRT algorithm&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Constructor of SIRT algorithm"""</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">SIRT</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -617,21 +617,21 @@
 <div class="viewcode-block" id="SIRT.set_up">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.SIRT.set_up">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialisation of the algorithm&quot;&quot;&quot;</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> setting up&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">"""Initialisation of the algorithm"""</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="s2"> setting up"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
 
         <span class="n">warning</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">operator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">warning</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;an `operator`&quot;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">"an `operator`"</span>
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">warning</span> <span class="o">+=</span> <span class="mi">10</span>
             <span class="k">if</span> <span class="n">warning</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot; and `data`&quot;</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s2">" and `data`"</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;`data`&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">"`data`"</span>
         <span class="k">if</span> <span class="n">warning</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;You must pass </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s1"> to the SIRT algorithm&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'You must pass </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s1"> to the SIRT algorithm'</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">initial</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -655,33 +655,33 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_weights</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">configured</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> configured&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="s2"> configured"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">relaxation_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the relaxation parameter :math:`\omega`&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get the relaxation parameter :math:`\omega`"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation_parameter</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the preconditioning array :math:`D`&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get the preconditioning array :math:`D`"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Dscaled</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation_parameter</span>
 
 <div class="viewcode-block" id="SIRT.set_relaxation_parameter">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.SIRT.set_relaxation_parameter">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_relaxation_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the relaxation parameter :math:`\omega`</span>
+<span class="w">        </span><span class="sd">"""Set the relaxation parameter :math:`\omega`</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        value : float</span>
 <span class="sd">            The relaxation parameter to be applied to the update. Must be between 0 and 2 to guarantee asymptotic convergence.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected relaxation parameter to be in range 0-2. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+                <span class="s2">"Expected relaxation parameter to be in range 0-2. Got </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_relaxation_parameter</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_weights</span><span class="p">()</span>
@@ -689,7 +689,7 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_set_up_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the preconditioning arrays M and D&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Set up the preconditioning arrays M and D"""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>
@@ -701,7 +701,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_remove_nan_or_inf</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">replace_with</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_remove_nan_or_inf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datacontainer</span><span class="p">,</span> <span class="n">replace_with</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Replace nan and inf in datacontainer with a given value.</span>
+<span class="w">        </span><span class="sd">"""Replace nan and inf in datacontainer with a given value.</span>
 
 <span class="sd">        Parameters:</span>
 <span class="sd">        -------------</span>
@@ -713,7 +713,7 @@
 
 
 <span class="sd">        In case the input datacontainer is a :code:`BlockDataContainer` the substitution is executed for each container in the :code:`BlockDataContainer`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datacontainer</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">datacontainer</span><span class="o">.</span><span class="n">containers</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_remove_nan_or_inf</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">replace_with</span><span class="o">=</span><span class="n">replace_with</span><span class="p">)</span>
@@ -726,11 +726,11 @@
 <div class="viewcode-block" id="SIRT.update">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.SIRT.update">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Performs a single iteration of the SIRT algorithm. The update step for iteration :math:`k` is given by</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">""" Performs a single iteration of the SIRT algorithm. The update step for iteration :math:`k` is given by</span>
 
 <span class="sd">        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M (b - Ax^{k}) ) ) )</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># self.r = self.data - self.operator.direct(self.x)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
@@ -751,11 +751,11 @@
 <div class="viewcode-block" id="SIRT.update_objective">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.algorithms.SIRT.update_objective">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Appends the current objective value to the list of previous objective values</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">""" Appends the current objective value to the list of previous objective values</span>
 
 <span class="sd">        .. math:: \frac{1}{2}\|A x - b\|^{2}</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">squared_norm</span><span class="p">())</span></div>
 </div>
 
@@ -788,8 +788,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

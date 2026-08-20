@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.utilities.StepSizeMethods &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.optimisation.utilities.StepSizeMethods &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/utilities/StepSizeMethods';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2024 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2024 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -544,24 +544,24 @@
 <div class="viewcode-block" id="StepSizeRule">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.StepSizeRule">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StepSizeRule</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Abstract base class for a step size rule. The abstract method, `get_step_size` takes in an algorithm and thus can access all parts of the algorithm (e.g. current iterate, current gradient, objective functions etc) and from this  should return a float as a step size.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Initialises the step size rule</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Initialises the step size rule</span>
+<span class="sd">        '''</span>
         <span class="k">pass</span>
 
 <div class="viewcode-block" id="StepSizeRule.get_step_size">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.StepSizeRule.get_step_size">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
 <span class="sd">        the calculated step size:float</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 </div>
 
@@ -570,32 +570,32 @@
 <div class="viewcode-block" id="ConstantStepSize">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.ConstantStepSize">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConstantStepSize</span><span class="p">(</span><span class="n">StepSizeRule</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Step-size rule that always returns a constant step-size.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    step_size: float</span>
 <span class="sd">        The step-size to be returned with each call.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step_size</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Initialises the constant step size rule</span>
+<span class="w">        </span><span class="sd">'''Initialises the constant step size rule</span>
 
 <span class="sd">         Parameters:</span>
 <span class="sd">         -------------</span>
 <span class="sd">         step_size : float, the constant step size</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span> <span class="o">=</span> <span class="n">step_size</span>
 
 <div class="viewcode-block" id="ConstantStepSize.get_step_size">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.ConstantStepSize.get_step_size">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
 <span class="sd">        the calculated step size:float</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span></div>
 </div>
 
@@ -605,7 +605,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ArmijoStepSizeRule</span><span class="p">(</span><span class="n">StepSizeRule</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Applies the Armijo rule to calculate the step size (step_size).</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">""" Applies the Armijo rule to calculate the step size (step_size).</span>
 
 <span class="sd">    The Armijo rule runs a while loop to find the appropriate step_size by starting from a very large number (`alpha`). The step_size is found by reducing the step size (by a factor `beta`) in an iterative way until a certain criterion is met. To avoid infinite loops, we add a maximum number of times (`max_iterations`) the while loop is run.</span>
 
@@ -628,11 +628,11 @@
 <span class="sd">        If `warmstart = True` the initial step size at each Armijo iteration is the calculated step size from the last iteration. If `warmstart = False` at each  Armijo iteration, the initial step size is reset to the original, large `alpha`.</span>
 <span class="sd">        In the case of *well-behaved* convex functions, `warmstart = True` is likely to be computationally less expensive. In the case of non-convex functions, or particularly tricky functions, setting `warmstart = False` may be beneficial.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">warmstart</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Initialises the step size rule</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Initialises the step size rule</span>
+<span class="sd">        '''</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha_orig</span> <span class="o">=</span> <span class="n">alpha</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
@@ -646,14 +646,14 @@
 <div class="viewcode-block" id="ArmijoStepSizeRule.get_step_size">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.ArmijoStepSizeRule.get_step_size">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Applies the Armijo rule to calculate the step size (`step_size`)</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
 <span class="sd">        the calculated step size:float</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">warmstart</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha_orig</span>
@@ -662,7 +662,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">x_armijo</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting Armijo backtracking with initial step size: </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Starting Armijo backtracking with initial step size: </span><span class="si">%f</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
 
         <span class="k">while</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span><span class="p">:</span>
 
@@ -676,11 +676,11 @@
             <span class="n">k</span> <span class="o">+=</span> <span class="mf">1.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span>
 
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Armijo rule took </span><span class="si">%d</span><span class="s2"> iterations to find step size&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Armijo rule took </span><span class="si">%d</span><span class="s2"> iterations to find step size"</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s1">&#39;Could not find a proper step_size in </span><span class="si">{}</span><span class="s1"> loops. Consider increasing alpha or max_iterations.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span><span class="p">))</span>
+                <span class="s1">'Could not find a proper step_size in </span><span class="si">{}</span><span class="s1"> loops. Consider increasing alpha or max_iterations.'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span></div>
 </div>
@@ -691,7 +691,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BarzilaiBorweinStepSizeRule</span><span class="p">(</span><span class="n">StepSizeRule</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Applies the Barzilai- Borwein rule to calculate the step size (step_size).</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">""" Applies the Barzilai- Borwein rule to calculate the step size (step_size).</span>
 
 <span class="sd">    Let :math:`\Delta x=x_k-x_{k-1}` and :math:`\Delta g=g_k-g_{k-1}`. Where :math:`x_k` is the :math:`k` th iterate (current solution after iteration :math:`k` ) and :math:`g_k` is the gradient calculation in the :math:`k` th iterate, found in :code:`algorithm.gradient_update`.  A Barzilai-Borwein (BB) iteration is :math:`x_{k+1}=x_k-\alpha_kg_k` where the step size :math:`\alpha _k` is either</span>
 
@@ -707,46 +707,46 @@
 <span class="sd">    ----------</span>
 <span class="sd">    initial: float, greater than zero</span>
 <span class="sd">        The step-size for the first iteration. We recommend something of the order :math:`1/f.L` where :math:`f` is the (differentiable part of) the objective you wish to minimise.</span>
-<span class="sd">    mode: One of &#39;long&#39;, &#39;short&#39; or &#39;alternate&#39;, default is &#39;short&#39;.</span>
+<span class="sd">    mode: One of 'long', 'short' or 'alternate', default is 'short'.</span>
 <span class="sd">        This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short.</span>
-<span class="sd">    stabilisation_param: &#39;auto&#39;, float or &#39;off&#39;, default is &#39;auto&#39;</span>
-<span class="sd">        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` where by &#39;default&#39;, the `stabilisation_param`, :math:`\Delta` is  determined automatically to be the minimium of :math:`\Delta x` from the first 3 iterations. The user can also pass a fixed constant or turn &quot;off&quot; the stabilisation, equivalently passing `np.inf`.</span>
+<span class="sd">    stabilisation_param: 'auto', float or 'off', default is 'auto'</span>
+<span class="sd">        In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` where by 'default', the `stabilisation_param`, :math:`\Delta` is  determined automatically to be the minimium of :math:`\Delta x` from the first 3 iterations. The user can also pass a fixed constant or turn "off" the stabilisation, equivalently passing `np.inf`.</span>
 
 
 <span class="sd">    Reference</span>
 <span class="sd">    ---------</span>
-<span class="sd">    - Barzilai, Jonathan; Borwein, Jonathan M. (1988). &quot;Two-Point Step Size Gradient Methods&quot;. IMA Journal of Numerical Analysis. 8: 141–148, https://doi.org/10.1093/imanum/8.1.141</span>
+<span class="sd">    - Barzilai, Jonathan; Borwein, Jonathan M. (1988). "Two-Point Step Size Gradient Methods". IMA Journal of Numerical Analysis. 8: 141–148, https://doi.org/10.1093/imanum/8.1.141</span>
 
 <span class="sd">    - Burdakov, O., Dai, Y. and Huang, N., 2019. STABILIZED BARZILAI-BORWEIN METHOD. Journal of Computational Mathematics, 37(6). https://doi.org/10.4208/jcm.1911-m2019-0171</span>
 
 <span class="sd">    - https://en.wikipedia.org/wiki/Barzilai-Borwein_method</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="n">stabilisation_param</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Initialises the step size rule</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'short'</span><span class="p">,</span> <span class="n">stabilisation_param</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">'''Initialises the step size rule</span>
+<span class="sd">        '''</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;short&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">'short'</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">is_short</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;long&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;alternate&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">'long'</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">'alternate'</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">is_short</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Mode should be chosen from &quot;long&quot;, &quot;short&quot; or &quot;alternate&quot;. &#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Mode should be chosen from "long", "short" or "alternate". '</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">store_grad</span><span class="o">=</span><span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="o">=</span><span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span>
-        <span class="k">if</span> <span class="n">stabilisation_param</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">stabilisation_param</span> <span class="o">==</span> <span class="s1">'auto'</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">adaptive</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">stabilisation_param</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
-        <span class="k">elif</span> <span class="n">stabilisation_param</span> <span class="o">==</span> <span class="s2">&quot;off&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">stabilisation_param</span> <span class="o">==</span> <span class="s2">"off"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">adaptive</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">stabilisation_param</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
         <span class="k">elif</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stabilisation_param</span><span class="p">,</span> <span class="n">Number</span><span class="p">)</span> <span class="ow">and</span> <span class="n">stabilisation_param</span> <span class="o">&gt;=</span><span class="mi">0</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">adaptive</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot; The stabilisation_param should be &#39;auto&#39;, a positive number or &#39;off&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">" The stabilisation_param should be 'auto', a positive number or 'off'"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stabilisation_param</span><span class="o">=</span><span class="n">stabilisation_param</span>
 
 
@@ -754,14 +754,14 @@
 <div class="viewcode-block" id="BarzilaiBorweinStepSizeRule.get_step_size">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule.get_step_size">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Applies the B-B rule to calculate the step size (`step_size`)</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
 <span class="sd">        the calculated step size:float</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1">#For the first iteration we use an initial step size because the BB step size requires a previous iterate.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="o">=</span><span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c1"># We store the last iterate in order to calculate the BB step size</span>
@@ -792,7 +792,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">store_x</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">store_grad</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">gradient_update</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;alternate&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">"alternate"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">is_short</span> <span class="o">=</span>  <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_short</span>
 
         <span class="k">return</span> <span class="n">ret</span></div>
@@ -827,8 +827,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

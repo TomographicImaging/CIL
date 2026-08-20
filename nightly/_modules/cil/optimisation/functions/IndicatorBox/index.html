@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.functions.IndicatorBox &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.optimisation.functions.IndicatorBox &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/functions/IndicatorBox';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2019 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -546,7 +546,7 @@
 <div class="viewcode-block" id="IndicatorBox">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.IndicatorBox">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IndicatorBox</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Indicator function for box constraint</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">'''Indicator function for box constraint</span>
 
 <span class="sd">      .. math::</span>
 
@@ -605,18 +605,18 @@
 <span class="sd">        num_threads = 4</span>
 <span class="sd">        ib = IndicatorBox(lower=0, upper=1)</span>
 <span class="sd">        ib.set_num_threads(num_threads)</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">accelerated</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">accelerated</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Numba backend is used.&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Numba backend is used."</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">IndicatorBox</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">IndicatorBox_numba</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Numpy backend is used.&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Numpy backend is used."</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">IndicatorBox</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">IndicatorBox_numpy</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">accelerated</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;__init__&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''__init__'''</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">IndicatorBox</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="c1"># We set lower and upper to either a float or a numpy array</span>
@@ -640,20 +640,20 @@
 <div class="viewcode-block" id="IndicatorBox.set_suppress_evaluation">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.IndicatorBox.set_suppress_evaluation">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_suppress_evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Suppresses the evaluation of the function</span>
+<span class="w">        </span><span class="sd">'''Suppresses the evaluation of the function</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        value : bool</span>
 <span class="sd">            If True, the function evaluation on any input will return 0, without calculation.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Value must be boolean&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Value must be boolean'</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_suppress_evaluation</span> <span class="o">=</span> <span class="n">value</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Evaluates IndicatorBox at x</span>
+<span class="w">        </span><span class="sd">'''Evaluates IndicatorBox at x</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -661,7 +661,7 @@
 <span class="sd">            x : DataContainer</span>
 
 <span class="sd">        Evaluates the IndicatorBox at x. If ``suppress_evaluation`` is ``True``, returns 0.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppress_evaluation</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="mf">0.0</span>
@@ -669,7 +669,7 @@
 <div class="viewcode-block" id="IndicatorBox.proximal">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.IndicatorBox.proximal">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;Proximal operator of IndicatorBox at x</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">'''Proximal operator of IndicatorBox at x</span>
 
 <span class="sd">        .. math:: prox_{\tau * f}(x)</span>
 
@@ -686,7 +686,7 @@
 <span class="sd">        ----</span>
 
 <span class="sd">            ``tau`` is ignored but it is in the signature of the generic Function class</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -703,26 +703,26 @@
 <div class="viewcode-block" id="IndicatorBox.gradient">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.IndicatorBox.gradient">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;IndicatorBox is not differentiable, so calling gradient will raise a ``ValueError``&#39;&#39;&#39;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;The IndicatorBox is not differentiable&#39;</span><span class="p">)</span></div>
+<span class="w">        </span><span class="sd">'''IndicatorBox is not differentiable, so calling gradient will raise a ``ValueError``'''</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'The IndicatorBox is not differentiable'</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outarr</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Implement this in the derived class&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Implement this in the derived class'</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">num_threads</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Get the optional number of threads parameter to use for the accelerated version.</span>
+<span class="w">        </span><span class="sd">'''Get the optional number of threads parameter to use for the accelerated version.</span>
 
-<span class="sd">        Defaults to the value set in the CIL multiprocessing module.&#39;&#39;&#39;</span>
+<span class="sd">        Defaults to the value set in the CIL multiprocessing module.'''</span>
         <span class="k">return</span> <span class="n">cil_mp</span><span class="o">.</span><span class="n">NUM_THREADS</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_threads</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_threads</span>
 
 <div class="viewcode-block" id="IndicatorBox.set_num_threads">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.IndicatorBox.set_num_threads">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_num_threads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Set the optional number of threads parameter to use for the accelerated version.</span>
+<span class="w">        </span><span class="sd">'''Set the optional number of threads parameter to use for the accelerated version.</span>
 
-<span class="sd">        This is discarded if ``accelerated=False``.&#39;&#39;&#39;</span>
+<span class="sd">        This is discarded if ``accelerated=False``.'''</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_threads</span> <span class="o">=</span> <span class="n">value</span></div>
 </div>
 
@@ -731,7 +731,7 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">IndicatorBox_numba</span><span class="p">(</span><span class="n">IndicatorBox</span><span class="p">):</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Evaluates IndicatorBox at x&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Evaluates IndicatorBox at x'''</span>
         <span class="c1"># set the number of threads to the number of threads defined by the user</span>
         <span class="c1"># or default to what set in the CIL multiprocessing module</span>
         <span class="n">num_threads</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">get_num_threads</span><span class="p">()</span>
@@ -765,7 +765,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="n">breaking</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Convex conjugate of IndicatorBox at x&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Convex conjugate of IndicatorBox at x'''</span>
         <span class="c1"># set the number of threads to the number of threads defined by the user</span>
         <span class="c1"># or default to what set in the CIL multiprocessing module</span>
         <span class="n">num_threads</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">get_num_threads</span><span class="p">()</span>
@@ -809,7 +809,7 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">IndicatorBox_numpy</span><span class="p">(</span><span class="n">IndicatorBox</span><span class="p">):</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Evaluates IndicatorBox at x&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Evaluates IndicatorBox at x'''</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower</span><span class="p">)</span>
                 <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper</span><span class="p">)):</span>
@@ -819,7 +819,7 @@
         <span class="k">return</span> <span class="n">val</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Convex conjugate of IndicatorBox at x&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''Convex conjugate of IndicatorBox at x'''</span>
         <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outarr</span><span class="p">):</span>
@@ -831,19 +831,19 @@
 
 <span class="c1">## Utilities</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_as_nparray_or_number</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns x as a numpy array or a number&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Returns x as a numpy array or a number'''</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="c1"># In this case we trust that it will be either a numpy ndarray</span>
         <span class="c1"># or a number as described in the docstring</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Assuming that x is a numpy array or a number&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'Assuming that x is a numpy array or a number'</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">x</span>
 
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_array_within_limits_ff</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">breaking</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns 0 if all elements of x are within [lower, upper]&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Returns 0 if all elements of x are within [lower, upper]'''</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
         <span class="n">j</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">ufunc</span><span class="o">.</span><span class="n">parallel</span><span class="o">.</span><span class="n">_get_thread_id</span><span class="p">()</span>
@@ -854,9 +854,9 @@
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_array_within_limits_af</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">breaking</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns 0 if all elements of x are within [lower, upper]&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Returns 0 if all elements of x are within [lower, upper]'''</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">lower</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x and lower must have the same size&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'x and lower must have the same size'</span><span class="p">)</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">loarr</span> <span class="o">=</span> <span class="n">lower</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
@@ -868,9 +868,9 @@
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_array_within_limits_aa</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">breaking</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns 0 if all elements of x are within [lower, upper]&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Returns 0 if all elements of x are within [lower, upper]'''</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">lower</span><span class="o">.</span><span class="n">size</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">upper</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x, lower and upper must have the same size&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'x, lower and upper must have the same size'</span><span class="p">)</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">uparr</span> <span class="o">=</span> <span class="n">upper</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">loarr</span> <span class="o">=</span> <span class="n">lower</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
@@ -883,9 +883,9 @@
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_array_within_limits_fa</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">breaking</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns 0 if all elements of x are within [lower, upper]&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Returns 0 if all elements of x are within [lower, upper]'''</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">upper</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x and upper must have the same size&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'x and upper must have the same size'</span><span class="p">)</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">uparr</span> <span class="o">=</span> <span class="n">upper</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
@@ -900,9 +900,9 @@
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_proximal_aa</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Slightly faster than using np.clip&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Slightly faster than using np.clip'''</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">lower</span><span class="o">.</span><span class="n">size</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">upper</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x, lower and upper must have the same size&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'x, lower and upper must have the same size'</span><span class="p">)</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">loarr</span> <span class="o">=</span> <span class="n">lower</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">uparr</span> <span class="o">=</span> <span class="n">upper</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
@@ -915,9 +915,9 @@
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_proximal_af</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Slightly faster than using np.clip&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Slightly faster than using np.clip'''</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">lower</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x, lower and upper must have the same size&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'x, lower and upper must have the same size'</span><span class="p">)</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">loarr</span> <span class="o">=</span> <span class="n">lower</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
@@ -929,9 +929,9 @@
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_proximal_fa</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Slightly faster than using np.clip&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Slightly faster than using np.clip'''</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">upper</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x, lower and upper must have the same size&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'x, lower and upper must have the same size'</span><span class="p">)</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">uparr</span> <span class="o">=</span> <span class="n">upper</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
@@ -943,9 +943,9 @@
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_proximal_na</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Slightly faster than using np.clip&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Slightly faster than using np.clip'''</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">upper</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x and upper must have the same size&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'x and upper must have the same size'</span><span class="p">)</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">uparr</span> <span class="o">=</span> <span class="n">upper</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
@@ -955,9 +955,9 @@
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_proximal_an</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lower</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Slightly faster than using np.clip&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''Slightly faster than using np.clip'''</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">lower</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x and lower must have the same size&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'x and lower must have the same size'</span><span class="p">)</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">loarr</span> <span class="o">=</span> <span class="n">lower</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
@@ -967,10 +967,10 @@
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_convex_conjugate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">acc</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Convex conjugate of IndicatorBox</span>
+<span class="w">    </span><span class="sd">'''Convex conjugate of IndicatorBox</span>
 
 <span class="sd">    im.maximum(0).sum()</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
@@ -1007,8 +1007,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

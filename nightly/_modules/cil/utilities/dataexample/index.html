@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.utilities.dataexample &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.utilities.dataexample &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/utilities/dataexample';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -522,14 +522,14 @@
 <span></span><span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2019 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -555,23 +555,23 @@
         <span class="k">return</span> <span class="kc">None</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">CILDATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
-    <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;share&#39;</span><span class="p">,</span><span class="s1">&#39;cil&#39;</span><span class="p">))</span>
+    <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">'share'</span><span class="p">,</span><span class="s1">'cil'</span><span class="p">))</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data_dir'</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">TestData</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">ddir</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">dfile</span><span class="p">(),</span> <span class="n">size</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">REMOTEDATA</span><span class="p">(</span><span class="n">DATA</span><span class="p">):</span>
-    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-    <span class="n">ZENODO_RECORD</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-    <span class="n">ZIP_FILE</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-    <span class="n">CIL_DATA_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CIL_DATA_DIR&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">''</span>
+    <span class="n">ZENODO_RECORD</span> <span class="o">=</span> <span class="s1">''</span>
+    <span class="n">ZIP_FILE</span> <span class="o">=</span> <span class="s1">''</span>
+    <span class="n">CIL_DATA_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"CIL_DATA_DIR"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">assert_dir</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">data_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s2">&quot;data_dir must be specified&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s2">"data_dir must be specified"</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">CIL_DATA_DIR</span><span class="p">):</span>
@@ -579,7 +579,7 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">download_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">CIL_DATA_DIR</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Download a dataset from a remote repository</span>
 
 <span class="sd">        Parameters</span>
@@ -587,23 +587,23 @@
 <span class="sd">        data_dir: str</span>
 <span class="sd">           The path to the data directory where the downloaded data should be stored.</span>
 <span class="sd">           If unspecified, tries to use the CIL_DATA_DIR environment variable.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">assert_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">)):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset folder already exists in </span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Dataset folder already exists in </span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">user_input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Are you sure you want to download </span><span class="si">{cls.ZIP_FILE}</span><span class="s2"> dataset from Zenodo record </span><span class="si">{cls.ZENODO_RECORD}</span><span class="s2">? [Y/n]: &quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">prompt</span> <span class="k">else</span> <span class="s1">&#39;y&#39;</span>
-            <span class="k">if</span> <span class="n">user_input</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Download cancelled&#39;</span><span class="p">)</span>
+            <span class="n">user_input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">"Are you sure you want to download </span><span class="si">{cls.ZIP_FILE}</span><span class="s2"> dataset from Zenodo record </span><span class="si">{cls.ZENODO_RECORD}</span><span class="s2">? [Y/n]: "</span><span class="p">)</span> <span class="k">if</span> <span class="n">prompt</span> <span class="k">else</span> <span class="s1">'y'</span>
+            <span class="k">if</span> <span class="n">user_input</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'y'</span><span class="p">,</span> <span class="s1">'yes'</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">'Download cancelled'</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
             <span class="kn">from</span><span class="w"> </span><span class="nn">zenodo_get</span><span class="w"> </span><span class="kn">import</span> <span class="n">zenodo_get</span>
-            <span class="n">zenodo_get</span><span class="p">([</span><span class="bp">cls</span><span class="o">.</span><span class="n">ZENODO_RECORD</span><span class="p">,</span> <span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ZIP_FILE</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">])</span>
-            <span class="k">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ZIP_FILE</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
+            <span class="n">zenodo_get</span><span class="p">([</span><span class="bp">cls</span><span class="o">.</span><span class="n">ZENODO_RECORD</span><span class="p">,</span> <span class="s1">'-g'</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ZIP_FILE</span><span class="p">,</span> <span class="s1">'-o'</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">])</span>
+            <span class="k">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ZIP_FILE</span><span class="p">),</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
                 <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">))</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ZIP_FILE</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;md5sums.txt&#39;</span><span class="p">)):</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;md5sums.txt&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">'md5sums.txt'</span><span class="p">)):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">'md5sums.txt'</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">True</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">BOAT</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
@@ -641,7 +641,7 @@
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        A DLS dataset</span>
 
 <span class="sd">        Parameters</span>
@@ -653,11 +653,11 @@
 <span class="sd">        -------</span>
 <span class="sd">        AcquisitionData</span>
 <span class="sd">            The DLS dataset</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
 
-        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data_dir'</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">NEXUSDataReader</span><span class="p">()</span>
-        <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">&#39;24737_fd_normalised.nxs&#39;</span><span class="p">))</span>
+        <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">'24737_fd_normalised.nxs'</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
 </div>
 
@@ -668,7 +668,7 @@
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_PARALLEL_BEAM_DATA.get">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME</span>
 
 <span class="sd">        Parameters</span>
@@ -680,11 +680,11 @@
 <span class="sd">        -------</span>
 <span class="sd">        AcquisitionData</span>
 <span class="sd">            The simulated spheres dataset</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
 
-        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data_dir'</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">NEXUSDataReader</span><span class="p">()</span>
-        <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">&#39;sim_parallel_beam.nxs&#39;</span><span class="p">))</span>
+        <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">'sim_parallel_beam.nxs'</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
 </div>
 
@@ -695,7 +695,7 @@
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SIMULATED_CONE_BEAM_DATA.get">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME</span>
 
 <span class="sd">        Parameters</span>
@@ -707,18 +707,18 @@
 <span class="sd">        -------</span>
 <span class="sd">        AcquisitionData</span>
 <span class="sd">            The simulated spheres dataset</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
 
-        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data_dir'</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">NEXUSDataReader</span><span class="p">()</span>
-        <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">&#39;sim_cone_beam.nxs&#39;</span><span class="p">))</span>
+        <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">'sim_cone_beam.nxs'</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
 </div>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">SIMULATED_SPHERE_VOLUME</span><span class="p">(</span><span class="n">CILDATA</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        A simulated volume of spheres</span>
 
 <span class="sd">        Parameters</span>
@@ -730,33 +730,33 @@
 <span class="sd">        -------</span>
 <span class="sd">        ImageData</span>
 <span class="sd">            The simulated spheres volume</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+<span class="sd">        '''</span>
+        <span class="n">ddir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data_dir'</span><span class="p">,</span> <span class="n">CILDATA</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">NEXUSDataReader</span><span class="p">()</span>
-        <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">&#39;sim_volume.nxs&#39;</span><span class="p">))</span>
+        <span class="n">loader</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">ddir</span><span class="p">),</span> <span class="s1">'sim_volume.nxs'</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
 <div class="viewcode-block" id="WALNUT">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.WALNUT">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">WALNUT</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''</span>
 <span class="sd">    A microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; data_dir = &#39;my_PC/data_folder&#39;</span>
+<span class="sd">    &gt;&gt;&gt; data_dir = 'my_PC/data_folder'</span>
 <span class="sd">    &gt;&gt;&gt; dataexample.WALNUT.download_data(data_dir) # download the data</span>
 <span class="sd">    &gt;&gt;&gt; dataexample.WALNUT.get(data_dir) # load the data</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">&#39;walnut&#39;</span>
-    <span class="n">ZENODO_RECORD</span> <span class="o">=</span> <span class="s1">&#39;4822516&#39;</span>
-    <span class="n">ZIP_FILE</span> <span class="o">=</span> <span class="s1">&#39;walnut.zip&#39;</span>
+<span class="sd">    '''</span>
+    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">'walnut'</span>
+    <span class="n">ZENODO_RECORD</span> <span class="o">=</span> <span class="s1">'4822516'</span>
+    <span class="n">ZIP_FILE</span> <span class="o">=</span> <span class="s1">'walnut.zip'</span>
 
 <div class="viewcode-block" id="WALNUT.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.WALNUT.get">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">REMOTEDATA</span><span class="o">.</span><span class="n">CIL_DATA_DIR</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Get the microcomputed tomography dataset of a walnut from https://zenodo.org/records/4822516</span>
 <span class="sd">        This function returns the raw projection data from the .txrm file</span>
 
@@ -769,39 +769,39 @@
 <span class="sd">        -------</span>
 <span class="sd">        ImageData</span>
 <span class="sd">            The walnut dataset</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">assert_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
-        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">,</span> <span class="s1">&#39;valnut&#39;</span><span class="p">,</span><span class="s1">&#39;valnut_2014-03-21_643_28&#39;</span><span class="p">,</span><span class="s1">&#39;tomo-A&#39;</span><span class="p">,</span><span class="s1">&#39;valnut_tomo-A.txrm&#39;</span><span class="p">)</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">,</span> <span class="s1">'valnut'</span><span class="p">,</span><span class="s1">'valnut_2014-03-21_643_28'</span><span class="p">,</span><span class="s1">'tomo-A'</span><span class="p">,</span><span class="s1">'valnut_tomo-A.txrm'</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">loader</span> <span class="o">=</span> <span class="n">ZEISSDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">filepath</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="k">except</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">):</span>
-            <span class="k">raise</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Dataset .txrm file not found in specifed data_dir: </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
-<span class="s2">                                    Specify a different data_dir or download data with dataexample.</span><span class="si">{}</span><span class="s2">.download_data(data_dir)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)))</span></div>
+            <span class="k">raise</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">"Dataset .txrm file not found in specifed data_dir: </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">                                    Specify a different data_dir or download data with dataexample.</span><span class="si">{}</span><span class="s2">.download_data(data_dir)"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)))</span></div>
 </div>
 
 
 <div class="viewcode-block" id="USB">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.USB">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">USB</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''</span>
 <span class="sd">    A microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; data_dir = &#39;my_PC/data_folder&#39;</span>
+<span class="sd">    &gt;&gt;&gt; data_dir = 'my_PC/data_folder'</span>
 <span class="sd">    &gt;&gt;&gt; dataexample.USB.download_data(data_dir) # download the data</span>
 <span class="sd">    &gt;&gt;&gt; dataexample.USB.get(data_dir) # load the data</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">&#39;USB&#39;</span>
-    <span class="n">ZENODO_RECORD</span> <span class="o">=</span> <span class="s1">&#39;4822516&#39;</span>
-    <span class="n">ZIP_FILE</span> <span class="o">=</span> <span class="s1">&#39;usb.zip&#39;</span>
+<span class="sd">    '''</span>
+    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">'USB'</span>
+    <span class="n">ZENODO_RECORD</span> <span class="o">=</span> <span class="s1">'4822516'</span>
+    <span class="n">ZIP_FILE</span> <span class="o">=</span> <span class="s1">'usb.zip'</span>
 
 <div class="viewcode-block" id="USB.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.USB.get">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">REMOTEDATA</span><span class="o">.</span><span class="n">CIL_DATA_DIR</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Get the microcomputed tomography dataset of a usb memory stick from https://zenodo.org/records/4822516</span>
 <span class="sd">        This function returns the raw projection data from the .txrm file</span>
 
@@ -814,39 +814,39 @@
 <span class="sd">        -------</span>
 <span class="sd">        ImageData</span>
 <span class="sd">            The usb dataset</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">assert_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
-        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">,</span> <span class="s1">&#39;gruppe 4&#39;</span><span class="p">,</span><span class="s1">&#39;gruppe 4_2014-03-20_1404_12&#39;</span><span class="p">,</span><span class="s1">&#39;tomo-A&#39;</span><span class="p">,</span><span class="s1">&#39;gruppe 4_tomo-A.txrm&#39;</span><span class="p">)</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">,</span> <span class="s1">'gruppe 4'</span><span class="p">,</span><span class="s1">'gruppe 4_2014-03-20_1404_12'</span><span class="p">,</span><span class="s1">'tomo-A'</span><span class="p">,</span><span class="s1">'gruppe 4_tomo-A.txrm'</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">loader</span> <span class="o">=</span> <span class="n">ZEISSDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">filepath</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="k">except</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">):</span>
-            <span class="k">raise</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Dataset .txrm file not found in: </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
-<span class="s2">                                    Specify a different data_dir or download data with dataexample.</span><span class="si">{}</span><span class="s2">.download_data(data_dir)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)))</span></div>
+            <span class="k">raise</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">"Dataset .txrm file not found in: </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">                                    Specify a different data_dir or download data with dataexample.</span><span class="si">{}</span><span class="s2">.download_data(data_dir)"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)))</span></div>
 </div>
 
 
 <div class="viewcode-block" id="KORN">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.KORN">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KORN</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''</span>
 <span class="sd">    A microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; data_dir = &#39;my_PC/data_folder&#39;</span>
+<span class="sd">    &gt;&gt;&gt; data_dir = 'my_PC/data_folder'</span>
 <span class="sd">    &gt;&gt;&gt; dataexample.KORN.download_data(data_dir) # download the data</span>
 <span class="sd">    &gt;&gt;&gt; dataexample.KORN.get(data_dir) # load the data</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">&#39;korn&#39;</span>
-    <span class="n">ZENODO_RECORD</span> <span class="o">=</span> <span class="s1">&#39;6874123&#39;</span>
-    <span class="n">ZIP_FILE</span> <span class="o">=</span> <span class="s1">&#39;korn.zip&#39;</span>
+<span class="sd">    '''</span>
+    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">'korn'</span>
+    <span class="n">ZENODO_RECORD</span> <span class="o">=</span> <span class="s1">'6874123'</span>
+    <span class="n">ZIP_FILE</span> <span class="o">=</span> <span class="s1">'korn.zip'</span>
 
 <div class="viewcode-block" id="KORN.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.KORN.get">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">REMOTEDATA</span><span class="o">.</span><span class="n">CIL_DATA_DIR</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Get the microcomputed tomography dataset of a sunflower seeds in a box from https://zenodo.org/records/6874123</span>
 <span class="sd">        This function returns the raw projection data from the .xtekct file</span>
 
@@ -860,15 +860,15 @@
 <span class="sd">        ImageData</span>
 <span class="sd">            The korn dataset</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">assert_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
-        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">,</span> <span class="s1">&#39;Korn i kasse&#39;</span><span class="p">,</span><span class="s1">&#39;47209 testscan korn01_recon.xtekct&#39;</span><span class="p">)</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FOLDER</span><span class="p">,</span> <span class="s1">'Korn i kasse'</span><span class="p">,</span><span class="s1">'47209 testscan korn01_recon.xtekct'</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">loader</span> <span class="o">=</span> <span class="n">NikonDataReader</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">filepath</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="k">except</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">):</span>
-            <span class="k">raise</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Dataset .xtekct file not found in: </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
-<span class="s2">                                    Specify a different data_dir or download data with dataexample.</span><span class="si">{}</span><span class="s2">.download_data(data_dir)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)))</span></div>
+            <span class="k">raise</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">"Dataset .xtekct file not found in: </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">                                    Specify a different data_dir or download data with dataexample.</span><span class="si">{}</span><span class="s2">.download_data(data_dir)"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)))</span></div>
 </div>
 
 
@@ -876,25 +876,25 @@
 <div class="viewcode-block" id="SANDSTONE">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SANDSTONE">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SANDSTONE</span><span class="p">(</span><span class="n">REMOTEDATA</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''</span>
 <span class="sd">    A synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435</span>
 <span class="sd">    A small subset of the data containing selected projections and 4 slices of the reconstruction</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; data_dir = &#39;my_PC/data_folder&#39;</span>
+<span class="sd">    &gt;&gt;&gt; data_dir = 'my_PC/data_folder'</span>
 <span class="sd">    &gt;&gt;&gt; dataexample.SANDSTONE.download_data(data_dir) # download the data</span>
 <span class="sd">    &gt;&gt;&gt; dataexample.SANDSTONE.get(data_dir) # load the data</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">&#39;sandstone&#39;</span>
-    <span class="n">ZENODO_RECORD</span> <span class="o">=</span> <span class="s1">&#39;4912435&#39;</span>
-    <span class="n">ZIP_FILE</span> <span class="o">=</span> <span class="s1">&#39;small.zip&#39;</span>
+<span class="sd">    '''</span>
+    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s1">'sandstone'</span>
+    <span class="n">ZENODO_RECORD</span> <span class="o">=</span> <span class="s1">'4912435'</span>
+    <span class="n">ZIP_FILE</span> <span class="o">=</span> <span class="s1">'small.zip'</span>
 
 <div class="viewcode-block" id="SANDSTONE.get">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.SANDSTONE.get">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">REMOTEDATA</span><span class="o">.</span><span class="n">CIL_DATA_DIR</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Get the synchrotron x-ray tomography dataset of sandstone from https://zenodo.org/records/4912435</span>
 <span class="sd">        A small subset of the data containing selected projections and 4 slices of the reconstruction</span>
 <span class="sd">        Parameters</span>
@@ -909,14 +909,14 @@
 <span class="sd">        -------</span>
 <span class="sd">        ImageData</span>
 <span class="sd">            The selected sandstone dataset</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">assert_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;filename must be specified&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">"filename must be specified"</span><span class="p">)</span>
         <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;.mat&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">'.mat'</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">loadmat</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span><span class="n">filename</span><span class="p">))</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown extension: </span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown extension: </span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 </div>
 
 
@@ -924,24 +924,24 @@
 <div class="viewcode-block" id="TestData">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TestData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Class to return test data</span>
+<span class="w">    </span><span class="sd">'''Class to return test data</span>
 
 <span class="sd">    provides 6 dataset:</span>
-<span class="sd">    BOAT = &#39;boat.tiff&#39;</span>
-<span class="sd">    CAMERA = &#39;camera.png&#39;</span>
-<span class="sd">    PEPPERS = &#39;peppers.tiff&#39;</span>
-<span class="sd">    RESOLUTION_CHART = &#39;resolution_chart.tiff&#39;</span>
-<span class="sd">    SIMPLE_PHANTOM_2D = &#39;hotdog&#39;</span>
-<span class="sd">    SHAPES =  &#39;shapes.png&#39;</span>
-<span class="sd">    RAINBOW = &#39;rainbow.png&#39;</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">BOAT</span> <span class="o">=</span> <span class="s1">&#39;boat.tiff&#39;</span>
-    <span class="n">CAMERA</span> <span class="o">=</span> <span class="s1">&#39;camera.png&#39;</span>
-    <span class="n">PEPPERS</span> <span class="o">=</span> <span class="s1">&#39;peppers.tiff&#39;</span>
-    <span class="n">RESOLUTION_CHART</span> <span class="o">=</span> <span class="s1">&#39;resolution_chart.tiff&#39;</span>
-    <span class="n">SIMPLE_PHANTOM_2D</span> <span class="o">=</span> <span class="s1">&#39;hotdog&#39;</span>
-    <span class="n">SHAPES</span> <span class="o">=</span>  <span class="s1">&#39;shapes.png&#39;</span>
-    <span class="n">RAINBOW</span> <span class="o">=</span>  <span class="s1">&#39;rainbow.png&#39;</span>
+<span class="sd">    BOAT = 'boat.tiff'</span>
+<span class="sd">    CAMERA = 'camera.png'</span>
+<span class="sd">    PEPPERS = 'peppers.tiff'</span>
+<span class="sd">    RESOLUTION_CHART = 'resolution_chart.tiff'</span>
+<span class="sd">    SIMPLE_PHANTOM_2D = 'hotdog'</span>
+<span class="sd">    SHAPES =  'shapes.png'</span>
+<span class="sd">    RAINBOW = 'rainbow.png'</span>
+<span class="sd">    '''</span>
+    <span class="n">BOAT</span> <span class="o">=</span> <span class="s1">'boat.tiff'</span>
+    <span class="n">CAMERA</span> <span class="o">=</span> <span class="s1">'camera.png'</span>
+    <span class="n">PEPPERS</span> <span class="o">=</span> <span class="s1">'peppers.tiff'</span>
+    <span class="n">RESOLUTION_CHART</span> <span class="o">=</span> <span class="s1">'resolution_chart.tiff'</span>
+    <span class="n">SIMPLE_PHANTOM_2D</span> <span class="o">=</span> <span class="s1">'hotdog'</span>
+    <span class="n">SHAPES</span> <span class="o">=</span>  <span class="s1">'shapes.png'</span>
+    <span class="n">RAINBOW</span> <span class="o">=</span>  <span class="s1">'rainbow.png'</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
@@ -949,7 +949,7 @@
 <div class="viewcode-block" id="TestData.load">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData.load">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Return a test data of the requested image</span>
 
 <span class="sd">        Parameters</span>
@@ -965,12 +965,12 @@
 <span class="sd">        -------</span>
 <span class="sd">        ImageData</span>
 <span class="sd">            The simulated spheres volume</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="k">if</span> <span class="n">which</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">TestData</span><span class="o">.</span><span class="n">BOAT</span><span class="p">,</span> <span class="n">TestData</span><span class="o">.</span><span class="n">CAMERA</span><span class="p">,</span>
                          <span class="n">TestData</span><span class="o">.</span><span class="n">PEPPERS</span><span class="p">,</span> <span class="n">TestData</span><span class="o">.</span><span class="n">RESOLUTION_CHART</span><span class="p">,</span>
                          <span class="n">TestData</span><span class="o">.</span><span class="n">SIMPLE_PHANTOM_2D</span><span class="p">,</span> <span class="n">TestData</span><span class="o">.</span><span class="n">SHAPES</span><span class="p">,</span>
                          <span class="n">TestData</span><span class="o">.</span><span class="n">RAINBOW</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown TestData </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">which</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Unknown TestData </span><span class="si">{}</span><span class="s1">.'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">which</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">which</span> <span class="o">==</span> <span class="n">TestData</span><span class="o">.</span><span class="n">SIMPLE_PHANTOM_2D</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">N</span> <span class="o">=</span> <span class="mi">512</span>
@@ -999,7 +999,7 @@
 
                 <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span> <span class="o">=</span> <span class="n">M</span><span class="p">,</span> <span class="n">voxel_num_y</span> <span class="o">=</span> <span class="n">N</span><span class="p">,</span> <span class="n">dimension_labels</span><span class="o">=</span><span class="p">[</span><span class="n">ImageDimension</span><span class="o">.</span><span class="n">HORIZONTAL_Y</span><span class="p">,</span> <span class="n">ImageDimension</span><span class="o">.</span><span class="n">HORIZONTAL_X</span><span class="p">])</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
-                <span class="n">tmp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">M</span><span class="p">,</span><span class="n">N</span><span class="p">)))</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">'L'</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">M</span><span class="p">,</span><span class="n">N</span><span class="p">)))</span>
                 <span class="n">data</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp</span><span class="o">/</span><span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -1015,7 +1015,7 @@
                 <span class="n">bands</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">getbands</span><span class="p">()</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
-                        <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+                        <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">'RGB'</span><span class="p">)</span>
                         <span class="n">bands</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">getbands</span><span class="p">()</span>
 
                     <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">voxel_num_x</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">voxel_num_y</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">),</span>
@@ -1039,15 +1039,15 @@
                     <span class="c1">#data = (data-dmin)/(dmax-dmin) * (scale[1]-scale[0]) +scale[0])</span>
                     <span class="n">data</span> <span class="o">*=</span> <span class="p">(</span><span class="n">scale</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">scale</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="n">data</span> <span class="o">+=</span> <span class="n">scale</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="c1"># print (&quot;data.geometry&quot;, data.geometry)</span>
+        <span class="c1"># print ("data.geometry", data.geometry)</span>
         <span class="k">return</span> <span class="n">data</span></div>
 
 
 <div class="viewcode-block" id="TestData.random_noise">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData.random_noise">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Function to add noise to input image</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'gaussian'</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">'''Function to add noise to input image</span>
 
 <span class="sd">        :param image: input dataset, DataContainer of numpy.ndarray</span>
 <span class="sd">        :param mode: type of noise</span>
@@ -1055,8 +1055,8 @@
 <span class="sd">        :param clip: should clip the data.</span>
 <span class="sd">        See https://github.com/scikit-image/scikit-image/blob/master/skimage/util/noise.py</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">):</span>
+<span class="sd">        '''</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s1">'as_array'</span><span class="p">):</span>
             <span class="n">arr</span> <span class="o">=</span> <span class="n">TestData</span><span class="o">.</span><span class="n">scikit_random_noise</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="n">clip</span><span class="p">,</span>
                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1070,8 +1070,8 @@
 <div class="viewcode-block" id="TestData.scikit_random_noise">
 <a class="viewcode-back" href="../../../../utilities/#cil.utilities.dataexample.TestData.scikit_random_noise">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">scikit_random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scikit_random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'gaussian'</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Function to add random noise of various types to a floating-point image.</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1079,40 +1079,40 @@
 <span class="sd">            Input image data. Will be converted to float.</span>
 <span class="sd">        mode : str, optional</span>
 <span class="sd">            One of the following strings, selecting the type of noise to add:</span>
-<span class="sd">            - &#39;gaussian&#39;  Gaussian-distributed additive noise.</span>
-<span class="sd">            - &#39;localvar&#39;  Gaussian-distributed additive noise, with specified</span>
+<span class="sd">            - 'gaussian'  Gaussian-distributed additive noise.</span>
+<span class="sd">            - 'localvar'  Gaussian-distributed additive noise, with specified</span>
 <span class="sd">                        local variance at each point of `image`.</span>
-<span class="sd">            - &#39;poisson&#39;   Poisson-distributed noise generated from the data.</span>
-<span class="sd">            - &#39;salt&#39;      Replaces random pixels with 1.</span>
-<span class="sd">            - &#39;pepper&#39;    Replaces random pixels with 0 (for unsigned images) or</span>
+<span class="sd">            - 'poisson'   Poisson-distributed noise generated from the data.</span>
+<span class="sd">            - 'salt'      Replaces random pixels with 1.</span>
+<span class="sd">            - 'pepper'    Replaces random pixels with 0 (for unsigned images) or</span>
 <span class="sd">                        -1 (for signed images).</span>
-<span class="sd">            - &#39;s&amp;p&#39;       Replaces random pixels with either 1 or `low_val`, where</span>
+<span class="sd">            - 's&amp;p'       Replaces random pixels with either 1 or `low_val`, where</span>
 <span class="sd">                        `low_val` is 0 for unsigned images or -1 for signed</span>
 <span class="sd">                        images.</span>
-<span class="sd">            - &#39;speckle&#39;   Multiplicative noise using out = image + n*image, where</span>
+<span class="sd">            - 'speckle'   Multiplicative noise using out = image + n*image, where</span>
 <span class="sd">                        n is uniform noise with specified mean &amp; variance.</span>
 <span class="sd">        seed : int, optional</span>
 <span class="sd">            If provided, this will set the random seed before generating noise,</span>
 <span class="sd">            for valid pseudo-random comparisons.</span>
 <span class="sd">        clip : bool, optional</span>
 <span class="sd">            If True (default), the output will be clipped after noise applied</span>
-<span class="sd">            for modes `&#39;speckle&#39;`, `&#39;poisson&#39;`, and `&#39;gaussian&#39;`. This is</span>
+<span class="sd">            for modes `'speckle'`, `'poisson'`, and `'gaussian'`. This is</span>
 <span class="sd">            needed to maintain the proper image data range. If False, clipping</span>
 <span class="sd">            is not applied, and the output may extend beyond the range [-1, 1].</span>
 <span class="sd">        mean : float, optional</span>
-<span class="sd">            Mean of random distribution. Used in &#39;gaussian&#39; and &#39;speckle&#39;.</span>
+<span class="sd">            Mean of random distribution. Used in 'gaussian' and 'speckle'.</span>
 <span class="sd">            Default : 0.</span>
 <span class="sd">        var : float, optional</span>
-<span class="sd">            Variance of random distribution. Used in &#39;gaussian&#39; and &#39;speckle&#39;.</span>
+<span class="sd">            Variance of random distribution. Used in 'gaussian' and 'speckle'.</span>
 <span class="sd">            Note: variance = (standard deviation) ** 2. Default : 0.01</span>
 <span class="sd">        local_vars : ndarray, optional</span>
 <span class="sd">            Array of positive floats, same shape as `image`, defining the local</span>
-<span class="sd">            variance at every image point. Used in &#39;localvar&#39;.</span>
+<span class="sd">            variance at every image point. Used in 'localvar'.</span>
 <span class="sd">        amount : float, optional</span>
 <span class="sd">            Proportion of image pixels to replace with noise on range [0, 1].</span>
-<span class="sd">            Used in &#39;salt&#39;, &#39;pepper&#39;, and &#39;salt &amp; pepper&#39;. Default : 0.05</span>
+<span class="sd">            Used in 'salt', 'pepper', and 'salt &amp; pepper'. Default : 0.05</span>
 <span class="sd">        salt_vs_pepper : float, optional</span>
-<span class="sd">            Proportion of salt vs. pepper noise for &#39;s&amp;p&#39; on range [0, 1].</span>
+<span class="sd">            Proportion of salt vs. pepper noise for 's&amp;p' on range [0, 1].</span>
 <span class="sd">            Higher values represent more salt. Default : 0.5 (equal amounts)</span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1161,7 +1161,7 @@
 <span class="sd">            used to endorse or promote products derived from this software without</span>
 <span class="sd">            specific prior written permission.</span>
 
-<span class="sd">        THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS&#39;&#39; AND ANY EXPRESS OR</span>
+<span class="sd">        THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR</span>
 <span class="sd">        IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
 <span class="sd">        WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</span>
 <span class="sd">        DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,</span>
@@ -1173,7 +1173,7 @@
 <span class="sd">        IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <span class="sd">        POSSIBILITY OF SUCH DAMAGE.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
         <span class="c1"># Detect if a signed image was input</span>
@@ -1187,51 +1187,51 @@
             <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
 
         <span class="n">allowedtypes</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;gaussian&#39;</span><span class="p">:</span> <span class="s1">&#39;gaussian_values&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;localvar&#39;</span><span class="p">:</span> <span class="s1">&#39;localvar_values&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;poisson&#39;</span><span class="p">:</span> <span class="s1">&#39;poisson_values&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;salt&#39;</span><span class="p">:</span> <span class="s1">&#39;sp_values&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;pepper&#39;</span><span class="p">:</span> <span class="s1">&#39;sp_values&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;s&amp;p&#39;</span><span class="p">:</span> <span class="s1">&#39;s&amp;p_values&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;speckle&#39;</span><span class="p">:</span> <span class="s1">&#39;gaussian_values&#39;</span><span class="p">}</span>
+            <span class="s1">'gaussian'</span><span class="p">:</span> <span class="s1">'gaussian_values'</span><span class="p">,</span>
+            <span class="s1">'localvar'</span><span class="p">:</span> <span class="s1">'localvar_values'</span><span class="p">,</span>
+            <span class="s1">'poisson'</span><span class="p">:</span> <span class="s1">'poisson_values'</span><span class="p">,</span>
+            <span class="s1">'salt'</span><span class="p">:</span> <span class="s1">'sp_values'</span><span class="p">,</span>
+            <span class="s1">'pepper'</span><span class="p">:</span> <span class="s1">'sp_values'</span><span class="p">,</span>
+            <span class="s1">'s&amp;p'</span><span class="p">:</span> <span class="s1">'s&amp;p_values'</span><span class="p">,</span>
+            <span class="s1">'speckle'</span><span class="p">:</span> <span class="s1">'gaussian_values'</span><span class="p">}</span>
 
         <span class="n">kwdefaults</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
-            <span class="s1">&#39;var&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
-            <span class="s1">&#39;amount&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
-            <span class="s1">&#39;salt_vs_pepper&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
-            <span class="s1">&#39;local_vars&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">}</span>
+            <span class="s1">'mean'</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+            <span class="s1">'var'</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+            <span class="s1">'amount'</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+            <span class="s1">'salt_vs_pepper'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s1">'local_vars'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">}</span>
 
         <span class="n">allowedkwargs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;gaussian_values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;var&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;localvar_values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;local_vars&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;sp_values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;s&amp;p_values&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">,</span> <span class="s1">&#39;salt_vs_pepper&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;poisson_values&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+            <span class="s1">'gaussian_values'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'mean'</span><span class="p">,</span> <span class="s1">'var'</span><span class="p">],</span>
+            <span class="s1">'localvar_values'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'local_vars'</span><span class="p">],</span>
+            <span class="s1">'sp_values'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'amount'</span><span class="p">],</span>
+            <span class="s1">'s&amp;p_values'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'amount'</span><span class="p">,</span> <span class="s1">'salt_vs_pepper'</span><span class="p">],</span>
+            <span class="s1">'poisson_values'</span><span class="p">:</span> <span class="p">[]}</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowedkwargs</span><span class="p">[</span><span class="n">allowedtypes</span><span class="p">[</span><span class="n">mode</span><span class="p">]]:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> keyword not in allowed keywords </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'</span><span class="si">%s</span><span class="s1"> keyword not in allowed keywords </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span>
                                 <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">allowedkwargs</span><span class="p">[</span><span class="n">allowedtypes</span><span class="p">[</span><span class="n">mode</span><span class="p">]]))</span>
 
         <span class="c1"># Set kwarg defaults</span>
         <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">allowedkwargs</span><span class="p">[</span><span class="n">allowedtypes</span><span class="p">[</span><span class="n">mode</span><span class="p">]]:</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">kw</span><span class="p">,</span> <span class="n">kwdefaults</span><span class="p">[</span><span class="n">kw</span><span class="p">])</span>
 
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">:</span>
-            <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">'gaussian'</span><span class="p">:</span>
+            <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">'mean'</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">'var'</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span>
                                     <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">image</span> <span class="o">+</span> <span class="n">noise</span>
 
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;localvar&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">'localvar'</span><span class="p">:</span>
             <span class="c1"># Ensure local variance input is correct</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;local_vars&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;All values of `local_vars` must be &gt; 0.&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">'local_vars'</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'All values of `local_vars` must be &gt; 0.'</span><span class="p">)</span>
 
-            <span class="c1"># Safe shortcut usage broadcasts kwargs[&#39;local_vars&#39;] as a ufunc</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">image</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;local_vars&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+            <span class="c1"># Safe shortcut usage broadcasts kwargs['local_vars'] as a ufunc</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">image</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">'local_vars'</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;poisson&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">'poisson'</span><span class="p">:</span>
             <span class="c1"># Determine unique values in image &amp; calculate the next power of two</span>
             <span class="n">vals</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
             <span class="n">vals</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">vals</span><span class="p">))</span>
@@ -1248,20 +1248,20 @@
             <span class="k">if</span> <span class="n">low_clip</span> <span class="o">==</span> <span class="o">-</span><span class="mf">1.</span><span class="p">:</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">*</span> <span class="p">(</span><span class="n">old_max</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.</span>
 
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;salt&#39;</span><span class="p">:</span>
-            <span class="c1"># Re-call function with mode=&#39;s&amp;p&#39; and p=1 (all salt noise)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">TestData</span><span class="o">.</span><span class="n">random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;s&amp;p&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
-                            <span class="n">amount</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span> <span class="n">salt_vs_pepper</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">'salt'</span><span class="p">:</span>
+            <span class="c1"># Re-call function with mode='s&amp;p' and p=1 (all salt noise)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">TestData</span><span class="o">.</span><span class="n">random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'s&amp;p'</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                            <span class="n">amount</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">'amount'</span><span class="p">],</span> <span class="n">salt_vs_pepper</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;pepper&#39;</span><span class="p">:</span>
-            <span class="c1"># Re-call function with mode=&#39;s&amp;p&#39; and p=1 (all pepper noise)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">TestData</span><span class="o">.</span><span class="n">random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;s&amp;p&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
-                            <span class="n">amount</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span> <span class="n">salt_vs_pepper</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">'pepper'</span><span class="p">:</span>
+            <span class="c1"># Re-call function with mode='s&amp;p' and p=1 (all pepper noise)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">TestData</span><span class="o">.</span><span class="n">random_noise</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'s&amp;p'</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                            <span class="n">amount</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">'amount'</span><span class="p">],</span> <span class="n">salt_vs_pepper</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;s&amp;p&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">'s&amp;p'</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;salt_vs_pepper&#39;</span><span class="p">]</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">'amount'</span><span class="p">]</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">'salt_vs_pepper'</span><span class="p">]</span>
             <span class="n">flipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
                                     <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">])</span>
             <span class="n">salted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
@@ -1270,8 +1270,8 @@
             <span class="n">out</span><span class="p">[</span><span class="n">flipped</span> <span class="o">&amp;</span> <span class="n">salted</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">out</span><span class="p">[</span><span class="n">flipped</span> <span class="o">&amp;</span> <span class="n">peppered</span><span class="p">]</span> <span class="o">=</span> <span class="n">low_clip</span>
 
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;speckle&#39;</span><span class="p">:</span>
-            <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">'speckle'</span><span class="p">:</span>
+            <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">'mean'</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">'var'</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span>
                                     <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">image</span> <span class="o">+</span> <span class="n">image</span> <span class="o">*</span> <span class="n">noise</span>
 
@@ -1311,8 +1311,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

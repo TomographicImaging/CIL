@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.io.NEXUSDataWriter &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.io.NEXUSDataWriter &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/io/NEXUSDataWriter';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2019 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -552,7 +552,7 @@
 <div class="viewcode-block" id="NEXUSDataWriter">
 <a class="viewcode-back" href="../../../../io/#cil.io.NEXUSDataWriter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">NEXUSDataWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39; Create a writer for NEXUS files.</span>
+<span class="w">    </span><span class="sd">''' Create a writer for NEXUS files.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -560,10 +560,10 @@
 <span class="sd">        The dataset to write to file</span>
 <span class="sd">    file_name: os.path or string, default None</span>
 <span class="sd">        The file name to write</span>
-<span class="sd">    compression: str, {&#39;uint8&#39;, &#39;uint16&#39;, None}, default None</span>
+<span class="sd">    compression: str, {'uint8', 'uint16', None}, default None</span>
 <span class="sd">        The lossy compression to apply, default None will not compress data.</span>
 <span class="sd">        uint8 or unit16 will compress to 8 and 16 bit dtypes respectively.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
@@ -571,7 +571,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">&amp;</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">CONE_FLEX</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Currently, CONE_FLEX geometry is not supported by NEXUSDataWriter&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Currently, CONE_FLEX geometry is not supported by NEXUSDataWriter'</span><span class="p">)</span>
 
 
         <span class="k">if</span> <span class="p">((</span><span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
@@ -584,30 +584,30 @@
                <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="n">compression</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Set up the writer</span>
 
 <span class="sd">        data: AcquisitionData, ImageData,</span>
 <span class="sd">            The dataset to write to file</span>
 <span class="sd">        file_name: os.path or string, default None</span>
 <span class="sd">            The file name to write</span>
-<span class="sd">        compression: str, {&#39;uint8&#39;, &#39;uint16&#39;, None}, default None</span>
+<span class="sd">        compression: str, {'uint8', 'uint16', None}, default None</span>
 <span class="sd">            The lossy compression to apply, default None will not compress data.</span>
 <span class="sd">            uint8 or unit16 will compress to 8 and 16 bit dtypes respectively.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Path to write file is required.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">'Path to write file is required.'</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Data to write is required.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">'Data to write is required.'</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;nxs&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;nex&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="o">+=</span><span class="s1">&#39;.nxs&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'nxs'</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'nex'</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="o">+=</span><span class="s1">'.nxs'</span>
 
         <span class="c1"># Deal with compression</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compress</span>           <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_compress</span><span class="p">(</span><span class="n">compression</span><span class="p">)</span>
@@ -616,25 +616,25 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">))</span> <span class="ow">or</span>
                 <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">))):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Writer supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
-                            <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">'Writer supports only following data types:</span><span class="se">\n</span><span class="s1">'</span> <span class="o">+</span>
+                            <span class="s1">' - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData'</span><span class="p">)</span>
 
         <span class="c1"># check that h5py library is installed</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">h5pyAvailable</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;h5py is not available, cannot write NEXUS files.&#39;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">'h5py is not available, cannot write NEXUS files.'</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="NEXUSDataWriter.write">
 <a class="viewcode-back" href="../../../../io/#cil.io.NEXUSDataWriter.write">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        write dataset to disk</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="c1"># check filename and data have been set:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Path to nexus file to write to is required.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'Path to nexus file to write to is required.'</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Data to write out must be set.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'Data to write out must be set.'</span><span class="p">)</span>
 
         <span class="c1"># if the folder does not exist, create the folder</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)):</span>
@@ -644,27 +644,27 @@
             <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_compression_scale_offset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span><span class="p">)</span>
 
         <span class="c1"># create the file</span>
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 
             <span class="c1"># give the file some important attributes</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;file_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;cil_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">version</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;file_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">())</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;creator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bytes_</span><span class="p">(</span><span class="s1">&#39;NEXUSDataWriter.py&#39;</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NeXus_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;4.3.0&#39;</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;HDF5_Version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">hdf5_version</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;h5py_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">version</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'file_name'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'cil_version'</span><span class="p">]</span> <span class="o">=</span> <span class="n">version</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'file_time'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">())</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'creator'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bytes_</span><span class="p">(</span><span class="s1">'NEXUSDataWriter.py'</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'NeXus_version'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'4.3.0'</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'HDF5_Version'</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">hdf5_version</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'h5py_version'</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">version</span>
 
             <span class="c1"># create the NXentry group</span>
-            <span class="n">nxentry</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry&#39;</span><span class="p">)</span>
-            <span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NX_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NXentry&#39;</span>
+            <span class="n">nxentry</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">'entry1/tomo_entry'</span><span class="p">)</span>
+            <span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'NX_class'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'NXentry'</span>
 
             <span class="c1">#create empty data entry</span>
-            <span class="n">ds_data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/data/data&#39;</span><span class="p">,</span><span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">ds_data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/data/data'</span><span class="p">,</span><span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress</span><span class="p">:</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">offset</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'scale'</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'offset'</span><span class="p">]</span> <span class="o">=</span> <span class="n">offset</span>
 
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
                     <span class="n">ds_data</span><span class="p">[</span><span class="n">i</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">offset</span>
@@ -672,87 +672,87 @@
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">write_direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
 
             <span class="c1"># set up dataset attributes</span>
-            <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ImageData&#39;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;AcquisitionData&#39;</span>
+            <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'data_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'ImageData'</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">)</span> <span class="k">else</span> <span class="s1">'AcquisitionData'</span>
 
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">number_of_dimensions</span><span class="p">):</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;dim</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="sa">f</span><span class="s1">'dim</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">):</span>
                 <span class="c1"># create group to store configuration</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config&#39;</span><span class="p">)</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/source&#39;</span><span class="p">)</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector&#39;</span><span class="p">)</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/rotation_axis&#39;</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/config'</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/config/source'</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/config/detector'</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/config/rotation_axis'</span><span class="p">)</span>
 
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;dimension&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">dimension</span><span class="p">)</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;num_channels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">num_channels</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'geometry'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'dimension'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">dimension</span><span class="p">)</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'num_channels'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">num_channels</span>
 
-                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector/direction_x&#39;</span><span class="p">,</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/config/detector/direction_x'</span><span class="p">,</span>
                                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
-                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">'float32'</span><span class="p">,</span>
                                  <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_x</span><span class="p">)</span>
 
-                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector/position&#39;</span><span class="p">,</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/config/detector/position'</span><span class="p">,</span>
                                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
-                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">'float32'</span><span class="p">,</span>
                                  <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s1">&#39;cone&#39;</span><span class="p">:</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/source/position&#39;</span><span class="p">,</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s1">'cone'</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/config/source/position'</span><span class="p">,</span>
                                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
-                                     <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+                                     <span class="n">dtype</span> <span class="o">=</span> <span class="s1">'float32'</span><span class="p">,</span>
                                      <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/ray/direction&#39;</span><span class="p">,</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/config/ray/direction'</span><span class="p">,</span>
                                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
-                                     <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+                                     <span class="n">dtype</span> <span class="o">=</span> <span class="s1">'float32'</span><span class="p">,</span>
                                      <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 
-                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/rotation_axis/position&#39;</span><span class="p">,</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/config/rotation_axis/position'</span><span class="p">,</span>
                                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
-                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">'float32'</span><span class="p">,</span>
                                  <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
 
 
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;num_pixels_h&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;pixel_size_h&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;panel_origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'num_pixels_h'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'pixel_size_h'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'panel_origin'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span>
 
                 <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM3</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/detector/direction_y&#39;</span><span class="p">,</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/config/detector/direction_y'</span><span class="p">,</span>
                                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
-                                     <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+                                     <span class="n">dtype</span> <span class="o">=</span> <span class="s1">'float32'</span><span class="p">,</span>
                                      <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">direction_y</span><span class="p">)</span>
 
-                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/rotation_axis/direction&#39;</span><span class="p">,</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/config/rotation_axis/direction'</span><span class="p">,</span>
                                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
-                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">'float32'</span><span class="p">,</span>
                                  <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 
-                    <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;num_pixels_v&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;pixel_size_v&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'num_pixels_v'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">num_pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'pixel_size_v'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">pixel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-                <span class="n">angles</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/config/angles&#39;</span><span class="p">,</span>
+                <span class="n">angles</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">'entry1/tomo_entry/config/angles'</span><span class="p">,</span>
                                                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
-                                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+                                                 <span class="n">dtype</span> <span class="o">=</span> <span class="s1">'float32'</span><span class="p">,</span>
                                                  <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_data</span><span class="p">)</span>
-                <span class="n">angles</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;angle_unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_unit</span>
-                <span class="n">angles</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;initial_angle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">initial_angle</span>
+                <span class="n">angles</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'angle_unit'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">angle_unit</span>
+                <span class="n">angles</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'initial_angle'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">angles</span><span class="o">.</span><span class="n">initial_angle</span>
 
             <span class="k">else</span><span class="p">:</span>   <span class="c1"># ImageData</span>
 
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;voxel_num_x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_x</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;voxel_num_y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_y</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;voxel_num_z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_z</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;voxel_size_x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_size_x</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;voxel_size_y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_size_y</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;voxel_size_z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_size_z</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;center_x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">center_x</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;center_y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">center_y</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;center_z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">center_z</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;channels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channels</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;channel_spacing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channel_spacing</span></div>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'voxel_num_x'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_x</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'voxel_num_y'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_y</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'voxel_num_z'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_num_z</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'voxel_size_x'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_size_x</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'voxel_size_y'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_size_y</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'voxel_size_z'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">voxel_size_z</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'center_x'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">center_x</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'center_y'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">center_y</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'center_z'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">center_z</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'channels'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channels</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'channel_spacing'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channel_spacing</span></div>
 </div>
 
 </pre></div>
@@ -784,8 +784,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

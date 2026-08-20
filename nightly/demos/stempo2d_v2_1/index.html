@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>TV-regularized reconstruction of the dynamix STEMPO dataset in CIL &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>TV-regularized reconstruction of the dynamix STEMPO dataset in CIL &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,9 +52,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/stempo2d_v2_1';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="1D inverse problem demo using deriv2 from regtools" href="../deriv2_cgls/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -603,14 +603,14 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">#  Copyright 2023 United Kingdom Research and Innovation</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -696,7 +696,7 @@
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set logging level for CIL processors:</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
-<span class="n">cil_log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;cil.processors&#39;</span><span class="p">)</span>
+<span class="n">cil_log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'cil.processors'</span><span class="p">)</span>
 <span class="n">cil_log_level</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -711,14 +711,14 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;stempo_static_2d_b4.mat&quot;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span> <span class="o">=</span> <span class="s2">"stempo_static_2d_b4.mat"</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">mat73</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-<span class="n">CtData</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;CtData&quot;</span><span class="p">]</span>
-<span class="n">sinogram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">CtData</span><span class="p">[</span><span class="s2">&quot;sinogram&quot;</span><span class="p">])</span>
+<span class="n">CtData</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"CtData"</span><span class="p">]</span>
+<span class="n">sinogram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">CtData</span><span class="p">[</span><span class="s2">"sinogram"</span><span class="p">])</span>
 <span class="c1"># Load parameters</span>
-<span class="n">param</span> <span class="o">=</span> <span class="n">CtData</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span>
-<span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;angles&quot;</span><span class="p">])</span>
+<span class="n">param</span> <span class="o">=</span> <span class="n">CtData</span><span class="p">[</span><span class="s2">"parameters"</span><span class="p">]</span>
+<span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">"angles"</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -726,7 +726,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Sinogram size is </span><span class="si">{</span><span class="n">sinogram</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Sinogram size is </span><span class="si">{</span><span class="n">sinogram</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -745,15 +745,15 @@ Sinogram size is (360, 560)
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Acquisition geometry parameters</span>
-<span class="n">binningFactor</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;binningPost&quot;</span><span class="p">]</span> <span class="c1"># Data is binned</span>
-<span class="n">SOD</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;distanceSourceOrigin&quot;</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SOD: </span><span class="si">{</span><span class="n">SOD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
-<span class="n">SDD</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;distanceSourceDetector&quot;</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SDD: </span><span class="si">{</span><span class="n">SDD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="n">binningFactor</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">"binningPost"</span><span class="p">]</span> <span class="c1"># Data is binned</span>
+<span class="n">SOD</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">"distanceSourceOrigin"</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'SOD: </span><span class="si">{</span><span class="n">SOD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm'</span><span class="p">)</span>
+<span class="n">SDD</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">"distanceSourceDetector"</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'SDD: </span><span class="si">{</span><span class="n">SDD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm'</span><span class="p">)</span>
 <span class="n">ODD</span> <span class="o">=</span> <span class="n">SDD</span> <span class="o">-</span> <span class="n">SOD</span> <span class="c1"># Origin-detector-distance</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ODD: </span><span class="si">{</span><span class="n">ODD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
-<span class="n">pixelSize</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;pixelSizePost&quot;</span><span class="p">]</span> <span class="c1"># Detector pixel width after binning</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detector pixel size: </span><span class="si">{</span><span class="n">pixelSize</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'ODD: </span><span class="si">{</span><span class="n">ODD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm'</span><span class="p">)</span>
+<span class="n">pixelSize</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">"pixelSizePost"</span><span class="p">]</span> <span class="c1"># Detector pixel width after binning</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Detector pixel size: </span><span class="si">{</span><span class="n">pixelSize</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -773,11 +773,11 @@ Detector pixel size: 0.200 mm
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">SOD</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">ODD</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;mm&#39;</span><span class="p">,</span><span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">SOD</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">ODD</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">'mm'</span><span class="p">,</span><span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 <span class="n">num_angles</span><span class="p">,</span> <span class="n">num_pixels</span> <span class="o">=</span> <span class="n">sinogram</span><span class="o">.</span><span class="n">shape</span>
-<span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixelSize</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;bottom-left&#39;</span><span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixelSize</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'bottom-left'</span><span class="p">)</span>
 <span class="n">ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="o">-</span><span class="n">angles</span><span class="p">)</span>
-<span class="n">ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">((</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">))</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">((</span><span class="s1">'angle'</span><span class="p">,</span><span class="s1">'horizontal'</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -898,7 +898,7 @@ center : x0,y0
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">'gpu'</span><span class="p">)</span>
 <br/></pre></div>
 </div>
 </div>
@@ -944,30 +944,30 @@ center : x0,y0
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load data</span>
-<span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;stempo_seq8x45_2d_b4.mat&quot;</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s2">"stempo_seq8x45_2d_b4.mat"</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">mat73</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-<span class="n">CtData</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;CtData&quot;</span><span class="p">]</span>
-<span class="n">sinogram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">CtData</span><span class="p">[</span><span class="s2">&quot;sinogram&quot;</span><span class="p">])</span>
+<span class="n">CtData</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"CtData"</span><span class="p">]</span>
+<span class="n">sinogram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">CtData</span><span class="p">[</span><span class="s2">"sinogram"</span><span class="p">])</span>
 <span class="c1"># Load parameters</span>
-<span class="n">param</span> <span class="o">=</span> <span class="n">CtData</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span>
-<span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;angles&quot;</span><span class="p">])</span>
+<span class="n">param</span> <span class="o">=</span> <span class="n">CtData</span><span class="p">[</span><span class="s2">"parameters"</span><span class="p">]</span>
+<span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="s2">"angles"</span><span class="p">])</span>
 
-<span class="n">binningFactor</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;binningPost&quot;</span><span class="p">]</span>
-<span class="n">SOD</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;distanceSourceOrigin&quot;</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SOD: </span><span class="si">{</span><span class="n">SOD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
-<span class="n">SDD</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;distanceSourceDetector&quot;</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SDD: </span><span class="si">{</span><span class="n">SDD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="n">binningFactor</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">"binningPost"</span><span class="p">]</span>
+<span class="n">SOD</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">"distanceSourceOrigin"</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'SOD: </span><span class="si">{</span><span class="n">SOD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm'</span><span class="p">)</span>
+<span class="n">SDD</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">"distanceSourceDetector"</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'SDD: </span><span class="si">{</span><span class="n">SDD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm'</span><span class="p">)</span>
 <span class="n">ODD</span> <span class="o">=</span> <span class="n">SDD</span> <span class="o">-</span> <span class="n">SOD</span> <span class="c1"># Origin-detector-distance</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ODD: </span><span class="si">{</span><span class="n">ODD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
-<span class="n">pixelSize</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;pixelSizePost&quot;</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detector pixel size: </span><span class="si">{</span><span class="n">pixelSize</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'ODD: </span><span class="si">{</span><span class="n">ODD</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm'</span><span class="p">)</span>
+<span class="n">pixelSize</span> <span class="o">=</span> <span class="n">param</span><span class="p">[</span><span class="s2">"pixelSizePost"</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Detector pixel size: </span><span class="si">{</span><span class="n">pixelSize</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> mm'</span><span class="p">)</span>
 
 <span class="c1"># Acquisition geometry</span>
-<span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">SOD</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">ODD</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;mm&#39;</span><span class="p">,</span><span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">SOD</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">ODD</span><span class="p">],</span> <span class="n">units</span><span class="o">=</span><span class="s1">'mm'</span><span class="p">,</span><span class="n">detector_direction_x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 <span class="n">num_angles</span><span class="p">,</span> <span class="n">num_pixels</span> <span class="o">=</span> <span class="n">sinogram</span><span class="o">.</span><span class="n">shape</span>
-<span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixelSize</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;bottom-left&#39;</span><span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">,</span> <span class="n">pixel_size</span><span class="o">=</span><span class="n">pixelSize</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'bottom-left'</span><span class="p">)</span>
 <span class="n">ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="o">-</span><span class="n">angles</span><span class="p">)</span>
-<span class="n">ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">((</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">))</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_labels</span><span class="p">((</span><span class="s1">'angle'</span><span class="p">,</span><span class="s1">'horizontal'</span><span class="p">))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">ag</span><span class="p">)</span>
 
@@ -1046,7 +1046,7 @@ center : x0,y0
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">sinogram</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">sinogram</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1074,10 +1074,10 @@ center : x0,y0
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create projection operator using Astra-Toolbox.</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">'gpu'</span><span class="p">)</span>
 
 <span class="n">bp</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">stempoData</span><span class="p">)</span> <span class="c1"># Backgprojection</span>
-<span class="n">show2D</span><span class="p">([</span> <span class="n">bp</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span> <span class="s1">&#39;Adjoint reconstruction&#39;</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span> <span class="n">bp</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span> <span class="s1">'Adjoint reconstruction'</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1105,10 +1105,10 @@ center : x0,y0
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="s1">'gpu'</span><span class="p">)</span>
 <span class="c1"># run on the AcquisitionData</span>
 <span class="n">recon_fbp</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">stempoData</span><span class="p">)</span>
-<span class="n">show2D</span><span class="p">([</span><span class="n">recon_fbp_static</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Static reconstruction&#39;</span><span class="p">,</span> <span class="s1">&#39;Dynamic reconstruction&#39;</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">recon_fbp_static</span><span class="p">,</span> <span class="n">recon_fbp</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'Static reconstruction'</span><span class="p">,</span> <span class="s1">'Dynamic reconstruction'</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1246,8 +1246,8 @@ Stop criterion has been reached.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_cgls</span><span class="p">,</span> <span class="n">recon_cgls_early_stopping</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;FBP&#39;</span><span class="p">,</span> <span class="s1">&#39;CGLS&#39;</span><span class="p">,</span> <span class="s1">&#39;CGLS_early_stopping&#39;</span><span class="p">],</span> \
-       <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">recon_fbp</span><span class="p">,</span> <span class="n">recon_cgls</span><span class="p">,</span> <span class="n">recon_cgls_early_stopping</span><span class="p">],</span> <span class="p">[</span><span class="s1">'FBP'</span><span class="p">,</span> <span class="s1">'CGLS'</span><span class="p">,</span> <span class="s1">'CGLS_early_stopping'</span><span class="p">],</span> \
+       <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'upper-left'</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1279,7 +1279,7 @@ Stop criterion has been reached.
 <span class="n">numAngles</span> <span class="o">=</span> <span class="mi">45</span>
 <span class="n">anglesSparse</span> <span class="o">=</span> <span class="n">angles</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">numAngles</span><span class="p">]</span>
 <span class="n">sinoSparse</span> <span class="o">=</span> <span class="n">sinogram</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">numAngles</span><span class="p">,:]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Sinogram size is now </span><span class="si">{</span><span class="n">sinoSparse</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Sinogram size is now </span><span class="si">{</span><span class="n">sinoSparse</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
 <span class="n">agSparse</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="n">agSparse</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="o">-</span><span class="n">anglesSparse</span><span class="p">)</span>
@@ -1316,10 +1316,10 @@ Sinogram size is now (45, 560)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">agSparse</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">agSparse</span><span class="p">,</span> <span class="s1">'gpu'</span><span class="p">)</span>
 <span class="c1"># run on the AcquisitionData</span>
 <span class="n">sparse_fbp</span> <span class="o">=</span> <span class="n">fbp</span><span class="p">(</span><span class="n">stempoSparse</span><span class="p">)</span>
-<span class="n">show2D</span><span class="p">(</span><span class="n">sparse_fbp</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;t=1, 45 angles FBP&#39;</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">sparse_fbp</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">'t=1, 45 angles FBP'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1344,7 +1344,7 @@ Sinogram size is now (45, 560)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">agSparse</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">agSparse</span><span class="p">,</span> <span class="s1">'gpu'</span><span class="p">)</span>
 <span class="c1"># initial estimate - zero array in this case</span>
 <span class="n">initial</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
@@ -1375,8 +1375,8 @@ Sinogram size is now (45, 560)
 <span class="c1"># get and visualise the results</span>
 <span class="n">sparse_cgls_early_stopping</span> <span class="o">=</span> <span class="n">cgls</span><span class="o">.</span><span class="n">solution</span>
 
-<span class="n">show2D</span><span class="p">([</span><span class="n">sparse_fbp</span><span class="p">,</span> <span class="n">sparse_cgls</span><span class="p">,</span> <span class="n">sparse_cgls_early_stopping</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;FBP&#39;</span><span class="p">,</span> <span class="s1">&#39;CGLS&#39;</span><span class="p">,</span> <span class="s1">&#39;CGLS_early_stopping&#39;</span><span class="p">],</span> \
-       <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;upper-left&#39;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">))</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">sparse_fbp</span><span class="p">,</span> <span class="n">sparse_cgls</span><span class="p">,</span> <span class="n">sparse_cgls_early_stopping</span><span class="p">],</span> <span class="p">[</span><span class="s1">'FBP'</span><span class="p">,</span> <span class="s1">'CGLS'</span><span class="p">,</span> <span class="s1">'CGLS_early_stopping'</span><span class="p">],</span> \
+       <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'upper-left'</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1529,7 +1529,7 @@ Stop criterion has been reached.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">agSparse</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">agSparse</span><span class="p">,</span> <span class="s1">'gpu'</span><span class="p">)</span>
 <span class="n">LS</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">stempoSparse</span><span class="p">)</span>
 <span class="n">G</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 <span class="n">fista_LS</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">LS</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -1573,7 +1573,7 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">LS_reco</span> <span class="o">=</span> <span class="n">fista_LS</span><span class="o">.</span><span class="n">solution</span>
-<span class="n">show2D</span><span class="p">(</span><span class="n">LS_reco</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;LS reconstruction&quot;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">LS_reco</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"LS reconstruction"</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.05</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1659,7 +1659,7 @@ A_0 &amp; 0 &amp; \dots &amp; 0 \\
 <span class="n">projOpList</span> <span class="o">=</span> <span class="n">projOp</span><span class="o">.</span><span class="n">get_as_list</span><span class="p">()</span> <span class="c1"># List of the operators we want</span>
 
 <span class="c1"># We need a zero-operator for padding (If the sizes changed for different time steps this would be pain)</span>
-<span class="c1"># (Luckily they don&#39;t)</span>
+<span class="c1"># (Luckily they don't)</span>
 <span class="n">ZOp</span> <span class="o">=</span> <span class="n">ZeroOperator</span><span class="p">(</span><span class="n">projOpList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">(),</span> <span class="n">projOpList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span>
 
 <span class="n">Alist</span> <span class="o">=</span> <span class="p">[</span><span class="n">ZOp</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="o">*</span><span class="n">T</span><span class="p">)]</span> <span class="c1"># Long list of zero-operators</span>
@@ -1771,7 +1771,7 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">FISTArecn</span> <span class="o">=</span> <span class="n">fista</span><span class="o">.</span><span class="n">solution</span>
-<span class="n">show2D</span><span class="p">(</span><span class="n">FISTArecn</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;FISTA, t=</span><span class="si">{</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)])</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">FISTArecn</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">'FISTA, t=</span><span class="si">{</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">'</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)])</span>
 </pre></div>
 </div>
 </div>
@@ -1807,7 +1807,7 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.05</span>
-<span class="n">TVlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">FGP_TV</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)]</span>
+<span class="n">TVlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">FGP_TV</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">'gpu'</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)]</span>
 <span class="n">TV</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="o">*</span><span class="n">TVlist</span><span class="p">)</span> <span class="c1"># Unroll the list as before</span>
 
 <span class="n">fista_TV</span> <span class="o">=</span> <span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">F_LS</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">TV</span><span class="p">,</span> <span class="n">max_iteration</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -1851,7 +1851,7 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">FISTATVrecn</span> <span class="o">=</span> <span class="n">fista_TV</span><span class="o">.</span><span class="n">solution</span>
-<span class="n">show2D</span><span class="p">(</span><span class="n">FISTATVrecn</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;FISTA+TV, t=</span><span class="si">{</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)])</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">FISTATVrecn</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">'FISTA+TV, t=</span><span class="si">{</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">'</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)])</span>
 </pre></div>
 </div>
 </div>
@@ -1965,10 +1965,10 @@ b_{T-1} \\
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s add spatial TV to the mix (luckily it can also include non-negativity)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let's add spatial TV to the mix (luckily it can also include non-negativity)</span>
 <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="c1"># Regularization parameter for spatial TV</span>
 
-<span class="n">TV</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">FGP_TV</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)])</span>
+<span class="n">TV</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">FGP_TV</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">nonnegativity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">'gpu'</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)])</span>
 </pre></div>
 </div>
 </div>
@@ -2015,7 +2015,7 @@ Stop criterion has been reached.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MASSIVErecn</span> <span class="o">=</span> <span class="n">fista_MASSIVE</span><span class="o">.</span><span class="n">solution</span>
-<span class="n">show2D</span><span class="p">(</span><span class="n">MASSIVErecn</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;FISTA+TV, t=</span><span class="si">{</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)])</span>
+<span class="n">show2D</span><span class="p">(</span><span class="n">MASSIVErecn</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">'FISTA+TV, t=</span><span class="si">{</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">'</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)])</span>
 </pre></div>
 </div>
 </div>
@@ -2099,8 +2099,8 @@ Stop criterion has been reached.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

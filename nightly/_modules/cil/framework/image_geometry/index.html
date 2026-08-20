@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.image_geometry &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.framework.image_geometry &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/framework/image_geometry';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2018 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2018 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -546,32 +546,32 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">BackwardCompat</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">CHANNEL</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use ImageDimension.CHANNEL instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"use ImageDimension.CHANNEL instead"</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ImageDimension</span><span class="o">.</span><span class="n">CHANNEL</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">HORIZONTAL_X</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use ImageDimension.HORIZONTAL_X instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"use ImageDimension.HORIZONTAL_X instead"</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ImageDimension</span><span class="o">.</span><span class="n">HORIZONTAL_X</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">HORIZONTAL_Y</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use ImageDimension.HORIZONTAL_Y instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"use ImageDimension.HORIZONTAL_Y instead"</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ImageDimension</span><span class="o">.</span><span class="n">HORIZONTAL_Y</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">RANDOM</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use FillType.RANDOM instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"use FillType.RANDOM instead"</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">FillType</span><span class="o">.</span><span class="n">RANDOM</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">RANDOM_INT</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use FillType.RANDOM_INT instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"use FillType.RANDOM_INT instead"</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">FillType</span><span class="o">.</span><span class="n">RANDOM_INT</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">VERTICAL</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;use ImageDimension.VERTICAL instead&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"use ImageDimension.VERTICAL instead"</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ImageDimension</span><span class="o">.</span><span class="n">VERTICAL</span>
 
 
@@ -605,7 +605,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dimension_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="n">labels_default</span> <span class="o">=</span> <span class="n">ImageDimension</span><span class="o">.</span><span class="n">get_order_for_engine</span><span class="p">(</span><span class="s2">&quot;cil&quot;</span><span class="p">)</span>
+        <span class="n">labels_default</span> <span class="o">=</span> <span class="n">ImageDimension</span><span class="o">.</span><span class="n">get_order_for_engine</span><span class="p">(</span><span class="s2">"cil"</span><span class="p">)</span>
 
         <span class="n">shape_default</span> <span class="o">=</span> <span class="p">[</span>   <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">voxel_num_z</span><span class="p">,</span>
@@ -688,16 +688,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="n">channels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel_labels</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel_spacing</span> <span class="o">=</span> <span class="mf">1.0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dimension_labels&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'dimension_labels'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'dtype'</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ImageGeometry.get_slice">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry.get_slice">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">horizontal_y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''</span>
 <span class="sd">        Returns a new ImageGeometry of a single slice of in the requested direction.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="n">geometry_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">geometry_new</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="mi">1</span>
@@ -755,43 +755,43 @@
 <div class="viewcode-block" id="ImageGeometry.clone">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry.clone">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;returns a copy of the ImageGeometry&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''returns a copy of the ImageGeometry'''</span>
         <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ImageGeometry.copy">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry.copy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;alias of clone&#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">'''alias of clone'''</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">repres</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;Number of channels: </span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">)</span>
-        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;channel_spacing: </span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_spacing</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"Number of channels: </span><span class="si">{0}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">)</span>
+        <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"channel_spacing: </span><span class="si">{0}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_spacing</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_num_z</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;voxel_num : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="s2">,z</span><span class="si">{2}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voxel_num_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_num_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_num_z</span><span class="p">)</span>
-            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;voxel_size : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="s2">,z</span><span class="si">{2}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_z</span><span class="p">)</span>
-            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;center : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="s2">,z</span><span class="si">{2}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_z</span><span class="p">)</span>
+            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"voxel_num : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="s2">,z</span><span class="si">{2}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voxel_num_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_num_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_num_z</span><span class="p">)</span>
+            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"voxel_size : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="s2">,z</span><span class="si">{2}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_z</span><span class="p">)</span>
+            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"center : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="s2">,z</span><span class="si">{2}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_z</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;voxel_num : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voxel_num_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_num_y</span><span class="p">)</span>
-            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;voxel_size : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_y</span><span class="p">)</span>
-            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">&quot;center : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_y</span><span class="p">)</span>
+            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"voxel_num : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voxel_num_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_num_y</span><span class="p">)</span>
+            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"voxel_size : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_y</span><span class="p">)</span>
+            <span class="n">repres</span> <span class="o">+=</span> <span class="s2">"center : x</span><span class="si">{0}</span><span class="s2">,y</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_y</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">repres</span>
 <div class="viewcode-block" id="ImageGeometry.allocate">
 <a class="viewcode-back" href="../../../../framework/#cil.framework.ImageGeometry.allocate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;Allocates an ImageData according to the geometry</span>
+<span class="w">        </span><span class="sd">'''Allocates an ImageData according to the geometry</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        value : number or string, default=0</span>
 <span class="sd">            The value to allocate. Accepts a number to allocate a uniform array, </span>
 <span class="sd">            None to allocate an empty memory block, or a string to create a random </span>
-<span class="sd">            array: &#39;random&#39; allocates floats between 0 and 1, &#39;random_int&#39; by default</span>
+<span class="sd">            array: 'random' allocates floats between 0 and 1, 'random_int' by default</span>
 <span class="sd">            allocates integers between 0 and 100  or between provided `min_value` and </span>
 <span class="sd">            `max_value`</span>
 <span class="sd">        </span>
@@ -806,22 +806,22 @@
 
 <span class="sd">            min_value : int, optional</span>
 <span class="sd">                The minimum value random integer to generate, only used if `value` </span>
-<span class="sd">                is &#39;random_int&#39;. New since version 25.0.0. Default is 0.</span>
+<span class="sd">                is 'random_int'. New since version 25.0.0. Default is 0.</span>
 <span class="sd">            </span>
 <span class="sd">            max_value : int, optional</span>
 <span class="sd">                The maximum value random integer to generate, only used if `value` </span>
-<span class="sd">                is &#39;random_int&#39;. Default is 100.</span>
+<span class="sd">                is 'random_int'. Default is 100.</span>
 
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
-<span class="sd">            Since v25.0.0 the methods used by &#39;random&#39; or &#39;random_int&#39; use `numpy.random.default_rng`. </span>
+<span class="sd">            Since v25.0.0 the methods used by 'random' or 'random_int' use `numpy.random.default_rng`. </span>
 <span class="sd">            This method does not use the global numpy.random.seed() so if a seed is </span>
 <span class="sd">            required it should be passed directly as a kwarg.</span>
-<span class="sd">            To allocate random numbers using the earlier behaviour use `value=&#39;random_deprecated&#39;` </span>
-<span class="sd">            or `value=&#39;random_int_deprecated&#39;` </span>
+<span class="sd">            To allocate random numbers using the earlier behaviour use `value='random_deprecated'` </span>
+<span class="sd">            or `value='random_int_deprecated'` </span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+<span class="sd">        '''</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'dtype'</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
 
         <span class="n">out</span> <span class="o">=</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
@@ -860,8 +860,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

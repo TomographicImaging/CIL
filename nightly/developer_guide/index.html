@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Developers’ Guide &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>Developers’ Guide &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../_static/documentation_options.js?v=8959950e"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,9 +49,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'developer_guide';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="CIL Plugins" href="../plugins/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -627,7 +627,7 @@ See <a class="reference external" href="https://git-scm.com/docs/git-clone#Docum
 <p>You need to have a <strong>working compiler</strong> on your system, such as Visual Studio on Windows, GCC on Linux and XCode on MacOS.</p>
 </div>
 <p>If not installing inside a conda environment, then the user might need to set the locations of optional libraries:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>-Ccmake.define.IPP_ROOT<span class="o">=</span><span class="s2">&quot;&lt;path_to_ipp&gt;&quot;</span><span class="w"> </span>-Ccmake.define.OpenMP_ROOT<span class="o">=</span><span class="s2">&quot;&lt;path_to_openmp&gt;&quot;</span><span class="w"> </span>-Ccmake.define.CMAKE_BUILD_TYPE<span class="o">=</span>RelWithDebInfo
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>-Ccmake.define.IPP_ROOT<span class="o">=</span><span class="s2">"&lt;path_to_ipp&gt;"</span><span class="w"> </span>-Ccmake.define.OpenMP_ROOT<span class="o">=</span><span class="s2">"&lt;path_to_openmp&gt;"</span><span class="w"> </span>-Ccmake.define.CMAKE_BUILD_TYPE<span class="o">=</span>RelWithDebInfo
 </pre></div>
 </div>
 </section>
@@ -765,7 +765,7 @@ for docstring formatting and this rendered <a class="reference external" href="h
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text"><cite>FBP.run method from cil.io.recon.FBP</cite></span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Runs the configured FBP recon and returns the reconstruction</span>
 
 <span class="sd">        Parameters</span>
@@ -780,17 +780,17 @@ for docstring formatting and this rendered <a class="reference external" href="h
 <span class="sd">        -------</span>
 <span class="sd">        ImageData</span>
 <span class="sd">            The reconstructed volume. Suppressed if `out` is passed</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">AcquisitionType</span><span class="o">.</span><span class="n">DIM2</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only 3D datasets can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">!=</span> <span class="s1">&#39;simple&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">!=</span> <span class="s1">&#39;offset&#39;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only simple and offset geometries can be processed in chunks with `set_split_processing`&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Only 3D datasets can be processed in chunks with `set_split_processing`"</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">!=</span> <span class="s1">'simple'</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">system_description</span> <span class="o">!=</span> <span class="s1">'offset'</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Only simple and offset geometries can be processed in chunks with `set_split_processing`"</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only default image geometries can be processed in chunks `set_split_processing`&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Only default image geometries can be processed in chunks `set_split_processing`"</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
@@ -811,7 +811,7 @@ for docstring formatting and this rendered <a class="reference external" href="h
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_PO_for_chunks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tot_slices</span><span class="o">-</span><span class="n">remainder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span><span class="p">):</span>
 
-                <span class="k">if</span> <span class="s1">&#39;bottom&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">'bottom'</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
                     <span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
                     <span class="n">end</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices_per_chunk</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -827,7 +827,7 @@ for docstring formatting and this rendered <a class="reference external" href="h
             <span class="k">if</span> <span class="n">remainder</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_setup_PO_for_chunks</span><span class="p">(</span><span class="n">remainder</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="s1">&#39;bottom&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">'bottom'</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
                     <span class="n">start</span> <span class="o">=</span> <span class="n">tot_slices</span><span class="o">-</span><span class="n">remainder</span>
                     <span class="n">end</span> <span class="o">=</span> <span class="n">tot_slices</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -964,12 +964,12 @@ There are 3 sets of parameters:</p>
 <span class="n">Copyright</span> <span class="p">[</span><span class="n">yyyy</span><span class="p">]</span> <span class="n">The</span> <span class="n">University</span> <span class="n">of</span> <span class="n">Manchester</span>
 <span class="n">Copyright</span> <span class="p">[</span><span class="n">yyyy</span><span class="p">]</span> <span class="p">[</span><span class="n">name</span> <span class="n">of</span> <span class="n">copyright</span> <span class="n">owner</span><span class="p">]</span>
 <span class="n">Author</span><span class="p">(</span><span class="n">s</span><span class="p">):</span> <span class="p">[</span><span class="n">Author</span> <span class="n">name</span><span class="p">,</span> <span class="n">Author</span> <span class="n">email</span> <span class="p">(</span><span class="n">optional</span><span class="p">)]</span>
-<span class="n">Licensed</span> <span class="n">under</span> <span class="n">the</span> <span class="n">Apache</span> <span class="n">License</span><span class="p">,</span> <span class="n">Version</span> <span class="mf">2.0</span> <span class="p">(</span><span class="n">the</span> <span class="s2">&quot;License&quot;</span><span class="p">);</span>
+<span class="n">Licensed</span> <span class="n">under</span> <span class="n">the</span> <span class="n">Apache</span> <span class="n">License</span><span class="p">,</span> <span class="n">Version</span> <span class="mf">2.0</span> <span class="p">(</span><span class="n">the</span> <span class="s2">"License"</span><span class="p">);</span>
 <span class="n">you</span> <span class="n">may</span> <span class="ow">not</span> <span class="n">use</span> <span class="n">this</span> <span class="n">file</span> <span class="k">except</span> <span class="ow">in</span> <span class="n">compliance</span> <span class="k">with</span> <span class="n">the</span> <span class="n">License</span><span class="o">.</span>
 <span class="n">You</span> <span class="n">may</span> <span class="n">obtain</span> <span class="n">a</span> <span class="n">copy</span> <span class="n">of</span> <span class="n">the</span> <span class="n">License</span> <span class="n">at</span>
     <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">apache</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">licenses</span><span class="o">/</span><span class="n">LICENSE</span><span class="o">-</span><span class="mf">2.0</span>
 <span class="n">Unless</span> <span class="n">required</span> <span class="n">by</span> <span class="n">applicable</span> <span class="n">law</span> <span class="ow">or</span> <span class="n">agreed</span> <span class="n">to</span> <span class="ow">in</span> <span class="n">writing</span><span class="p">,</span> <span class="n">software</span>
-<span class="n">distributed</span> <span class="n">under</span> <span class="n">the</span> <span class="n">License</span> <span class="ow">is</span> <span class="n">distributed</span> <span class="n">on</span> <span class="n">an</span> <span class="s2">&quot;AS IS&quot;</span> <span class="n">BASIS</span><span class="p">,</span>
+<span class="n">distributed</span> <span class="n">under</span> <span class="n">the</span> <span class="n">License</span> <span class="ow">is</span> <span class="n">distributed</span> <span class="n">on</span> <span class="n">an</span> <span class="s2">"AS IS"</span> <span class="n">BASIS</span><span class="p">,</span>
 <span class="n">WITHOUT</span> <span class="n">WARRANTIES</span> <span class="n">OR</span> <span class="n">CONDITIONS</span> <span class="n">OF</span> <span class="n">ANY</span> <span class="n">KIND</span><span class="p">,</span> <span class="n">either</span> <span class="n">express</span> <span class="ow">or</span> <span class="n">implied</span><span class="o">.</span>
 <span class="n">See</span> <span class="n">the</span> <span class="n">License</span> <span class="k">for</span> <span class="n">the</span> <span class="n">specific</span> <span class="n">language</span> <span class="n">governing</span> <span class="n">permissions</span> <span class="ow">and</span>
 <span class="n">limitations</span> <span class="n">under</span> <span class="n">the</span> <span class="n">License</span><span class="o">.</span>
@@ -1024,8 +1024,8 @@ There are 3 sets of parameters:</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

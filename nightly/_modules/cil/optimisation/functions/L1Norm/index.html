@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.functions.L1Norm &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.optimisation.functions.L1Norm &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/functions/L1Norm';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2019 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2019 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -541,7 +541,7 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">soft_shrinkage</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the soft-shrinkage operator at x. This is used for the calculation of the proximal. </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Returns the value of the soft-shrinkage operator at x. This is used for the calculation of the proximal. </span>
 <span class="sd">    </span>
 <span class="sd">    .. math:: soft_shrinkage (x) = \begin{cases}</span>
 <span class="sd">                x-\tau, \mbox{if } x &gt; \tau \</span>
@@ -572,12 +572,12 @@
 <span class="sd">                \frac{z}{|z|}, \mbox{otherwise}</span>
 <span class="sd">                \end{cases}.</span>
 <span class="sd">                </span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">tau</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;tau should be non-negative!&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+                <span class="s2">"tau should be non-negative!"</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">tau</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;tau should be real!&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"tau should be real!"</span><span class="p">)</span>
 
     <span class="c1"># get the sign of the input</span>
     <span class="n">dsign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">iscomplexobj</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span><span class="o">.</span><span class="n">sign</span><span class="p">()</span>
@@ -607,7 +607,7 @@
 <div class="viewcode-block" id="L1Norm">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.L1Norm">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">L1Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;L1Norm function</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""L1Norm function</span>
 
 <span class="sd">    Consider the following cases:</span>
 
@@ -628,7 +628,7 @@
 <span class="sd">    b: DataContainer, default None</span>
 <span class="sd">        Translation of the function.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">L1Norm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -637,7 +637,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">_WeightedL1Norm</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the L1Norm function at :math:`x`.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Returns the value of the L1Norm function at :math:`x`.</span>
 
 <span class="sd">        .. math:: f(x) = ||x - b||_{L^1(w)}</span>
 
@@ -651,13 +651,13 @@
 <span class="sd">        float</span>
 <span class="sd">            The value of the function at :math:`x`</span>
 <span class="sd">            </span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
 <div class="viewcode-block" id="L1Norm.convex_conjugate">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.L1Norm.convex_conjugate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the L1 Norm function at :math:`x`.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Returns the value of the convex conjugate of the L1 Norm function at :math:`x`.</span>
 
 
 <span class="sd">        This is the indicator of the unit :math:`L^{\infty}` norm:</span>
@@ -694,14 +694,14 @@
 <span class="sd">        float</span>
 <span class="sd">            The value of the convex conjugate of the WeightedL1Norm function at :math:`x`</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="L1Norm.proximal">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.L1Norm.proximal">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the L1 Norm function at :math:`x` with scaling parameter :math:`\tau`.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Returns the value of the proximal operator of the L1 Norm function at :math:`x` with scaling parameter :math:`\tau`.</span>
 
 
 <span class="sd">        Consider the following cases:</span>
@@ -713,7 +713,7 @@
 <span class="sd">    </span>
 <span class="sd">        .. math :: \mathrm{ShrinkOperator}_\tau(x) = sgn(x) * \max\{ |x| - \tau, 0 \}</span>
 <span class="sd">    </span>
-<span class="sd">        The weighted case follows from Example 6.23 in Chapter 6 of &quot;First-Order Methods in Optimization&quot;</span>
+<span class="sd">        The weighted case follows from Example 6.23 in Chapter 6 of "First-Order Methods in Optimization"</span>
 <span class="sd">        by Amir Beck, SIAM 2017 https://archive.siam.org/books/mo25/mo25_ch6.pdf</span>
 <span class="sd">    </span>
 <span class="sd">        c) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}_{\tau*w}(x)</span>
@@ -732,7 +732,7 @@
 <span class="sd">        float</span>
 <span class="sd">            The value of the proximal operator of the L1 norm function at :math:`x`.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
             
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
 </div>
@@ -741,16 +741,16 @@
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_L1Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;L1Norm function</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""L1Norm function</span>
 
 <span class="sd">        Consider the following cases:</span>
 <span class="sd">            a) .. math:: F(x) = ||x||_{1}</span>
 <span class="sd">            b) .. math:: F(x) = ||x - b||_{1}</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;creator</span>
+<span class="w">        </span><span class="sd">'''creator</span>
 
 <span class="sd">        Cases considered (with/without data):</span>
 <span class="sd">        a) :math:`f(x) = ||x||_{1}`</span>
@@ -758,9 +758,9 @@
 
 <span class="sd">        :param b: translation of the function</span>
 <span class="sd">        :type b: :code:`DataContainer`, optional</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        '''</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'b'</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">x</span>
@@ -794,10 +794,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
 
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Weights should be non-negative!&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Weights should be non-negative!"</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">weight</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Weights should be real!&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Weights should be real!"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
@@ -825,7 +825,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.MixedL11Norm">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MixedL11Norm</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
 
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;MixedL11Norm function</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""MixedL11Norm function</span>
 
 <span class="sd">    .. math:: F(x) = ||x||_{1,1} = \sum |x_{1}| + |x_{2}| + \cdots + |x_{n}|</span>
 
@@ -839,19 +839,19 @@
 <span class="sd">    L1Norm, MixedL21Norm</span>
 
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MixedL11Norm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the MixedL11Norm function at x.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Returns the value of the MixedL11Norm function at x.</span>
 
 <span class="sd">        :param x: :code:`BlockDataContainer`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
 
         <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
@@ -859,7 +859,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.MixedL11Norm.proximal">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the MixedL11Norm function at x.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Returns the value of the proximal operator of the MixedL11Norm function at x.</span>
 
 <span class="sd">        .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}(x)</span>
 
@@ -867,10 +867,10 @@
 
 <span class="sd">        .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShrinkOperator}(x) := sgn(x) * \max\{ |x| - \tau, 0 \}</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'__call__ expected BlockDataContainer, got </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
 
         <span class="k">return</span> <span class="n">soft_shrinkage</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span></div>
 </div>
@@ -904,8 +904,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

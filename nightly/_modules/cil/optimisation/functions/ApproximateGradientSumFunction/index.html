@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.functions.ApproximateGradientSumFunction &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>cil.optimisation.functions.ApproximateGradientSumFunction &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../../../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../../../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/functions/ApproximateGradientSumFunction';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -519,14 +519,14 @@
 <span></span><span class="c1">#  Copyright 2024 United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2024 The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -552,7 +552,7 @@
 <div class="viewcode-block" id="ApproximateGradientSumFunction">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ApproximateGradientSumFunction</span><span class="p">(</span><span class="n">SumFunction</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;ApproximateGradientSumFunction represents the following sum </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""ApproximateGradientSumFunction represents the following sum </span>
 
 <span class="sd">    .. math:: \sum_{i=0}^{n-1} f_{i} = (f_{0} + f_{2} + ... + f_{n-1})</span>
 
@@ -582,7 +582,7 @@
 <span class="sd">    Each time :code:`gradient` is called the class keeps track of which functions have been used to calculate the gradient. This may be useful for debugging or plotting after using this function in an iterative algorithm.  </span>
 <span class="sd">    </span>
 <span class="sd">        - The property :code:`data_passes_indices` is a list of lists holding the indices of the functions that are processed in each call of `gradient`. This list is updated each time `gradient` is called by appending a list of the indices of the functions used to calculate the gradient. </span>
-<span class="sd">        - The property :code:`data_passes` is a list of floats that holds the amount of data that has been processed up until each call of `gradient`. This list is updated each time `gradient` is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights&quot; function for this to be accurate.    </span>
+<span class="sd">        - The property :code:`data_passes` is a list of floats that holds the amount of data that has been processed up until each call of `gradient`. This list is updated each time `gradient` is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). Warning: if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights" function for this to be accurate.    </span>
 
 
 
@@ -613,7 +613,7 @@
 
 
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
@@ -621,9 +621,9 @@
             <span class="n">sampler</span> <span class="o">=</span> <span class="n">Sampler</span><span class="o">.</span><span class="n">random_with_replacement</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">functions</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">functions</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input to functions should be a list of functions&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="s2">&quot;next&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The provided sampler must have a `next` method&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Input to functions should be a list of functions"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="s2">"next"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'The provided sampler must have a `next` method'</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span> <span class="o">=</span> <span class="n">sampler</span>
 
@@ -634,7 +634,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">ApproximateGradientSumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">functions</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the sum of functions at :math:`x`.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Returns the value of the sum of functions at :math:`x`.</span>
 
 <span class="sd">        .. math:: (f_{0} + f_{1} + ... + f_{n-1})(x) = f_{0}(x) + f_{1}(x) + ... + f_{n-1}(x)</span>
 
@@ -647,13 +647,13 @@
 <span class="sd">            the value of the SumFunction at x</span>
 
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ApproximateGradientSumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ApproximateGradientSumFunction.full_gradient">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.full_gradient">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">full_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the  full gradient of the sum of functions at :math:`x`.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Returns the value of the  full gradient of the sum of functions at :math:`x`.</span>
 
 <span class="sd">        .. math:: \nabla_x(f_{0} + f_{1} + ... + f_{n-1})(x) = \nabla_xf_{0}(x) + \nabla_xf_{1}(x) + ... + \nabla_xf_{n-1}(x)</span>
 
@@ -666,7 +666,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        DataContainer</span>
 <span class="sd">            The value of the gradient of the sum function at x or nothing if `out`  </span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ApproximateGradientSumFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
 
@@ -675,7 +675,7 @@
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.approximate_gradient">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">approximate_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">function_num</span><span class="p">,</span>   <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the approximate gradient at a given point :code:`x` given a `function_number` in {0,...,len(functions)-1}.</span>
+<span class="w">        </span><span class="sd">""" Returns the approximate gradient at a given point :code:`x` given a `function_number` in {0,...,len(functions)-1}.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -687,14 +687,14 @@
 <span class="sd">        --------</span>
 <span class="sd">        DataContainer</span>
 <span class="sd">            the value of the approximate gradient of the sum function at :code:`x` given a `function_number` in {0,...,len(functions)-1} </span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="ApproximateGradientSumFunction.gradient">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.gradient">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x`</span>
+<span class="w">        </span><span class="sd">""" Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x`</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -705,7 +705,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        DataContainer</span>
 <span class="sd">            the value of the approximate gradient of the sum function at :code:`x`   </span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">function_num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
         
@@ -718,50 +718,50 @@
         
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_data_passes_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Internal function that updates the list of lists containing the function indices used to calculate the approximate gradient. </span>
+<span class="w">        </span><span class="sd">""" Internal function that updates the list of lists containing the function indices used to calculate the approximate gradient. </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        indices: list</span>
 <span class="sd">            List of indices used to calculate the approximate gradient in a given iteration</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_passes_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ApproximateGradientSumFunction.set_data_partition_weights">
 <a class="viewcode-back" href="../../../../../optimisation/#cil.optimisation.functions.ApproximateGradientSumFunction.set_data_partition_weights">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_data_partition_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Setter for the partition weights used to calculate the data passes  </span>
+<span class="w">        </span><span class="sd">""" Setter for the partition weights used to calculate the data passes  </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        weights: list of positive floats that sum to one. </span>
 <span class="sd">            The proportion of the data held in each function. Equivalent to the proportions that you partitioned your data into. </span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s1">&#39;The provided weights must be a list the same length as the number of functions&#39;</span><span class="p">)</span>
+                <span class="s1">'The provided weights must be a list the same length as the number of functions'</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-6</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The provided weights must sum to one&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'The provided weights must sum to one'</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s1">&#39;The provided weights must be greater than or equal to zero&#39;</span><span class="p">)</span>
+                <span class="s1">'The provided weights must be greater than or equal to zero'</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_partition_weights</span> <span class="o">=</span> <span class="n">weights</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">data_passes_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The property :code:`data_passes_indices` is a list of lists holding the indices of the functions that are processed in each call of `gradient`. This list is updated each time `gradient` is called by appending a list of the indices of the functions used to calculate the gradient.  &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">""" The property :code:`data_passes_indices` is a list of lists holding the indices of the functions that are processed in each call of `gradient`. This list is updated each time `gradient` is called by appending a list of the indices of the functions used to calculate the gradient.  """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_passes_indices</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">data_passes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The property :code:`data_passes` is a list of floats that holds the amount of data that has been processed up until each call of `gradient`. </span>
+<span class="w">        </span><span class="sd">""" The property :code:`data_passes` is a list of floats that holds the amount of data that has been processed up until each call of `gradient`. </span>
 <span class="sd">        This list is updated each time `gradient` is called by appending the proportion of the data used when calculating the approximate gradient since the class was initialised (a full gradient calculation would be 1 full data pass). </span>
-<span class="sd">        Note that if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights` function for this to be accurate.   &quot;&quot;&quot;</span>
+<span class="sd">        Note that if your functions do not contain an equal `amount` of data, for example your data was not partitioned into equal batches, then you must first use the `set_data_partition_weights` function for this to be accurate.   """</span>
         <span class="n">data_passes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_passes_indices</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -801,8 +801,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

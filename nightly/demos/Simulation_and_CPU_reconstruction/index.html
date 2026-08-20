@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>Simulation using gVXR and CPU reconstruction using CIL of a twisted hexagonal object with helical flow channels &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,9 +52,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/Simulation_and_CPU_reconstruction';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="CIL User Showcase 13: Anisotropic Regularization for FILD Measurements using CIL" href="../013_Anisotropic_regularisation_FILD_measurements/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -596,14 +596,14 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">#  Copyright 2024</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -668,7 +668,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ET</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="n">cmapRecon</span> <span class="o">=</span> <span class="s2">&quot;inferno&quot;</span>
+<span class="n">cmapRecon</span> <span class="o">=</span> <span class="s2">"inferno"</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 <br/></pre></div>
 </div>
@@ -701,10 +701,10 @@ Tue Jan  7 15:01:02 2025 (WW) Xpecgen is not installed either.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># xml name</span>
-<span class="n">xmlName</span> <span class="o">=</span> <span class="s1">&#39;scan_param.xml&#39;</span>
+<span class="n">xmlName</span> <span class="o">=</span> <span class="s1">'scan_param.xml'</span>
 
 <span class="c1"># stl name</span>
-<span class="n">stlName</span> <span class="o">=</span> <span class="s1">&#39;object.stl&#39;</span>
+<span class="n">stlName</span> <span class="o">=</span> <span class="s1">'object.stl'</span>
 
 <span class="c1"># data reduction factor (scale down)</span>
 <span class="n">dataRed</span> <span class="o">=</span> <span class="mi">15</span>
@@ -730,13 +730,13 @@ Tue Jan  7 15:01:02 2025 (WW) Xpecgen is not installed either.
             <span class="n">d</span><span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">tag</span><span class="p">][</span><span class="n">item</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">text</span>
 
 <span class="c1"># geometry data</span>
-<span class="n">numPixX</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;ScanParameter&#39;</span><span class="p">][</span><span class="s1">&#39;DetectorPixelX&#39;</span><span class="p">])</span>
-<span class="n">numPixY</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;ScanParameter&#39;</span><span class="p">][</span><span class="s1">&#39;DetectorPixelY&#39;</span><span class="p">])</span>
-<span class="n">souPos</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Geometrie&#39;</span><span class="p">][</span><span class="s1">&#39;SourceObjectDist&#39;</span><span class="p">])</span>
-<span class="n">detPos</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Geometrie&#39;</span><span class="p">][</span><span class="s1">&#39;SourceDetectorDist&#39;</span><span class="p">])</span>
-<span class="n">pixSiz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Recon&#39;</span><span class="p">][</span><span class="s1">&#39;ProjectionPixelSizeX&#39;</span><span class="p">])</span>
-<span class="n">detOffX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Recon&#39;</span><span class="p">][</span><span class="s1">&#39;ProjectionCenterOffsetX&#39;</span><span class="p">])</span>
-<span class="n">detOffY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Recon&#39;</span><span class="p">][</span><span class="s1">&#39;ProjectionCenterOffsetY&#39;</span><span class="p">])</span>
+<span class="n">numPixX</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">'ScanParameter'</span><span class="p">][</span><span class="s1">'DetectorPixelX'</span><span class="p">])</span>
+<span class="n">numPixY</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">'ScanParameter'</span><span class="p">][</span><span class="s1">'DetectorPixelY'</span><span class="p">])</span>
+<span class="n">souPos</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">'Geometrie'</span><span class="p">][</span><span class="s1">'SourceObjectDist'</span><span class="p">])</span>
+<span class="n">detPos</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">'Geometrie'</span><span class="p">][</span><span class="s1">'SourceDetectorDist'</span><span class="p">])</span>
+<span class="n">pixSiz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">'Recon'</span><span class="p">][</span><span class="s1">'ProjectionPixelSizeX'</span><span class="p">])</span>
+<span class="n">detOffX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">'Recon'</span><span class="p">][</span><span class="s1">'ProjectionCenterOffsetX'</span><span class="p">])</span>
+<span class="n">detOffY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">'Recon'</span><span class="p">][</span><span class="s1">'ProjectionCenterOffsetY'</span><span class="p">])</span>
 
 <span class="c1"># simulation data - resolution decreased by factor of dataRed</span>
 <span class="n">numPixX</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numPixX</span> <span class="o">/</span> <span class="n">dataRed</span><span class="p">)</span>
@@ -744,8 +744,8 @@ Tue Jan  7 15:01:02 2025 (WW) Xpecgen is not installed either.
 <span class="n">pixSiz</span> <span class="o">=</span> <span class="n">pixSiz</span> <span class="o">*</span> <span class="n">dataRed</span>
 
 <span class="c1"># scan data</span>
-<span class="n">scaVol</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;ScanParameter&#39;</span><span class="p">][</span><span class="s1">&#39;Voltage&#39;</span><span class="p">])</span>
-<span class="n">numPro</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;Recon&#39;</span><span class="p">][</span><span class="s1">&#39;ProjectionCount&#39;</span><span class="p">])</span>
+<span class="n">scaVol</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">'ScanParameter'</span><span class="p">][</span><span class="s1">'Voltage'</span><span class="p">])</span>
+<span class="n">numPro</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">'Recon'</span><span class="p">][</span><span class="s1">'ProjectionCount'</span><span class="p">])</span>
 <br/></pre></div>
 </div>
 </div>
@@ -764,12 +764,12 @@ Tue Jan  7 15:01:02 2025 (WW) Xpecgen is not installed either.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span> <span class="o">=</span> <span class="n">k3d</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">stlName</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">stlName</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
     <span class="n">plot</span> <span class="o">+=</span> <span class="n">k3d</span><span class="o">.</span><span class="n">stl</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span><span class="n">color</span><span class="o">=</span><span class="mh">0xfdea4f</span><span class="p">)</span>
 <span class="n">plot</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Screenshot for online viewing:&quot;</span><span class="p">)</span>
-<span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;object_screenshot.png&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Screenshot for online viewing:"</span><span class="p">)</span>
+<span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">'object_screenshot.png'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -807,7 +807,7 @@ Screenshot for online viewing:
 <span class="n">endAng</span> <span class="o">=</span> <span class="mi">360</span>
 
 <span class="c1"># material</span>
-<span class="n">matNam</span> <span class="o">=</span> <span class="s2">&quot;ZrO2&quot;</span>
+<span class="n">matNam</span> <span class="o">=</span> <span class="s2">"ZrO2"</span>
 <span class="n">matDen</span> <span class="o">=</span> <span class="mf">5.68</span>     <span class="c1"># g/cm3</span>
 </pre></div>
 </div>
@@ -847,26 +847,26 @@ Screenshot for online viewing:
 <span class="n">window_id</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">opengl_major_version</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">opengl_minor_version</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;OPENGL&quot;</span>
+<span class="n">backend</span> <span class="o">=</span> <span class="s2">"OPENGL"</span>
 <span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">gvxr</span><span class="o">.</span><span class="n">createWindow</span><span class="p">(</span><span class="n">window_id</span><span class="p">,</span> <span class="n">visible</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">opengl_major_version</span><span class="p">,</span> <span class="n">opengl_minor_version</span><span class="p">)</span>
 
 <span class="c1"># Setup Detector</span>
 <span class="n">gvxr</span><span class="o">.</span><span class="n">setDetectorNumberOfPixels</span><span class="p">(</span><span class="n">numPixX</span><span class="p">,</span> <span class="n">numPixY</span><span class="p">)</span>
-<span class="n">gvxr</span><span class="o">.</span><span class="n">setDetectorPixelSize</span><span class="p">(</span><span class="n">pixSiz</span><span class="p">,</span> <span class="n">pixSiz</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">setDetectorPixelSize</span><span class="p">(</span><span class="n">pixSiz</span><span class="p">,</span> <span class="n">pixSiz</span><span class="p">,</span> <span class="s2">"mm"</span><span class="p">)</span>
 <span class="n">gvxr</span><span class="o">.</span><span class="n">setDetectorUpVector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">gvxr</span><span class="o">.</span><span class="n">setDetectorPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">detPos</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">setDetectorPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">detPos</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"mm"</span><span class="p">)</span>
 
 <span class="c1"># Setup Source</span>
-<span class="n">gvxr</span><span class="o">.</span><span class="n">setSourcePosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">souPos</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s2">&quot;mm&quot;</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">setSourcePosition</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="n">souPos</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s2">"mm"</span><span class="p">)</span>
 <span class="n">gvxr</span><span class="o">.</span><span class="n">usePointSource</span><span class="p">()</span>
-<span class="n">gvxr</span><span class="o">.</span><span class="n">addEnergyBinToSpectrum</span><span class="p">(</span><span class="n">scaVol</span><span class="p">,</span> <span class="s2">&quot;keV&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">addEnergyBinToSpectrum</span><span class="p">(</span><span class="n">scaVol</span><span class="p">,</span> <span class="s2">"keV"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
 <span class="c1"># Setup Model</span>
 <span class="n">gvxr</span><span class="o">.</span><span class="n">removePolygonMeshesFromSceneGraph</span><span class="p">()</span>
-<span class="n">gvxr</span><span class="o">.</span><span class="n">loadMeshFile</span><span class="p">(</span><span class="s2">&quot;cell&quot;</span><span class="p">,</span> <span class="n">stlName</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">)</span>
-<span class="n">gvxr</span><span class="o">.</span><span class="n">setCompound</span><span class="p">(</span><span class="s2">&quot;cell&quot;</span><span class="p">,</span><span class="n">matNam</span><span class="p">)</span>
-<span class="n">gvxr</span><span class="o">.</span><span class="n">setDensity</span><span class="p">(</span><span class="s2">&quot;cell&quot;</span><span class="p">,</span> <span class="n">matDen</span><span class="p">,</span> <span class="s2">&quot;g/cm3&quot;</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">loadMeshFile</span><span class="p">(</span><span class="s2">"cell"</span><span class="p">,</span> <span class="n">stlName</span><span class="p">,</span> <span class="s2">"mm"</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">setCompound</span><span class="p">(</span><span class="s2">"cell"</span><span class="p">,</span><span class="n">matNam</span><span class="p">)</span>
+<span class="n">gvxr</span><span class="o">.</span><span class="n">setDensity</span><span class="p">(</span><span class="s2">"cell"</span><span class="p">,</span> <span class="n">matDen</span><span class="p">,</span> <span class="s2">"g/cm3"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -940,19 +940,19 @@ Tue Jan  7 15:01:05 2025 ---- file_name:        object.stl      nb_faces:       
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gvxr</span><span class="o">.</span><span class="n">computeCTAcquisition</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="c1"># Where to save the projections</span>
-                          <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="c1"># Where to save the screenshots</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gvxr</span><span class="o">.</span><span class="n">computeCTAcquisition</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="c1"># Where to save the projections</span>
+                          <span class="s2">""</span><span class="p">,</span> <span class="c1"># Where to save the screenshots</span>
                           <span class="n">numPro</span><span class="p">,</span> <span class="c1"># Total number of projections</span>
                           <span class="mi">0</span><span class="p">,</span> <span class="c1"># First angle</span>
                           <span class="kc">False</span><span class="p">,</span> <span class="c1"># Include the last angle</span>
                           <span class="n">endAng</span><span class="p">,</span> <span class="c1"># Last angle</span>
                           <span class="mi">0</span><span class="p">,</span> <span class="c1"># Number of flat images</span>
-                          <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">,</span> <span class="c1"># Centre of rotation</span>
+                          <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"mm"</span><span class="p">,</span> <span class="c1"># Centre of rotation</span>
                           <span class="o">*</span><span class="n">gvxr</span><span class="o">.</span><span class="n">getDetectorUpVector</span><span class="p">())</span> <span class="c1"># Rotation axis</span>
 
 <span class="n">projSim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gvxr</span><span class="o">.</span><span class="n">getLastProjectionSet</span><span class="p">())</span>
 
-<span class="c1"># Don&#39;t forget, we need to use flatfield normalisation on the radiographs to get the correct attenuation values!</span>
+<span class="c1"># Don't forget, we need to use flatfield normalisation on the radiographs to get the correct attenuation values!</span>
 <span class="c1"># Because our flatfield and darkfield are perfect, all we need to do is divide by the total energy</span>
 <span class="n">projSim</span> <span class="o">/=</span> <span class="n">gvxr</span><span class="o">.</span><span class="n">getTotalEnergyWithDetectorResponse</span><span class="p">()</span>
 </pre></div>
@@ -967,8 +967,8 @@ Tue Jan  7 15:01:05 2025 ---- file_name:        object.stl      nb_faces:       
 <span class="n">plot</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
 
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Screenshot for online viewing:&quot;</span><span class="p">)</span>
-<span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;projection_screenshot.png&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Screenshot for online viewing:"</span><span class="p">)</span>
+<span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">'projection_screenshot.png'</span><span class="p">)</span>
 <br/></pre></div>
 </div>
 </div>
@@ -1005,16 +1005,16 @@ Screenshot for online viewing:
 <span class="n">bitMul</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">bitDep</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
 
 <span class="c1"># admin</span>
-<span class="n">filNam</span> <span class="o">=</span> <span class="s2">&quot;proj&quot;</span>
+<span class="n">filNam</span> <span class="o">=</span> <span class="s2">"proj"</span>
 
 <span class="c1"># write data to raw - CIL method</span>
 <span class="n">imData</span> <span class="o">=</span> <span class="n">DataContainer</span><span class="p">(</span><span class="n">projSim</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-<span class="n">rawWrite</span> <span class="o">=</span> <span class="n">RAWFileWriter</span><span class="p">(</span><span class="n">imData</span><span class="p">,</span><span class="n">filNam</span><span class="o">+</span><span class="s2">&quot;_CIL&quot;</span><span class="p">,</span><span class="s1">&#39;uint16&#39;</span><span class="p">)</span>
+<span class="n">rawWrite</span> <span class="o">=</span> <span class="n">RAWFileWriter</span><span class="p">(</span><span class="n">imData</span><span class="p">,</span><span class="n">filNam</span><span class="o">+</span><span class="s2">"_CIL"</span><span class="p">,</span><span class="s1">'uint16'</span><span class="p">)</span>
 <span class="n">rawWrite</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
 
 <span class="c1"># write to raw - numpy</span>
 <span class="n">projSimNP</span> <span class="o">=</span> <span class="n">projSim</span> <span class="o">*</span> <span class="n">bitMul</span>
-<span class="n">projSimNP</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">filNam</span><span class="o">+</span><span class="s2">&quot;_np.raw&quot;</span><span class="p">)</span>
+<span class="n">projSimNP</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'uint16'</span><span class="p">)</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">filNam</span><span class="o">+</span><span class="s2">"_np.raw"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1029,35 +1029,35 @@ Screenshot for online viewing:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># use simulated or simulated read/write projection data</span>
-<span class="n">dataSource</span> <span class="o">=</span> <span class="s2">&quot;simRW&quot;</span>        <span class="c1"># sim, simRW, exp</span>
-<span class="n">dataWriteMethod</span> <span class="o">=</span> <span class="s2">&quot;np&quot;</span>      <span class="c1"># CIL, np</span>
+<span class="n">dataSource</span> <span class="o">=</span> <span class="s2">"simRW"</span>        <span class="c1"># sim, simRW, exp</span>
+<span class="n">dataWriteMethod</span> <span class="o">=</span> <span class="s2">"np"</span>      <span class="c1"># CIL, np</span>
 
 <span class="k">match</span><span class="p">(</span><span class="n">dataSource</span><span class="p">):</span>
-    <span class="k">case</span> <span class="s2">&quot;sim&quot;</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;using sim data&#39;</span><span class="p">)</span>
+    <span class="k">case</span> <span class="s2">"sim"</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'using sim data'</span><span class="p">)</span>
         <span class="n">proj</span> <span class="o">=</span> <span class="n">projSim</span>
 
-    <span class="k">case</span> <span class="s2">&quot;exp&quot;</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;using experimental data&#39;</span><span class="p">)</span>
+    <span class="k">case</span> <span class="s2">"exp"</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'using experimental data'</span><span class="p">)</span>
 
-    <span class="k">case</span> <span class="s2">&quot;simRW&quot;</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;using simRW data&#39;</span><span class="p">)</span>
+    <span class="k">case</span> <span class="s2">"simRW"</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'using simRW data'</span><span class="p">)</span>
 
         <span class="c1"># get number of pixels</span>
         <span class="n">num_pixels</span> <span class="o">=</span> <span class="n">numPixX</span> <span class="o">*</span> <span class="n">numPixY</span> <span class="o">*</span> <span class="n">numPro</span>
 
         <span class="k">match</span><span class="p">(</span><span class="n">dataWriteMethod</span><span class="p">):</span>
-            <span class="k">case</span> <span class="s2">&quot;CIL&quot;</span><span class="p">:</span>
+            <span class="k">case</span> <span class="s2">"CIL"</span><span class="p">:</span>
                 <span class="c1"># Read the .raw file as a numpy array - CIL data</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filNam</span><span class="o">+</span><span class="s2">&quot;_CIL.raw&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filNam</span><span class="o">+</span><span class="s2">"_CIL.raw"</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">num_pixels</span><span class="p">)</span>
 
                 <span class="c1"># normalise data - need to use compression and scale data</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">+</span> <span class="mf">16918.20416302011</span><span class="p">)</span> <span class="o">/</span> <span class="mf">82453.20416302011</span>
 
-            <span class="k">case</span> <span class="s2">&quot;np&quot;</span><span class="p">:</span>
+            <span class="k">case</span> <span class="s2">"np"</span><span class="p">:</span>
                 <span class="c1"># Read the .raw file as a numpy array - NP data</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filNam</span><span class="o">+</span><span class="s2">&quot;_np.raw&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filNam</span><span class="o">+</span><span class="s2">"_np.raw"</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">num_pixels</span><span class="p">)</span>
 
                 <span class="c1"># normalise data</span>
@@ -1087,13 +1087,13 @@ using simRW data
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">projDiff</span> <span class="o">=</span> <span class="mi">100</span><span class="o">*</span><span class="p">(</span><span class="n">projSim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">projRead</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">projSim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">limit</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">projDiff</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span><span class="n">projDiff</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
 
-<span class="n">show2D</span><span class="p">([</span><span class="n">projSim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">projRead</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">projDiff</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sim&quot;</span><span class="p">,</span><span class="s2">&quot;sim_read_write_&quot;</span><span class="o">+</span><span class="n">dataWriteMethod</span><span class="p">,</span><span class="s2">&quot;difference (in %)&quot;</span><span class="p">],</span>\
-        <span class="n">cmap</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="s1">&#39;seismic&#39;</span><span class="p">],</span><span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">fix_range</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="o">-</span><span class="n">limit</span><span class="p">,</span><span class="n">limit</span><span class="p">)],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">projSim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">projRead</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">projDiff</span><span class="p">],</span><span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s2">"sim"</span><span class="p">,</span><span class="s2">"sim_read_write_"</span><span class="o">+</span><span class="n">dataWriteMethod</span><span class="p">,</span><span class="s2">"difference (in %)"</span><span class="p">],</span>\
+        <span class="n">cmap</span><span class="o">=</span><span class="p">[</span><span class="s1">'inferno'</span><span class="p">,</span> <span class="s1">'inferno'</span><span class="p">,</span> <span class="s1">'seismic'</span><span class="p">],</span><span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">fix_range</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="o">-</span><span class="n">limit</span><span class="p">,</span><span class="n">limit</span><span class="p">)],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">projDiff</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Histogram of </span><span class="si">% d</span><span class="s2">ifference&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="s1">&#39;both&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Histogram of </span><span class="si">% d</span><span class="s2">ifference"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="s1">'both'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1121,15 +1121,15 @@ using simRW data
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># colormap</span>
-<span class="n">cmapSino</span> <span class="o">=</span> <span class="s2">&quot;inferno&quot;</span>    <span class="c1"># gray, inferno</span>
+<span class="n">cmapSino</span> <span class="o">=</span> <span class="s2">"inferno"</span>    <span class="c1"># gray, inferno</span>
 
 <span class="c1"># reduce data (64 -&gt; 32 bit)</span>
 <span class="n">proj_red</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="n">aqData</span> <span class="o">=</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">proj_red</span><span class="p">,</span><span class="kc">False</span><span class="p">,</span><span class="n">ag</span><span class="p">)</span>
 <span class="n">islicer</span><span class="p">(</span><span class="n">aqData</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmapSino</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Screenshot for online viewing:&quot;</span><span class="p">)</span>
-<span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;islicer_screenshot.png&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Screenshot for online viewing:"</span><span class="p">)</span>
+<span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">'islicer_screenshot.png'</span><span class="p">)</span>
 <br/><br/></pre></div>
 </div>
 </div>
@@ -1154,7 +1154,7 @@ Screenshot for online viewing:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1"># get slice</span>
-<span class="n">dataSlice</span> <span class="o">=</span> <span class="n">aqData</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+<span class="n">dataSlice</span> <span class="o">=</span> <span class="n">aqData</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">)</span>
 
 <span class="c1"># log corecction</span>
 <span class="n">dataSlice</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">dataSlice</span><span class="p">)</span>
@@ -1170,13 +1170,13 @@ Screenshot for online viewing:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">imgeom</span><span class="p">,</span> <span class="n">dataSlice</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">imgeom</span><span class="p">,</span> <span class="n">dataSlice</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">'cpu'</span><span class="p">)</span>
 
-<span class="c1"># &#39;CGLS&#39;:</span>
+<span class="c1"># 'CGLS':</span>
 <span class="n">cgls</span> <span class="o">=</span> <span class="n">CGLS</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">imgeom</span><span class="o">.</span><span class="n">allocate</span><span class="p">(),</span> <span class="n">operator</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">dataSlice</span><span class="p">)</span>
 <span class="n">cgls</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
 
-<span class="c1"># &#39;SIRT&#39;:</span>
+<span class="c1"># 'SIRT':</span>
 <span class="n">constraint</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">sirt</span> <span class="o">=</span> <span class="n">SIRT</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">imgeom</span><span class="o">.</span><span class="n">allocate</span><span class="p">(),</span> <span class="n">operator</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">dataSlice</span><span class="p">,</span> <span class="n">constraint</span><span class="o">=</span><span class="n">constraint</span><span class="p">)</span>
 <span class="n">sirt</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
@@ -1199,7 +1199,7 @@ Screenshot for online viewing:
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">cgls</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span><span class="n">sirt</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CGLS&quot;</span><span class="p">,</span><span class="s2">&quot;SIRT&quot;</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmapRecon</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">show2D</span><span class="p">([</span><span class="n">cgls</span><span class="o">.</span><span class="n">solution</span><span class="p">,</span><span class="n">sirt</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s2">"CGLS"</span><span class="p">,</span><span class="s2">"SIRT"</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmapRecon</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">"upper"</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1278,8 +1278,8 @@ Screenshot for online viewing:
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>CIL Callbacks How To &#8212; CIL 25.0.1.dev84+g11b5a188f.d20260617 documentation</title>
+    <title>CIL Callbacks How To &#8212; CIL 26.0.1.dev1+gb356e6822.d20260820 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
 
-    <script src="../../_static/documentation_options.js?v=b3e80615"></script>
+    <script src="../../_static/documentation_options.js?v=8959950e"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,9 +52,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'demos/01_callbacks';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '25.0.1.dev84+g11b5a188f.d20260617';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev1+gb356e6822.d20260820';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="A detailed look at CIL geometry" href="../00_CIL_geometry/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.0.1.dev84+g11b5a188f.d20260617" />
+  <meta name="docsearch:version" content="26.0.1.dev1+gb356e6822.d20260820" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -550,14 +550,14 @@
 <span class="c1">#  Copyright 2024 -  United Kingdom Research and Innovation</span>
 <span class="c1">#  Copyright 2024 -  The University of Manchester</span>
 <span class="c1">#</span>
-<span class="c1">#  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#  Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1">#  you may not use this file except in compliance with the License.</span>
 <span class="c1">#  You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#      http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1">#  Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1">#  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#  distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1">#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1">#  See the License for the specific language governing permissions and</span>
 <span class="c1">#  limitations under the License.</span>
@@ -591,10 +591,10 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 
 
 <span class="c1"># set up default colour map for visualisation</span>
-<span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="s2">"gray"</span>
 
 <span class="c1"># set the backend for FBP and the ProjectionOperator</span>
-<span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;gpu&#39;</span>
+<span class="n">device</span> <span class="o">=</span> <span class="s1">'gpu'</span>
 </pre></div>
 </div>
 </div>
@@ -613,17 +613,17 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SIMULATED_CONE_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
 <span class="c1"># Consider just a single 2D slice</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
-<span class="n">ground_truth</span> <span class="o">=</span> <span class="n">ground_truth</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">&#39;centre&#39;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">)</span>
+<span class="n">ground_truth</span> <span class="o">=</span> <span class="n">ground_truth</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="s1">'centre'</span><span class="p">)</span>
 
 <span class="n">absorption</span> <span class="o">=</span> <span class="n">TransmissionAbsorptionConverter</span><span class="p">()(</span><span class="n">data</span><span class="p">)</span>
-<span class="n">absorption</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;angle&#39;</span><span class="p">:(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)})(</span><span class="n">absorption</span><span class="p">)</span>
+<span class="n">absorption</span> <span class="o">=</span> <span class="n">Slicer</span><span class="p">(</span><span class="n">roi</span><span class="o">=</span><span class="p">{</span><span class="s1">'angle'</span><span class="p">:(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)})(</span><span class="n">absorption</span><span class="p">)</span>
 
 <span class="n">ig</span> <span class="o">=</span> <span class="n">ground_truth</span><span class="o">.</span><span class="n">geometry</span>
 
 <span class="n">recon</span> <span class="o">=</span> <span class="n">FDK</span><span class="p">(</span><span class="n">absorption</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="n">ig</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
-<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FDK Reconstruction&#39;</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Ground Truth'</span><span class="p">,</span> <span class="s1">'FDK Reconstruction'</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">'upper'</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -644,7 +644,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 
 <span class="n">algo</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
-<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="s1">&#39; Limited Angle FDK Reconstruction&#39;</span><span class="p">,</span> <span class="s1">&#39;TV solution&#39;</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Ground Truth'</span><span class="p">,</span> <span class="s1">' Limited Angle FDK Reconstruction'</span><span class="p">,</span> <span class="s1">'TV solution'</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">'upper'</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
 <br/></pre></div>
 </div>
 </div>
@@ -662,7 +662,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <span class="n">cb1</span><span class="o">=</span><span class="n">callbacks</span><span class="o">.</span><span class="n">ProgressCallback</span><span class="p">()</span>
 <span class="n">cb2</span><span class="o">=</span><span class="n">callbacks</span><span class="o">.</span><span class="n">TextProgressCallback</span><span class="p">()</span>
 <span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">cb1</span><span class="p">,</span> <span class="n">cb2</span><span class="p">])</span>
-<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FDK Reconstruction&#39;</span><span class="p">,</span> <span class="s1">&#39;TV solution&#39;</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Ground Truth'</span><span class="p">,</span> <span class="s1">'FDK Reconstruction'</span><span class="p">,</span> <span class="s1">'TV solution'</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">'upper'</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -692,7 +692,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 
 <span class="n">algo</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">TextProgressCallback</span><span class="p">(),</span> <span class="n">EarlyStoppingObjective</span><span class="p">()])</span>
-<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FDK Reconstruction&#39;</span><span class="p">,</span> <span class="s1">&#39;TV solution&#39;</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Ground Truth'</span><span class="p">,</span> <span class="s1">'FDK Reconstruction'</span><span class="p">,</span> <span class="s1">'TV solution'</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">'upper'</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
 <br/></pre></div>
 </div>
 </div>
@@ -702,7 +702,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">EarlyStoppingReference</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
-<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">      </span><span class="sd">"""</span>
 <span class="sd">      Terminates the algorithm when the mean square difference between the current solution and a provided reference image is equal to or less than a provided tolerance.</span>
 
 <span class="sd">      Parameters</span>
@@ -712,7 +712,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <span class="sd">            The image to compare the iterates to. The algorithm will terminate if the current solution satisfies :math:`\frac{1}{N}||x-ref_img||_2^2&lt;tol`, where :math:`N` is the number of pixels in the image.</span>
 <span class="sd">      tolerance: float, default 1e-8</span>
 <span class="sd">            A small value which determines the sensitivity of this stopping criterion. The algorithm will terminate if the current solution satisfies :math:`\frac{1}{N}||x-ref_img||_2^2&lt;tol`, where :math:`N` is the number of pixels in the image.</span>
-<span class="sd">      &quot;&quot;&quot;</span>
+<span class="sd">      """</span>
 
       <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ref_img</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="o">=</span><span class="n">ref_img</span>
@@ -724,7 +724,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <span class="n">algo</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">cb</span><span class="o">=</span><span class="n">EarlyStoppingReference</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span> <span class="mf">3e-8</span><span class="p">)</span>
 <span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">TextProgressCallback</span><span class="p">(),</span><span class="n">cb</span> <span class="p">])</span>
-<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FDK Reconstruction&#39;</span><span class="p">,</span> <span class="s1">&#39;TV solution&#39;</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Ground Truth'</span><span class="p">,</span> <span class="s1">'FDK Reconstruction'</span><span class="p">,</span> <span class="s1">'TV solution'</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">'upper'</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -737,7 +737,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">LeastSquaresCallback</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 
@@ -751,7 +751,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <span class="sd">    save_values: list of floats</span>
 <span class="sd">      The saved least squares calculation, one per iteration</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
@@ -770,13 +770,13 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <span class="n">algo2</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">mycallback_FISTA_no_lower_bound</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">.</span><span class="n">ProgressCallback</span><span class="p">()])</span>
 
 
-<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">algo1</span><span class="o">.</span><span class="n">get_output</span><span class="p">(),</span> <span class="n">algo2</span><span class="o">.</span><span class="n">get_output</span><span class="p">()],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ground_truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA TV with non-negativity &#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA TV without non-negativity &#39;</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">show2D</span><span class="p">([</span><span class="n">absorption</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">algo1</span><span class="o">.</span><span class="n">get_output</span><span class="p">())</span><span class="o">-</span><span class="n">absorption</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">algo2</span><span class="o">.</span><span class="n">get_output</span><span class="p">())</span><span class="o">-</span><span class="n">absorption</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ground_truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Data error FISTA TV with non-negativity&#39;</span><span class="p">,</span> <span class="s1">&#39;Data error FISTA TV without non-negativity&#39;</span><span class="p">],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">]],</span> <span class="n">cmap</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="s1">&#39;seismic&#39;</span><span class="p">,</span> <span class="s1">&#39;seismic&#39;</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">501</span><span class="p">),</span> <span class="n">mycallback_FISTA_lower_bound</span><span class="o">.</span><span class="n">save_values</span><span class="p">[</span><span class="mi">10</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;FISTA TV with non-negativity &#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">501</span><span class="p">),</span> <span class="n">mycallback_FISTA_no_lower_bound</span><span class="o">.</span><span class="n">save_values</span><span class="p">[</span><span class="mi">10</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;FISTA TV without with non-negativity&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Data discrepancy&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration&#39;</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">algo1</span><span class="o">.</span><span class="n">get_output</span><span class="p">(),</span> <span class="n">algo2</span><span class="o">.</span><span class="n">get_output</span><span class="p">()],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'ground_truth'</span><span class="p">,</span> <span class="s1">'FISTA TV with non-negativity '</span><span class="p">,</span> <span class="s1">'FISTA TV without non-negativity '</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">absorption</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">algo1</span><span class="o">.</span><span class="n">get_output</span><span class="p">())</span><span class="o">-</span><span class="n">absorption</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">algo2</span><span class="o">.</span><span class="n">get_output</span><span class="p">())</span><span class="o">-</span><span class="n">absorption</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'ground_truth'</span><span class="p">,</span> <span class="s1">'Data error FISTA TV with non-negativity'</span><span class="p">,</span> <span class="s1">'Data error FISTA TV without non-negativity'</span><span class="p">],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">]],</span> <span class="n">cmap</span><span class="o">=</span><span class="p">[</span><span class="s1">'gray'</span><span class="p">,</span> <span class="s1">'seismic'</span><span class="p">,</span> <span class="s1">'seismic'</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">501</span><span class="p">),</span> <span class="n">mycallback_FISTA_lower_bound</span><span class="o">.</span><span class="n">save_values</span><span class="p">[</span><span class="mi">10</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'FISTA TV with non-negativity '</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">501</span><span class="p">),</span> <span class="n">mycallback_FISTA_no_lower_bound</span><span class="o">.</span><span class="n">save_values</span><span class="p">[</span><span class="mi">10</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'FISTA TV without with non-negativity'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">'log'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Data discrepancy'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Iteration'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -793,13 +793,13 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">skimage</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">SigmaEstimateCallback</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Properties</span>
 <span class="sd">    ----------</span>
 <span class="sd">    save_values: list of floats</span>
 <span class="sd">      The saved sigma calculation, one per iteration</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
@@ -818,12 +818,12 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <span class="n">algo2</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">mycallback_FISTA_TV_alpha_1</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">.</span><span class="n">ProgressCallback</span><span class="p">()])</span>
 
 
-<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">algo1</span><span class="o">.</span><span class="n">get_output</span><span class="p">(),</span> <span class="n">algo2</span><span class="o">.</span><span class="n">get_output</span><span class="p">()],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ground_truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA_TV_alpha_01&#39;</span><span class="p">,</span> <span class="s1">&#39;FISTA_TV_alpha_1&#39;</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">show2D</span><span class="p">([</span><span class="n">absorption</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">algo1</span><span class="o">.</span><span class="n">get_output</span><span class="p">())</span><span class="o">-</span><span class="n">absorption</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">algo2</span><span class="o">.</span><span class="n">get_output</span><span class="p">())</span><span class="o">-</span><span class="n">absorption</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ground_truth&#39;</span><span class="p">,</span> <span class="s1">&#39;Data error FISTA_TV_alpha_01&#39;</span><span class="p">,</span> <span class="s1">&#39;Data error FISTA_TV_alpha_1&#39;</span><span class="p">],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">]],</span> <span class="n">cmap</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="s1">&#39;seismic&#39;</span><span class="p">,</span> <span class="s1">&#39;seismic&#39;</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">501</span><span class="p">),</span> <span class="n">mycallback_FISTA_TV_alpha_01</span><span class="o">.</span><span class="n">save_values</span><span class="p">[</span><span class="mi">10</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;FISTA TV alpha=0.1 &#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">501</span><span class="p">),</span> <span class="n">mycallback_FISTA_TV_alpha_1</span><span class="o">.</span><span class="n">save_values</span><span class="p">[</span><span class="mi">10</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;FISTA TV alpha=1.0 &#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Noise Estimate&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration&#39;</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">algo1</span><span class="o">.</span><span class="n">get_output</span><span class="p">(),</span> <span class="n">algo2</span><span class="o">.</span><span class="n">get_output</span><span class="p">()],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'ground_truth'</span><span class="p">,</span> <span class="s1">'FISTA_TV_alpha_01'</span><span class="p">,</span> <span class="s1">'FISTA_TV_alpha_1'</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">absorption</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">algo1</span><span class="o">.</span><span class="n">get_output</span><span class="p">())</span><span class="o">-</span><span class="n">absorption</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">algo2</span><span class="o">.</span><span class="n">get_output</span><span class="p">())</span><span class="o">-</span><span class="n">absorption</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s1">'ground_truth'</span><span class="p">,</span> <span class="s1">'Data error FISTA_TV_alpha_01'</span><span class="p">,</span> <span class="s1">'Data error FISTA_TV_alpha_1'</span><span class="p">],</span> <span class="n">fix_range</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">]],</span> <span class="n">cmap</span><span class="o">=</span><span class="p">[</span><span class="s1">'gray'</span><span class="p">,</span> <span class="s1">'seismic'</span><span class="p">,</span> <span class="s1">'seismic'</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">501</span><span class="p">),</span> <span class="n">mycallback_FISTA_TV_alpha_01</span><span class="o">.</span><span class="n">save_values</span><span class="p">[</span><span class="mi">10</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'FISTA TV alpha=0.1 '</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">501</span><span class="p">),</span> <span class="n">mycallback_FISTA_TV_alpha_1</span><span class="o">.</span><span class="n">save_values</span><span class="p">[</span><span class="mi">10</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'FISTA TV alpha=1.0 '</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Noise Estimate'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Iteration'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <br/><br/></pre></div>
 </div>
@@ -838,7 +838,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MetricsDiagnostics</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 
@@ -855,7 +855,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <span class="sd">        The results are calculated and printed every `print_interval` number of iterations</span>
 
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_image</span><span class="p">,</span> <span class="n">metrics_dict</span><span class="p">,</span> <span class="n">print_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 
@@ -888,19 +888,19 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">callback_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:&gt;20}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">metric_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">metric_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"</span><span class="si">{:&gt;20}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">metric_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">metric_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">callback_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computed_metrics</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="c1"># Handle list of metrics</span>
-            <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:&gt;20.5e}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">computed_metrics</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span><span class="p">):])</span>
+            <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"</span><span class="si">{:&gt;20.5e}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">computed_metrics</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span><span class="p">):])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Handle single metric</span>
-            <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{:&gt;20.5e}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computed_metrics</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">"</span><span class="si">{:&gt;20.5e}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computed_metrics</span><span class="p">)</span>
 
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.quality_measures</span><span class="w"> </span><span class="kn">import</span> <span class="n">mae</span><span class="p">,</span> <span class="n">psnr</span><span class="p">,</span> <span class="n">mse</span>
-<span class="n">metric_callback</span><span class="o">=</span> <span class="n">MetricsDiagnostics</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;MSE&#39;</span><span class="p">:</span><span class="n">mse</span><span class="p">,</span> <span class="s1">&#39;MAE&#39;</span><span class="p">:</span><span class="n">mae</span><span class="p">,</span> <span class="s1">&#39;PSNR&#39;</span><span class="p">:</span><span class="n">psnr</span><span class="p">})</span>
+<span class="n">metric_callback</span><span class="o">=</span> <span class="n">MetricsDiagnostics</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span> <span class="p">{</span><span class="s1">'MSE'</span><span class="p">:</span><span class="n">mse</span><span class="p">,</span> <span class="s1">'MAE'</span><span class="p">:</span><span class="n">mae</span><span class="p">,</span> <span class="s1">'PSNR'</span><span class="p">:</span><span class="n">psnr</span><span class="p">})</span>
 <span class="n">algo</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callbacks</span><span class="o">.</span><span class="n">ProgressCallback</span><span class="p">(),</span> <span class="n">metric_callback</span><span class="p">])</span>
 </pre></div>
@@ -915,7 +915,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ImageQualityCallback</span><span class="p">(</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 
@@ -945,12 +945,12 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <span class="sd">    Properties</span>
 <span class="sd">    ----------</span>
 <span class="sd">    metric_store: dictionary</span>
-<span class="sd">      The keys of the dictionary are &quot;global_&quot;+metric keys or roi key +&#39;_&#39;+ metric key. Stored under these keys is a list of calculations of the metric for that roi, one per iteration.</span>
+<span class="sd">      The keys of the dictionary are "global_"+metric keys or roi key +'_'+ metric key. Stored under these keys is a list of calculations of the metric for that roi, one per iteration.</span>
 
 <span class="sd">    stat_store: dictionary</span>
-<span class="sd">      The keys of the dictionary are &quot;global_&quot;+statistic keys or roi key +&#39;_&#39;+ statistic key. Stored under these keys is a list of calculations of the statistic for that roi, one per iteration.</span>
+<span class="sd">      The keys of the dictionary are "global_"+statistic keys or roi key +'_'+ statistic key. Stored under these keys is a list of calculations of the statistic for that roi, one per iteration.</span>
 
-<span class="sd">      &quot;&quot;&quot;</span>
+<span class="sd">      """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_image</span><span class="p">,</span>
                  <span class="n">roi_mask_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -969,37 +969,37 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span> <span class="o">=</span> <span class="n">metrics_dict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">&#39;global_&#39;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">'global_'</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">if</span> <span class="n">roi_mask_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">roi_name</span> <span class="ow">in</span> <span class="n">roi_mask_dict</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">'_'</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">statistics_dict</span> <span class="o">=</span> <span class="n">statistics_dict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics_dict</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="s1">&#39;global_&#39;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="s1">'global_'</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">if</span> <span class="n">roi_mask_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">roi_name</span> <span class="ow">in</span> <span class="n">roi_mask_dict</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">'_'</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">metric_name</span><span class="p">,</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">ans</span> <span class="o">=</span> <span class="n">metric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">&#39;global_&#39;</span><span class="o">+</span><span class="n">metric_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">'global_'</span><span class="o">+</span><span class="n">metric_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
 
                 <span class="k">for</span> <span class="n">roi_name</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_mask_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="n">ans</span> <span class="o">=</span> <span class="n">metric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">roi</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">metric_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">'_'</span><span class="o">+</span><span class="n">metric_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">statistic_name</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statistics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">ans</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">_NoValue</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="s1">&#39;global_&#39;</span><span class="o">+</span><span class="n">statistic_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="s1">'global_'</span><span class="o">+</span><span class="n">statistic_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
 
                 <span class="k">for</span> <span class="n">roi_name</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_mask_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">ans</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;bool&#39;</span><span class="p">))</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">statistic_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+                    <span class="n">ans</span> <span class="o">=</span> <span class="n">stat</span><span class="p">(</span><span class="n">algorithm</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'bool'</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">stat_store</span><span class="p">[</span><span class="n">roi_name</span><span class="o">+</span><span class="s1">'_'</span><span class="o">+</span><span class="n">statistic_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1023,11 +1023,11 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 
 
 <span class="n">roi_image_dict</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;brightest&#39;</span> <span class="p">:</span> <span class="n">brightest</span><span class="p">,</span>
-    <span class="s1">&#39;darkest&#39;</span> <span class="p">:</span> <span class="n">darkest</span>
+    <span class="s1">'brightest'</span> <span class="p">:</span> <span class="n">brightest</span><span class="p">,</span>
+    <span class="s1">'darkest'</span> <span class="p">:</span> <span class="n">darkest</span>
 <span class="p">}</span>
 
-<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">brightest</span><span class="p">,</span> <span class="n">darkest</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Ground truth&quot;</span><span class="p">,</span> <span class="s2">&quot;Brightest sphere mask&quot;</span><span class="p">,</span> <span class="s2">&quot;Darkest sphere mask&quot;</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">brightest</span><span class="p">,</span> <span class="n">darkest</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="s2">"Ground truth"</span><span class="p">,</span> <span class="s2">"Brightest sphere mask"</span><span class="p">,</span> <span class="s2">"Darkest sphere mask"</span><span class="p">],</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1038,12 +1038,12 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.utilities.quality_measures</span><span class="w"> </span><span class="kn">import</span> <span class="n">mae</span><span class="p">,</span> <span class="n">psnr</span><span class="p">,</span> <span class="n">mse</span>
 <span class="n">img_qual_callback</span> <span class="o">=</span> <span class="n">ImageQualityCallback</span><span class="p">(</span><span class="n">ground_truth</span><span class="p">,</span>
                                               <span class="n">roi_mask_dict</span> <span class="o">=</span> <span class="n">roi_image_dict</span><span class="p">,</span>
-                                              <span class="n">metrics_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;MSE&#39;</span><span class="p">:</span><span class="n">mse</span><span class="p">,</span>
-                                                              <span class="s1">&#39;MAE&#39;</span><span class="p">:</span><span class="n">mae</span><span class="p">,</span>
-                                                              <span class="s1">&#39;PSNR&#39;</span><span class="p">:</span><span class="n">psnr</span><span class="p">},</span>
-                                              <span class="n">statistics_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;MEAN&#39;</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">y</span><span class="p">)),</span>
-                                                                 <span class="s1">&#39;STDDEV&#39;</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">y</span><span class="p">)),</span>
-                                                                 <span class="s1">&#39;MAX&#39;</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mi">0</span><span class="p">))},</span>
+                                              <span class="n">metrics_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'MSE'</span><span class="p">:</span><span class="n">mse</span><span class="p">,</span>
+                                                              <span class="s1">'MAE'</span><span class="p">:</span><span class="n">mae</span><span class="p">,</span>
+                                                              <span class="s1">'PSNR'</span><span class="p">:</span><span class="n">psnr</span><span class="p">},</span>
+                                              <span class="n">statistics_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'MEAN'</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">y</span><span class="p">)),</span>
+                                                                 <span class="s1">'STDDEV'</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">y</span><span class="p">)),</span>
+                                                                 <span class="s1">'MAX'</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mi">0</span><span class="p">))},</span>
                                               <span class="p">)</span>
 </pre></div>
 </div>
@@ -1054,7 +1054,7 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">algo</span><span class="o">=</span><span class="n">FISTA</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">f</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">update_objective_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">algo</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">img_qual_callback</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">.</span><span class="n">ProgressCallback</span><span class="p">()])</span>
-<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="s1">&#39;FDK Reconstruction&#39;</span><span class="p">,</span> <span class="s1">&#39;TV solution&#39;</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">show2D</span><span class="p">([</span><span class="n">ground_truth</span><span class="p">,</span> <span class="n">recon</span><span class="p">,</span> <span class="n">algo</span><span class="o">.</span><span class="n">solution</span><span class="p">],</span> <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Ground Truth'</span><span class="p">,</span> <span class="s1">'FDK Reconstruction'</span><span class="p">,</span> <span class="s1">'TV solution'</span><span class="p">],</span> <span class="n">origin</span> <span class="o">=</span> <span class="s1">'upper'</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1063,10 +1063,10 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">),</span> <span class="n">img_qual_callback</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">&#39;global_MSE&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;MSE&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration number&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Mean squared error against iteration number&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">),</span> <span class="n">img_qual_callback</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">'global_MSE'</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'MSE'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Iteration number'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'Mean squared error against iteration number'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 <br/></pre></div>
 </div>
@@ -1076,12 +1076,12 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">),</span> <span class="n">img_qual_callback</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">&#39;brightest_PSNR&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Brightest&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">),</span> <span class="n">img_qual_callback</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">&#39;global_PSNR&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Global&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">),</span> <span class="n">img_qual_callback</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">&#39;darkest_PSNR&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Darkest&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration number&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;PSNR&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39; PSNR for the different regions of interest&#39;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">),</span> <span class="n">img_qual_callback</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">'brightest_PSNR'</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Brightest'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">),</span> <span class="n">img_qual_callback</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">'global_PSNR'</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Global'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">),</span> <span class="n">img_qual_callback</span><span class="o">.</span><span class="n">metrics_store</span><span class="p">[</span><span class="s1">'darkest_PSNR'</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Darkest'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Iteration number'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'PSNR'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">' PSNR for the different regions of interest'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1135,8 +1135,8 @@ algorithm. These callbacks have access to the entire state of the algorithm, all
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

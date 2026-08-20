@@ -281,7 +281,9 @@ class GenericFilteredBackProjection(Reconstructor):
         theta = np.linspace(-1, 1, 9, True)
         plt.xticks(theta, ['-π', '-3π/4', '-π/2', '-π/4', '0', 'π/4', 'π/2', '3π/4', 'π'])
         plt.legend()
-        return plt
+        fig2 = plt.gcf() 
+        plt.show() 
+        return fig2 
 
 
     def _calculate_weights(self):

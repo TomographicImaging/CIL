@@ -24,14 +24,120 @@ except ModuleNotFoundError:
     algs = None
 from cil.plugins.tigre import CIL2TIGREGeometry
 from cil.framework import ImageData
+import glob
+import importlib.metadata
+import json
 import logging
 import numpy as np
+import os
+import sys
 import warnings
 from cil.framework.labels import AcquisitionDimension
 
 log = logging.getLogger(__name__)
 
-import weakref
+# TIGRE algorithms that force blocksize=1 and produce a bug with 3.1.3
+SINGLE_ANGLE_ALGORITHMS = ('sart', 'sart_tv', 'asd_pocs', 'awasd_pocs', 'pcsd', 'aw_pcsd')
+
+# TIGRE algorithms with a bug under NumPy >= 2 and 3.1.3.
+NUMPY2_PROMOTION_ALGORITHMS = ('fista',)
+
+# TIGRE algorithms that call `im3ddenoise` with potential multigpu single slice bug 
+TV_DENOISE_ALGORITHMS = ('ista', 'fista', 'sart_tv', 'ossart_tv')
+
+# Next release of tigre with potential fixes for single-angle projection and FISTA float64 bugs. The single-angle bug is fixed in master, but not yet released.
+NEXT_TIGRE_RELEASE = (3, 1, 4)
+
+TIGRE_SINGLE_ANGLE_FIX_RELEASE = NEXT_TIGRE_RELEASE
+TIGRE_FISTA_FLOAT64_FIX_RELEASE = NEXT_TIGRE_RELEASE
+
+# Names TIGRE has been packaged under.
+TIGRE_DISTRIBUTIONS = ('tigre', 'pytigre')
+
+_tigre_version_number = None
+
+
+def _tigre_older_than(release):
+    """
+    Return True if the installed TIGRE predates `release`, given as a tuple of ints.
+
+    Returns False when TIGRE is not installed, so that the bug checks below stay quiet rather than
+    warning about a TIGRE that is not there.
+
+    Note that TIGRE only bumps its version at release time, so a build from master reports the
+    version of the last release, currently 3.1.3, even though master already contains every fix
+    below. Anyone building TIGRE from source will therefore see warnings for bugs their TIGRE does
+    not have.
+    """
+    global _tigre_version_number
+
+    if algs is None:
+        return False
+
+    if _tigre_version_number is None:
+        version = ''
+
+        for name in TIGRE_DISTRIBUTIONS:
+            try:
+                version = importlib.metadata.version(name)
+            except importlib.metadata.PackageNotFoundError:
+                # conda writes `conda-meta/<name>-<version>-<build>.json` for what it installed
+                for path in glob.glob(os.path.join(sys.prefix, 'conda-meta', name + '-*.json')):
+                    try:
+                        with open(path) as record_file:
+                            record = json.load(record_file)
+                    except (OSError, ValueError):
+                        continue
+
+                    # the glob also catches packages whose name merely starts with `name`
+                    if record.get('name') == name:
+                        version = record.get('version', '')
+                        break
+
+            if version:
+                break
+
+        # keep the leading numeric components, so '3.1.3.dev0+g1234abc' gives (3, 1, 3) and an
+        # unparseable version gives ()
+        parts = []
+        for part in version.split('.'):
+            if not part.isdigit():
+                break
+            parts.append(int(part))
+
+        _tigre_version_number = tuple(parts)
+
+    return _tigre_version_number < release
+
+
+def _has_tigre_single_angle_bug():
+    """
+    Detect the TIGRE bug that breaks any projection of a single angle.
+
+    Reported upstream as CERN/TIGRE#744 and fixed by CERN/TIGRE#749 (commits 5f9a52691f and
+    26d8e2e8ff, 2026-06-23), which is currently not in a release.
+
+    Note this can be deleted when tigre is released with the fix, and CIL is updated to use that
+    release.
+    """
+    return _tigre_older_than(TIGRE_SINGLE_ANGLE_FIX_RELEASE)
+
+
+def _has_tigre_fista_float64_bug():
+    """
+    Detect the TIGRE bug that breaks FISTA under NumPy >= 2.
+
+    Fixed upstream by CERN/TIGRE commit 1c8f53b ("Numpy 2.4 fixes in FISTA", 2026-08-14),
+    which casts the square root to float32. The fix is not currently in a release.
+
+    NumPy 1 promotes the expression the other way, so an old NumPy hides the bug whatever TIGRE is
+    installed.
+
+    Note this can be deleted when tigre is released with the fix, and CIL is updated to use that
+    release. The bug is only triggered by FISTA, so we don't need to check other algorithms.
+    """
+    return (np.lib.NumpyVersion(np.__version__) >= '2.0.0'
+            and _tigre_older_than(TIGRE_FISTA_FLOAT64_FIX_RELEASE))
 
 
 class tigre_algo_wrapper(Reconstructor):
@@ -77,10 +183,13 @@ class tigre_algo_wrapper(Reconstructor):
         of CIL geometries to TIGRE geometries and prepares the data for the specified algorithm.
         The `algorithm_name` parameter should match one of the available TIGRE algorithms for example: 'art', 'sirt', 'sart', 'ossart', 'cgls', 'lsmr', 'hybrid_lsqr', 'ista', 'fista', 'sart_tv', 'ossart_tv'.
 
-        We are aware that running the TIGRE algorithms: ISTA, FISTA, SART_TV, OSSART_TV using 2D data can lead to
-        incorrect results in the TV denoising step, particularly when using more than one GPU. See
-        https://github.com/CERN/TIGRE/issues/681
-        You can change the GPUs used by passing the `gpuids` keyword argument, for example:
+        There are currently three known bugs in TIGRE that can affect the use of this wrapper. Each one is
+        detected at initialisation and warned about, so you should not need to check for them yourself:
+        1. Single-angle projection bug: Some algorithms (e.g., 'sart', 'sart_tv', 'asd_pocs', 'awasd_pocs', 'pcsd', 'aw_pcsd') project one angle at a time and cannot run with certain versions of TIGRE. If you encounter an error related to single-angle projection, please check the TIGRE version and consider using an ordered-subsets variant of the algorithm with blocksize > 1.
+        2. FISTA float64 bug: The 'fista' algorithm upcasts its working volume to float64 under NumPy >= 2, which can lead to errors. If you encounter an error related to float64, please check the TIGRE version and consider using 'ista', which is unaffected.
+        3. 2D TV denoising bug: The TV-based algorithms ('ista', 'fista', 'sart_tv', 'ossart_tv') use im3ddenoise, which can lead to issues when denoising a single-slice volume across multiple GPUs. If you encounter NaNs or unexpected results, please ensure that you are using a single GPU for 2D data. See
+         https://github.com/CERN/TIGRE/issues/681. 
+
 
         .. code-block:: python
 
@@ -117,29 +226,6 @@ class tigre_algo_wrapper(Reconstructor):
         ag = data.geometry
         self.tigre_geom, self.tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(
             ig, ag)
-        self.tigre_projections = data.as_array()
-
-        # DEVELOPER NOTE: revisit this warning whenever the TIGRE version is updated.
-        # It guards against CERN/TIGRE#681, an out-of-bounds read in the TV denoising step
-        # for single-slice (2D) images, which corrupted the result when the image was split
-        # across more than one GPU. A CUDA-side fix (`image_size[2] > 1` guards in
-        # Common/CUDA/tv_proximal.cu) landed in CERN/TIGRE#699 and is present in TIGRE
-        # v3.1.3, which is CIL's current minimum, so this warning is expected to be
-        # obsolete. It is kept only because the fix has not yet been confirmed on
-        # multi-GPU hardware. Once it has, remove this block, the matching paragraph in
-        # the docstring above, and the `expect_warning` machinery in
-        # test/test_PluginsTigre_Algorithms.py.
-        if self.tigre_projections.ndim == 2:
-            if any( a==algorithm_name for a in ['ista', 'fista', 'sart_tv', 'ossart_tv']):
-                warnings.warn(
-                    "We are aware that the TIGRE algorithms: ISTA, FISTA, SART_TV, OSSART_TV using 2D data can lead to incorrect results in the TV denoising step, particularly when using more than one GPU.", UserWarning, stacklevel=2)
-
-
-        if data.dimension_labels[0] != AcquisitionDimension.ANGLE:
-            self.tigre_projections = np.expand_dims(self.tigre_projections, axis=0)
-
-        if self.tigre_geom.is2D:
-            self.tigre_projections = np.expand_dims(self.tigre_projections, axis=1)
 
         self.tigre_algo = getattr(algs, algorithm_name)
         self.number_iterations = number_iterations
@@ -149,38 +235,115 @@ class tigre_algo_wrapper(Reconstructor):
             self.gpuids = GpuIds()
         log.info("Using GPU ids: %s", self.gpuids)
 
-        self._input = None
+        self._warn_if_single_angle_bug(algorithm_name)
+        self._warn_if_fista_float64_bug(algorithm_name)
+        self._warn_if_2d_denoise_bug(algorithm_name)
 
         super(tigre_algo_wrapper, self).__init__(data, image_geometry=ig, backend='tigre')
 
         log.info("%s configured", self.__class__.__name__)
 
+    def _warn_if_single_angle_bug(self, algorithm_name):
+        """
+        Warn if this configuration will hit the TIGRE single-angle bug, see
+        `_has_tigre_single_angle_bug`. `run` fails deep inside TIGRE, so the warning gives the
+        user something to search for before that happens.
+        """
+        if not _has_tigre_single_angle_bug():
+            return
+
+        if algorithm_name in SINGLE_ANGLE_ALGORITHMS:
+            reason = "'{}' projects one angle at a time".format(algorithm_name)
+        elif self.kwargs.get('blocksize') == 1:
+            reason = "blocksize=1 projects one angle at a time"
+        elif np.shape(self.tigre_angles)[0] == 1:
+            reason = "the dataset holds a single angle"
+        else:
+            return
+
+        warnings.warn(
+            "This version of TIGRE cannot project a single angle, and {}, so `run` is expected "
+            "to fail with 'only 0-dimensional arrays can be converted to Python scalars'. This "
+            "is CERN/TIGRE#744, fixed upstream by CERN/TIGRE#749 but not in any TIGRE release "
+            "up to v3.1.3. Update TIGRE, or use an ordered-subsets variant of the algorithm "
+            "with blocksize > 1.".format(reason), UserWarning, stacklevel=3)
+
+    def _warn_if_fista_float64_bug(self, algorithm_name):
+        """
+        Warn if this configuration will hit the TIGRE FISTA float64 bug, see
+        `_has_tigre_fista_float64_bug`. The volume is only upcast at the end of an iteration, so
+        a single iteration still runs and is not worth warning about.
+        """
+        if (algorithm_name not in NUMPY2_PROMOTION_ALGORITHMS or self.number_iterations < 2
+                or not _has_tigre_fista_float64_bug()):
+            return
+
+        warnings.warn(
+            "TIGRE's '{}' upcasts its working volume to float64 under NumPy {}, so `run` with "
+            "number_iterations > 1 is expected to fail with 'Input data should be float32, not "
+            "float64'. This is fixed upstream by CERN/TIGRE commit 1c8f53b but is not in any "
+            "TIGRE release up to v3.1.3. Update TIGRE, or use 'ista', which is "
+            "unaffected.".format(algorithm_name, np.__version__), UserWarning, stacklevel=3)
+
+    def _warn_if_2d_denoise_bug(self, algorithm_name):
+        """
+        Warn if this configuration TV-denoises a single-slice volume across more than one GPU.
+
+        The TV algorithms always call `im3ddenoise`, so with 2D data they hand `tv_proximal` a
+        volume one slice deep, which TIGRE then splits over every GPU it was given. This is a
+        known issue - CERN/TIGRE#681.
+
+        """
+        if algorithm_name not in TV_DENOISE_ALGORITHMS or not self.tigre_geom.is2D:
+            return
+
+        devices = getattr(self.gpuids, 'devices', None) or []
+        if len(devices) < 2:
+            return
+
+        warnings.warn(
+            "Potential issue with im3ddenoise for a 2D data on multiple GPUs: CERN/TIGRE#681 "
+            "For safety,  pass a `gpuids` holding a single  device", UserWarning, stacklevel=3)
+
     def set_input(self, input):
         """
-        When called by the parent class during initialisation, sets the input data to run the reconstructor on. The geometry of the dataset must be compatible with the reconstructor.
-        When called after initialisation, raises NotImplementedError as changing the input is not currently supported.
+        Set the input data to run the reconstructor on. The geometry of the dataset must be compatible
+        with the reconstructor.
+
+        Called by the parent class during initialisation, and may be called afterwards to reuse the
+        configured algorithm on a different dataset.
+
         Parameters
         ----------
         input : AcquisitionData
             A dataset with a compatible geometry
         """
-        if self._input is None:
-            if input.geometry != self.acquisition_geometry:
-                raise ValueError ("Input not compatible with configured reconstructor. Initialise a new reconstructor with this geometry")
-            else:
-                self._input = weakref.ref(input)
-                
-        else:
-            raise NotImplementedError("Setting the input after initialisation is not currently supported.")
+        super().set_input(input)
+        self.tigre_projections = self._prepare_projections(input)
+
+    def _prepare_projections(self, data):
+        """
+        Return the data reshaped to the layout TIGRE expects.
+
+        `as_array` returns a pointer and `expand_dims` returns a view, so this holds the user's
+        buffer rather than a copy.
+        """
+        projections = data.as_array()
+
+        if data.dimension_labels[0] != AcquisitionDimension.ANGLE:
+            projections = np.expand_dims(projections, axis=0)
+
+        if self.tigre_geom.is2D:
+            projections = np.expand_dims(projections, axis=1)
+
+        return projections
 
     def _get_tigre_initial(self):
         """
         Build a fresh, TIGRE-shaped float32 initial volume.
 
-        TIGRE binds the array it is given (`self.res = init` in
-        tigre/algorithms/iterative_recon_alg.py) and several algorithms update it in place,
-        so this must return a private buffer each time: it protects the user's `initial` and
-        keeps repeated `run` calls independent of each other.
+        This protects the user's `initial` and keeps repeated `run` calls independent of each other.
+
         """
         if self._initial is None:
             return np.zeros(self.tigre_geom.nVoxel, dtype=np.float32)

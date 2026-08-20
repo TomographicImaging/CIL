@@ -281,7 +281,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         FBP_filter = ramp*(np.cos(freq*np.pi*4)+1*np.cos(1/5*freq*np.pi/2))/2
         return FBP_filter
 
-    def _test_plot_properties(self, plot, filter_name, filter_array, fft_order, cutoff):
+    def _compare_plot_properties(self, plot, filter_name, filter_array, fft_order, cutoff):
         """
         Tests that the plot has the correct labels, titles, and data for the given filter.
         """
@@ -335,7 +335,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
                         self.fail(msg + f" and raised an exception: {e}")
 
                     filter_array = fdk.get_filter_array()
-                    self._test_plot_properties(plot, filter_name, filter_array, fft_order, cutoff)
+                    self._compare_plot_properties(plot, filter_name, filter_array, fft_order, cutoff)
                     mock_show.reset_mock()
                     plt.close('all')
 
@@ -367,7 +367,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
                 except Exception as e:
                     self.fail(msg + f" and raised an exception: {e}")
     
-                self._test_plot_properties(plot, filter_name, filter_array, fft_order, cutoff)
+                self._compare_plot_properties(plot, filter_name, filter_array, fft_order, cutoff)
                 mock_show.reset_mock()
                 plt.close('all')
 

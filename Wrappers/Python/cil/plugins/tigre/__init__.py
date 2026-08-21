@@ -19,3 +19,4 @@
 from .Geometry import CIL2TIGREGeometry
 from .ProjectionOperator import ProjectionOperator
 from .FBP import FBP
+from .Algorithms import tigre_algo_wrapper

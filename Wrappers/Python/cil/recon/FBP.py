@@ -264,7 +264,7 @@ class GenericFilteredBackProjection(Reconstructor):
 
         Returns
         -------
-        matplotlib.pyplot
+        matplotlib.figure.Figure
             A plot of the filter
         """
         import matplotlib.pyplot as plt

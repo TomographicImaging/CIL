@@ -1917,6 +1917,7 @@ class TestLSQR(CCPiTestClass):
 
         self.initial = self.ig.allocate(None)
         self.initial.fill(np.ones(self.n)/self.n)
+        self.initial_zero = self.ig.allocate(0)
         
 
     def test_initialization_defaults(self):
@@ -1928,19 +1929,21 @@ class TestLSQR(CCPiTestClass):
             LSQR()
 
     def test_initialization_with_params(self):
-        lsqr = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+
+        lsqr = LSQR(initial=self.initial_zero, operator=self.Aop, data=self.bop, alpha=0.5)
         self.assertEqual(lsqr.regalpha, 0.5)
         self.assertNumpyArrayAlmostEqual(lsqr.operator.direct(self.x).as_array(), self.bop.as_array())
-        self.assertNumpyArrayAlmostEqual(lsqr.u.as_array(), (-lsqr.operator.direct(self.initial).as_array()+ self.bop.as_array())/lsqr.beta)
+        self.assertNumpyArrayAlmostEqual(lsqr.u.as_array(), (-lsqr.operator.direct(self.initial_zero).as_array()+ self.bop.as_array())/lsqr.beta)
         self.assertTrue(lsqr.configured)
 
     def test_set_up(self):
-        lsqr = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
-        beta =  (self.bop -self.Aop.direct(self.initial)).norm()
+
+        lsqr = LSQR(initial=self.initial_zero, operator=self.Aop, data=self.bop, alpha=0.5)
+        beta =  (self.bop -self.Aop.direct(self.initial_zero)).norm()
         self.assertAlmostEqual(lsqr.beta,  beta, 4)
         self.assertAlmostEqual(lsqr.phibar,  beta, 5 )
         self.assertAlmostEqual(lsqr.normr,  beta, 5 )
-        alpha = self.Aop.adjoint((self.bop -self.Aop.direct(self.initial))/beta).norm()
+        alpha = self.Aop.adjoint((self.bop -self.Aop.direct(self.initial_zero))/beta).norm()
         self.assertAlmostEqual(lsqr.alpha, alpha, 5)
         self.assertAlmostEqual(lsqr.rhobar, alpha, 5)
         
@@ -1988,30 +1991,93 @@ class TestLSQR(CCPiTestClass):
 
 
     def test_update_regularised(self):
-        lsqr_reg = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
-        
+        # scalar alpha and the explicit block system [A; alpha*I] agree from a zero
+        # initial guess
+        lsqr_reg = LSQR(initial=self.initial_zero, operator=self.Aop, data=self.bop, alpha=0.5)
+
         L = IdentityOperator(self.ig)
         alpha = 0.5
 
         operator_block = BlockOperator(self.Aop, alpha*L)
         zero_data = L.range.allocate(0)
         data_block = BlockDataContainer(self.bop, zero_data)
-        initial_block = self.initial
-        
-        lsqr_block = LSQR (initial=initial_block, operator=operator_block, data=data_block, alpha=0)
-        
+
+        lsqr_block = LSQR (initial=self.initial_zero, operator=operator_block, data=data_block, alpha=0)
+
         lsqr_block.run(1)
         lsqr_reg.run(1)
-        
+
         self.assertNumpyArrayAlmostEqual(lsqr_reg.solution.as_array(), lsqr_block.solution.as_array(),4)
-        
+
         lsqr_block.run(1)
         lsqr_reg.run(1)
-        
+
         self.assertNumpyArrayAlmostEqual(lsqr_reg.solution.as_array(), lsqr_block.solution.as_array(),4)
+
+    def test_warns_on_nonzero_initial_with_regularisation(self):
+        # the scalar penalty is applied to the update, so a warm start silently changes
+        # the objective that is being minimised
+        with self.assertWarnsRegex(UserWarning, "non-zero `initial`"):
+            LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+
+    def test_no_warning_for_zero_initial_or_no_regularisation(self):
+        for kwargs in (dict(initial=self.initial_zero, alpha=0.5),
+                       dict(initial=self.initial, alpha=0),
+                       dict(alpha=0.5)):
+            with self.subTest(**kwargs):
+                with warnings.catch_warnings(record=True) as caught:
+                    warnings.simplefilter("always")
+                    LSQR(operator=self.Aop, data=self.bop, **kwargs)
+                self.assertFalse([w for w in caught
+                                  if "non-zero `initial`" in str(w.message)])
+
+    def test_regularised_warm_start_solves_shifted_problem(self):
+        # from a non-zero initial guess the
+        # scalar rule converges to the minimiser of ||Ax-b||^2 + alpha^2||x-x0||^2, whereas
+        # the explicit block system converges to the intended ||Ax-b||^2 + alpha^2||x||^2
+        alpha = 0.5
+        A = self.Aop.A
+        b = self.bop.as_array()
+        x0 = self.ig.allocate(None)
+        x0.fill(np.ones(self.n, dtype=np.float32))
+
+        normal = A.T @ A + alpha**2 * np.eye(self.n)
+        true_minimiser = np.linalg.solve(normal, A.T @ b)
+        shifted_minimiser = np.linalg.solve(normal, A.T @ b + alpha**2 * x0.as_array())
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            scalar = LSQR(initial=x0.copy(), operator=self.Aop, data=self.bop, alpha=alpha)
+        scalar.run(200, verbose=0)
+
+        L = IdentityOperator(self.ig)
+        block = LSQR(initial=x0.copy(), operator=BlockOperator(self.Aop, alpha*L),
+                     data=BlockDataContainer(self.bop, L.range.allocate(0)), alpha=0)
+        block.run(200, verbose=0)
+
+        self.assertNumpyArrayAlmostEqual(scalar.solution.as_array(), shifted_minimiser, 3)
+        self.assertNumpyArrayAlmostEqual(block.solution.as_array(), true_minimiser, 3)
+        # and the two are genuinely different, so the assertions above are not vacuous
+        self.assertGreater(
+            np.linalg.norm(scalar.solution.as_array() - true_minimiser), 1e-2)
 
 
     def test_update_objective(self):
-        lsqr_reg = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
-        lsqr_reg.run(1)
-        self.assertAlmostEqual(lsqr_reg.objective[0], (self.Aop.direct(self.initial)-self.bop).norm()**2 + 0.5*self.initial.norm()**2, 1)
+        alpha = 0.5
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            lsqr_reg = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=alpha)
+        lsqr_reg.run(20)
+
+        #  before the first update the objective is the plain residual
+        self.assertAlmostEqual(lsqr_reg.objective[0],
+                               (self.Aop.direct(self.initial)-self.bop).norm()**2, 1)
+
+        # thereafter it tracks ||Ax-b||^2 + alpha^2||x-initial||^2, with alpha squared and
+        # measured from the initial guess rather than from zero
+        residual = (self.Aop.direct(lsqr_reg.solution)-self.bop).norm()**2
+        penalty = (lsqr_reg.solution-self.initial).norm()**2
+        self.assertAlmostEqual(lsqr_reg.objective[-1], residual + alpha**2*penalty, 3)
+        self.assertNotAlmostEqual(lsqr_reg.objective[-1], residual + alpha*penalty, 3)
+        self.assertNotAlmostEqual(lsqr_reg.objective[-1],
+                                  residual + alpha**2*lsqr_reg.solution.norm()**2, 3)

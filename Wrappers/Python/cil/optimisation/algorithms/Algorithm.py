@@ -51,6 +51,18 @@ class Algorithm:
         self.update_objective_interval = update_objective_interval
         self.iter_string = 'Iter'
 
+    def _reset_iteration_state(self):
+        '''Resets the iteration counter and the objective/iteration history.
+
+        This is intended for internal use by step-size rules that re-run the
+        algorithm during set-up (e.g. Bayesian optimisation of the step sizes),
+        so that they do not need to reach into the algorithm's private state.
+        '''
+        self.iteration = -1
+        self.__loss = []
+        self._iteration = []
+        self._total_iterations = 1
+
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
         raise NotImplementedError
@@ -185,14 +197,14 @@ class Algorithm:
     @property
     def update_objective_interval(self):
         '''gets the update_objective_interval'''
-        return self.__update_objective_interval
+        return self._update_objective_interval
 
     @update_objective_interval.setter
     def update_objective_interval(self, value):
         '''sets the update_objective_interval'''
         if not isinstance(value, Integral) or value < 0:
             raise ValueError('interval must be an integer >= 0')
-        self.__update_objective_interval = value
+        self._update_objective_interval = value
 
     def run(self, iterations=None, callbacks: Optional[List[Callback]] = None, verbose=1):
         r"""run upto :code:`iterations` with callbacks/logging.

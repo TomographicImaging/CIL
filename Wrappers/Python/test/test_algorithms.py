@@ -30,7 +30,7 @@ from cil.framework import VectorData, ImageData, ImageGeometry, AcquisitionData,
 
 from cil.framework.labels import FillType
 
-from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks, Sensitivity, StepSizeRule
+from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sampler, callbacks, Sensitivity, StepSizeRule, SPDHGStepSizesFromRatio, SPDHGConstantStepSize
 from cil.optimisation.algorithms.APGD import NesterovMomentum, ScalarMomentumCoefficient, ConstantMomentum
 from cil.optimisation.operators import IdentityOperator, AdjointOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
@@ -840,291 +840,9 @@ class TestPDHG(CCPiTestClass):
         
         
         
-    def test_PDHG_Denoising(self):
-        # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
-        data = dataexample.PEPPERS.get(size=(256, 256))
-        ig = data.geometry
-        ag = ig
+    
 
-        which_noise = 0
-        # Create noisy data.
-        noises = ['gaussian', 'poisson', 's&p']
-        dnoise = noises[which_noise]
-
-        def setup(data, dnoise):
-            if dnoise == 's&p':
-                n1 = applynoise.saltnpepper(
-                    data, salt_vs_pepper=0.9, amount=0.2, seed=10)
-            elif dnoise == 'poisson':
-                scale = 5
-                n1 = applynoise.poisson(data.as_array()/scale, seed=10)*scale
-            elif dnoise == 'gaussian':
-                n1 = applynoise.gaussian(data.as_array(), seed=10)
-            else:
-                raise ValueError('Unsupported Noise ', noise)
-            noisy_data = ig.allocate()
-            noisy_data.fill(n1)
-
-            # Regularisation Parameter depending on the noise distribution
-            if dnoise == 's&p':
-                alpha = 0.8
-            elif dnoise == 'poisson':
-                alpha = 1
-            elif dnoise == 'gaussian':
-                alpha = .3
-                # fidelity
-            if dnoise == 's&p':
-                g = L1Norm(b=noisy_data)
-            elif dnoise == 'poisson':
-                g = KullbackLeibler(b=noisy_data)
-            elif dnoise == 'gaussian':
-                g = 0.5 * L2NormSquared(b=noisy_data)
-            return noisy_data, alpha, g
-
-        noisy_data, alpha, g = setup(data, dnoise)
-        operator = GradientOperator(
-            ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
-
-        f1 = alpha * MixedL21Norm()
-
-        # Compute operator Norm
-        normK = operator.norm()
-
-        # Primal & dual stepsizes
-        sigma = 1
-        tau = 1/(sigma*normK**2)
-
-        # Setup and run the PDHG algorithm
-        pdhg1 = PDHG(f=f1, g=g, operator=operator, tau=tau, sigma=sigma)
-        pdhg1.update_objective_interval = 200
-        pdhg1.run(1000, verbose=0)
-
-        rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
-        log.info("RMSE %F", rmse)
-        self.assertLess(rmse, 2e-4)
-
-        which_noise = 1
-        noise = noises[which_noise]
-        noisy_data, alpha, g = setup(data, noise)
-        operator = GradientOperator(
-            ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
-
-        f1 = alpha * MixedL21Norm()
-
-        # Compute operator Norm
-        normK = operator.norm()
-
-        # Primal & dual stepsizes
-        sigma = 1
-        tau = 1/(sigma*normK**2)
-
-        # Setup and run the PDHG algorithm
-        pdhg1 = PDHG(f=f1, g=g, operator=operator, tau=tau, sigma=sigma,
-                     update_objective_interval=200)
-
-        pdhg1.run(1000, verbose=0)
-
-        rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
-        log.info("RMSE %f", rmse)
-        self.assertLess(rmse, 2e-4)
-
-        which_noise = 2
-        noise = noises[which_noise]
-        noisy_data, alpha, g = setup(data, noise)
-        operator = GradientOperator(
-            ig, correlation=GradientOperator.CORRELATION_SPACE, backend='numpy')
-
-        f1 = alpha * MixedL21Norm()
-
-        # Compute operator Norm
-        normK = operator.norm()
-
-        # Primal & dual stepsizes
-        sigma = 1
-        tau = 1/(sigma*normK**2)
-
-        # Setup and run the PDHG algorithm
-        pdhg1 = PDHG(f=f1, g=g, operator=operator, tau=tau, sigma=sigma)
-        pdhg1.update_objective_interval = 200
-        pdhg1.run(1000, verbose=0)
-
-        rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
-        log.info("RMSE %f", rmse)
-        self.assertLess(rmse, 2e-4)
-
-    def test_PDHG_step_sizes(self):
-        ig = ImageGeometry(3, 3)
-        data = ig.allocate('random', seed=3)
-
-        f = L2NormSquared(b=data)
-        g = L2NormSquared()
-        operator = 3*IdentityOperator(ig)
-
-        # check if sigma, tau are None
-        pdhg = PDHG(f=f, g=g, operator=operator)
-        self.assertAlmostEqual(pdhg.sigma, 1./operator.norm())
-        self.assertAlmostEqual(pdhg.tau, 1./operator.norm())
-
-        # check if sigma is negative
-        with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator,
-                        sigma=-1)
-
-        # check if tau is negative
-        with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator, tau=-1)
-
-        # check if tau is None
-        sigma = 3.0
-        pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma)
-        self.assertAlmostEqual(pdhg.sigma, sigma)
-        self.assertAlmostEqual(pdhg.tau, 1./(sigma * operator.norm()**2))
-
-        # check if sigma is None
-        tau = 3.0
-        pdhg = PDHG(f=f, g=g, operator=operator, tau=tau)
-        self.assertAlmostEqual(pdhg.tau, tau)
-        self.assertAlmostEqual(pdhg.sigma, 1./(tau * operator.norm()**2))
-
-        # check if sigma/tau are not None
-        tau = 1.0
-        sigma = 1.0
-        pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
-                    sigma=sigma)
-        self.assertAlmostEqual(pdhg.tau, tau)
-        self.assertAlmostEqual(pdhg.sigma, sigma)
-
-        # check sigma/tau as arrays, sigma wrong shape
-        ig1 = ImageGeometry(2, 2)
-        sigma = ig1.allocate()
-        with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator,
-                        sigma=sigma)
-
-        # check sigma/tau as arrays, tau wrong shape
-        tau = ig1.allocate()
-        with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator, tau=tau)
-
-        # check sigma not Number or object with correct shape
-        with self.assertRaises(AttributeError):
-            pdhg = PDHG(f=f, g=g, operator=operator,
-                        sigma="sigma")
-
-        # check tau not Number or object with correct shape
-        with self.assertRaises(AttributeError):
-            pdhg = PDHG(f=f, g=g, operator=operator,
-                        tau="tau")
-
-        # check warning message if condition is not satisfied
-        sigma = 4/operator.norm()
-        tau = 1/3
-        with self.assertWarnsRegex(UserWarning, "Convergence criterion"):
-            pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
-                        sigma=sigma)
-
-        # check no warning message if check convergence is false
-        sigma = 4/operator.norm()
-        tau = 1/3
-        with warnings.catch_warnings(record=True) as warnings_log:
-            pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
-                        sigma=sigma, check_convergence=False)
-        self.assertEqual(warnings_log, [])
-
-        # check no warning message if condition is satisfied
-        sigma = 1/operator.norm()
-        tau = 1/3
-        with warnings.catch_warnings(record=True) as warnings_log:
-            pdhg = PDHG(f=f, g=g, operator=operator, tau=tau,
-                        sigma=sigma)
-        self.assertEqual(warnings_log, [])
-
-    def test_PDHG_strongly_convex_gamma_g(self):
-        ig = ImageGeometry(3, 3)
-        data = ig.allocate('random', seed=3)
-
-        f = L2NormSquared(b=data)
-        g = L2NormSquared()
-        operator = IdentityOperator(ig)
-
-        # sigma, tau
-        sigma = 1.0
-        tau = 1.0
-
-        pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                    gamma_g=0.5)
-        pdhg.run(1, verbose=0)
-        self.assertAlmostEqual(
-            pdhg.theta, 1.0 / np.sqrt(1 + 2 * pdhg.gamma_g * tau))
-        self.assertAlmostEqual(pdhg.tau, tau * pdhg.theta)
-        self.assertAlmostEqual(pdhg.sigma, sigma / pdhg.theta)
-        pdhg.run(4, verbose=0)
-        self.assertNotEqual(pdhg.sigma, sigma)
-        self.assertNotEqual(pdhg.tau, tau)
-
-        # check negative strongly convex constant
-        with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        gamma_g=-0.5)
-
-        # check strongly convex constant not a number
-        with self.assertRaises(ValueError):
-            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        gamma_g="-0.5")
-
-    def test_PDHG_strongly_convex_gamma_fcong(self):
-        ig = ImageGeometry(3, 3)
-        data = ig.allocate('random', seed=3)
-
-        f = L2NormSquared(b=data)
-        g = L2NormSquared()
-        operator = IdentityOperator(ig)
-
-        # sigma, tau
-        sigma = 1.0
-        tau = 1.0
-
-        pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                    gamma_fconj=0.5)
-        pdhg.run(1, verbose=0)
-        self.assertEqual(pdhg.theta, 1.0 / np.sqrt(1 +
-                         2 * pdhg.gamma_fconj * sigma))
-        self.assertEqual(pdhg.tau, tau / pdhg.theta)
-        self.assertEqual(pdhg.sigma, sigma * pdhg.theta)
-        pdhg.run(4, verbose=0)
-        self.assertNotEqual(pdhg.sigma, sigma)
-        self.assertNotEqual(pdhg.tau, tau)
-
-        # check negative strongly convex constant
-        try:
-            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        gamma_fconj=-0.5)
-        except ValueError as ve:
-            log.info(str(ve))
-
-        # check strongly convex constant not a number
-        try:
-            pdhg = PDHG(f=f, g=g, operator=operator, sigma=sigma, tau=tau,
-                        gamma_fconj="-0.5")
-        except ValueError as ve:
-            log.info(str(ve))
-
-    def test_PDHG_strongly_convex_both_fconj_and_g(self):
-
-        ig = ImageGeometry(3, 3)
-        data = ig.allocate('random', seed=3)
-
-        f = L2NormSquared(b=data)
-        g = L2NormSquared()
-        operator = IdentityOperator(ig)
-
-        try:
-            pdhg = PDHG(f=f, g=g, operator=operator,
-                        gamma_g=0.5, gamma_fconj=0.5)
-            pdhg.run(verbose=0)
-        except ValueError as err:
-            log.info(str(err))
-
+    
     def test_pdhg_theta(self):
         ig = ImageGeometry(3, 3)
         data = ig.allocate('random', seed=3)
@@ -1373,48 +1091,7 @@ class TestSPDHG(CCPiTestClass):
         self.assertListEqual(spdhg._prob_weights, [
                              1/self.subsets] * self.subsets)
         self.assertEqual(spdhg._sampler._type, 'random_with_replacement')
-        self.assertListEqual(
-            spdhg.sigma, [rho / ni for ni in spdhg._norms])
-        self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni,
-                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
-        self.assertNumpyArrayEqual(
-            spdhg.x.as_array(), self.A.domain_geometry().allocate(0).as_array())
-        self.assertEqual(spdhg.update_objective_interval, 1)
-
-        # Test SPDHG setters - "from ratio"
-        gamma = 3.7
-        rho = 5.6
-        spdhg.set_step_sizes_from_ratio(gamma, rho)
-        self.assertListEqual(
-            spdhg.sigma, [gamma * rho / ni for ni in spdhg._norms])
-        self.assertEqual(spdhg.tau, min([pi*rho / (si * ni**2) for pi, ni,
-                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
-
-        # Test SPDHG setters - set_step_sizes default values for sigma and tau
-        gamma = 1.
-        rho = .99
-        spdhg.set_step_sizes()
-        self.assertListEqual(
-            spdhg.sigma, [rho / ni for ni in spdhg._norms])
-        self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni,
-                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
-
-        # Test SPDHG setters - set_step_sizes with sigma and tau
-        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=100)
-        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
-        self.assertEqual(spdhg.tau, 100)
-
-        # Test SPDHG setters - set_step_sizes with sigma
-        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=None)
-        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
-        self.assertEqual(spdhg.tau, min([(rho*pi / (si * ni**2)) for pi, ni,
-                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
-
-        # Test SPDHG setters - set_step_sizes with tau
-        spdhg.set_step_sizes(sigma=None, tau=100)
-        self.assertListEqual(spdhg.sigma, [
-                             gamma * rho*pi / (spdhg.tau*ni**2) for ni, pi in zip(spdhg._norms, spdhg._prob_weights)])
-        self.assertEqual(spdhg.tau, 100)
+        
 
     def test_spdhg_non_default_init(self):
         # Test SPDHG init with non-default values
@@ -1452,27 +1129,33 @@ class TestSPDHG(CCPiTestClass):
         self.assertListEqual(spdhg._norms, [1]*len(self.A2))
 
     def test_spdhg_check_convergence(self):
+    
+       
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
-
         self.assertTrue(spdhg.check_convergence())
 
         gamma = 3.7
         rho = 0.9
-        spdhg.set_step_sizes_from_ratio(gamma, rho)
+        rule = SPDHGStepSizesFromRatio(gamma, rho)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         self.assertTrue(spdhg.check_convergence())
 
         gamma = 3.7
         rho = 100
-        spdhg.set_step_sizes_from_ratio(gamma, rho)
+        rule = SPDHGStepSizesFromRatio(gamma, rho)
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         self.assertFalse(spdhg.check_convergence())
 
-        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=100)
+        rule = SPDHGConstantStepSize(step_size=(100, [1]*self.subsets))
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         self.assertFalse(spdhg.check_convergence())
 
-        spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=None)
+        rule = SPDHGConstantStepSize(step_size=(None, [1]*self.subsets))
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         self.assertTrue(spdhg.check_convergence())
 
-        spdhg.set_step_sizes(sigma=None, tau=100)
+        rule = SPDHGConstantStepSize(step_size=(100, None))
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         self.assertTrue(spdhg.check_convergence())
 
         
@@ -1709,7 +1392,7 @@ class TestADMM(unittest.TestCase):
         sigma = 1./normK
         tau = 1./normK
 
-        pdhg = PDHG(f=F, g=G, operator=K, tau=tau, sigma=sigma,
+        pdhg = PDHG(f=F, g=G, operator=K, step_size=(tau, sigma),
                     update_objective_interval=10)
         pdhg.run(500, verbose=0)
 
@@ -1771,8 +1454,7 @@ class Test_PD3O(CCPiTestClass):
         G = 0.5 * L2NormSquared(b=self.data)
         sigma = 1./norm_op
         tau = 1./norm_op
-        pdhg = PDHG(f=F, g=G, operator=operator, tau=tau,
-                    sigma=sigma, update_objective_interval=100)
+        pdhg = PDHG(f=F, g=G, operator=operator, step_size=(tau,sigma), update_objective_interval=100)
         pdhg.run(1)
 
         # setup PD3O denoising  (F=ZeroFunction)

@@ -1,8 +1,11 @@
 * x.x.x
   - New features:
     - Added `Huber Loss` function (#2281)
+    - TIGRE support for tilted rotation axis (laminography) is now avaliable with TIGRE `FBP`, the `matched` back-projector and the `interpolated` forward-projector (#2362)
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
+  - Bug fixes:
+    - The interpolated TIGRE cone-beam projector now supports tilted rotation axis (laminography): the previously-broken case (axis pointing at the source) no longer returns zeros (#2362)
 
 * 26.0.0
   - New features:

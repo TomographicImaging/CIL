@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils_projectors import TestCommon_FBP_SIM
+from utils_projectors import TestCommon_FBP_SIM, TestCommon_FBP_Laminography
 from utils import has_tigre, has_nvidia, initialise_tests
 
 initialise_tests()
@@ -65,3 +65,18 @@ class Test_Parallel2D_FBP_tigre(unittest.TestCase, TestCommon_FBP_SIM):
         self.Parallel2D()
         self.tolerance_fbp = 1e-3
         self.tolerance_fbp_roi = 1e-3
+
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Parallel3D_Laminography_FBP_tigre(unittest.TestCase, TestCommon_FBP_Laminography):
+    def setUp(self):
+        setup_parameters(self)
+        self.Parallel3D()
+        self.tolerance_fbp_laminography = 0.8
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Cone3D_Laminography_FBP_tigre(unittest.TestCase, TestCommon_FBP_Laminography):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3D()
+        self.tolerance_fbp_laminography = 0.8

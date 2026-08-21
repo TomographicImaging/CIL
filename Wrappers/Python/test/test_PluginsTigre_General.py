@@ -19,6 +19,7 @@
 import unittest
 from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy as np
+from scipy.spatial.transform import Rotation
 from cil.utilities import dataexample
 from utils_projectors import TestCommon_ProjectionOperatorBlockOperator
 
@@ -65,9 +66,8 @@ class Test_convert_geometry(unittest.TestCase):
         #2D cone
         tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(self.ig, ag)
 
-        for i, ang in enumerate(tg_angles):
-            ang2 = -(self.angles_rad[i] + np.pi/2)
-            self.compare_angles(ang,ang2,1e-6)
+        #all cone geometries use the unified per-projection ZYZ Euler route
+        self.compare_cone_source(ag, tg_geometry, tg_angles)
 
         self.assertTrue(tg_geometry.mode=='cone')
         np.testing.assert_allclose(tg_geometry.DSD, ag.dist_center_detector + ag.dist_source_center)
@@ -92,9 +92,8 @@ class Test_convert_geometry(unittest.TestCase):
 
         tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(self.ig, ag)
 
-        for i, ang in enumerate(tg_angles):
-            ang2 = -(self.angles_rad[i] + np.pi/2)
-            self.compare_angles(ang,ang2,1e-6)
+        #all 3D cone geometries use the unified per-projection ZYZ Euler route
+        self.compare_cone_source(ag, tg_geometry, tg_angles)
 
         self.assertTrue(tg_geometry.mode=='cone')
         np.testing.assert_allclose(tg_geometry.DSD, ag.dist_center_detector + ag.dist_source_center)
@@ -102,12 +101,28 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
         np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
         np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
-        np.testing.assert_allclose(tg_geometry.rotDetector,0)
-        np.testing.assert_allclose(tg_geometry.offDetector,0)
+        np.testing.assert_allclose(tg_geometry.rotDetector,0, atol=1e-12)
+        np.testing.assert_allclose(tg_geometry.offDetector,0, atol=1e-12)
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
         np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
         np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
+
+    def compare_cone_source(self, ag, tg_geometry, tg_angles):
+
+        tg_angles = np.asarray(tg_angles)
+        self.assertEqual(tg_angles.shape, (len(ag.config.angles.angle_data), 3))
+
+        cil = ag.copy()
+        cil.config.system.align_reference_frame('cil')
+        S0 = cil.config.system.source.position  # reference source in the volume (CIL) frame
+        if S0.size == 2:
+            S0 = np.append(S0, 0.)  # promote 2D geometry to 3D
+
+        for a, euler in zip(self.angles_rad, tg_angles):
+            source = tg_geometry.DSO * Rotation.from_euler('ZYZ', euler).as_matrix()[:, 0]
+            expected = Rotation.from_euler('z', -a).as_matrix() @ S0
+            np.testing.assert_allclose(source, expected, atol=1e-4)
 
     def test_cone3D_offset(self):
 
@@ -134,9 +149,7 @@ class Test_convert_geometry(unittest.TestCase):
         s2d = ag.dist_center_detector + ag.dist_source_center - 6 * 3 /5
         np.testing.assert_allclose(tg_geometry.DSD, s2d)
 
-        for i, ang in enumerate(tg_angles):
-            ang2 = -(self.angles_rad[i] + np.pi/2 + yaw)
-            self.compare_angles(ang,ang2,1e-6)
+        self.compare_cone_source(ag, tg_geometry, tg_angles)
 
         self.assertTrue(tg_geometry.mode=='cone')
         np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
@@ -149,7 +162,8 @@ class Test_convert_geometry(unittest.TestCase):
 
     def test_cone3D_advanced(self):
 
-        ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-10,0], detector_position=[0,10,0], rotation_axis_position=[0,0, 0],rotation_axis_direction=[0,-1,1])\
+        tilt = np.pi/4
+        ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-10,0], detector_position=[0,10,0], rotation_axis_position=[0,0, 0],rotation_axis_direction=[0,-np.sin(tilt),np.cos(tilt)])\
                                       .set_angles(self.angles_deg, angle_unit='degree')\
                                       .set_labels(['vertical', 'angle','horizontal'])\
                                       .set_panel((self.num_pixels_x,self.num_pixels_y), (self.pixel_size_x,self.pixel_size_y))
@@ -158,32 +172,32 @@ class Test_convert_geometry(unittest.TestCase):
 
         tg_geometry, tg_angles= CIL2TIGREGeometry.getTIGREGeometry(self.ig, ag)
 
-        self.assertAlmostEqual(tg_geometry.DSO, ag.dist_source_center*np.sin(np.pi/4),5)
+        #source kept at full distance, detector on the far side at the full source-detector distance
+        np.testing.assert_allclose(tg_geometry.DSO, ag.dist_source_center)
+        np.testing.assert_allclose(tg_geometry.DSD, ag.dist_center_detector + ag.dist_source_center)
 
-        s2o = ag.dist_source_center * np.cos(np.pi/4)
-        np.testing.assert_allclose(tg_geometry.DSO, s2o)
+        #the tilt is carried entirely by the Euler angles: no detector rotation, no offsets
+        np.testing.assert_allclose(tg_geometry.rotDetector, 0)
+        np.testing.assert_allclose(tg_geometry.offDetector, 0, atol=1e-12)
+        np.testing.assert_allclose(tg_geometry.offOrigin, 0)
 
-        s2d = (ag.dist_center_detector + ag.dist_source_center) * np.cos(np.pi/4)
-        np.testing.assert_allclose(tg_geometry.DSD, s2d)
+        #per-projection (alpha, theta, psi) triples
+        tg_angles = np.asarray(tg_angles)
+        self.assertEqual(tg_angles.shape, (len(self.angles_deg), 3))
 
-        det_rot = np.array([0,-np.pi/4,0])
-        np.testing.assert_allclose(tg_geometry.rotDetector,det_rot)
-
-        det_offset = np.array([-s2d,0,0])
-        np.testing.assert_allclose(tg_geometry.offDetector,det_offset)
-
-        for i, ang in enumerate(tg_angles):
-            ang2 = -(self.angles_rad[i] + np.pi/2)
-            self.compare_angles(ang,ang2,1e-6)
+        #reconstruct the source position from (DSO, Euler) as TIGRE's kernel does
+        #(base source [DSO,0,0] rotated by R = Rz(alpha) Ry(theta) Rz(psi), i.e. col 0 of R)
+        for alpha, theta, psi in tg_angles:
+            source = tg_geometry.DSO * Rotation.from_euler('ZYZ', [alpha, theta, psi]).as_matrix()[:, 0]
+            #source stays at the full distance from the origin for every projection
+            np.testing.assert_allclose(np.linalg.norm(source), ag.dist_source_center, atol=1e-4)
+            #and at a constant tilt from the rotation plane: z = DSO * sin(tilt)
+            np.testing.assert_allclose(source[2], ag.dist_source_center*np.sin(tilt), atol=1e-4)
 
         self.assertTrue(tg_geometry.mode=='cone')
         np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
         np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
         np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
-
-
-        height = 10 / np.sqrt(2)
-        np.testing.assert_allclose(tg_geometry.offOrigin,[-height,0,0])
 
         np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
         np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
@@ -262,6 +276,67 @@ class Test_convert_geometry(unittest.TestCase):
 
         np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
         np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
+
+    def test_parallel3D_advanced(self):
+        # A tilted rotation axis (laminography) with a parallel beam takes the same per-projection
+        # ZYZ Euler route as the cone advanced case
+        tilt = np.pi/4
+        ag = AcquisitionGeometry.create_Parallel3D(rotation_axis_direction=[0,-np.sin(tilt),np.cos(tilt)])\
+                                      .set_angles(self.angles_deg, angle_unit='degree')\
+                                      .set_labels(['vertical', 'angle','horizontal'])\
+                                      .set_panel((self.num_pixels_x,self.num_pixels_y), (self.pixel_size_x,self.pixel_size_y))
+
+        self.assertTrue(ag.system_description=='advanced')
+
+        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(self.ig, ag)
+
+        #no detector rotation, no offsets
+        np.testing.assert_allclose(tg_geometry.rotDetector, 0, atol=1e-12)
+        np.testing.assert_allclose(tg_geometry.offDetector, 0, atol=1e-12)
+        np.testing.assert_allclose(tg_geometry.offOrigin, 0)
+
+        #per-projection (alpha, theta, psi) triples
+        tg_angles = np.asarray(tg_angles)
+        self.assertEqual(tg_angles.shape, (len(self.angles_deg), 3))
+
+        #TIGRE rotates the volume by R = Rz(alpha) Ry(theta) Rz(psi); the volume z-axis (the
+        #rotation axis) holds a constant tilt from the beam-frame z-axis: z-component = cos(tilt)
+        for alpha, theta, psi in tg_angles:
+            axis = Rotation.from_euler('ZYZ', [alpha, theta, psi]).as_matrix()[:, 2]
+            np.testing.assert_allclose(np.linalg.norm(axis), 1.0, atol=1e-4)
+            np.testing.assert_allclose(axis[2], np.cos(tilt), atol=1e-4)
+
+        self.assertTrue(tg_geometry.mode=='parallel')
+        np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
+        np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
+        np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
+        np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
+
+    def test_panel_origin_flips(self):
+        # The panel storage origin flips the detector by pi about the matching axis (roll/pitch/yaw);
+
+        expected = {
+            'bottom-left':  [0, 0, 0],
+            'top-left':     [0, np.pi, 0],
+            'bottom-right': [0, 0, np.pi],
+            'top-right':    [np.pi, 0, 0],
+        }
+        for origin, rot in expected.items():
+            rot_mat = Rotation.from_euler('xyz', rot).as_matrix()
+            cone = AcquisitionGeometry.create_Cone3D(source_position=[0,-6,0], detector_position=[0,16,0])\
+                                          .set_angles(self.angles_deg, angle_unit='degree')\
+                                          .set_labels(['vertical', 'angle','horizontal'])\
+                                          .set_panel((self.num_pixels_x,self.num_pixels_y), (self.pixel_size_x,self.pixel_size_y), origin=origin)
+            tg_cone, _ = CIL2TIGREGeometry.getTIGREGeometry(self.ig, cone)
+            np.testing.assert_allclose(Rotation.from_euler('xyz', tg_cone.rotDetector).as_matrix(), rot_mat, atol=1e-12, err_msg=f"cone origin {origin}")
+
+            par = AcquisitionGeometry.create_Parallel3D()\
+                                          .set_angles(self.angles_deg, angle_unit='degree')\
+                                          .set_labels(['vertical', 'angle','horizontal'])\
+                                          .set_panel((self.num_pixels_x,self.num_pixels_y), (self.pixel_size_x,self.pixel_size_y), origin=origin)
+            tg_par, _ = CIL2TIGREGeometry.getTIGREGeometry(self.ig, par)
+            np.testing.assert_allclose(Rotation.from_euler('xyz', tg_par.rotDetector).as_matrix(), rot_mat, atol=1e-12, err_msg=f"parallel origin {origin}")
 
 
 @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")

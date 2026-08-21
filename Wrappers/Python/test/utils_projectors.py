@@ -554,6 +554,152 @@ class TestCommon_ProjectionOperator(object):
             np.testing.assert_equal(bp.array, res)
 
 
+class TestCommon_ProjectionOperator_Geometry(object):
+    '''
+    Known-answer forward/back-projection tests for advanced (tilted-axis) geometry,
+    for both Cone3D and Parallel3D.
+    '''
+    
+    N = 8
+    axis_vertical      = [0,  0,  1]   #axis vertical (pointing up)
+    axis_vertical_down = [0,  0, -1]   #axis vertical, reversed (pointing down)
+    axis_along_beam    = [0, -1,  0]   #axis tilted 90 deg to lie along the beam
+
+    def Cone3D(self):
+        self._is_cone = True
+        #a distant source (SOD >> object) makes a single cone view effectively parallel
+        def create_geometry(rotation_axis, angles, num_pix):
+            return AcquisitionGeometry.create_Cone3D(source_position=[0, -10000, 0], detector_position=[0, 10, 0],
+                                                     detector_direction_x=[1, 0, 0], detector_direction_y=[0, 0, 1],
+                                                     rotation_axis_direction=rotation_axis)\
+                                       .set_panel([num_pix, num_pix], [1, 1], origin='bottom-left')\
+                                       .set_angles(angles, angle_unit='degree')
+
+        self.create_geometry = create_geometry
+
+    def Parallel3D(self):
+        self._is_cone = False
+        def create_geometry(rotation_axis, angles, num_pix):
+            return AcquisitionGeometry.create_Parallel3D(ray_direction=[0, 1, 0],
+                                                         detector_direction_x=[1, 0, 0], detector_direction_y=[0, 0, 1],
+                                                         rotation_axis_direction=rotation_axis)\
+                                       .set_panel([num_pix, num_pix], [1, 1], origin='bottom-left')\
+                                       .set_angles(angles, angle_unit='degree')
+        
+        self.create_geometry = create_geometry
+
+    def _forward_project(self, ag, ig, volume):
+        #project, then return the data in TIGRE order so it can be
+        ag = ag.copy()
+        ag.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag))
+        fp = self.ProjectionOperator(ig, ag, **self.PO_args).direct(volume)
+        fp.reorder('tigre')
+        return fp.as_array()
+
+    def _back_project(self, ag, ig, detector_image):
+        ag = ag.copy()
+        ag.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag))
+        data = ag.allocate(0)
+        data.fill(detector_image)
+        bp = self.ProjectionOperator(ig, ag, **self.PO_args).adjoint(data)
+        bp.reorder('tigre')
+        return bp.as_array()
+
+    def test_forward_projector_axes(self):
+
+        ag = self.create_geometry(self.axis_vertical, [0], self.N)
+        ig = ag.get_ImageGeometry()
+
+        phantom = ig.allocate(0)
+        phantom.array[3:5, 2:6, 2:4] = 0.5
+        phantom.array[3:5, 2:6, 4:6] = 1.0
+        vol = phantom.array
+
+
+        #axis vertical, angle 0: rays sum over y
+        fp = self._forward_project(ag, ig, phantom)
+        np.testing.assert_allclose(fp, vol.sum(axis=1), atol=self.tolerance_fp)
+
+        #reversing the vertical rotation axis
+        ag = self.create_geometry(self.axis_vertical_down, [0], self.N)
+        fp = self._forward_project(ag, ig, phantom)
+        np.testing.assert_allclose(fp, vol.sum(axis=1)[:, ::-1], atol=self.tolerance_fp)
+
+        #axis vertical, angle 90: rays sum over x
+        ag = self.create_geometry(self.axis_vertical, [90], self.N)
+        fp = self._forward_project(ag, ig, phantom)
+        np.testing.assert_allclose(fp, vol.sum(axis=2), atol=self.tolerance_fp)
+
+        #axis along the beam, angle 0: rays sum over z
+        ag = self.create_geometry(self.axis_along_beam, [0], self.N)
+        fp = self._forward_project(ag, ig, phantom)
+        np.testing.assert_allclose(fp, vol.sum(axis=0), atol=self.tolerance_fp)
+
+
+    def test_forward_projector_laminography(self):
+        # foward projects a single offset blob. For laminography this traces an ellipse that we fit to extract the tilt and offset
+        num_pixels = 64
+        offset = 15
+        tilt = np.deg2rad(30)
+        axis = [0.0, -np.sin(tilt), np.cos(tilt)]
+        angles = np.linspace(0, 360, 72, endpoint=False)
+
+        ag = self.create_geometry(axis, angles, num_pixels)
+        ig = ag.get_ImageGeometry()
+
+        c = num_pixels // 2
+        phantom = ig.allocate(0)
+        phantom.array[c-2:c+2, c-2:c+2, c+offset-2:c+offset+2] = 1.0
+
+        arr = self._forward_project(ag, ig, phantom)
+
+        #centroid of the blob on the detector at each angle, measured from the panel centre
+        u = []
+        v = []
+        pixels = np.arange(num_pixels)
+        for projection in arr:
+            u.append((projection.sum(axis=0) * pixels).sum() / projection.sum())
+            v.append((projection.sum(axis=1) * pixels).sum() / projection.sum())
+
+        u = np.array(u) - (num_pixels - 1) / 2
+        v = np.array(v) - (num_pixels - 1) / 2
+
+        #fit the ellipse  u^2/a^2 + v^2/b^2 = 1  by linear least squares in (u^2, v^2)
+        coeffs, *_ = np.linalg.lstsq(np.column_stack([u**2, v**2]), np.ones_like(u), rcond=None)
+        semi_u = 1 / np.sqrt(coeffs[0])
+        semi_v = 1 / np.sqrt(coeffs[1])
+
+        np.testing.assert_allclose(semi_u, offset, rtol=0.05)                  #semi-major = blob offset
+        np.testing.assert_allclose(semi_v / semi_u, np.sin(tilt), rtol=0.05)   #minor/major = sin(tilt)
+
+
+    def test_back_projection(self):
+        # back-projects a single detector pixel through a 45 deg tilted axis.
+
+        N = 9
+        tilt = np.deg2rad(45)
+        axis = [0.0, -np.sin(tilt), np.cos(tilt)]
+
+        ag = self.create_geometry(axis, [0], N)
+        ig = ag.get_ImageGeometry()
+
+        c = N // 2
+        detector_image = np.zeros((N, N), dtype=np.float32) 
+        detector_image[c, c] = 1.0
+
+        bp = self._back_project(ag, ig, detector_image)
+
+        #central voxel hit exactly, peak ridge on the 45 deg line z + y = N-1 in the central x column
+        ridge = np.array([bp[z, N - 1 - z, c] for z in range(N)])
+        np.testing.assert_allclose(bp[c, c, c], 1.0, atol=self.tolerance_fp)
+        np.testing.assert_allclose(ridge, 1.0, atol=self.tolerance_fp)
+
+        #nothing is back-projected outside the central x column
+        mask = np.ones(N, bool)
+        mask[c] = False
+        np.testing.assert_allclose(bp[:, :, mask], 0.0, atol=self.tolerance_fp)
+
+
 class TestCommon_ProjectionOperator_SIM(SimData):
     '''
     Tests forward and backward operators function with and without 'out'
@@ -668,6 +814,42 @@ class TestCommon_FBP_SIM(SimData):
             FBP = self.FBP(acquisition_geometry = self.ag, **self.FBP_args)
             reco = FBP(self.acq_data)
             np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=self.tolerance_fbp)
+
+
+class TestCommon_FBP_Laminography(SimData):
+    '''
+    Laminography FBP test: a thin simulated spheres phantom foward projected with a tilt then reconstructed.
+    '''
+    def test_FBP_laminography(self):
+        # forward project the sphere phantom cut to ~5 central slices through the
+        # dataset geometry with a tilted rotation axis, FBP reconstruct, and compare
+        # the slices to the original.
+        if self.backend == 'tigre':
+            from cil.plugins.tigre import ProjectionOperator
+        else:
+            from cil.plugins.astra import ProjectionOperator
+
+        ig = self.ig
+        c = ig.voxel_num_z // 2
+        half = 2                                    #keep 2*half+1 = 5 central slices
+        sl = slice(c - half, c + half + 1)
+        thin = ig.allocate(0)
+        thin.array[sl] = self.img_data.array[sl]
+
+        #tilt the dataset's own rotation axis 30 deg out of vertical
+        tilt = np.deg2rad(30)
+        ag = self.ag.copy()
+        ag.config.system.rotation_axis.direction = [0.0, -np.sin(tilt), np.cos(tilt)]
+        ag.set_labels(AcquisitionDimension.get_order_for_engine(self.backend, ag))
+
+        data = ProjectionOperator(ig, ag).direct(thin)
+        reco = self.FBP(ig, ag, **self.FBP_args)(data)
+        #laminography FBP loses amplitude (missing wedge) but recovers the structure:
+        #require the reconstructed slices to correlate strongly with the original
+        orig = self.img_data.array[sl].ravel()
+        rec = reco.array[sl].ravel()
+        corr = np.corrcoef(orig, rec)[0, 1]
+        self.assertGreater(corr, self.tolerance_fbp_laminography)
 
 
 class TestCommon_ProjectionOperatorBlockOperator(object):

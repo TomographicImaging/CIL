@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 
 def _resolve_pdhg_step_sizes(tau, sigma, operator):
-    """Validate user-supplied PDHG primal/dual step sizes and fill in defaults.
+    """Returns PDHG primal and dual step sizes from user input as numbers. Fill in defaults when user hasn't made a choice.
 
     Either, both or neither of ``tau``/``sigma`` may be provided. Scalars must be
     positive; array-like values must match the operator's domain (``tau``) or
@@ -85,8 +85,7 @@ def _validate_pdhg_step_sizes(tau, sigma, operator):
             ("sigma", sigma, operator.range_geometry().shape)):
         if value is None:
             raise ValueError(
-                "The step-size rule returned {0} = None. This step-size rule is "
-                "not compatible with PDHG.".format(name))
+                f"The step-size rule returned {name} = None. This step-size rule is not compatible with PDHG.")
         if isinstance(value, Number):
             if value <= 0:
                 raise ValueError(
@@ -265,8 +264,7 @@ class ArmijoStepSizeRule(StepSizeRule):
         if not self.warmstart:
             self.alpha = self.alpha_orig
 
-        f_x = algorithm.calculate_objective_function_at_point(
-            algorithm.solution)
+        f_x = algorithm.calculate_objective_function_at_point(algorithm.solution)
 
         self.x_armijo = algorithm.solution.copy()
 
@@ -278,8 +276,7 @@ class ArmijoStepSizeRule(StepSizeRule):
             algorithm.gradient_update.multiply(self.alpha, out=self.x_armijo)
             algorithm.solution.subtract(self.x_armijo, out=self.x_armijo)
 
-            f_x_a = algorithm.calculate_objective_function_at_point(
-                self.x_armijo)
+            f_x_a = algorithm.calculate_objective_function_at_point(self.x_armijo)
             sqnorm = algorithm.gradient_update.squared_norm()
             if f_x_a - f_x <= - (self.alpha/2) * sqnorm:
                 break
@@ -305,10 +302,9 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
 
     - :math:`\alpha_k^{SHORT}=\frac{\Delta x \cdot\Delta g}{\Delta g \cdot\Delta g}`.
 
-    Where the operator :math:`\cdot` is the standard inner product between two vectors. 
+    Where the operator :math:`\cdot` is the standard inner product between two vectors.
 
     This is suitable for use with gradient based iterative methods where the calculated gradient is stored as `algorithm.gradient_update`.
-
 
     Parameters
     ----------
@@ -318,8 +314,6 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         This calculates the step-size based on the LONG, SHORT or alternating between the two, starting with short.
     stabilisation_param: 'auto', float or 'off', default is 'auto'
         In order to add stability the step-size has an upper limit of :math:`\Delta/\|g_k\|` where by 'default', the `stabilisation_param`, :math:`\Delta` is  determined automatically to be the minimium of :math:`\Delta x` from the first 3 iterations. The user can also pass a fixed constant or turn "off" the stabilisation, equivalently passing `np.inf`.
-
-
 
 
     Reference
@@ -341,8 +335,7 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
         elif self.mode == 'long' or self.mode == 'alternate':
             self.is_short = False
         else:
-            raise ValueError(
-                'Mode should be chosen from "long", "short" or "alternate". ')
+            raise ValueError('Mode should be chosen from "long", "short" or "alternate". ')
 
         self.store_grad = None
         self.store_x = None

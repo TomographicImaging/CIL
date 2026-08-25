@@ -372,15 +372,15 @@ class TestPDHGConstantStepSize(CCPiTestClass):
         with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, step_size=(tau, None))
 
-        # check sigma not Number or object with correct shape
-        with self.assertRaises(AttributeError):
+        # check tau neither a Number nor an array-like object
+        with self.assertRaisesRegex(ValueError, "must be None, a positive number or an array-like object"):
             pdhg = PDHG(f=f, g=g, operator=operator,
-                        step_size=("sigma", None))
+                        step_size=("banana", None))
 
-        # check tau not Number or object with correct shape
-        with self.assertRaises(AttributeError):
+        # check sigma neither a Number nor an array-like object
+        with self.assertRaisesRegex(ValueError, "must be None, a positive number or an array-like object"):
             pdhg = PDHG(f=f, g=g, operator=operator,
-                        step_size=("tau", None))
+                        step_size=(None, "banana"))
 
         # check warning message if condition is not satisfied
         sigma = 4/operator.norm()
@@ -429,9 +429,10 @@ class TestPDHGConstantStepSize(CCPiTestClass):
                  step_size=ConstantStepSize(0.1))
 
     def test_wrong_shape_rule_raises_valueerror(self):
-        # A rule that provides get_initial_step_size but returns wrong-shaped
-        # step sizes (here a list where PDHG expects a scalar/array) must raise
-        # a clear ValueError from the PDHG step-size validation.
+        # A rule that provides get_initial_step_size but returns step sizes that
+        # are neither a positive number nor an array-like (here a list, as an
+        # SPDHG rule would return) must raise a clear ValueError from the PDHG
+        # step-size validation.
         class _BadRule(StepSizeRule):
             def get_initial_step_size(self, algorithm):
                 return 0.1, [0.1, 0.1]
@@ -440,9 +441,24 @@ class TestPDHGConstantStepSize(CCPiTestClass):
                 return 0.1, [0.1, 0.1]
 
         operator = IdentityOperator(ImageGeometry(2, 2))
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, "must be a positive number or an array-like object"):
             PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator,
                  step_size=_BadRule())
+
+        # A rule returning an array-like of the wrong shape must still report a
+        # shape mismatch.
+        wrong_shape = ImageGeometry(3, 3).allocate(0.1)
+
+        class _WrongShapeRule(StepSizeRule):
+            def get_initial_step_size(self, algorithm):
+                return 0.1, wrong_shape
+
+            def get_step_size(self, algorithm):
+                return 0.1, wrong_shape
+
+        with self.assertRaisesRegex(ValueError, "is not the same as the expected shape"):
+            PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator,
+                 step_size=_WrongShapeRule())
 
 
 class TestStepSizePDHGStronglyConvex(CCPiTestClass):

@@ -43,18 +43,26 @@ def _resolve_pdhg_step_sizes(tau, sigma, operator):
             if tau <= 0:
                 raise ValueError(
                     "The step-sizes of PDHG must be positive, passed tau = {}".format(tau))
-        elif tau.shape != operator.domain_geometry().shape:
-            raise ValueError(" The shape of tau = {0} is not the same as the shape of the domain_geometry = {1}".format(
-                tau.shape, operator.domain_geometry().shape))
+        elif hasattr(tau, "shape"):
+            if tau.shape != operator.domain_geometry().shape:
+                raise ValueError(" The shape of tau = {0} is not the same as the shape of the domain_geometry = {1}".format(
+                    tau.shape, operator.domain_geometry().shape))
+        else:
+            raise ValueError("The step-sizes of PDHG must be None, a positive number or an array-like object (e.g. a DataContainer, BlockDataContainer or numpy array) with the shape of the domain_geometry = {0}, passed tau = {1!r} of type {2}".format(
+                operator.domain_geometry().shape, tau, type(tau).__name__))
 
     if sigma is not None:
         if isinstance(sigma, Number):
             if sigma <= 0:
                 raise ValueError(
                     "The step-sizes of PDHG are positive, passed sigma = {}".format(sigma))
-        elif sigma.shape != operator.range_geometry().shape:
-            raise ValueError(" The shape of sigma = {0} is not the same as the shape of the range_geometry = {1}".format(
-                sigma.shape, operator.range_geometry().shape))
+        elif hasattr(sigma, "shape"):
+            if sigma.shape != operator.range_geometry().shape:
+                raise ValueError(" The shape of sigma = {0} is not the same as the shape of the range_geometry = {1}".format(
+                    sigma.shape, operator.range_geometry().shape))
+        else:
+            raise ValueError("The step-sizes of PDHG must be None, a positive number or an array-like object (e.g. a DataContainer, BlockDataContainer or numpy array) with the shape of the range_geometry = {0}, passed sigma = {1!r} of type {2}".format(
+                operator.range_geometry().shape, sigma, type(sigma).__name__))
 
     # Default sigma and tau step-sizes
     if tau is None and sigma is None:
@@ -90,11 +98,18 @@ def _validate_pdhg_step_sizes(tau, sigma, operator):
             if value <= 0:
                 raise ValueError(
                     "The step-sizes of PDHG must be positive, got {0} = {1}.".format(name, value))
-        elif getattr(value, "shape", None) != shape:
+        elif hasattr(value, "shape"):
+            if value.shape != shape:
+                raise ValueError(
+                    "The shape of {0} = {1} is not the same as the expected shape = {2}. "
+                    "This step-size rule may not be compatible with PDHG.".format(
+                        name, value.shape, shape))
+        else:
             raise ValueError(
-                "The shape of {0} = {1} is not the same as the expected shape = {2}. "
+                "The step-sizes of PDHG must be a positive number or an array-like object (e.g. a DataContainer, "
+                "BlockDataContainer or numpy array) of the expected shape = {0}, got {1} = {2!r} of type {3}. "
                 "This step-size rule may not be compatible with PDHG.".format(
-                    name, getattr(value, "shape", type(value)), shape))
+                    shape, name, value, type(value).__name__))
 
 
 def _validate_spdhg_step_sizes(tau, sigma, n_operators):

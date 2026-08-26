@@ -1,3 +1,9 @@
+* x.x.x
+  - New features:
+    - Added `Huber Loss` function (#2281)
+  - Enhancements:
+    - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
+
 * 26.0.0
   - New features:
     - `LSQR` algorithm added to the CIL algorithm class (#1975)

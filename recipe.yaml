@@ -62,6 +62,7 @@ requirements:
     - cil-data >=22 # -c ccpi
     - tqdm
     - numba
+    - array-api-compat
   # version constraints of optional dependencies
   run_constraints:
     - tomophantom >=3.0.3

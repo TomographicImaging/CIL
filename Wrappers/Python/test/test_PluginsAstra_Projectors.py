@@ -74,16 +74,16 @@ class TestAstraProjectors(ParametrizedTestCase, unittest.TestCase):
         self.norm = 14.85
 
     def test_ProjectionOperator_img_geom_default(self):
-        K = ProjectionOperator(image_geometry=None, acquisition_geometry=self.ag, device='gpu')
+        K = ProjectionOperator(image_geometry=None, acquisition_geometry=self.ag, device='cpu')
         assert(K.volume_geometry == self.ag.get_ImageGeometry())
 
     def test_ProjectionOperator_acq_geom_default(self):
         with self.assertRaises(TypeError):
-            ProjectionOperator(image_geometry=self.ig, acquisition_geometry=None, device='gpu')
+            ProjectionOperator(image_geometry=self.ig, acquisition_geometry=None, device='cpu')
 
     def test_ProjectionOperator_all_default(self):
         with self.assertRaises(TypeError):
-            ProjectionOperator(image_geometry=None, acquisition_geometry=None, device='gpu')
+            ProjectionOperator(image_geometry=None, acquisition_geometry=None, device='cpu')
 
     @parametrize("device, raise_error, err_type",
         [param('cpu', False, None, id="cpu_NoError"),

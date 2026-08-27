@@ -49,7 +49,7 @@ class TestL1NormRR(unittest.TestCase):
         model = 12 # select a model number from the library
         N = 400 # set dimension of the phantom
         path = os.path.dirname(tomophantom.__file__)
-        path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
+        path_library2D = os.path.join(path, "phantomlib", "Phantom2DLibrary.dat")
 
         phantom_2D = TomoP2D.Model(model, N, path_library2D)
         # data = ImageData(phantom_2D)

@@ -27,7 +27,7 @@ from .partitioner import Partitioner
 class AcquisitionData(DataContainer, Partitioner):
     """
     DataContainer for holding 2D or 3D sinogram
-    
+
     Parameters
     ----------
     array : numpy.ndarray or DataContainer
@@ -36,10 +36,10 @@ class AcquisitionData(DataContainer, Partitioner):
         If True, the array will be deep copied. If False, the array will be shallow copied.
     geometry : AcquisitionGeometry
         The geometry of the data. If the dtype of the array and geometry are different, the geometry dtype will be overridden.
-    
+
     **kwargs:
         dtype : numpy.dtype
-            Specify the data type of the AcquisitionData array, this is useful if you pass None to array and want to over-ride the dtype of the geometry. 
+            Specify the data type of the AcquisitionData array, this is useful if you pass None to array and want to over-ride the dtype of the geometry.
             If an array is passed, dtype must match the dtype of the array.
 
     """
@@ -84,7 +84,7 @@ class AcquisitionData(DataContainer, Partitioner):
             if dtype is None:
                 dtype = geometry.dtype
             array = numpy.empty(geometry.shape, dtype)
-    
+
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
 
@@ -107,12 +107,12 @@ class AcquisitionData(DataContainer, Partitioner):
         '''
         Check if two AcquisitionData objects are equal. This is done by checking if the geometry, data and dtype are equal.
         Also, if the other object is a numpy.ndarray, it will check if the data and dtype are equal.
-        
+
         Parameters
         ----------
         other: AcquisitionData or numpy.ndarray
             The object to compare with.
-        
+
         Returns
         -------
         bool
@@ -123,12 +123,12 @@ class AcquisitionData(DataContainer, Partitioner):
             if numpy.array_equal(self.as_array(), other.as_array()) \
                 and self.geometry == other.geometry \
                 and self.dtype == other.dtype:
-                return True 
+                return True
         elif numpy.array_equal(self.as_array(), other) and self.dtype==other.dtype:
             return True
         else:
             return False
-        
+
     def _get_slice(self, **kwargs):
         '''
         Functionality of get_slice
@@ -165,8 +165,8 @@ class AcquisitionData(DataContainer, Partitioner):
             return out
         else:
             return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new)
-        
-    
+
+
     def get_slice(self, *args, **kwargs):
         '''
         Returns a new AcquisitionData of a single slice in the requested direction.
@@ -205,10 +205,10 @@ class AcquisitionData(DataContainer, Partitioner):
                 raise TypeError(f"Cannot use 'projection' for geometries that use angles. Use 'angle' instead.")
             elif key not in AcquisitionDimension and key != 'force':
                 raise TypeError(f"'{key}' not in allowed labels {AcquisitionDimension}.")
-            
+
         if args:
             warnings.warn("Positional arguments for get_slice are deprecated. Use keyword arguments instead.", DeprecationWarning, stacklevel=2)
-            
+
             num_args = len(args)
 
             if num_args > 0:

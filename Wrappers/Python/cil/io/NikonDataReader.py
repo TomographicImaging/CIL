@@ -54,6 +54,8 @@ class NikonDataReader(object):
     Notes
     -----
     `roi` behaviour:
+        The indices provided are start inclusive, stop exclusive.
+
         Files are stacked along axis_0. axis_1 and axis_2 correspond
         to row and column dimensions, respectively.
 
@@ -67,7 +69,16 @@ class NikonDataReader(object):
 
         ``start`` and ``end`` can be specified as ``None`` which is equivalent
         to ``start = 0`` and ``end = load everything to the end``, respectively.
-        Start and end also can be negative.
+        Start and end also can be negative. i.e. {'axis_name1':(10, -10)} will 
+        crop the dimension symmetrically
+
+        The following two examples are equivalent, if the size of the horizontal dimension is 2000:
+
+        >>> reader1 = NikonDataReader(file_name, roi={'horizontal': (10, -10)})
+
+        >>> reader2 = NikonDataReader(file_name, roi={'horizontal': (10, 1990)})
+
+        For more info on negative indexing in python see: https://numpy.org/doc/stable/user/basics.indexing.html
 
     '''
 

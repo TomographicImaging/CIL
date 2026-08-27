@@ -287,7 +287,6 @@ class TestGD(CCPiTestClass):
         self.assertAlmostEqual(gd.solution.array[1], self.scipy_opt_high.x[1], places=3)
 
     def test_bb_step_size_gd_converge(self):
-        np.random.seed(2)
         n = 10
         m = 10
         A = np.arange(1, n*m+1, dtype=np.float32).reshape(n,m)
@@ -295,8 +294,10 @@ class TestGD(CCPiTestClass):
         x = (np.arange(n, dtype=np.float32)-n/2)/n
         b=A@x
 
-
+        
         Aop = MatrixOperator(A)
+        norm = Aop.PowerMethod(Aop, method="composed_with_adjoint", seed=4)
+        Aop.set_norm(norm)
         bop = VectorData(b)
         ig=Aop.domain
 

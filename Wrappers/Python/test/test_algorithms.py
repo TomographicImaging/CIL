@@ -37,7 +37,7 @@ from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOp
 
 
 
-from cil.optimisation.functions import Rosenbrock, MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, ScaledFunction
+from cil.optimisation.functions import Rosenbrock, MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, SARAHFunction, ScaledFunction
 from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD , LSQR
 
 
@@ -1885,7 +1885,29 @@ class Test_PD3O(CCPiTestClass):
         algo_pd3o.run(1)
         self.assertEqual(f.data_passes[-1], 2/3)
         self.assertEqual(f.data_passes_indices, [[0], [1]])
-        
+
+
+    def test_PD3O_rejects_SARAH(self):
+        # PD3O evaluates the gradient twice per iteration, at two different points, which advances
+        # the SARAH recursion twice per iteration and mis-counts `data_passes`, so it is rejected.
+        initial = VectorData(np.zeros(21))
+        b = VectorData(np.arange(1,22))
+        functions=[]
+        for i in range(3):
+            diagonal=np.zeros(21)
+            diagonal[7*i:7*(i+1)]=1
+            A=MatrixOperator(np.diag(diagonal))
+            functions.append( LeastSquares(A, A.direct(b)))
+
+        operator = IdentityOperator(initial.geometry)
+        f = SARAHFunction(functions, Sampler.sequential(3))
+
+        with self.assertRaises(NotImplementedError):
+            PD3O(f=f, g=IndicatorBox(lower=0), h=0.1*L1Norm(), operator=operator)
+
+        # a scaled SARAHFunction is unwrapped first, so it is rejected too
+        with self.assertRaises(NotImplementedError):
+            PD3O(f=3*(2*f), g=IndicatorBox(lower=0), h=0.1*L1Norm(), operator=operator)
 
 
 

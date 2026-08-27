@@ -154,6 +154,9 @@ class WaveletOperator(LinearOperator):
             raise AttributeError(
                 f"Size of the range geometry is {range_geometry.shape} but the size of the wavelet coefficient array must be {tuple(range_shape)}.")
 
+        # semi-orthogonality constant
+        self.orthogonal_scalar = kwargs.get('orthogonal_scalar', 1.0)
+
         super().__init__(domain_geometry=domain_geometry, range_geometry=range_geometry)
 
     def _shape2slice(self):

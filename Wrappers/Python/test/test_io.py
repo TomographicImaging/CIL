@@ -94,6 +94,65 @@ if not has_file:
   
 
 class TestZeissDataReader(unittest.TestCase):
+    @unittest.skipIf(not (has_file and has_olefile and has_dxchange), 
+                     f"Missing prerequisites: has_file {has_file}, has_olefile {has_olefile} has_dxchange {has_dxchange}")
+    def test_roi(self):
+        # want to pass an roi
+        reader = ZEISSDataReader(file_name=test_txrm_file)
+        metadata = reader.get_metadata()
+        horizontal_max = metadata['image_width']
+        vertical_max = metadata['image_height']
+        angles_max = len(metadata['thetas'])
+        valid_roi = {'angle': (0,1000, 1), 'vertical': (0,500), 'horizontal': (0, 400)}
+        reader.set_up(file_name=test_txrm_file, roi=valid_roi)
+        data3d = reader.read()
+
+        expected_shape=[1000,500, 400]
+        # angle, vertical, horizontal
+
+        self.assertEqual(data3d.shape, tuple(expected_shape))
+
+        valid_roi_negative_endpoint = {'angle': (0,-(angles_max-1000), 1), 'vertical': (0,-(vertical_max-500)), 'horizontal': (0, -(horizontal_max-400))}
+
+        reader.set_up(file_name=test_txrm_file, roi=valid_roi_negative_endpoint)
+        data3d = reader.read()
+        self.assertEqual(data3d.shape, tuple(expected_shape))
+
+        valid_roi_negative_startpoint = {'angle': (-1000, None, 1), 'vertical': (-500, None), 'horizontal': (-400, None)}
+        reader.set_up(file_name=test_txrm_file, roi=valid_roi_negative_startpoint)
+        data3d = reader.read()
+        self.assertEqual(data3d.shape, tuple(expected_shape))
+
+
+        invalid_rois_negative_startpoint = [{'angle': (-10000, None, 1), 'vertical': (-500, None), 'horizontal': (-400, None)},
+                                            {'angle': (-1000, None, 1), 'vertical': (-5000, None), 'horizontal': (-400, None)},
+                                            {'angle': (-1000, None, 1), 'vertical': (-500, None), 'horizontal': (-4000, None)}]
+        for invalid_roi in invalid_rois_negative_startpoint:
+            with self.assertRaises(ValueError):
+                reader.set_up(file_name=test_txrm_file, roi=invalid_roi)
+
+        invalid_rois_negative_endpoint = [{'angle': (0,-10000, 1), 'vertical': (0,-(vertical_max-500)), 'horizontal': (0, -(horizontal_max-400))},
+                                            {'angle': (0,-(angles_max-1000), 1), 'vertical': (0,-5000), 'horizontal': (0, -(horizontal_max-400))},
+                                            {'angle': (0,-(angles_max-1000), 1), 'vertical': (0,-(vertical_max-500)), 'horizontal': (0, -4000)}]
+        for invalid_roi in invalid_rois_negative_endpoint:
+            with self.assertRaises(ValueError):
+                reader.set_up(file_name=test_txrm_file, roi=invalid_roi)
+
+        invalid_rois_positive_endpoints = [{'angle': (0,10000, 1), 'vertical': (0,500), 'horizontal': (0, 400)},
+                                            {'angle': (0,1000, 1), 'vertical': (0,5000), 'horizontal': (0, 400)},
+                                            {'angle': (0,1000, 1), 'vertical': (0,500), 'horizontal': (0, 4000)}]
+        for invalid_roi in invalid_rois_positive_endpoints:
+            with self.assertRaises(ValueError):
+                reader.set_up(file_name=test_txrm_file, roi=invalid_roi)
+        
+        invalid_rois_positive_startpoints = [{'angle': (10000, None, 1), 'vertical': (-500, None), 'horizontal': (-400, None)},
+                                            {'angle': (1000, None, 1), 'vertical': (5000, None), 'horizontal': (-400, None)},
+                                            {'angle': (1000, None, 1), 'vertical': (-500, None), 'horizontal': (4000, None)}]
+        for invalid_roi in invalid_rois_positive_startpoints:
+            with self.assertRaises(ValueError):
+                reader.set_up(file_name=test_txrm_file, roi=invalid_roi)
+
+
     
     @unittest.skipIf(not (has_file and has_olefile and has_dxchange), 
                      f"Missing prerequisites: has_file {has_file}, has_olefile {has_olefile} has_dxchange {has_dxchange}")

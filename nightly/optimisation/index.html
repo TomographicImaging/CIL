@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 26.0.1.dev3+g11334a394.d20260821 documentation</title>
+    <title>Optimisation framework &#8212; CIL 26.0.1.dev5+g60b0a9022.d20260828 documentation</title>
   
   
   
@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=99201010"></script>
+    <script src="../_static/documentation_options.js?v=b58ecf0b"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,9 +51,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'optimisation';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev3+g11334a394.d20260821';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev5+g60b0a9022.d20260828';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -64,7 +64,7 @@
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="../io/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="26.0.1.dev3+g11334a394.d20260821" />
+  <meta name="docsearch:version" content="26.0.1.dev5+g60b0a9022.d20260828" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -1157,22 +1157,53 @@ print to screen of the status of the optimisation.</p>
 <p>Solves the problem:</p>
 <div class="math notranslate nohighlight">
 \[\min_x \|Ax - b\|_2^2\]</div>
-<p>Optionally, with Tikhonov regularisation:</p>
+<p>Optionally, with Tikhonov regularisation towards the initial guess <span class="math notranslate nohighlight">\(x_0\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[\min_x \|Ax - b\|_2^2 + \alpha^2 \|x\|_2^2\]</div>
+\[\min_x \|Ax - b\|_2^2 + \alpha^2 \|x - x_0\|_2^2\]</div>
+<p>which reduces to the usual <span class="math notranslate nohighlight">\(\alpha^2 \|x\|_2^2\)</span> penalty for the default zero initial.
+See the note below.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.Operator" title="cil.optimisation.operators.Operator"><em>Operator</em></a>) – Linear operator representing the forward model.</p></li>
-<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Initial guess for the solution. If not provided, a zero-initialised container is used.</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Initial guess for the solution. If not provided, a zero-initialised container is used.
+When <cite>alpha</cite> is non-zero it also sets the point the penalty is applied relative to, see
+the note below.</p></li>
 <li><p><strong>data</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Measured data (right-hand side of the equation).</p></li>
-<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Non-negative regularisation parameter. If zero, standard LSQR is used.</p></li>
-<li><p><strong>Reference</strong></p></li>
-<li><p><strong>---------</strong></p></li>
-<li><p><strong>https</strong> (<em>//web.stanford.edu/group/SOL/software/lsqr/</em>)</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Non-negative regularisation parameter. If zero, standard LSQR is used. Otherwise the
+penalty is applied relative to <cite>initial</cite>, see the note below.</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Passing a non-zero <cite>alpha</cite> gives the option for Tikhonov regularisation without building a
+block operator and data container, and consequently at a lower memory cost.</p>
+<p>Given a non-zero initial guess <span class="math notranslate nohighlight">\(x_0\)</span>, LSQR solves for the update
+<span class="math notranslate nohighlight">\(\delta = x - x_0\)</span> against the initial residual <span class="math notranslate nohighlight">\(r_0 = b - Ax_0\)</span>. The scalar
+<span class="math notranslate nohighlight">\(\alpha\)</span> is applied to whichever variable is being solved for, so it penalises
+<span class="math notranslate nohighlight">\(\delta\)</span> and the algorithm minimises</p>
+<div class="math notranslate nohighlight">
+\[\min_\delta \|A\delta - r_0\|_2^2 + \alpha^2 \|\delta\|_2^2
+\quad\Longleftrightarrow\quad
+\min_x \|Ax - b\|_2^2 + \alpha^2 \|x - x_0\|_2^2 .\]</div>
+<p>This is Tikhonov regularisation towards <span class="math notranslate nohighlight">\(x_0\)</span>, which is useful when a prior
+reconstruction is available, and it coincides with the <span class="math notranslate nohighlight">\(\alpha^2 \|x\|_2^2\)</span> penalty
+only when <span class="math notranslate nohighlight">\(x_0 = 0\)</span>. Since the two objectives differ, a warning is raised when a
+non-zero <cite>initial</cite> is combined with a non-zero <cite>alpha</cite>.</p>
+<p>To penalise <span class="math notranslate nohighlight">\(\|x\|_2^2\)</span> from a non-zero starting point, build the block system
+explicitly and pass it to an unregularised LSQR (or to
+<a class="reference internal" href="#cil.optimisation.algorithms.CGLS" title="cil.optimisation.algorithms.CGLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">CGLS</span></code></a>):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cil.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockDataContainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cil.optimisation.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockOperator</span><span class="p">,</span> <span class="n">IdentityOperator</span>
+
+<span class="n">block_operator</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">IdentityOperator</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()))</span>
+<span class="n">block_data</span> <span class="o">=</span> <span class="n">BlockDataContainer</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">lsqr</span> <span class="o">=</span> <span class="n">LSQR</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">block_operator</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">block_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://web.stanford.edu/group/SOL/software/lsqr/">https://web.stanford.edu/group/SOL/software/lsqr/</a></p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="cil.optimisation.algorithms.LSQR.set_up">
 <span class="sig-name descname"><span class="pre">set_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cil/optimisation/algorithms/LSQR/#LSQR.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.algorithms.LSQR.set_up" title="Link to this definition">#</a></dt>
@@ -1180,7 +1211,8 @@ print to screen of the status of the optimisation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Initial guess for the solution.</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Initial guess for the solution. When <cite>alpha</cite> is non-zero it also sets the point the
+penalty is applied relative to, see the note in the class documentation.</p></li>
 <li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.Operator" title="cil.optimisation.operators.Operator"><em>Operator</em></a>) – Linear operator representing the forward model.</p></li>
 <li><p><strong>data</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Measured data.</p></li>
 </ul>
@@ -10463,8 +10495,8 @@ Otherwise it is a BlockGeometry.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

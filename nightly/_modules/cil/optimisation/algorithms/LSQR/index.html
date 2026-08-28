@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.LSQR &#8212; CIL 26.0.1.dev3+g11334a394.d20260821 documentation</title>
+    <title>cil.optimisation.algorithms.LSQR &#8212; CIL 26.0.1.dev5+g60b0a9022.d20260828 documentation</title>
   
   
   
@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=1a224605a0b85cee09a9" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery.css?v=fd6457a4" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=1a224605a0b85cee09a9"></script>
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9" />
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../../../../_static/documentation_options.js?v=99201010"></script>
+    <script src="../../../../../_static/documentation_options.js?v=b58ecf0b"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,9 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/algorithms/LSQR';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev3+g11334a394.d20260821';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev5+g60b0a9022.d20260828';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="../../../../../search/" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="26.0.1.dev3+g11334a394.d20260821" />
+  <meta name="docsearch:version" content="26.0.1.dev5+g60b0a9022.d20260828" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -559,11 +559,14 @@
 
 <span class="sd">        \min_x \|Ax - b\|_2^2</span>
 
-<span class="sd">    Optionally, with Tikhonov regularisation:</span>
+<span class="sd">    Optionally, with Tikhonov regularisation towards the initial guess :math:`x_0`:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        \min_x \|Ax - b\|_2^2 + \alpha^2 \|x\|_2^2</span>
+<span class="sd">        \min_x \|Ax - b\|_2^2 + \alpha^2 \|x - x_0\|_2^2</span>
+
+<span class="sd">    which reduces to the usual :math:`\alpha^2 \|x\|_2^2` penalty for the default zero initial.</span>
+<span class="sd">    See the note below.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -571,10 +574,47 @@
 <span class="sd">        Linear operator representing the forward model.</span>
 <span class="sd">    initial : DataContainer, optional</span>
 <span class="sd">        Initial guess for the solution. If not provided, a zero-initialised container is used.</span>
+<span class="sd">        When `alpha` is non-zero it also sets the point the penalty is applied relative to, see</span>
+<span class="sd">        the note below.</span>
 <span class="sd">    data : DataContainer</span>
 <span class="sd">        Measured data (right-hand side of the equation).</span>
 <span class="sd">    alpha : float, optional</span>
-<span class="sd">        Non-negative regularisation parameter. If zero, standard LSQR is used.</span>
+<span class="sd">        Non-negative regularisation parameter. If zero, standard LSQR is used. Otherwise the</span>
+<span class="sd">        penalty is applied relative to `initial`, see the note below.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Passing a non-zero `alpha` gives the option for Tikhonov regularisation without building a</span>
+<span class="sd">    block operator and data container, and consequently at a lower memory cost.</span>
+
+<span class="sd">    Given a non-zero initial guess :math:`x_0`, LSQR solves for the update</span>
+<span class="sd">    :math:`\delta = x - x_0` against the initial residual :math:`r_0 = b - Ax_0`. The scalar</span>
+<span class="sd">    :math:`\alpha` is applied to whichever variable is being solved for, so it penalises</span>
+<span class="sd">    :math:`\delta` and the algorithm minimises</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \min_\delta \|A\delta - r_0\|_2^2 + \alpha^2 \|\delta\|_2^2</span>
+<span class="sd">        \quad\Longleftrightarrow\quad</span>
+<span class="sd">        \min_x \|Ax - b\|_2^2 + \alpha^2 \|x - x_0\|_2^2 .</span>
+
+<span class="sd">    This is Tikhonov regularisation towards :math:`x_0`, which is useful when a prior</span>
+<span class="sd">    reconstruction is available, and it coincides with the :math:`\alpha^2 \|x\|_2^2` penalty</span>
+<span class="sd">    only when :math:`x_0 = 0`. Since the two objectives differ, a warning is raised when a</span>
+<span class="sd">    non-zero `initial` is combined with a non-zero `alpha`.</span>
+
+<span class="sd">    To penalise :math:`\|x\|_2^2` from a non-zero starting point, build the block system</span>
+<span class="sd">    explicitly and pass it to an unregularised LSQR (or to</span>
+<span class="sd">    :class:`~cil.optimisation.algorithms.CGLS`):</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        from cil.framework import BlockDataContainer</span>
+<span class="sd">        from cil.optimisation.operators import BlockOperator, IdentityOperator</span>
+
+<span class="sd">        block_operator = BlockOperator(A, alpha * IdentityOperator(A.domain_geometry()))</span>
+<span class="sd">        block_data = BlockDataContainer(b, A.domain_geometry().allocate(0))</span>
+<span class="sd">        lsqr = LSQR(initial=x0, operator=block_operator, data=block_data)</span>
 
 <span class="sd">    Reference</span>
 <span class="sd">    ---------</span>
@@ -588,7 +628,8 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        initial : DataContainer, optional</span>
-<span class="sd">            Initial guess for the solution.</span>
+<span class="sd">            Initial guess for the solution. When `alpha` is non-zero it also sets the point the</span>
+<span class="sd">            penalty is applied relative to, see the note in the class documentation.</span>
 <span class="sd">        operator : Operator</span>
 <span class="sd">            Linear operator representing the forward model.</span>
 <span class="sd">        data : DataContainer</span>
@@ -618,13 +659,29 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        initial : DataContainer</span>
-<span class="sd">            Initial guess for the solution.</span>
+<span class="sd">            Initial guess for the solution. When `alpha` is non-zero it also sets the point the</span>
+<span class="sd">            penalty is applied relative to, see the note in the class documentation.</span>
 <span class="sd">        operator : Operator</span>
 <span class="sd">            Linear operator representing the forward model.</span>
 <span class="sd">        data : DataContainer</span>
 <span class="sd">            Measured data.</span>
 <span class="sd">        """</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="s2"> setting up"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="c1"># The scalar regularisation is applied to the variable LSQR is solving for. From a</span>
+        <span class="c1"># non-zero initial guess that variable is the update, so the penalty is measured from</span>
+        <span class="c1"># `initial` rather than from zero.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">regalpha</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">initial</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">"LSQR was passed a non-zero `initial` together with a non-zero `alpha`. The "</span>
+                <span class="s2">"scalar regularisation is applied relative to `initial`, so the algorithm "</span>
+                <span class="s2">"minimises ||Ax-b||^2 + alpha^2||x-initial||^2, that is, Tikhonov "</span>
+                <span class="s2">"regularisation towards `initial` rather than towards zero. Start from zero "</span>
+                <span class="s2">"if you intend to penalise ||x||, or penalise ||x|| from a warm start by "</span>
+                <span class="s2">"passing the block operator [A; alpha*I] with data [b; 0] to LSQR or CGLS. "</span>
+                <span class="s2">"See the LSQR documentation for details."</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># 1 domain</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span>
 
@@ -743,8 +800,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=1a224605a0b85cee09a9"></script>
-<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1a224605a0b85cee09a9"></script>
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

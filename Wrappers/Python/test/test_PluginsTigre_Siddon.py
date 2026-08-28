@@ -19,6 +19,7 @@
 import unittest
 from utils_projectors import TestCommon_ProjectionOperator_SIM
 from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
+from utils_projectors import TestCommon_ProjectionOperator_Geometry
 from utils import has_tigre, has_nvidia, initialise_tests
 
 if has_tigre:
@@ -55,6 +56,15 @@ class Test_Cone3D_Projectors_toy_tigre(unittest.TestCase, TestCommon_ProjectionO
         self.Cone3D()
         self.tolerance_linearity = 1e-2
         self.tolerance_norm = 0.1
+
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Cone3D_Geometry_tigre(unittest.TestCase, TestCommon_ProjectionOperator_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3D()
+        self.tolerance_fp = 0.02
+        self.tolerance_mass = 0.1
 
 
 @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")

@@ -20,6 +20,7 @@ import logging
 import numpy as np
 
 from cil.framework import ImageData, AcquisitionData, BlockGeometry
+from cil.framework.labels import AcquisitionType
 from cil.framework.labels import AcquisitionDimension, ImageDimension
 from cil.optimisation.operators import BlockOperator, LinearOperator
 from cil.plugins.tigre import CIL2TIGREGeometry
@@ -142,17 +143,32 @@ class ProjectionOperator_ag(ProjectionOperator):
         super(ProjectionOperator,self).__init__(domain_geometry=image_geometry,\
              range_geometry=acquisition_geometry)
 
-        if direct_method not in ['interpolated', 'Siddon']:
+        _direct_method = {'interpolated': 'interpolated', 'siddon': 'Siddon'}.get(
+            direct_method.lower())
+        
+        if _direct_method is None:
             raise ValueError(
                 "direct_method expected 'interpolated' or 'Siddon' got {}".
                 format(direct_method))
 
-        if adjoint_weights not in ['matched', 'FDK']:
+        _adjoint_weights = {'matched': 'matched', 'fdk': 'FDK'}.get(
+            adjoint_weights.lower())
+        
+        if _adjoint_weights is None:
             raise ValueError(
                 "adjoint_weights expected 'matched' or 'FDK' got {}".format(
                     adjoint_weights))
 
-        self.method = {'direct': direct_method, 'adjoint': adjoint_weights}
+        self.method = {'direct': _direct_method, 'adjoint': _adjoint_weights}
+
+        if self.method['direct'] == 'Siddon' \
+                and acquisition_geometry.geom_type == AcquisitionType.PARALLEL \
+                and acquisition_geometry.system_description == 'advanced':
+
+            raise NotImplementedError(
+                "TIGRE's Siddon forward projector does not support tilted/advanced "
+                "parallel beam geometry: its parallel beam is confined to the x-y "
+                "plane. Use direct_method='interpolated'.")
 
         #set up TIGRE geometry
         tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(
@@ -230,7 +246,7 @@ class ProjectionOperator_ag(ProjectionOperator):
         data = x.as_array()
 
         #if single angle projection add the dimension in for TIGRE
-        if x.dimension_labels[0] != AcquisitionDimension.ANGLE:
+        if x.dimension_labels[0] != [AcquisitionDimension.ANGLE, AcquisitionDimension.PROJECTION]:
             data = np.expand_dims(data, axis=0)
 
         if self.tigre_geom.is2D:

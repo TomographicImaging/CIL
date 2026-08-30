@@ -90,6 +90,11 @@ else:
     has_cvxpy = True
 system_state['has_cvxpy']=has_cvxpy
 
+#skopt (scikit-optimize)
+module_info = importlib.util.find_spec("skopt")
+has_skopt = module_info is not None
+system_state['has_skopt'] = has_skopt
+
 
 #ipp
 from cil.framework import cilacc

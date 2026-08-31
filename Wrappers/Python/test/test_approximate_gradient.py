@@ -29,6 +29,7 @@ from cil.optimisation.functions import LeastSquares
 from cil.optimisation.functions import ApproximateGradientSumFunction
 from cil.optimisation.functions import SGFunction, SAGFunction, SAGAFunction
 from cil.optimisation.functions import SVRGFunction, LSVRGFunction
+from cil.optimisation.functions import SARAHFunction
 from cil.optimisation.operators import MatrixOperator
 from cil.optimisation.algorithms import GD
 from cil.framework import VectorData
@@ -542,4 +543,102 @@ class TestLSVRG(CCPiTestClass, approx_gradient_child_class_testing):
         with self.assertRaises(IndexError):
             f.gradient(self.initial)
             f.gradient(self.initial)
-            
+
+
+class TestSARAH(CCPiTestClass, approx_gradient_child_class_testing):
+
+    def setUp(self):
+        self.stochastic_estimator=SARAHFunction
+        self.n_subsets=5
+        self.set_up()
+
+    def test_SARAH_init(self):
+        self.assertEqual(self.f_stochastic.update_frequency,
+                         2*self.f_stochastic.num_functions)
+        self.assertListEqual(self.f_stochastic.data_passes, [])
+        self.assertListEqual(self.f_stochastic.data_passes_indices, [])
+        f2 = SARAHFunction(self.f_subsets, update_frequency=3)
+        self.assertEqual(f2.update_frequency, 3)
+        self.assertListEqual(f2.data_passes, [])
+
+    def test_SARAH_update_frequency_must_be_a_positive_integer(self):
+        # unlike SVRG, SARAH cannot be run without full gradient calculations
+        for bad in [0, -1, 2.5]:
+            with self.assertRaises(ValueError):
+                SARAHFunction(self.f_subsets, update_frequency=bad)
+
+    def test_SARAH_update_frequency_and_data_passes(self):
+        # each intermediate iteration evaluates two gradients, but both of the same sampled function,
+        # so costs 1/n of a data pass, as for SVRGFunction
+        objective = SARAHFunction(self.f_subsets, Sampler.sequential(self.n_subsets))
+        alg_stochastic = GD(initial=self.initial,
+                            f=objective, update_objective_interval=500,
+                            step_size=5e-8)
+        alg_stochastic.run(1, verbose=0)
+        self.assertNumpyArrayAlmostEqual(
+            np.array(objective.data_passes), np.array([1.]))
+        self.assertListEqual(objective.data_passes_indices, [list(range(self.n_subsets))])
+
+        alg_stochastic.run(3, verbose=0)
+        self.assertNumpyArrayAlmostEqual(
+            np.array(objective.data_passes), np.array([1., 6./5, 7./5, 8./5]))
+        self.assertListEqual(objective.data_passes_indices[1:], [[0], [1], [2]])
+
+        # a full gradient is taken again on iteration 2*n
+        alg_stochastic.run(6, verbose=0)
+        self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes), np.array(
+            [1., 6./5, 7./5, 8./5, 9./5, 10./5, 11./5, 12./5, 13./5, 14./5]))
+        alg_stochastic.run(1, verbose=0)
+        self.assertNumpyArrayAlmostEqual(np.array(objective.data_passes)[-1], 19./5)
+        self.assertListEqual(objective.data_passes_indices[-1], list(range(self.n_subsets)))
+
+        objective = SARAHFunction(self.f_subsets, self.sampler, update_frequency=3)
+        alg_stochastic = GD(initial=self.initial,
+                            f=objective, update_objective_interval=500,
+                            step_size=5e-8)
+        alg_stochastic.run(4, verbose=0)
+        self.assertNumpyArrayAlmostEqual(
+            np.array(objective.data_passes), np.array([1., 6./5, 7./5, 12./5]))
+
+    def test_SARAH_recursion(self):
+        # v_k = n*(grad f_{i_k}(x_k) - grad f_{i_k}(x_{k-1})) + v_{k-1}, restarting from the full gradient
+        objective = SARAHFunction(self.f_subsets, Sampler.sequential(self.n_subsets),
+                                  update_frequency=4)
+        x0 = self.initial
+        x1 = self.initial + 1.
+        x2 = self.initial + 3.
+
+        v0 = objective.gradient(x0)
+        self.assertNumpyArrayAlmostEqual(v0.array, self.f.gradient(x0).array, 4)
+
+        v1 = objective.gradient(x1)
+        expected = self.n_subsets*(self.f_subsets[0].gradient(x1) -
+                                   self.f_subsets[0].gradient(x0)) + v0
+        self.assertNumpyArrayAlmostEqual(v1.array, expected.array, 4)
+
+        # the reference point is the previous iterate, not the point of the last full gradient
+        v2 = objective.gradient(x2)
+        expected = self.n_subsets*(self.f_subsets[1].gradient(x2) -
+                                   self.f_subsets[1].gradient(x1)) + v1
+        self.assertNumpyArrayAlmostEqual(v2.array, expected.array, 4)
+
+    def test_SARAH_estimator_not_returned_by_reference(self):
+        # the recursion reads the previous estimator, so mutating a returned container must not corrupt it
+        reference = SARAHFunction(self.f_subsets, Sampler.sequential(self.n_subsets))
+        objective = SARAHFunction(self.f_subsets, Sampler.sequential(self.n_subsets))
+
+        reference.gradient(self.initial)
+        objective.gradient(self.initial).fill(0.)
+
+        self.assertNumpyArrayAlmostEqual(objective.gradient(self.initial+1).array,
+                                         reference.gradient(self.initial+1).array, 4)
+
+    def test_SARAH_out(self):
+        reference = SARAHFunction(self.f_subsets, Sampler.sequential(self.n_subsets))
+        objective = SARAHFunction(self.f_subsets, Sampler.sequential(self.n_subsets))
+        out = self.initial.copy()
+
+        for x in [self.initial, self.initial+1., self.initial+3.]:
+            returned = objective.gradient(x, out=out)
+            self.assertEqual(id(returned), id(out))
+            self.assertNumpyArrayAlmostEqual(out.array, reference.gradient(x).array, 4)

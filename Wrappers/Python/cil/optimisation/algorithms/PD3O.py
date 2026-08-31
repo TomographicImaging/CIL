@@ -18,7 +18,7 @@
 
 
 from cil.optimisation.algorithms import Algorithm
-from cil.optimisation.functions import ZeroFunction, ScaledFunction, SVRGFunction, LSVRGFunction, ApproximateGradientSumFunction
+from cil.optimisation.functions import ZeroFunction, ScaledFunction, SVRGFunction, LSVRGFunction, SARAHFunction, ApproximateGradientSumFunction
 from cil.utilities import dtype_like
 import logging
 import warnings
@@ -27,7 +27,7 @@ class FunctionWrappingForPD3O():
     """
     An internal class that wraps the functions, :math:`f`, in PD3O to allow :math:`f` to be an `ApproximateGradientSumFunction`.
 
-    Note that currently :math:`f`  can be any type of deterministic function, an `ApproximateGradientSumFunction` or a scaled `ApproximateGradientSumFunction` but this is not set up to work for a `SumFunction` or `TranslatedFunction` which contains `ApproximateGradientSumFunction`s.
+    Note that currently :math:`f`  can be any type of deterministic function, an `ApproximateGradientSumFunction` or a scaled `ApproximateGradientSumFunction` but this is not set up to work for a `SumFunction` or `TranslatedFunction` which contains `ApproximateGradientSumFunction`s. `SARAHFunction` is not supported and raises a `NotImplementedError`.
 
     Parameters
     ----------
@@ -43,6 +43,10 @@ class FunctionWrappingForPD3O():
 
         self._gradient_call_index = 0
 
+        if isinstance(self.f, SARAHFunction):
+            raise NotImplementedError(
+                "PD3O does not support `SARAHFunction`. PD3O evaluates the gradient twice per iteration, which advances the SARAH recursion twice per iteration and mis-counts `data_passes`. Use `SARAHFunction` with `GD`, `ISTA` or `FISTA` instead.")
+
         if isinstance(self.f, (SVRGFunction, LSVRGFunction)):
             self.gradient = self.svrg_gradient
         elif isinstance(self.f, ApproximateGradientSumFunction):
@@ -53,12 +57,12 @@ class FunctionWrappingForPD3O():
     def svrg_gradient(self, x, out=None):
         if self._gradient_call_index == 0:
             self._gradient_call_index += 1
-            self.f.gradient(x, out)
+            out = self.f.gradient(x, out)
         else:
             if len(self.f.data_passes_indices[-1]) == self.f.sampler.num_indices:
-                self.f._update_full_gradient_and_return(x, out=out)
+                out = self.f._update_full_gradient_and_return(x, out=out)
             else:
-                self.f.approximate_gradient( x, self.f.function_num, out=out)
+                out = self.f.approximate_gradient( x, self.f.function_num, out=out)
             self.f._data_passes_indices.pop(-1)
             self._gradient_call_index = 0
 
@@ -67,11 +71,12 @@ class FunctionWrappingForPD3O():
         return out
 
     def approximate_sum_function_gradient(self, x, out=None):
+        # See the note in `svrg_gradient` on assigning the return value.
         if self._gradient_call_index == 0:
             self._gradient_call_index += 1
-            self.f.gradient(x, out)
+            out = self.f.gradient(x, out)
         else:
-            self.f.approximate_gradient( x, self.f.function_num, out=out)
+            out = self.f.approximate_gradient( x, self.f.function_num, out=out)
             self._gradient_call_index = 0
 
         if self.scalar != 1:
@@ -119,6 +124,10 @@ class PD3O(Algorithm):
         Note
         -----
         We have not implemented or tested when  :math:`f` is a stochastic function (`ApproximateGradientSumFunction`) wrapped as a `SumFunction` or `TranslatedFunction`.
+
+        Note
+        -----
+        :math:`f` may not be a :class:`~cil.optimisation.functions.SARAHFunction`. PD3O evaluates the gradient twice per iteration, at two different points, which advances the SARAH recursion twice per iteration and mis-counts `data_passes`. Use `SARAHFunction` with `GD`, `ISTA` or `FISTA` instead.
 
         Reference
         ---------

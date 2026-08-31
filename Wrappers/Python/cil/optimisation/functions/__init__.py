@@ -39,6 +39,7 @@ from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
 from .SGFunction import SGFunction
 from .SVRGFunction import SVRGFunction, LSVRGFunction
 from .SAGFunction import SAGFunction, SAGAFunction
+from .SARAHFunction import SARAHFunction
 from .AbsFunction import FunctionOfAbs
 from .HuberLoss import HuberLoss
 

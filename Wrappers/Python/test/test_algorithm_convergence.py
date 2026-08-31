@@ -2,7 +2,7 @@
 from cil.optimisation.algorithms import SPDHG, PDHG, LSQR, FISTA, APGD, GD, PD3O, LADMM
 from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction, LeastSquares, TotalVariation, MixedL21Norm
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
-from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule, ArmijoStepSizeRule
+from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule, ArmijoStepSizeRule, LADMMAdaptiveStepSizeSRA
 from cil.framework import AcquisitionGeometry, BlockDataContainer, BlockGeometry, VectorData, ImageGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
@@ -183,15 +183,15 @@ class TestFISTA(CCPiTestClass):
         F = L2NormSquared(b = noisy_data)
         num_iters = 100
 
-        admm_0 = LADMM(f = F, g = G, operator = K, rho = 1e0, mode = 'adaptive')
+        admm_0 = LADMM(f = F, g = G, operator = K, step_size = LADMMAdaptiveStepSizeSRA(initial_penalty = 1e0))
         admm_0.run(num_iters)
-        admm_1 = LADMM(f = F, g = G, operator = K, rho = 1e1, mode = 'adaptive')
+        admm_1 = LADMM(f = F, g = G, operator = K, step_size = LADMMAdaptiveStepSizeSRA(initial_penalty = 1e1))
         admm_1.run(num_iters)
-        admm_n1 = LADMM(f = F, g = G, operator = K, rho = 1e-1, mode = 'adaptive')
+        admm_n1 = LADMM(f = F, g = G, operator = K, step_size = LADMMAdaptiveStepSizeSRA(initial_penalty = 1e-1))
         admm_n1.run(num_iters)
-        admm_2 = LADMM(f = F, g = G, operator = K, rho = 1e2,  mode = 'adaptive')
+        admm_2 = LADMM(f = F, g = G, operator = K, step_size = LADMMAdaptiveStepSizeSRA(initial_penalty = 1e2))
         admm_2.run(num_iters)
-        admm_n2 = LADMM(f = F, g = G, operator = K, rho = 1e-2, mode = 'adaptive')
+        admm_n2 = LADMM(f = F, g = G, operator = K, step_size = LADMMAdaptiveStepSizeSRA(initial_penalty = 1e-2))
         admm_n2.run(num_iters)
 
 

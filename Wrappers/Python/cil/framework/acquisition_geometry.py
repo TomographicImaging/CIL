@@ -1918,6 +1918,46 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         else:
             return self.config.angles.angle_data
 
+    def get_angles(self, angle_unit='degree', include_initial_angle=False):
+        '''Returns the angular positions of the acquisition data, converted to the requested units
+
+        Parameters
+        ----------
+        angle_unit : string, default='degree'
+            The units to return the angles in, 'degree' or 'radian'
+
+        include_initial_angle : bool, default=False
+            If True the initial angle is added to each angle. The initial angle rotates
+            the reconstruction grid relative to the first projection.
+
+        Returns
+        -------
+        numpy.ndarray
+            A copy of the angular positions. None for `Cone3D_Flex` geometry, where the
+            rotation is described by the system geometry instead.
+
+        Examples
+        --------
+        >>> geometry.get_angles('radian', include_initial_angle=True)
+
+        '''
+        if AcquisitionType.CONE_FLEX & self.geom_type:
+            return None
+
+        angles = self.config.angles.angle_data.copy()
+
+        if include_initial_angle:
+            angles += self.config.angles.initial_angle
+
+        angle_unit = AngleUnit(angle_unit)
+        if angle_unit != AngleUnit(self.config.angles.angle_unit):
+            if angle_unit == AngleUnit.RADIAN:
+                angles = numpy.deg2rad(angles)
+            else:
+                angles = numpy.rad2deg(angles)
+
+        return angles
+
     @property
     def dist_source_center(self):
         """
@@ -2217,6 +2257,44 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
             warnings.warn("Angles cannot be set for Cone3D_Flex geometry.", UserWarning, stacklevel=2)
         else:
             self.config.angles = Angles(angles, initial_angle, angle_unit)
+        return self
+
+    def set_initial_angle(self, initial_angle, angle_unit='degree'):
+        '''Updates the initial angle of an AcquisitionGeometry object, leaving the angles unchanged
+
+        The initial angle rotates the reconstruction grid relative to the first projection.
+
+        Parameters
+        ----------
+        initial_angle : float
+            The angular offset of the object from the reference frame
+
+        angle_unit : string, default='degree'
+            The units `initial_angle` is given in, 'degree' or 'radian'. It is converted
+            and stored in the units the angles are stored in.
+
+        Returns
+        -------
+        AcquisitionGeometry
+            Returns the configured AcquisitionGeometry object
+
+        Examples
+        --------
+        >>> geometry.set_initial_angle(5.0)
+
+        '''
+        if AcquisitionType.CONE_FLEX & self.geom_type:
+            warnings.warn("Angles cannot be set for Cone3D_Flex geometry.", UserWarning, stacklevel=2)
+            return self
+
+        angle_unit = AngleUnit(angle_unit)
+        if angle_unit != AngleUnit(self.config.angles.angle_unit):
+            if angle_unit == AngleUnit.DEGREE:
+                initial_angle = numpy.deg2rad(initial_angle)
+            else:
+                initial_angle = numpy.rad2deg(initial_angle)
+
+        self.config.angles.initial_angle = initial_angle
         return self
 
     def set_panel(self, num_pixels, pixel_size=(1,1), origin='bottom-left'):

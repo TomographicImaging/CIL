@@ -71,7 +71,6 @@ def convert_standard_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry
 
     sinogram_geometry.config.system.align_reference_frame('cil')
     angles = sinogram_geometry.config.angles
-    degrees = angles.angle_unit == AngleUnit.DEGREE
 
     system = sinogram_geometry.config.system
     panel = sinogram_geometry.config.panel
@@ -129,10 +128,10 @@ def convert_standard_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry
     #Build for astra 3D only
     vectors = np.zeros((angles.num_positions, 12))
 
-    for i, theta in enumerate(angles.angle_data):
-        ang = - angles.initial_angle - theta
+    for i, theta in enumerate(sinogram_geometry.get_angles(AngleUnit.RADIAN, include_initial_angle=True)):
+        ang = - theta
 
-        rotation_matrix = rotation_matrix_z_from_euler(ang, degrees=degrees)
+        rotation_matrix = rotation_matrix_z_from_euler(ang, degrees=False)
 
         vectors[i, :3]  = rotation_matrix.dot(src).reshape(3)
         vectors[i, 3:6] = rotation_matrix.dot(det).reshape(3)

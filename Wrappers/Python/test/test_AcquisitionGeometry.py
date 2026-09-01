@@ -370,6 +370,87 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         self.assertEqual(AG.config.angles.initial_angle, 0.1)
         self.assertEqual(AG.config.angles.angle_unit, 'radian')
 
+    def test_set_initial_angle(self):
+
+        AG = AcquisitionGeometry.create_Parallel2D()
+        angles = np.linspace(0, 360, 10, dtype=np.float32)
+        AG.set_angles(angles, 10.0, 'degree')
+
+        #as configured
+        self.assertEqual(AG.config.angles.initial_angle, 10.0)
+
+        #update it, angles are untouched
+        self.assertIs(AG.set_initial_angle(20.0), AG)
+        self.assertEqual(AG.config.angles.initial_angle, 20.0)
+        np.testing.assert_allclose(AG.config.angles.angle_data, angles, rtol=1E-6)
+        self.assertEqual(AG.config.angles.angle_unit, 'degree')
+
+        #given in the other unit, stored in the geometry's unit
+        AG.set_initial_angle(np.pi, 'radian')
+        self.assertAlmostEqual(AG.config.angles.initial_angle, 180.0, places=5)
+        self.assertEqual(AG.config.angles.angle_unit, 'degree')
+
+        #on a radian geometry
+        AG.set_angles(angles, 0.5, 'radian')
+        self.assertEqual(AG.config.angles.initial_angle, 0.5)
+
+        #the default is still degrees, and is converted on the way in
+        AG.set_initial_angle(180.0)
+        self.assertAlmostEqual(AG.config.angles.initial_angle, np.pi, places=5)
+        self.assertEqual(AG.config.angles.angle_unit, 'radian')
+
+        AG.set_initial_angle(np.pi/2, 'radian')
+        self.assertAlmostEqual(AG.config.angles.initial_angle, np.pi/2, places=5)
+
+        #units are not case sensitive
+        AG.set_initial_angle(np.pi/4, 'RaDiAn')
+        self.assertAlmostEqual(AG.config.angles.initial_angle, np.pi/4, places=5)
+
+        with self.assertRaises(ValueError):
+            AG.set_initial_angle(1.0, 'gradian')
+
+    def test_get_angles(self):
+
+        AG = AcquisitionGeometry.create_Parallel2D()
+        angles = np.linspace(0, 360, 10, dtype=np.float32)
+        AG.set_angles(angles, 10.0, 'degree')
+
+        #as configured
+        np.testing.assert_allclose(AG.config.angles.angle_data, angles, rtol=1E-6)
+        self.assertEqual(AG.config.angles.initial_angle, 10.0)
+        self.assertEqual(AG.config.angles.angle_unit, 'degree')
+
+        #defaults to degrees, without the initial angle
+        np.testing.assert_allclose(AG.get_angles(), angles, rtol=1E-6)
+
+        #the returned array is a copy
+        AG.get_angles()[:] = 0
+        np.testing.assert_allclose(AG.config.angles.angle_data, angles, rtol=1E-6)
+
+        np.testing.assert_allclose(AG.get_angles('degree'), angles, rtol=1E-6)
+        np.testing.assert_allclose(AG.get_angles('radian'), np.deg2rad(angles), rtol=1E-6)
+
+        np.testing.assert_allclose(AG.get_angles(include_initial_angle=True), angles + 10.0, rtol=1E-6)
+        np.testing.assert_allclose(AG.get_angles('radian', include_initial_angle=True),
+                                   np.deg2rad(angles + 10.0), rtol=1E-6)
+
+        #stored in radians
+        AG.set_angles(np.deg2rad(angles), np.deg2rad(10.0), 'radian')
+        np.testing.assert_allclose(AG.config.angles.angle_data, np.deg2rad(angles), rtol=1E-6)
+        self.assertEqual(AG.config.angles.angle_unit, 'radian')
+
+        #the default is still degrees
+        np.testing.assert_allclose(AG.get_angles(), angles, rtol=1E-5)
+        np.testing.assert_allclose(AG.get_angles('degree', include_initial_angle=True), angles + 10.0, rtol=1E-5)
+        np.testing.assert_allclose(AG.get_angles('radian', include_initial_angle=True),
+                                   np.deg2rad(angles + 10.0), rtol=1E-5)
+
+        #units are not case sensitive
+        np.testing.assert_allclose(AG.get_angles('DeGrEe'), angles, rtol=1E-5)
+
+        with self.assertRaises(ValueError):
+            AG.get_angles('gradian')
+
     def test_set_panel(self):
         AG = AcquisitionGeometry.create_Parallel3D()
 

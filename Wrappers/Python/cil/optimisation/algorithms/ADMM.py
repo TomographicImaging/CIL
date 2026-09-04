@@ -65,13 +65,7 @@ class LADMM(Algorithm):
         Positive step size parameter
     initial: DataContainer, defaults to DataContainer filled with zeros
         Initial guess 
-            
-    
-    Note
-    ----
-    This implementation of ADMM minimises the same objective function as the Primal-Dual Hybrid Gradient (PDHG) method.
-    The main algorithmic difference is that in ADMM we compute the proximal of :math:`f` and :math:`g` 
-    where in the PDHG this is a proximal-conjugate and proximal.
+              
     
     
     Note

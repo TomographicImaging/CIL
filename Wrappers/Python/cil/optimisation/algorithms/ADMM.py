@@ -30,22 +30,22 @@ class LADMM(Algorithm):
     
     .. math::
     
-        \min_{x} f(x) + g(y), \text{ subject to } Ax + By = b
+        \min_{x,y} f(x) + g(y), \text{ subject to } Ax + By = b
 
-    In CIL, we have implemented the case where :math:`A = Id`, :math:`B = -K`, :math:`b = 0`  which gives 
-    
+    In CIL, we have implemented the case where :math:`A = K`, :math:`B = -Id`, :math:`b = 0`  which gives
+
     .. math::
-        
-        \min_x f(Kx) + g(x).
+
+        \min_x f(x) + g(Kx).
         
     The algorithm is given by the following iteration, for :math:`k\geq 1`:
     
     .. math::
 
         \begin{cases}
-            x_{k} = \mathrm{prox}_{\tau f} \left(x_{k-1} - \dfrac{\tau}{\sigma} A_{T}\left(Ax_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\
-            z_{k} = \mathrm{prox}_{\sigma g} \left(Ax_{k} + u_{k-1}\right) \\
-            u_{k} = u_{k-1} + Ax_{k} - z_{k}
+            x_{k} = \mathrm{prox}_{\tau f} \left(x_{k-1} - \dfrac{\tau}{\sigma} K^{T}\left(Kx_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\
+            z_{k} = \mathrm{prox}_{\sigma g} \left(Kx_{k} + u_{k-1}\right) \\
+            u_{k} = u_{k-1} + Kx_{k} - z_{k}
         \end{cases}
         
     where :math:`\mathrm{prox}_{\tau f}` is the proximal operator of :math:`f` and :math:`\mathrm{prox}_{\sigma g}` is the proximal operator of :math:`g`.
@@ -56,22 +56,16 @@ class LADMM(Algorithm):
     operator:  CIL Linear Operator
         Operator :math:`K` in the objective function
     f: CIL Function
-        Convex function with "simple" proximal
+        Convex function with "simple" proximal. The function should act on the domain of the operator.
     g: CIL Function
-        Convex function with "simple" proximal
+        Convex function with "simple" proximal. The function should act on the range of the operator.
     sigma: float, positive, defaults to 1.
         Positive step size parameter
     tau: float, positive, defaults to :math:`\frac{\sigma}{\|K\|^{2}}`
         Positive step size parameter
     initial: DataContainer, defaults to DataContainer filled with zeros
         Initial guess 
-            
-    
-    Note
-    ----
-    This implementation of ADMM minimises the same objective function as the Primal-Dual Hybrid Gradient (PDHG) method.
-    The main algorithmic difference is that in ADMM we compute the proximal of :math:`f` and :math:`g` 
-    where in the PDHG this is a proximal-conjugate and proximal.
+              
     
     
     Note

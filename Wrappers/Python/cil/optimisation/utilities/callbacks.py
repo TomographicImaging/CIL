@@ -191,3 +191,128 @@ class CGLSEarlyStopping(Callback):
         if self.normx >= self.omega:
             print('The norm of the solution is greater than {} and so the algorithm is terminated'.format(self.omega))
             raise StopIteration
+
+
+class IRLSEarlyStopping(Callback):
+    r'''Callback to work with IRLS. It terminates the outer reweighting loop once
+    successive outer iterates stop moving, i.e. once
+
+    .. math:: \|u_k - u_{k-1}\|_2 < \epsilon \|u_{k-1}\|_2
+
+    where :math:`u_k` is the physical solution after the :math:`k`-th outer
+    iteration.
+
+    Parameters
+    ----------
+    epsilon: float, default 1e-4
+        Usually a small number: the algorithm will terminate once the relative
+        change between successive outer iterates falls below it.
+    verbose: int, default 1
+        1 prints the iteration the loop stopped at and the change that
+        triggered it; 0 stops silently.
+
+    Note
+    -----
+    The iterate is watched rather than the objective, and the distinction
+    matters here. :meth:`IRLS.update_objective` records the inner solver's
+    final residual, which is measured against a *different* reweighted
+    operator every outer iteration and so is not a fixed quantity being
+    minimised: on the walnut it climbs over the first few outer iterations and
+    then plateaus while the iterates are still moving.
+    :class:`EarlyStoppingObjectiveValue` would therefore stop on the plateau of
+    a quantity that is not the one converging. The relative change between
+    iterates falls monotonically -- geometrically in practice, by roughly a
+    factor of five per outer iteration on the walnut at ``alpha=0.05`` -- and is
+    what actually says the weights have settled.
+
+    Two containers the size of the solution are held, so that the comparison
+    costs no allocation per iteration. In standard form ``get_output`` maps the
+    iterate back through :math:`(WL)^{-1}` and needs a buffer to write into;
+    in block form it ignores ``out`` and hands back the live iterate, and the
+    buffer is released on the second call.
+    '''
+    def __init__(self, epsilon=1e-4, verbose=1):
+        self.epsilon = epsilon
+        self.verbose = verbose
+        self.previous = None
+        self.scratch = None
+        self.change = np.inf
+
+    def __call__(self, algorithm):
+        current = algorithm.get_output(out=self.scratch)
+
+        if self.previous is None:
+            # First call is Algorithm.__next__ at iteration -1, which records the
+            # initial objective without running an update. There is nothing to
+            # compare against yet.
+            self.previous = current.copy()
+            self.scratch = current.copy()
+            return
+
+        if self.scratch is not None and current is not self.scratch:
+            # Block form ignored `out` and returned the live iterate, so the
+            # scratch is dead weight the size of the solution. Release it.
+            self.scratch = None
+
+        denominator = self.previous.norm()
+        self.previous.subtract(current, out=self.previous)
+        numerator = self.previous.norm()
+        self.previous.fill(current)
+
+        if denominator == 0:
+            return
+        self.change = numerator / denominator
+
+        if self.change < self.epsilon:
+            if self.verbose:
+                print('The relative change between outer iterates is {:.3e}, '
+                      'below {}, and so the algorithm is terminated'.format(
+                          self.change, self.epsilon))
+            raise StopIteration
+
+
+class _TqdmCallback(Callback):
+    """
+    Drive a caller-managed :mod:`tqdm` bar from the algorithm's loss.
+
+    The bar is owned by whoever constructed it, so this neither creates nor
+    closes it. That is what lets a nested pair of these track an outer and an
+    inner loop independently.
+    """
+
+    def __init__(self, pbar):
+        self.pbar = pbar
+
+    def __call__(self, algorithm):
+        self.pbar.update(self._position(algorithm) - self.pbar.n)
+        loss = algorithm.get_last_loss()
+        if isinstance(loss, list):
+            loss = loss[0]
+        if loss is not None and not np.isnan(loss):
+            self.pbar.set_postfix(objective=f"{loss:.3f}")
+
+    def _position(self, algorithm):
+        """
+        Iterations completed in this run, which is not the number of calls.
+
+        Two things separate the two. From ``iteration == -1``
+        :meth:`Algorithm.run` takes one extra step that only records the
+        initial objective and does no work, so counting calls finishes one
+        ahead. And an inner solver re-entered by an outer loop resumes from
+        wherever it left off, so ``algorithm.iteration`` is not the position
+        either. What is the same in both cases is how many iterations are left:
+        ``_total_iterations`` is the iteration this run ends on.
+        """
+        if self.pbar.total is None or not hasattr(algorithm,
+                                                  '_total_iterations'):
+            return self.pbar.n + 1
+        remaining = algorithm._total_iterations - algorithm.iteration
+        return self.pbar.total - remaining
+
+
+class InnerCallback(_TqdmCallback):
+    """Reports an inner solver's progress on a bar owned by the outer loop."""
+
+
+class OuterCallback(_TqdmCallback):
+    """Reports an outer solver's progress, e.g. the IRLS reweighting loop."""

@@ -2016,9 +2016,21 @@ class TestLSQR(CCPiTestClass):
 
     def test_warns_on_nonzero_initial_with_regularisation(self):
         # the scalar penalty is applied to the update, so a warm start silently changes
-        # the objective that is being minimised
+        # the objective that is being minimised. form='auto' avoids this by
+        # choosing the block form, so the hazard only remains for an explicit request
         with self.assertWarnsRegex(UserWarning, "non-zero `initial`"):
-            LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+            LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5,
+                 form='standard')
+
+    def test_auto_takes_the_block_form_from_a_nonzero_initial(self):
+        # LSQR cannot damp the solution in standard form, so 'auto' only takes it
+        # from zero. From anywhere else the block form carries the penalty instead
+        warm = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+        self.assertTrue(warm.block_form)
+
+        cold = LSQR(initial=self.initial_zero, operator=self.Aop, data=self.bop,
+                    alpha=0.5)
+        self.assertTrue(cold.standard_form)
 
     def test_no_warning_for_zero_initial_or_no_regularisation(self):
         for kwargs in (dict(initial=self.initial_zero, alpha=0.5),
@@ -2034,7 +2046,9 @@ class TestLSQR(CCPiTestClass):
     def test_regularised_warm_start_solves_shifted_problem(self):
         # from a non-zero initial guess the
         # scalar rule converges to the minimiser of ||Ax-b||^2 + alpha^2||x-x0||^2, whereas
-        # the explicit block system converges to the intended ||Ax-b||^2 + alpha^2||x||^2
+        # the explicit block system converges to the intended ||Ax-b||^2 + alpha^2||x||^2.
+        # form='standard' is asked for by name: this is the case form='auto'
+        # routes around, see test_auto_takes_the_block_form_from_a_nonzero_initial
         alpha = 0.5
         A = self.Aop.A
         b = self.bop.as_array()
@@ -2047,7 +2061,8 @@ class TestLSQR(CCPiTestClass):
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            scalar = LSQR(initial=x0.copy(), operator=self.Aop, data=self.bop, alpha=alpha)
+            scalar = LSQR(initial=x0.copy(), operator=self.Aop, data=self.bop,
+                          alpha=alpha, form='standard')
         scalar.run(200, verbose=0)
 
         L = IdentityOperator(self.ig)
@@ -2063,10 +2078,13 @@ class TestLSQR(CCPiTestClass):
 
 
     def test_update_objective(self):
+        # the standard form is asked for by name: it is the one whose objective is
+        # measured from `initial` rather than from zero
         alpha = 0.5
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            lsqr_reg = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=alpha)
+            lsqr_reg = LSQR(initial=self.initial, operator=self.Aop, data=self.bop,
+                            alpha=alpha, form='standard')
         lsqr_reg.run(20)
 
         #  before the first update the objective is the plain residual

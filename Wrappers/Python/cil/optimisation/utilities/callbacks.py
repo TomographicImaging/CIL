@@ -191,3 +191,106 @@ class CGLSEarlyStopping(Callback):
         if self.normx >= self.omega:
             print('The norm of the solution is greater than {} and so the algorithm is terminated'.format(self.omega))
             raise StopIteration
+
+
+class IRLSEarlyStopping(Callback):
+    r'''Callback to work with IRLS. It terminates the outer reweighting loop once
+    successive outer iterates stop moving, i.e. once
+
+    .. math:: \|u_k - u_{k-1}\|_2 < \epsilon \|u_{k-1}\|_2
+
+    where :math:`u_k` is the physical solution after the :math:`k`-th outer
+    iteration.
+
+    The callback allocates one :class:`DataContainer` the size of the physical
+    solution, on its first call: a copy of the previous solution in block
+    form, or a buffer for the current one in standard form.
+
+    Parameters
+    ----------
+    epsilon: float, default 1e-4
+        Usually a small number: the algorithm will terminate once the relative
+        change between successive outer iterates falls below it.
+    verbose: int, default 1
+        1 prints the iteration the loop stopped at and the change that
+        triggered it; 0 stops silently.
+    '''
+    def __init__(self, epsilon=1e-4, verbose=1):
+        self.epsilon = epsilon
+        self.verbose = verbose
+        self.tmp = None
+        self.change = np.inf
+
+    def __call__(self, algorithm):
+        previous = getattr(algorithm, 'tmp_solution', None)
+
+        if self.tmp is None:
+            # First call, at iteration -1: nothing to compare yet. Keep the
+            # fresh container get_output() allocated, or copy the live iterate.
+            current = algorithm.get_output()
+            self.tmp = current.copy() if previous is None else current
+            return
+
+        if previous is None:
+            # Block form: compare the live iterate against the copy in tmp.
+            current = algorithm.get_output()
+            denominator = self.tmp.norm()
+            self.tmp.subtract(current, out=self.tmp)
+            numerator = self.tmp.norm()
+            self.tmp.fill(current)
+        else:
+            # Standard form: tmp receives the current solution.
+            algorithm.get_output(out=self.tmp)
+            denominator = previous.norm()
+            self.tmp.subtract(previous, out=self.tmp)
+            numerator = self.tmp.norm()
+
+        if denominator == 0:
+            return
+        self.change = numerator / denominator
+
+        if self.change < self.epsilon:
+            if self.verbose:
+                print('The relative change between outer iterates is {:.3e}, '
+                      'below {}, and so the algorithm is terminated'.format(
+                          self.change, self.epsilon))
+            raise StopIteration
+
+
+class _TqdmCallback(Callback):
+    """
+    Drive a caller-managed :mod:`tqdm` bar from the algorithm's loss.
+
+    The bar is owned by whoever constructed it, so this neither creates nor
+    closes it. That is what lets a nested pair of these track an outer and an
+    inner loop independently.
+    """
+
+    def __init__(self, pbar):
+        self.pbar = pbar
+
+    def __call__(self, algorithm):
+        self.pbar.update(self._position(algorithm) - self.pbar.n)
+        loss = algorithm.get_last_loss()
+        if isinstance(loss, list):
+            loss = loss[0]
+        if loss is not None and not np.isnan(loss):
+            self.pbar.set_postfix(objective=f"{loss:.3f}")
+
+    def _position(self, algorithm):
+        """
+        Iterations completed in this run, which is not the number of calls.
+        """
+        if self.pbar.total is None or not hasattr(algorithm,
+                                                  '_total_iterations'):
+            return self.pbar.n + 1
+        remaining = algorithm._total_iterations - algorithm.iteration
+        return self.pbar.total - remaining
+
+
+class InnerCallback(_TqdmCallback):
+    """Reports an inner solver's progress on a bar owned by the outer loop."""
+
+
+class OuterCallback(_TqdmCallback):
+    """Reports an outer solver's progress, e.g. the IRLS reweighting loop."""

@@ -1,8 +1,13 @@
 * x.x.x
   - New features:
     - Added `Huber Loss` function (#2281)
-  - Enhancements:
+    - `IRLS` iteratively reweighted least squares algorithm added to the CIL algorithm class, solving `||Ax-b||^2 + alpha^2 ||Lx||_1` by a sequence of reweighted least squares problems (#2369)
+    - `IRLSEarlyStopping` callback added, stopping the outer loop on the relative change in the iterate (#2369)
+    - `TikhonovOperator`, `BlockTikhonovOperator` and `WeightedStructOperator` added to the operators, with a `create_tikhonov_operator` factory and a `resolve_form` rule that answers `form='auto'` without building anything (#2369)
+    - `DiagonalOperator` accepts a `BlockDataContainer` diagonal, applying one diagonal per block (nested to any depth) without forming the off-diagonal zeros (#2369)
+  - Enhancements: 
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
+    - `LSQR` and `CGLS` accept a regularisation operator built by `create_tikhonov_operator`, in either block form `[A; alpha*L]` or standard form `A*L^-1`, with `form='auto'` taking the cheaper standard form wherever the solver still minimises the regularised problem from where it starts (#2369)
 
 * 26.0.0
   - New features:

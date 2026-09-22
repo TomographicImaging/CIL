@@ -45,16 +45,10 @@ def _is_standard_form_capable(struct_operator):
     r"""
     True when :math:`L^{-1}` exists *and* equals :math:`L^*`.
 
-    ``is_orthogonal()`` alone is not enough: it reports a property of the
-    wavelet filter bank, not of the operator as a map between the two
-    geometries, and a ``WaveletOperator`` that pads at the boundary is a *tall
-    isometry* — :math:`L^*L = I`, so :math:`L^*` is a left inverse, but
-    :math:`LL^* \neq I` and no true inverse exists. The standard form applies
-    :math:`(WL)^{-1}` to a solver iterate that is a general element of
-    ``Range(L)``, not one known to lie in the image of :math:`L`, so a left
-    inverse is not sufficient. Requiring ``r == m`` on top of orthogonality is
-    what makes :math:`L` invertible, which in practice admits :math:`L = I`
-    and orthogonal wavelets with ``bnd_cond='periodization'``.
+    Orthogonality alone is not enough: a padding ``WaveletOperator`` is a tall
+    isometry (:math:`L^*L = I` but :math:`LL^* \neq I`), so :math:`L` must
+    also be square. In practice this admits :math:`L = I` and orthogonal
+    wavelets with ``bnd_cond='periodization'``.
     """
     if struct_operator is None:
         return True
@@ -69,21 +63,18 @@ def resolve_form(form='auto', solver=None, struct_operator=None,
     r"""
     Answer ``form='auto'``: ``'standard'`` or ``'block'``.
 
-    The rule :func:`create_tikhonov_operator` applies, exposed on its own so
-    that it can be asked without building an operator -- the answer depends on
-    :math:`L` and on the solver, not on the size of anything. An explicit
-    ``'standard'`` or ``'block'`` is returned unchanged.
+    The rule :func:`create_tikhonov_operator` applies, exposed so it can be
+    asked without building an operator. An explicit ``'standard'`` or
+    ``'block'`` is returned unchanged.
 
     Parameters
     ----------
     form : {'auto', 'standard', 'block'}, default 'auto'
         The form asked for.
     solver : class or Algorithm, optional
-        The solver that will iterate on the result, read only for its
-        ``warm_starts_in_standard_form``. That is a class attribute rather than
-        the derived ``supports_warm_start`` property precisely so the question
-        can be asked before an instance exists, so the class will do as well as
-        an instance. ``None`` assumes the permissive answer.
+        Read only for its class attribute ``warm_starts_in_standard_form``, so
+        a class does as well as an instance. ``None`` assumes the permissive
+        answer.
     struct_operator : LinearOperator, optional
         :math:`L`. ``None`` means the identity.
     weighted : bool, default False
@@ -116,16 +107,12 @@ def resolve_form(form='auto', solver=None, struct_operator=None,
         return 'block'
 
     if getattr(solver, 'warm_starts_in_standard_form', True):
-        # The standard form is the cheaper one, and a solver that runs on the
-        # true regularised normal equations is free to use it from anywhere,
-        # IRLS included.
+        # A solver that warm starts in standard form can take the cheaper form from anywhere.
         log.info("form='auto' resolved to 'standard'.")
         return 'standard'
 
     if weighted:
-        # IRLS re-solves from the previous outer iterate, and this solver damps
-        # the step rather than the solution, so only the block form imposes the
-        # penalty on what is actually being minimised.
+        # This solver damps the step, so only the block form penalises the solution when warm starting.
         log.info("form='auto' resolved to 'block': IRLS warm starts, which "
                  "this solver does not support in the standard form.")
         return 'block'
@@ -154,9 +141,8 @@ def create_tikhonov_operator(operator, solution_geometry=None,
 
         \min_u \|A u - b\|_2^2 + \alpha^2 \|W L u\|_2^2
 
-    can be handed to LSQR or CGLS in more than one way, and the choices are not
-    interchangeable. This factory owns that decision, so the solvers do not have
-    to.
+    can be handed to LSQR or CGLS in more than one way; this factory owns that
+    decision, so the solvers do not have to.
 
     Parameters
     ----------
@@ -170,7 +156,7 @@ def create_tikhonov_operator(operator, solution_geometry=None,
         The regularisation parameter :math:`\alpha`. Zero means no
         regularisation, and the bare ``operator`` is returned unwrapped.
     form : {'auto', 'standard', 'block'}, default 'auto'
-        Which change of variable to use. See the table below.
+        Which change of variable to use. See :func:`resolve_form`.
     weighted : bool, default False
         Whether to allocate the diagonal weight operator :math:`W` up front.
         The alternative is :meth:`WeightedStructOperator.enable_weights`
@@ -190,32 +176,26 @@ def create_tikhonov_operator(operator, solution_geometry=None,
         result carries a ``form`` attribute; use ``getattr(op, 'form', 'none')``
         to cover the unwrapped case.
 
-    Notes
-    -----
-    Dispatch:
+    Discussion
+    ----------
+    ``form='standard'`` builds :math:`K = A(WL)^{-1}`
+    (:class:`TikhonovOperator`): the solver iterates in ``Range(L)`` alone,
+    rather than on a stacked range, and :math:`\alpha` enters the solver's
+    own recurrence, so for :math:`L = I` it costs the same as an
+    unregularised solve. It requires an orthogonal,
+    square :math:`L` (the inverse is formed as :math:`L^* W^{-1}`), and LSQR
+    cannot warm start in it: the penalty lands on the step, not the solution.
 
-    ==============  ==============  ========================  ==========================  ==============================
-    ``regalpha``    ``form``        :math:`L`                 ``solver``                  result
-    ==============  ==============  ========================  ==========================  ==============================
-    ``== 0``        any             any                       any                         ``operator``, unwrapped
-    ``> 0``         ``'auto'``      otherwise                 any                         :class:`BlockTikhonovOperator`
-    ``> 0``         ``'auto'``      ``None`` or invertible    ``CGLS``, or ``None``       :class:`TikhonovOperator`
-    ``> 0``         ``'auto'``      ``None`` or invertible    ``LSQR``, zero start, no W  :class:`TikhonovOperator`
-    ``> 0``         ``'auto'``      ``None`` or invertible    ``LSQR``, otherwise         :class:`BlockTikhonovOperator`
-    ``> 0``         ``'block'``     any                       any                         :class:`BlockTikhonovOperator`
-    ``> 0``         ``'standard'``  ``None`` or invertible    any                         :class:`TikhonovOperator`
-    ``> 0``         ``'standard'``  otherwise                 any                         ``ValueError``
-    ==============  ==============  ========================  ==========================  ==============================
+    ``form='block'`` builds the stacked :math:`K = [A;\ \alpha WL]`
+    (:class:`BlockTikhonovOperator`): it never forms an inverse, so it accepts
+    any :math:`L` and warm starts with any solver, at the price of stacked
+    range containers spanning both ``Range(A)`` and ``Range(L)``.
 
-    The standard form is the cheaper of the two — one space of size :math:`r`
-    rather than a stack of size :math:`m + r`, collapsing to :math:`K = A` for
-    :math:`L = I` — so ``'auto'`` prefers it wherever it is correct, which
-    takes an invertible :math:`L` (:func:`_is_standard_form_capable`) and a
-    solver that stays correct there from where the caller starts
-    (:func:`resolve_form`). Everything ``'auto'`` excludes is *handled*, not
-    rejected: the block form imposes the same penalty
-    :math:`\alpha^2\|WLu\|^2` without ever forming an inverse. Only an explicit
-    ``form='standard'`` raises.
+    ``form='auto'`` prefers the cheaper standard form wherever it is correct
+    -- an invertible :math:`L`, and a solver that stays correct from the
+    caller's start (see :func:`resolve_form`) -- and falls back to the block
+    form otherwise. Only an explicit ``form='standard'`` raises when
+    :math:`L` is not invertible.
     """
     if form not in VALID_FORMS:
         raise ValueError(
@@ -285,26 +265,13 @@ class WeightedStructOperator(LinearOperator):
     domain_geometry : cil geometry
         The physical solution space, ``Domain(L)``.
     struct_operator : LinearOperator, optional
-        :math:`L`. ``None`` means the identity, and is treated as a genuinely
-        absent stage rather than as a multiplication by one: it removes both an
-        operator call and a staging buffer.
+        :math:`L`. ``None`` means the identity, and the stage is skipped
+        entirely.
     weighted : bool, default False
         Allocate :math:`W` immediately. Equivalent to calling
         :meth:`enable_weights` straight after construction.
     tmp_range_struct : DataContainer, optional
         Scratch in ``Range(L)`` to borrow instead of allocating.
-
-    Notes
-    -----
-    **Unweighted mode.** With ``weighted=False`` the weight operator is ``None``
-    and every method skips the :math:`W` stage entirely, rather than multiplying
-    by an identity.
-
-    **Two of the four maps are conditional.** :meth:`direct` and :meth:`adjoint`
-    work for any :math:`L`. :meth:`inverse` and :meth:`inverse_adjoint` apply
-    :math:`L^{-1}` as :math:`L^*` and so require an orthogonal :math:`L`; they
-    raise otherwise. Check with :meth:`is_invertible` before calling. The block
-    form uses only the first two, which is why it accepts any :math:`L`.
 
     Geometries
     ----------
@@ -317,9 +284,7 @@ class WeightedStructOperator(LinearOperator):
 
     def __init__(self, domain_geometry, struct_operator=None, weighted=False,
                  tmp_range_struct=None):
-        # An absent L and an explicit IdentityOperator are the same thing, and
-        # both let us skip a stage. Keep a real operator around for the paths
-        # that want to call it uniformly, but remember which case we are in.
+        # An absent L and an explicit IdentityOperator both skip the stage.
         self.struct_is_identity = (struct_operator is None
                                    or isinstance(struct_operator,
                                                  IdentityOperator))
@@ -346,10 +311,8 @@ class WeightedStructOperator(LinearOperator):
         r"""
         Allocate :math:`W`, and the staging buffer :math:`WL` needs, once.
 
-        Idempotent. This is the only allocation in the whole solve that happens
-        outside ``set_up``: IRLS is attached to an already-constructed inner
-        solver, so it cannot pass ``weighted=True`` down into the factory. It
-        calls this instead, once, and mutates the weights in place from then on.
+        Idempotent; the one allocation outside ``set_up``, for an IRLS
+        attaching to an already-built solver.
 
         Returns
         -------
@@ -365,8 +328,7 @@ class WeightedStructOperator(LinearOperator):
             domain_geometry=range_geometry,
         )
 
-        # Only a genuine two-stage WL needs an intermediate. Either factor being
-        # the identity collapses the composition to one stage.
+        # Only a genuine two-stage WL needs an intermediate.
         if self.tmp_range_struct is None and not self.struct_is_identity:
             self.tmp_range_struct = range_geometry.allocate(0)
 
@@ -393,13 +355,8 @@ class WeightedStructOperator(LinearOperator):
     @staticmethod
     def _fill_in_place(target, values):
         """
-        Recurse to the leaves before filling, at whatever depth.
-
-        ``BlockDataContainer.fill`` is not itself recursive: given a scalar it
-        silently leaves a nested child untouched. A single level of descent
-        covers a flat Range(L) -- the gradient's -- but not the leaves below
-        it when :math:`L` is a stack of struct operators and Range(L) is a
-        block of blocks, so descend all the way.
+        Recurse to the leaves before filling: ``BlockDataContainer.fill`` is
+        not itself recursive, and Range(L) can be a block of blocks.
         """
         if not hasattr(target, "containers"):
             target.fill(values)
@@ -428,24 +385,15 @@ class WeightedStructOperator(LinearOperator):
     # ------------------------------------------------------------------ #
 
     def struct_is_orthogonal(self):
-        r"""
-        True when :math:`L^*L = I`, as :math:`L` itself reports it.
-
-        Note that this is weaker than invertibility for a non-square :math:`L`.
-        Use :meth:`is_invertible` to decide whether :meth:`inverse` may be
-        called.
-        """
+        r"""True when :math:`L^*L = I`. Weaker than invertibility for a
+        non-square :math:`L`; use :meth:`is_invertible`."""
         return self.struct_operator.is_orthogonal()
 
     def is_invertible(self):
         r"""
-        True when :meth:`inverse` and :meth:`inverse_adjoint` can be used.
-
-        :math:`W` is a strictly positive diagonal and so always invertible,
-        which leaves :math:`L`. The only inverse this class can form is
-        :math:`L^*` — no operator in CIL exposes an ``inverse()`` method — so
-        :math:`L` must be orthogonal *and* square, not merely a tall
-        isometry. See :func:`_is_standard_form_capable`.
+        True when :meth:`inverse` and :meth:`inverse_adjoint` can be used:
+        the only inverse this class can form is :math:`L^*`, so :math:`L`
+        must be orthogonal *and* square.
         """
         return _is_standard_form_capable(self.struct_operator)
 
@@ -523,17 +471,9 @@ class WeightedStructOperator(LinearOperator):
         r"""
         Return :math:`y` such that :math:`W L y = x`. Orthogonal :math:`L` only.
 
-        Exact, not an approximation: :math:`(WL)^{-1} = L^{-1} W^{-1}` holds for
-        any invertible :math:`W` and :math:`L`, with no commutation assumption.
-        :math:`L^{-1}` is applied as :math:`L^*`, which is why orthogonality is
-        required rather than mere invertibility.
-
-        :math:`W^{-1}` is an element-wise division, done here rather than
-        delegated, because ``DiagonalOperator`` has no ``inverse``. The IRLS
-        weights are :math:`(|Lu|^2 + \tau^2)^{-1/4} \in (0, \tau^{-1/2}]`,
-        strictly positive by construction, so the division is always safe and
-        no pseudo-inverse masking is wanted: masking would silently turn
-        :math:`(WL)^{-1}` into a projector.
+        Exact: :math:`(WL)^{-1} = L^{-1} W^{-1}`, with :math:`L^{-1}` applied
+        as :math:`L^*`. :math:`W^{-1}` is an element-wise division, safe
+        because the IRLS weights are strictly positive by construction.
         """
         self._require_invertible("inverse()")
 
@@ -556,10 +496,8 @@ class WeightedStructOperator(LinearOperator):
         Return :math:`y` such that :math:`(W L)^* y = x`. Orthogonal :math:`L`
         only.
 
-        Also exact: :math:`(WL)^{-*} = W^{-*} L^{-*}`, and :math:`W` is real
-        diagonal so :math:`W^{-*} = W^{-1}`. With :math:`L` orthogonal,
-        :math:`L^{-*} = L`. Needs no staging: :math:`L^{-*}` lands in
-        ``Range(L)``, which is where :math:`W^{-1}` acts.
+        Exact: :math:`(WL)^{-*} = W^{-1} L`, which lands in ``Range(L)`` and
+        so needs no staging.
         """
         self._require_invertible("inverse_adjoint()")
 
@@ -616,10 +554,7 @@ class BlockTikhonovOperator(BlockOperator):
         self.struct_operator = self.reg_operator.struct_operator
         self.scaled_reg_operator = regalpha * self.reg_operator
 
-        # Accumulator for the allocation-free adjoint below. Needed whenever the
-        # second row is more than a plain scaling of x[1], i.e. whenever
-        # WL != I. See the note in `adjoint` on why this container cannot be
-        # avoided without lending a buffer from the algorithm.
+        # Accumulator for the allocation-free adjoint; needed whenever WL != I.
         if tmp_domain is None and not self.reg_operator.is_identity():
             tmp_domain = solution_geometry.allocate(0)
         self.tmp_domain = tmp_domain
@@ -651,25 +586,17 @@ class BlockTikhonovOperator(BlockOperator):
     def struct_direct(self, x, out=None):
         r"""
         Apply :math:`L` alone -- not :math:`WL` -- mapping a physical solution
-        into ``Range(L)``, where the weights live.
-
-        With :attr:`weights` and :meth:`enable_weights`, this is the named
-        surface an outer reweighting loop drives the operator through: IRLS
-        approximates :math:`\|Lu\|_1`, so its weights are a function of
-        :math:`Lu`, never of :math:`WLu`.
+        into ``Range(L)``, where the weights live: the IRLS weights are a
+        function of :math:`Lu`, never of :math:`WLu`.
         """
         return self.struct_operator.direct(x, out=out)
 
     def enable_weights(self):
-        """
-        Allocate the IRLS weights, and the accumulator the adjoint then needs.
-
-        See :meth:`WeightedStructOperator.enable_weights`.
-        """
+        """Allocate the IRLS weights, and the accumulator the adjoint then
+        needs. See :meth:`WeightedStructOperator.enable_weights`."""
         weights = self.reg_operator.enable_weights()
         if self.tmp_domain is None:
-            # WL is no longer the identity, so the second row stops being a
-            # plain scaling and the adjoint needs somewhere to stage it.
+            # WL is no longer the identity, so the adjoint needs staging.
             self.tmp_domain = self.reg_operator.domain_geometry().allocate(0)
         return weights
 

@@ -204,8 +204,8 @@ class TestRegularisationInterface(CCPiTestClass):
     def test_weighted_cgls_keeps_the_standard_form(self):
         """
         Under CGLS it is the other way round: the standard form iterates on
-        one container of size ``r`` rather than a stack of ``m + r``, and CGLS
-        warm starts correctly in it, so ``form='auto'`` takes the cheaper one.
+        one container rather than a stacked range, and CGLS warm starts
+        correctly in it, so ``form='auto'`` takes the cheaper one.
         """
         for L in (None, IdentityOperator(self.ig),
                   WaveletOperator(self.ig, wname='haar', level=1)):
@@ -805,7 +805,10 @@ class TestMemory(CCPiTestClass):
     """
     The three-tier contract seen from the outer loop: once ``set_up`` has run,
     an IRLS outer iteration allocates nothing, so the loop runs at constant
-    memory however long it goes on.
+    memory however long it goes on. The one exception is the objective
+    recomputation, transient by design and throttled by
+    ``update_objective_interval``, so these tests push it past the counted
+    iterations.
     """
 
     def setUp(self):
@@ -820,7 +823,8 @@ class TestMemory(CCPiTestClass):
                     weighted=weighted)
 
     def test_an_outer_iteration_allocates_nothing(self):
-        irls = IRLS(inner_solver=self.inner(), max_inner_iteration=3)
+        irls = IRLS(inner_solver=self.inner(), max_inner_iteration=3,
+                    update_objective_interval=100)
         irls.run(1, verbose=0)                      # pay for any lazy set-up
         with count_allocated_elements() as tally:
             irls.run(3, verbose=0)
@@ -828,7 +832,7 @@ class TestMemory(CCPiTestClass):
 
     def test_a_structural_operator_costs_nothing_extra_per_iteration(self):
         irls = IRLS(inner_solver=self.inner(GradientOperator(self.ig)),
-                    max_inner_iteration=3)
+                    max_inner_iteration=3, update_objective_interval=100)
         irls.run(1, verbose=0)
         with count_allocated_elements() as tally:
             irls.run(3, verbose=0)
@@ -843,7 +847,8 @@ class TestMemory(CCPiTestClass):
         inner = self.inner(struct_operator=IdentityOperator(self.ig),
                            form='standard', weighted=False)
         with self.assertWarns(UserWarning):
-            irls = IRLS(inner_solver=inner, max_inner_iteration=3)
+            irls = IRLS(inner_solver=inner, max_inner_iteration=3,
+                        update_objective_interval=100)
         self.assertIsNotNone(irls.tmp_solution)
 
         irls.run(1, verbose=0)
@@ -951,44 +956,74 @@ class TestIRLSEarlyStopping(CCPiTestClass):
         callback(algorithm)                      # must not raise
         self.assertEqual(numpy.inf, callback.change)
 
-    def test_the_scratch_is_released_when_out_is_ignored(self):
-        """
-        Block form hands back the live iterate rather than filling ``out``, so
-        the buffer is dead weight and the callback drops it.
-        """
-        class BlockFormAlgorithm(StubAlgorithm):
-            def get_output(self, out=None):
-                value = self.iterates[min(self.calls,
-                                          len(self.iterates) - 1)]
-                self.calls += 1
-                return value                     # ignores `out`
-
-        callback = IRLSEarlyStopping(epsilon=0.0, verbose=0)
-        algorithm = BlockFormAlgorithm([self.iterate([1.0, 0.0, 0.0, 0.0]),
-                                        self.iterate([2.0, 0.0, 0.0, 0.0])])
-        callback(algorithm)
-        self.assertIsNotNone(callback.scratch)
-        callback(algorithm)
-        self.assertIsNone(callback.scratch)
-
-    def test_the_scratch_is_kept_when_out_is_honoured(self):
+    def test_the_first_call_allocates_a_single_container(self):
         callback = IRLSEarlyStopping(epsilon=0.0, verbose=0)
         algorithm = StubAlgorithm([self.iterate([1.0, 0.0, 0.0, 0.0]),
                                    self.iterate([2.0, 0.0, 0.0, 0.0])])
+        with count_allocated_elements() as tally:
+            callback(algorithm)
+        self.assertEqual(1, tally['containers'])
+
+    def test_standard_form_reads_the_previous_solution_from_the_algorithm(self):
+        """
+        IRLS in standard form snapshots the previous outer solution into
+        ``tmp_solution``; the callback compares against that rather than
+        keeping a second copy, and must not write to it.
+        """
+        algorithm = StubAlgorithm([self.iterate([10.0, 0.0, 0.0, 0.0]),
+                                   self.iterate([11.0, 0.0, 0.0, 0.0])])
+        algorithm.tmp_solution = self.iterate([10.0, 0.0, 0.0, 0.0])
+        callback = IRLSEarlyStopping(epsilon=0.0, verbose=0)
+
         callback(algorithm)
         callback(algorithm)
-        self.assertIsNotNone(callback.scratch)
+        self.assertAlmostEqual(0.1, callback.change, places=6)
+        numpy.testing.assert_array_equal(
+            [10.0, 0.0, 0.0, 0.0], algorithm.tmp_solution.as_array())
 
     def test_comparing_costs_no_allocation_once_running(self):
         callback = IRLSEarlyStopping(epsilon=0.0, verbose=0)
         algorithm = StubAlgorithm([self.iterate([1.0, 0.0, 0.0, 0.0]),
                                    self.iterate([2.0, 0.0, 0.0, 0.0]),
                                    self.iterate([3.0, 0.0, 0.0, 0.0])])
-        callback(algorithm)                      # allocates the two buffers
+        callback(algorithm)                      # allocates the one buffer
         callback(algorithm)
         with count_allocated_elements() as tally:
             callback(algorithm)
         self.assertEqual(0, tally['containers'])
+
+
+class TestObjective(CCPiTestClass):
+    """The recorded loss is ||Au-b||^2 + alpha^2 ||Lu||_1 itself."""
+
+    def setUp(self):
+        self.operator, self.data = small_least_squares(rows=12, columns=6,
+                                                       seed=7)
+        self.geometry = self.operator.domain_geometry()
+        self.alpha = 0.4
+
+    def irls(self, solver=LSQR):
+        inner = solver(operator=self.operator, data=self.data,
+                       initial=self.geometry.allocate(0), alpha=self.alpha,
+                       weighted=True)
+        return IRLS(inner_solver=inner, max_inner_iteration=6)
+
+    def test_the_objective_matches_numpy(self):
+        for solver in (LSQR, CGLS):
+            with self.subTest(solver=solver.__name__):
+                irls = self.irls(solver)
+                irls.run(3, verbose=0)
+                u = irls.get_output().as_array()
+                residual = self.operator.A @ u - self.data.as_array()
+                expected = (residual @ residual
+                            + self.alpha**2 * numpy.abs(u).sum())
+                self.assertAlmostEqual(expected, irls.loss[-1], places=4)
+
+    def test_the_inner_loss_stays_reachable(self):
+        irls = self.irls()
+        irls.run(2, verbose=0)
+        self.assertTrue(len(irls.inner_solver.loss) > 0)
+        self.assertNotEqual(irls.inner_solver.loss[-1], irls.loss[-1])
 
 
 class TestInnerSolverBreakdown(CCPiTestClass):

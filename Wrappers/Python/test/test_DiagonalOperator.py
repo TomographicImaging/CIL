@@ -146,7 +146,7 @@ class TestPlainDiagonalOperator(CCPiTestClass):
 
     The first two below are the pre-existing diagonal tests, borrowed rather
     than copied -- direct, adjoint and norm, real and complex. The rest are the
-    geometry handling and the real-diagonal fast path.
+    geometry handling.
     """
 
     test_direct_adjoint_and_norm = borrowed('test_DiagonalOperator')
@@ -161,24 +161,6 @@ class TestPlainDiagonalOperator(CCPiTestClass):
     def test_explicit_domain_geometry_is_kept(self):
         operator = DiagonalOperator(rand(IG, 0), domain_geometry=IG)
         self.assertEqual(operator.domain_geometry().shape, IG.shape)
-
-    def test_adjoint_of_a_real_diagonal_never_conjugates(self):
-        """
-        `conjugate()` allocates a whole container per call and the solvers call
-        adjoint once per iteration, so the real path -- which is self-adjoint --
-        must not go anywhere near it.
-        """
-        diagonal = rand(IG, 3)
-        operator = DiagonalOperator(diagonal)
-        x = rand(IG, 4)
-        out = IG.allocate(0)
-        with mock.patch.object(type(diagonal), 'conjugate',
-                               side_effect=AssertionError(
-                                   'adjoint of a real diagonal called '
-                                   'conjugate(), which allocates')):
-            operator.adjoint(x, out=out)
-        self.assertNumpyArrayAlmostEqual((diagonal * x).as_array(),
-                                         out.as_array())
 
 
 # --------------------------------------------------------------------------- #

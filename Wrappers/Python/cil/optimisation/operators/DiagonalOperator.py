@@ -52,10 +52,6 @@ class DiagonalOperator(LinearOperator):
         if isinstance(diagonal, BlockDataContainer):
             self.diagonal_operator_list = [ DiagonalOperator(diagonal[i]) for i in range(len(diagonal)) ]
             if domain_geometry is None:
-                # `diagonal.geometry` is None for a block of blocks, because
-                # it builds on `el.geometry.copy()` and BlockGeometry has no
-                # copy(). Each child operator knows its own domain at whatever
-                # depth, so the geometry is composed from them.
                 domain_geometry = BlockGeometry(
                     *[op.domain_geometry() for op in self.diagonal_operator_list])
         else:
@@ -65,13 +61,6 @@ class DiagonalOperator(LinearOperator):
         super(DiagonalOperator, self).__init__(domain_geometry=domain_geometry,
                                     range_geometry=domain_geometry)
         self.diagonal = diagonal
-        # Decided once: a real diagonal is self-adjoint, and conjugate()
-        # allocates a whole container per call, which adjoint() cannot afford
-        # -- the solvers call it once per iteration. dtype cannot change in
-        # place, so mutating the diagonal in place cannot stale this.
-        self._is_complex = (self.diagonal_operator_list is None
-                            and np.issubdtype(diagonal.dtype,
-                                              np.complexfloating))
 
     def direct(self,x,out=None):
         "Returns :math:`D\circ x` "
@@ -88,16 +77,14 @@ class DiagonalOperator(LinearOperator):
         return out
 
     def adjoint(self,x, out=None):
-        "Returns :math:`D^*\circ x`, which is :math:`D\circ x` for a real `diagonal` "
+        "Returns :math:`D^*\circ x` "
         if self.diagonal_operator_list is not None:
             if out is None:
                 out = x.copy()
             for i, operator in enumerate(self.diagonal_operator_list):
                 operator.adjoint(x[i], out=out[i])
             return out
-        if self._is_complex:
-            return self.diagonal.conjugate().multiply(x,out=out)
-        return self.direct(x, out=out)
+        return self.diagonal.conjugate().multiply(x,out=out)
 
     def calculate_norm(self, **kwargs):
         r""" Returns the operator norm of DiagonalOperator which is the :math:`\infty` norm of `diagonal`

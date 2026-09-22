@@ -90,11 +90,8 @@ class CGLS(Algorithm):
     https://web.stanford.edu/group/SOL/software/cgls/
     '''
 
-    #: True: CGLS subtracts the :math:`\alpha^2 x` term explicitly, using the
-    #: whole iterate, so it runs on the true regularised normal equations in
-    #: either form. A class attribute rather than a property, because
-    #: :func:`~cil.optimisation.operators.TikhonovOperator.resolve_form` needs
-    #: it *before* an instance exists to have a form at all.
+    #: CGLS subtracts the :math:`\alpha^2 x` term explicitly, so it warm starts
+    #: in either form. Class-level so ``resolve_form`` can read it pre-instance.
     warm_starts_in_standard_form = True
 
     def __init__(self, initial=None, operator=None, data=None, alpha=0, struct_operator=None,
@@ -116,9 +113,7 @@ class CGLS(Algorithm):
                form='auto', weighted=False):
         r'''Initialisation of the algorithm
 
-        Allocates the entire workspace. Neither :meth:`initialise_variables` nor
-        :meth:`update` allocates anything afterwards, so an IRLS outer loop can
-        re-enter them indefinitely at constant memory.
+        Allocates the entire workspace; nothing allocates afterwards.
 
         Parameters
         ------------
@@ -141,15 +136,10 @@ class CGLS(Algorithm):
 
         log.info("%s setting up", self.__class__.__name__)
 
-        # What was asked for, as opposed to what it resolved to. CGLS never
-        # needs to revisit the choice -- see supports_warm_start -- but IRLS
-        # reads this off whichever inner solver it is given.
+        # The requested form, as opposed to what it resolved to; IRLS reads this.
         self.requested_form = form
 
-        # `solver=self` carries warm_starts_in_standard_form = True, which lets
-        # form='auto' take the cheaper standard form whenever (WL)^-1 exists,
-        # IRLS included: CGLS subtracts the alpha^2 x term itself, so the
-        # starting point cannot move the minimiser.
+        # solver=self lets form='auto' pick the cheaper standard form, since CGLS warm starts there.
         self.operator = create_tikhonov_operator(
             operator, operator.domain_geometry(), struct_operator,
             self.regalpha, form=form, weighted=weighted, solver=self)
@@ -179,14 +169,8 @@ class CGLS(Algorithm):
 
     @property
     def supports_warm_start(self):
-        """
-        Always True.
-
-        Unlike LSQR, CGLS subtracts the :math:`\\alpha^2 x` term explicitly in
-        :meth:`initialise_variables` and :meth:`update`, so it runs on the true
-        regularised normal equations in either form and the starting point
-        cannot move the minimiser.
-        """
+        """Always True: CGLS subtracts the :math:`\\alpha^2 x` term explicitly,
+        so it warm starts in either form."""
         return self.warm_starts_in_standard_form or not self.standard_form
 
     @property
@@ -195,37 +179,19 @@ class CGLS(Algorithm):
         return getattr(self.operator, 'weights', None)
 
     def enable_weights(self):
-        """
-        Allocate the IRLS weights after the fact.
-
-        Prefer ``weighted=True`` at construction, which keeps every allocation
-        inside ``set_up``.
-        """
+        """Allocate the IRLS weights after the fact; prefer ``weighted=True``
+        at construction."""
         return self.operator.enable_weights()
 
     def solution_geometry(self):
-        """
-        The geometry of the physical solution space, whatever the form.
-
-        In block form (and unregularised) this is the solver's own domain; in
-        standard form the iterate lives in ``Range(L)`` and the solution is
-        recovered through :math:`(WL)^{-1}`, whose range this is.
-        """
+        """The geometry of the physical solution space, whatever the form."""
         if self.standard_form:
             return self.operator.reg_operator.domain_geometry()
         return self.operator.domain_geometry()
 
     def initialise_variables(self):
-        r'''
-        Initialise the variables of the algorithm.
-
-        Allocates nothing: every container written here was allocated in
-        :meth:`set_up`.
-        '''
-        # alpha lives in two places: this solver's normal-equations term, and
-        # the operator handed back by the factory. set_up sets them together
-        # from the same value; catch anyone who has moved one since, before a
-        # whole solve quietly runs on the pair disagreeing.
+        r'''Initialise the variables of the algorithm. Allocates nothing.'''
+        # Catch self.regalpha and the operator's regalpha disagreeing.
         operator_alpha = getattr(self.operator, 'regalpha', None)
         if operator_alpha is not None and operator_alpha != self.regalpha:
             raise ValueError(
@@ -319,20 +285,11 @@ class CGLS(Algorithm):
         ----------
         out : DataContainer, optional
             Buffer to write the solution into, always honoured when given.
-            Pass one from a loop that calls this repeatedly, such as IRLS: it
-            makes the result an independent snapshot in both forms, and in
-            standard form -- where the iterate lives in ``Range(L)`` and has
-            to be mapped back through :math:`(WL)^{-1}` -- it also avoids an
-            allocation per call.
 
         Returns
         -------
         DataContainer
-            Current estimate of the solution. With ``out=None`` the two forms
-            differ: standard form returns a freshly mapped container, while
-            block form returns the **live iterate**, not a copy -- the
-            convention :meth:`Algorithm.get_output` sets. Anything held across
-            iterations should come through ``out=`` or be copied.
+            Current estimate of the solution.
         """
         if self.standard_form:
             return self.operator.reg_operator.inverse(self.x, out=out)

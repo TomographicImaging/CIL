@@ -202,6 +202,10 @@ class IRLSEarlyStopping(Callback):
     where :math:`u_k` is the physical solution after the :math:`k`-th outer
     iteration.
 
+    The callback allocates one :class:`DataContainer` the size of the physical
+    solution, on its first call: a copy of the previous solution in block
+    form, or a buffer for the current one in standard form.
+
     Parameters
     ----------
     epsilon: float, default 1e-4
@@ -210,54 +214,36 @@ class IRLSEarlyStopping(Callback):
     verbose: int, default 1
         1 prints the iteration the loop stopped at and the change that
         triggered it; 0 stops silently.
-
-    Note
-    -----
-    The iterate is watched rather than the objective, and the distinction
-    matters here. :meth:`IRLS.update_objective` records the inner solver's
-    final residual, which is measured against a *different* reweighted
-    operator every outer iteration and so is not a fixed quantity being
-    minimised: on the walnut it climbs over the first few outer iterations and
-    then plateaus while the iterates are still moving.
-    :class:`EarlyStoppingObjectiveValue` would therefore stop on the plateau of
-    a quantity that is not the one converging. The relative change between
-    iterates falls monotonically -- geometrically in practice, by roughly a
-    factor of five per outer iteration on the walnut at ``alpha=0.05`` -- and is
-    what actually says the weights have settled.
-
-    Two containers the size of the solution are held, so that the comparison
-    costs no allocation per iteration. In standard form ``get_output`` maps the
-    iterate back through :math:`(WL)^{-1}` and needs a buffer to write into;
-    in block form it ignores ``out`` and hands back the live iterate, and the
-    buffer is released on the second call.
     '''
     def __init__(self, epsilon=1e-4, verbose=1):
         self.epsilon = epsilon
         self.verbose = verbose
-        self.previous = None
-        self.scratch = None
+        self.tmp = None
         self.change = np.inf
 
     def __call__(self, algorithm):
-        current = algorithm.get_output(out=self.scratch)
+        previous = getattr(algorithm, 'tmp_solution', None)
 
-        if self.previous is None:
-            # First call is Algorithm.__next__ at iteration -1, which records the
-            # initial objective without running an update. There is nothing to
-            # compare against yet.
-            self.previous = current.copy()
-            self.scratch = current.copy()
+        if self.tmp is None:
+            # First call, at iteration -1: nothing to compare yet. Keep the
+            # fresh container get_output() allocated, or copy the live iterate.
+            current = algorithm.get_output()
+            self.tmp = current.copy() if previous is None else current
             return
 
-        if self.scratch is not None and current is not self.scratch:
-            # Block form ignored `out` and returned the live iterate, so the
-            # scratch is dead weight the size of the solution. Release it.
-            self.scratch = None
-
-        denominator = self.previous.norm()
-        self.previous.subtract(current, out=self.previous)
-        numerator = self.previous.norm()
-        self.previous.fill(current)
+        if previous is None:
+            # Block form: compare the live iterate against the copy in tmp.
+            current = algorithm.get_output()
+            denominator = self.tmp.norm()
+            self.tmp.subtract(current, out=self.tmp)
+            numerator = self.tmp.norm()
+            self.tmp.fill(current)
+        else:
+            # Standard form: tmp receives the current solution.
+            algorithm.get_output(out=self.tmp)
+            denominator = previous.norm()
+            self.tmp.subtract(previous, out=self.tmp)
+            numerator = self.tmp.norm()
 
         if denominator == 0:
             return
@@ -294,14 +280,6 @@ class _TqdmCallback(Callback):
     def _position(self, algorithm):
         """
         Iterations completed in this run, which is not the number of calls.
-
-        Two things separate the two. From ``iteration == -1``
-        :meth:`Algorithm.run` takes one extra step that only records the
-        initial objective and does no work, so counting calls finishes one
-        ahead. And an inner solver re-entered by an outer loop resumes from
-        wherever it left off, so ``algorithm.iteration`` is not the position
-        either. What is the same in both cases is how many iterations are left:
-        ``_total_iterations`` is the iteration this run ends on.
         """
         if self.pbar.total is None or not hasattr(algorithm,
                                                   '_total_iterations'):

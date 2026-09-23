@@ -59,7 +59,7 @@ class SARAHFunction(ApproximateGradientSumFunction):
     sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0, 1, ..., n-1}.
         This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`.
     update_frequency : positive int or None, optional
-        The interval for recomputing the full gradient and restarting the recursion, called the inner loop size :math:`m` in the reference. The default is 2*len(functions), chosen to match the default of :class:`~cil.optimisation.functions.SVRGFunction` so that the two are directly comparable. At :math:`m=1` SARAH reduces to gradient descent.
+        The interval for recomputing the full gradient and restarting the recursion.  The default is 2*len(functions). 
 
     """
 

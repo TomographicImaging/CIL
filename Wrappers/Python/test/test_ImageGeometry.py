@@ -37,7 +37,7 @@ class TestImageGeometry(unittest.TestCase):
         ig.set_labels(non_default_dimension_labels)
         ig.voxel_size_z = 5.5
         sub = ig.get_slice(vertical = 1)
-        self.assertTrue( sub.shape == (2,5,3))
+        self.assertTrue( sub.shape == (2,5,3,1))
         self.assertEqual(sub.voxel_size_z,5.5)
         self.assertEqual(sub.center_x,0)
         self.assertEqual(sub.center_y,0)
@@ -48,7 +48,7 @@ class TestImageGeometry(unittest.TestCase):
         ImageDimension["VERTICAL"]]
         self.ig.set_labels(non_default_dimension_labels)
         sub = self.ig.get_slice(vertical = 'centre')
-        self.assertTrue( sub.shape == (2,5,3))
+        self.assertTrue( sub.shape == (2,5,3,1))
         self.assertEqual(sub.center_x,0)
         self.assertEqual(sub.center_y,0)
         self.assertEqual(sub.center_z,0)
@@ -59,7 +59,7 @@ class TestImageGeometry(unittest.TestCase):
         ImageDimension["VERTICAL"]]
         self.ig.set_labels(non_default_dimension_labels)
         sub = self.ig.get_slice(horizontal_x = 1)
-        self.assertTrue(sub.shape == (5,3,4))
+        self.assertTrue(sub.shape == (1,5,3,4))
         self.assertEqual(sub.center_x,0.5)
         self.assertEqual(sub.center_y,0)
         self.assertEqual(sub.center_z,0)
@@ -82,17 +82,22 @@ class TestImageGeometry(unittest.TestCase):
         self.assertTrue(sub.channels == 1)
 
     def test_get_slice_horizontal_y(self):
-        non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["HORIZONTAL_Y"]]
+        non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
+        ImageDimension["VERTICAL"]]
         self.ig.set_labels(non_default_dimension_labels)
         sub = self.ig.get_slice(horizontal_y = 0)
-        self.assertTrue( sub.shape == (2,))
+        print(sub.shape)
+        self.assertTrue( sub.shape == (2,5,1,4))
         self.assertEqual(sub.center_x,0)
         self.assertEqual(sub.center_y,-1)
         self.assertEqual(sub.center_z,0)
 
     def test_get_slice_horizontal_x_and_horizontal_y(self):
+        non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
+            ImageDimension["VERTICAL"]]
+        self.ig.set_labels(non_default_dimension_labels)
         sub = self.ig.get_slice(horizontal_x=0,horizontal_y=0)
-        self.assertTrue( sub.shape == (5,4))
+        self.assertTrue( sub.shape == (1,5,1,4))
 
     # test get_centre_slice ---------------------------------------------------------------------------------------------------------------
 

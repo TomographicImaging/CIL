@@ -81,11 +81,12 @@ class ImageData(DataContainer):
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
 
-        else:
+        elif not issubclass(type(array) , numpy.ndarray):
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
+
         if array.shape != geometry.shape:
-            array_squeezed_shape = numpy.squeeze(array.shape)
-            geometry_squeezed_shape = numpy.squeeze(geometry.shape)
+            array_squeezed_shape = [d for d in array.shape if d != 1]
+            geometry_squeezed_shape = [d for d in geometry.shape if d != 1]
             if array_squeezed_shape != geometry_squeezed_shape:
                 raise ValueError(f'Shape mismatch {array.shape} {geometry.shape}')
             else:

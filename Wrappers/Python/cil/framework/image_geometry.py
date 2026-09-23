@@ -94,13 +94,13 @@ class ImageGeometry(metaclass=BackwardCompat):
             labels = labels_default
         labels = list(labels)
 
-     # channels
+        # channels
         if self.channels==0 or self.channels==1:
             try:
                 labels.remove(ImageDimension.CHANNEL)
             except ValueError:
                 pass #if not in custom list carry on
-
+        return tuple(labels)
 
     @dimension_labels.setter
     def dimension_labels(self, val):
@@ -154,7 +154,7 @@ class ImageGeometry(metaclass=BackwardCompat):
     def voxel_num_x(self):
         return self._voxel_num_x
 
-    @dtype.setter
+    @voxel_num_x.setter
     def voxel_num_x(self, val):
         if val < 1:
             warnings.warn("voxel_num_x must be greater than 0. Setting to 1", UserWarning)
@@ -166,7 +166,7 @@ class ImageGeometry(metaclass=BackwardCompat):
     def voxel_num_y(self):
         return self._voxel_num_y
 
-    @dtype.setter
+    @voxel_num_y.setter
     def voxel_num_y(self, val):
         if val < 1:
             warnings.warn("voxel_num_y must be greater than 0. Setting to 1", UserWarning)
@@ -178,7 +178,7 @@ class ImageGeometry(metaclass=BackwardCompat):
     def voxel_num_z(self):
         return self._voxel_num_z
 
-    @dtype.setter
+    @voxel_num_z.setter
     def voxel_num_z(self, val):
         if val < 1:
             warnings.warn("voxel_num_z must be greater than 0. Setting to 1", UserWarning)
@@ -318,15 +318,9 @@ class ImageGeometry(metaclass=BackwardCompat):
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
         repres += "channel_spacing: {0}\n".format(self.channel_spacing)
-
-        if self.voxel_num_z > 0:
-            repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
-            repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
-            repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
-        else:
-            repres += "voxel_num : x{0},y{1}\n".format(self.voxel_num_x, self.voxel_num_y)
-            repres += "voxel_size : x{0},y{1}\n".format(self.voxel_size_x, self.voxel_size_y)
-            repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
+        repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
+        repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
+        repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
 
         return repres
     

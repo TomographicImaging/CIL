@@ -87,10 +87,6 @@ class ImageGeometry(metaclass=BackwardCompat):
 
         labels_default = ImageDimension.get_order_for_engine("cil")
 
-        shape_default = [   self.channels,
-                            self.voxel_num_z,
-                            self.voxel_num_y,
-                            self.voxel_num_x]
 
         try:
             labels = self._dimension_labels
@@ -98,12 +94,12 @@ class ImageGeometry(metaclass=BackwardCompat):
             labels = labels_default
         labels = list(labels)
 
-        for i, x in enumerate(shape_default):
-            if x == 0 or x==1:
-                try:
-                    labels.remove(labels_default[i])
-                except ValueError:
-                    pass #if not in custom list carry on
+        # channels
+        if self.channels==0 or self.channels==1:
+            try:
+                labels.remove(ImageDimension.CHANNEL)
+            except ValueError:
+                pass #if not in custom list carry on
         return tuple(labels)
 
     @dimension_labels.setter
@@ -112,7 +108,18 @@ class ImageGeometry(metaclass=BackwardCompat):
 
     def set_labels(self, labels):
         if labels is not None:
-            self._dimension_labels = tuple(map(ImageDimension, labels))
+            dimension_labels = tuple(map(ImageDimension, labels))
+
+            # need to make sure all labels except channels are present:
+            if ImageDimension.VERTICAL not in dimension_labels:
+                warnings.warn("ImageGeometry must have a vertical dimension. Adding vertical to the beginning of the dimension_labels list.", UserWarning)
+                dimension_labels = (ImageDimension.VERTICAL,) + dimension_labels
+            if ImageDimension.HORIZONTAL_X not in dimension_labels:
+                raise ValueError("ImageGeometry must have a horizontal_x dimension. Please add horizontal_x to the dimension_labels list.")
+            if ImageDimension.HORIZONTAL_Y not in dimension_labels:
+                raise ValueError("ImageGeometry must have a horizontal_y dimension. Please add horizontal_y to the dimension_labels list.")
+
+            self._dimension_labels = dimension_labels
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -143,10 +150,46 @@ class ImageGeometry(metaclass=BackwardCompat):
     def dtype(self, val):
         self._dtype = val
 
+    @property
+    def voxel_num_x(self):
+        return self._voxel_num_x
+
+    @voxel_num_x.setter
+    def voxel_num_x(self, val):
+        if val < 1:
+            warnings.warn("voxel_num_x must be greater than 0. Setting to 1", UserWarning)
+            self._voxel_num_x = 1
+        else:
+            self._voxel_num_x = val
+
+    @property
+    def voxel_num_y(self):
+        return self._voxel_num_y
+
+    @voxel_num_y.setter
+    def voxel_num_y(self, val):
+        if val < 1:
+            warnings.warn("voxel_num_y must be greater than 0. Setting to 1", UserWarning)
+            self._voxel_num_y = 1
+        else:
+            self._voxel_num_y = val
+
+    @property
+    def voxel_num_z(self):
+        return self._voxel_num_z
+
+    @voxel_num_z.setter
+    def voxel_num_z(self, val):
+        if val < 1:
+            warnings.warn("voxel_num_z must be greater than 0. Setting to 1", UserWarning)
+            self._voxel_num_z = 1
+        else:
+            self._voxel_num_z = val
+
     def __init__(self,
-                 voxel_num_x=0,
-                 voxel_num_y=0,
-                 voxel_num_z=0,
+                 voxel_num_x=1,
+                 voxel_num_y=1,
+                 voxel_num_z=1,
                  voxel_size_x=1,
                  voxel_size_y=1,
                  voxel_size_z=1,
@@ -174,31 +217,69 @@ class ImageGeometry(metaclass=BackwardCompat):
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
         '''
-        Returns a new ImageGeometry of a single slice of in the requested direction.
+        Returns a new ImageGeometry of a single slice in the requested direction.
+
+        Parameters
+        ----------
+        channel : int or 'centre', optional
+            The channel index to slice. Default is None (no slicing).
+        vertical : int or 'centre', optional
+            The vertical index to slice. Default is None (no slicing).
+        horizontal_x : int, optional
+            The horizontal x index to slice. Default is None (no slicing).
+        horizontal_y : int, optional
+            The horizontal y index to slice. Default is None (no slicing).
+        Returns
+        -------
+        geometry_new : ImageGeometry
+            A new ImageGeometry object representing the sliced geometry.
+
+        Note
+        ----
+        Slicing on vertical with 'centre' will return the central slice in that dimension.
+        Slicing on channels returns a geometry with a single channel, however the channel label is not
+        typically stored in the geometry.
         '''
+
         geometry_new = self.copy()
         if channel is not None:
             geometry_new.channels = 1
-
             try:
                 geometry_new.channel_labels = [self.channel_labels[channel]]
             except:
                 geometry_new.channel_labels = None
 
         if vertical is not None:
-            geometry_new.voxel_num_z = 0
+            geometry_new.voxel_num_z = 1
+            if vertical != 'centre':
+                if vertical == 0:
+                    warnings.warn("Slicing vertical at index 0 results in a geometry \
+                                  offset along the vertical axis. If you do not require an offset ImageGeometry, set vertical='centre",
+                                  UserWarning)
+                voxel_offset = (self.voxel_num_z)/2 - (vertical+0.5)
+                geometry_new.center_z -= voxel_offset * geometry_new.voxel_size_z
 
         if horizontal_y is not None:
-            geometry_new.voxel_num_y = 0
+            geometry_new.voxel_num_y = 1
+            voxel_offset = (self.voxel_num_y)/2 - (horizontal_y +0.5)
+            geometry_new.center_y -= voxel_offset * geometry_new.voxel_size_y
 
         if horizontal_x is not None:
-            geometry_new.voxel_num_x = 0
+            geometry_new.voxel_num_x = 1
+            voxel_offset = (self.voxel_num_x)/2 - (horizontal_x+0.5)
+            geometry_new.center_x -= voxel_offset * geometry_new.voxel_size_x
 
         return geometry_new
+    
+    def get_centre_slice(self):
+        '''
+        Returns a new ImageGeometry of the centre slice in the vertical direction.
+        '''
+        return self.get_slice(vertical='centre')
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
-        for i, el in enumerate(default_dimension_labels):
+        for el in default_dimension_labels:
             for j, ek in enumerate(dimension_labels):
                 if el == ek:
                     order.append(j)
@@ -218,16 +299,12 @@ class ImageGeometry(metaclass=BackwardCompat):
         return self.center_y + 0.5*self.voxel_num_y*self.voxel_size_y
 
     def get_min_z(self):
-        if not self.voxel_num_z == 0:
-            return self.center_z - 0.5*self.voxel_num_z*self.voxel_size_z
-        else:
-            return 0
+        return self.center_z - 0.5*self.voxel_num_z*self.voxel_size_z
+
 
     def get_max_z(self):
-        if not self.voxel_num_z == 0:
-            return self.center_z + 0.5*self.voxel_num_z*self.voxel_size_z
-        else:
-            return 0
+        return self.center_z + 0.5*self.voxel_num_z*self.voxel_size_z
+
 
     def clone(self):
         '''returns a copy of the ImageGeometry'''
@@ -241,17 +318,12 @@ class ImageGeometry(metaclass=BackwardCompat):
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
         repres += "channel_spacing: {0}\n".format(self.channel_spacing)
-
-        if self.voxel_num_z > 0:
-            repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
-            repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
-            repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
-        else:
-            repres += "voxel_num : x{0},y{1}\n".format(self.voxel_num_x, self.voxel_num_y)
-            repres += "voxel_size : x{0},y{1}\n".format(self.voxel_size_x, self.voxel_size_y)
-            repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
+        repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
+        repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
+        repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
 
         return repres
+    
     def allocate(self, value=0, **kwargs):
         '''Allocates an ImageData according to the geometry
 

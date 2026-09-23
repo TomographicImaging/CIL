@@ -79,11 +79,10 @@ class AstraForwardProjector2D(DataProcessor):
             NotImplemented
 
     def check_input(self, dataset):
-        if dataset.number_of_dimensions == 1 or\
-           dataset.number_of_dimensions == 2:
-               return True
+        if dataset.number_of_dimensions == 3:
+            return True
         else:
-            raise ValueError("Expected input dimensions is 1 or 2, got {0}"\
+            raise ValueError("Expected input dimensions is 3, got {0}"\
                              .format(dataset.number_of_dimensions))
 
     def _set_up(self):

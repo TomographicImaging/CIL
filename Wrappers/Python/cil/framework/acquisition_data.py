@@ -230,6 +230,12 @@ class AcquisitionData(DataContainer, Partitioner):
                 kwargs['force'] = args[4]
 
         return self._get_slice(**kwargs)
+    
+    def get_centre_slice(self):
+        '''
+        Returns a new AcquisitionData of the centre slice in the vertical direction.
+        '''
+        return self.get_slice(vertical='centre')
 
     def reorder(self, order):
         '''

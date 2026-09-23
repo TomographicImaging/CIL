@@ -81,15 +81,16 @@ class ImageData(DataContainer):
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
 
-        elif issubclass(type(array) , numpy.ndarray):
-            # remove singleton dimensions
-            array = numpy.squeeze(array)
-
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
-
         if array.shape != geometry.shape:
-            raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
+            array_squeezed_shape = numpy.squeeze(array.shape)
+            geometry_squeezed_shape = numpy.squeeze(geometry.shape)
+            if array_squeezed_shape != geometry_squeezed_shape:
+                raise ValueError(f'Shape mismatch {array.shape} {geometry.shape}')
+            else:
+                array = array.reshape(geometry.shape)
+
 
         if array.ndim not in [2,3,4]:
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))

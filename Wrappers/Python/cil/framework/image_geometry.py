@@ -87,10 +87,6 @@ class ImageGeometry(metaclass=BackwardCompat):
 
         labels_default = ImageDimension.get_order_for_engine("cil")
 
-        shape_default = [   self.channels,
-                            self.voxel_num_z,
-                            self.voxel_num_y,
-                            self.voxel_num_x]
 
         try:
             labels = self._dimension_labels
@@ -98,13 +94,13 @@ class ImageGeometry(metaclass=BackwardCompat):
             labels = labels_default
         labels = list(labels)
 
-        for i, x in enumerate(shape_default):
-            if x == 0 or x==1:
-                try:
-                    labels.remove(labels_default[i])
-                except ValueError:
-                    pass #if not in custom list carry on
-        return tuple(labels)
+     # channels
+        if self.channels==0 or self.channels==1:
+            try:
+                labels.remove(ImageDimension.CHANNEL)
+            except ValueError:
+                pass #if not in custom list carry on
+
 
     @dimension_labels.setter
     def dimension_labels(self, val):
@@ -112,7 +108,18 @@ class ImageGeometry(metaclass=BackwardCompat):
 
     def set_labels(self, labels):
         if labels is not None:
-            self._dimension_labels = tuple(map(ImageDimension, labels))
+            dimension_labels = tuple(map(ImageDimension, labels))
+
+            # need to make sure all labels except channels are present:
+            if ImageDimension.VERTICAL not in dimension_labels:
+                warnings.warn("ImageGeometry must have a vertical dimension. Adding vertical to the beginning of the dimension_labels list.", UserWarning)
+                dimension_labels = (ImageDimension.VERTICAL,) + dimension_labels
+            if ImageDimension.HORIZONTAL_X not in dimension_labels:
+                raise ValueError("ImageGeometry must have a horizontal_x dimension. Please add horizontal_x to the dimension_labels list.")
+            if ImageDimension.HORIZONTAL_Y not in dimension_labels:
+                raise ValueError("ImageGeometry must have a horizontal_y dimension. Please add horizontal_y to the dimension_labels list.")
+
+            self._dimension_labels = dimension_labels
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -143,10 +150,46 @@ class ImageGeometry(metaclass=BackwardCompat):
     def dtype(self, val):
         self._dtype = val
 
+    @property
+    def voxel_num_x(self):
+        return self._voxel_num_x
+
+    @dtype.setter
+    def voxel_num_x(self, val):
+        if val < 1:
+            warnings.warn("voxel_num_x must be greater than 0. Setting to 1", UserWarning)
+            self._voxel_num_x = 1
+        else:
+            self._voxel_num_x = val
+
+    @property
+    def voxel_num_y(self):
+        return self._voxel_num_y
+
+    @dtype.setter
+    def voxel_num_y(self, val):
+        if val < 1:
+            warnings.warn("voxel_num_y must be greater than 0. Setting to 1", UserWarning)
+            self._voxel_num_y = 1
+        else:
+            self._voxel_num_y = val
+
+    @property
+    def voxel_num_z(self):
+        return self._voxel_num_z
+
+    @dtype.setter
+    def voxel_num_z(self, val):
+        if val < 1:
+            warnings.warn("voxel_num_z must be greater than 0. Setting to 1", UserWarning)
+            self._voxel_num_z = 1
+        else:
+            self._voxel_num_z = val
+
     def __init__(self,
-                 voxel_num_x=0,
-                 voxel_num_y=0,
-                 voxel_num_z=0,
+                 voxel_num_x=1,
+                 voxel_num_y=1,
+                 voxel_num_z=1,
                  voxel_size_x=1,
                  voxel_size_y=1,
                  voxel_size_z=1,
@@ -236,7 +279,7 @@ class ImageGeometry(metaclass=BackwardCompat):
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
-        for i, el in enumerate(default_dimension_labels):
+        for el in default_dimension_labels:
             for j, ek in enumerate(dimension_labels):
                 if el == ek:
                     order.append(j)
@@ -256,16 +299,12 @@ class ImageGeometry(metaclass=BackwardCompat):
         return self.center_y + 0.5*self.voxel_num_y*self.voxel_size_y
 
     def get_min_z(self):
-        if not self.voxel_num_z == 0:
-            return self.center_z - 0.5*self.voxel_num_z*self.voxel_size_z
-        else:
-            return 0
+        return self.center_z - 0.5*self.voxel_num_z*self.voxel_size_z
+
 
     def get_max_z(self):
-        if not self.voxel_num_z == 0:
-            return self.center_z + 0.5*self.voxel_num_z*self.voxel_size_z
-        else:
-            return 0
+        return self.center_z + 0.5*self.voxel_num_z*self.voxel_size_z
+
 
     def clone(self):
         '''returns a copy of the ImageGeometry'''
@@ -290,6 +329,7 @@ class ImageGeometry(metaclass=BackwardCompat):
             repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
 
         return repres
+    
     def allocate(self, value=0, **kwargs):
         '''Allocates an ImageData according to the geometry
 

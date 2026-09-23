@@ -42,7 +42,7 @@ def convert_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in):
 
     if sinogram_geometry_in.geom_type == AcquisitionType.CONE_FLEX:
         return convert_flex_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in)
-    
+
     return convert_standard_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in)
 
 
@@ -65,7 +65,7 @@ def convert_standard_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry
     """
     if sinogram_geometry_in.geom_type not in [AcquisitionType.PARALLEL, AcquisitionType.CONE]:
         raise ValueError(f"Unsupported geometry type: {sinogram_geometry_in.geom_type}. Only {AcquisitionType.PARALLEL} and {AcquisitionType.CONE}  geometries are supported.")
-    
+
     sinogram_geometry = sinogram_geometry_in.copy()
     volume_geometry_temp = volume_geometry.copy()
 
@@ -75,7 +75,7 @@ def convert_standard_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry
 
     system = sinogram_geometry.config.system
     panel = sinogram_geometry.config.panel
-    
+
 
     if AcquisitionType.DIM2 & sinogram_geometry.dimension:
         #create a 3D astra geom from 2D CIL geometry
@@ -124,7 +124,7 @@ def convert_standard_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry
         elif sinogram_geometry.geom_type != 'cone_flex':
             src = system.source.position.reshape(3,1)
             projector = 'cone_vec'
-  
+
 
     #Build for astra 3D only
     vectors = np.zeros((angles.num_positions, 12))
@@ -137,7 +137,7 @@ def convert_standard_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry
         vectors[i, :3]  = rotation_matrix.dot(src).reshape(3)
         vectors[i, 3:6] = rotation_matrix.dot(det).reshape(3)
         vectors[i, 6:9] = rotation_matrix.dot(row).reshape(3)
-        vectors[i, 9:]  = rotation_matrix.dot(col).reshape(3)    
+        vectors[i, 9:]  = rotation_matrix.dot(col).reshape(3)
 
     proj_geom = astra.creators.create_proj_geom(projector, panel.num_pixels[1], panel.num_pixels[0], vectors)
     vol_geom = astra.create_vol_geom(volume_geometry_temp.voxel_num_y,
@@ -176,11 +176,11 @@ def convert_flex_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry_in)
 
     if sinogram_geometry_in.geom_type != AcquisitionType.CONE_FLEX:
         raise ValueError(f"Unsupported geometry type: {sinogram_geometry_in.geom_type}. Only {AcquisitionType.CONE_FLEX} geometries are supported.")
-    
+
 
     system = sinogram_geometry_in.config.system
     panel = sinogram_geometry_in.config.panel
-     
+
     sign_h = 1
     sign_v = 1
 
@@ -226,17 +226,12 @@ def rotation_matrix_z_from_euler(angle, degrees):
     degrees : bool
         if radian or degrees
     """
-
-    if degrees:
-        alpha = angle / 180. * np.pi
-    else:
-        alpha = angle
-
+    alpha = angle * (np.pi / 180) if degrees else angle
     rot_matrix = np.zeros((3,3), dtype=np.float64)
     rot_matrix[0][0] = np.cos(alpha)
-    rot_matrix[0][1] = - np.sin(alpha)
     rot_matrix[1][0] = np.sin(alpha)
-    rot_matrix[1][1] = np.cos(alpha)
+    rot_matrix[0][1] = -rot_matrix[1][0]
+    rot_matrix[1][1] = rot_matrix[0][0]
     rot_matrix[2][2] = 1
 
     return rot_matrix

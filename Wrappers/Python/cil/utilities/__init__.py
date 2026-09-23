@@ -15,3 +15,10 @@
 #
 # Authors:
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
+def dtype_like(input_value, reference_array):
+    """Converts `input_value` to type of `reference_array` if `input_value` has `astype` or `dtype.type` methods"""
+    if hasattr(reference_array, 'dtype'):
+        if hasattr(input_value, 'astype'):
+            return input_value.astype(reference_array.dtype, copy=False)
+        return reference_array.dtype.type(input_value)
+    return input_value

@@ -1980,7 +1980,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
                         AcquisitionDimension.HORIZONTAL: self.config.panel.num_pixels[0]}
 
         
-        return tuple(shape_dict[label] for label in self.dimension_labels)
+        return tuple(int(shape_dict[label]) for label in self.dimension_labels)
        
     @property
     def dimension_labels(self):

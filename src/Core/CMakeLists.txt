@@ -51,7 +51,11 @@ else()
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+option(CIL_FORCE_IPP "Force CIL to use IPP" OFF)
 find_package(IPP)
+if(CIL_FORCE_IPP AND NOT IPP_FOUND)
+  message(FATAL_ERROR "CIL_FORCE_IPP and NOT IPP_FOUND")
+endif()
 
 list(APPEND cilacc_SOURCES utilities.cpp axpby.cpp FiniteDifferenceLibrary.cpp)
 list(APPEND cilacc_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include)

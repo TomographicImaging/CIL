@@ -234,8 +234,12 @@ In a similar way, plugging approximate gradient calculations into deterministic 
 +----------------+-------+------------+----------------+
 | SARAHFunction  | SARAH | Prox-SARAH | Acc-Prox-SARAH |
 +----------------+-------+------------+----------------+
+| LSARAHFunction | LSARAH|Prox-LSARAH | Acc-Prox-LSARAH|
++----------------+-------+------------+----------------+
 
-\*In development 
+\*In development
+
+Note that the entries of this table are not all equally well supported by theory. In particular, the convergence results for `SARAHFunction` with `ISTA` do not cover the single-sample case implemented here, those for `SARAHFunction` with `FISTA` do not exist, and there are no results at all for `LSARAHFunction` in the proximal case, marked `n/a` above. See the docstrings of those two classes for details.
 
 The stochastic gradient functions can be found listed under functions in the documentation. 
 
@@ -292,7 +296,7 @@ Note that the approximate gradient methods have different memory requirements:
 + The `SGFunction` has the same requirements as a `SumFunction`, so no increased memory usage
 + `SAGFunction` and `SAGAFunction` both store `n+3` times the image size in memory to store the last calculated gradient for each function in the sum and for intermediary calculations. 
 + `SVRGFunction` and `LSVRGFunction` with the default `store_gradients = False` store 4 times the image size in memory, including the "snapshot" point and gradient. If `store_gradients = True`, some computational effort is saved, at the expensive of stored memory `n+4` times the image size.
-+ `SARAHFunction` stores 3 times the image size in memory: the running gradient estimator, the previous iterate and one lot of intermediary calculations. Note also that each of its intermediate iterations costs two gradient calculations rather than one, because the sampled function is evaluated at both the current and the previous iterate.
++ `SARAHFunction` and `LSARAHFunction` store 3 times the image size in memory: the running gradient estimator, the previous iterate and one lot of intermediary calculations. Note also that each of their intermediate iterations costs two gradient calculations rather than one, because the sampled function is evaluated at both the current and the previous iterate.
 
 
 Operators
@@ -612,9 +616,16 @@ Loopless Stochastic Variance Reduced Gradient Function
    :inherited-members:
 
 
-Stochastic Recursive Gradient Function
+Stochastic Recursive Gradient (SARAH) Function
 ----------------------------------------------
 .. autoclass:: cil.optimisation.functions.SARAHFunction
+   :members:
+   :inherited-members:
+
+
+Loopless Stochastic Recursive Gradient (LSARAH) Function
+-----------------------------------------------------
+.. autoclass:: cil.optimisation.functions.LSARAHFunction
    :members:
    :inherited-members:
 

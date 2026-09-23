@@ -37,7 +37,7 @@ from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOp
 
 
 
-from cil.optimisation.functions import Rosenbrock, MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, SARAHFunction, ScaledFunction
+from cil.optimisation.functions import Rosenbrock, MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, SARAHFunction, LSARAHFunction, ScaledFunction
 from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD , LSQR
 
 
@@ -1908,6 +1908,11 @@ class Test_PD3O(CCPiTestClass):
         # a scaled SARAHFunction is unwrapped first, so it is rejected too
         with self.assertRaises(NotImplementedError):
             PD3O(f=3*(2*f), g=IndicatorBox(lower=0), h=0.1*L1Norm(), operator=operator)
+
+        # LSARAHFunction is a SARAHFunction, so it is rejected for the same reason
+        f_loopless = LSARAHFunction(functions, Sampler.sequential(3))
+        with self.assertRaises(NotImplementedError):
+            PD3O(f=f_loopless, g=IndicatorBox(lower=0), h=0.1*L1Norm(), operator=operator)
 
 
 

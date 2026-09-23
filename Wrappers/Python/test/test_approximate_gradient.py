@@ -29,7 +29,7 @@ from cil.optimisation.functions import LeastSquares
 from cil.optimisation.functions import ApproximateGradientSumFunction
 from cil.optimisation.functions import SGFunction, SAGFunction, SAGAFunction
 from cil.optimisation.functions import SVRGFunction, LSVRGFunction
-from cil.optimisation.functions import SARAHFunction
+from cil.optimisation.functions import SARAHFunction, LSARAHFunction
 from cil.optimisation.operators import MatrixOperator
 from cil.optimisation.algorithms import GD
 from cil.framework import VectorData
@@ -636,6 +636,90 @@ class TestSARAH(CCPiTestClass, approx_gradient_child_class_testing):
     def test_SARAH_out(self):
         reference = SARAHFunction(self.f_subsets, Sampler.sequential(self.n_subsets))
         objective = SARAHFunction(self.f_subsets, Sampler.sequential(self.n_subsets))
+        out = self.initial.copy()
+
+        for x in [self.initial, self.initial+1., self.initial+3.]:
+            returned = objective.gradient(x, out=out)
+            self.assertEqual(id(returned), id(out))
+            self.assertNumpyArrayAlmostEqual(out.array, reference.gradient(x).array, 4)
+
+
+class TestLSARAH(CCPiTestClass, approx_gradient_child_class_testing):
+
+    def setUp(self):
+        self.stochastic_estimator=LSARAHFunction
+        self.n_subsets=5
+        self.set_up()
+
+    def test_LSARAH_init(self):
+        self.assertEqual(self.f_stochastic.snapshot_update_probability,
+                         1/self.n_subsets)
+        self.assertListEqual(self.f_stochastic.data_passes, [])
+        self.assertListEqual(self.f_stochastic.data_passes_indices, [])
+
+        f2 = LSARAHFunction(self.f_subsets, snapshot_update_probability=1/2, seed=1)
+        self.assertEqual(f2.snapshot_update_probability, 1/2)
+        self.assertListEqual(f2.data_passes, [])
+
+    def test_LSARAH_always_snapshot(self):
+        # with probability 1 every iteration is a full gradient, so this is gradient descent
+        objective = LSARAHFunction(self.f_subsets, self.sampler,
+                                   snapshot_update_probability=1)
+        alg_stochastic = GD(initial=self.initial, f=objective,
+                            update_objective_interval=500, step_size=5e-8)
+        alg_stochastic.run(4, verbose=0)
+        self.assertNumpyArrayAlmostEqual(
+            np.array(objective.data_passes), np.array([1., 2., 3., 4.]))
+        for indices in objective.data_passes_indices:
+            self.assertListEqual(indices, list(range(self.n_subsets)))
+
+    def test_LSARAH_never_snapshot_matches_recursion(self):
+        # with probability 0 only the first iteration is a full gradient, so the recursion
+        # v_k = n*(grad f_{i_k}(x_k) - grad f_{i_k}(x_{k-1})) + v_{k-1} runs uninterrupted
+        objective = LSARAHFunction(self.f_subsets, Sampler.sequential(self.n_subsets),
+                                   snapshot_update_probability=0)
+        x0 = self.initial
+        x1 = self.initial + 1.
+        x2 = self.initial + 3.
+
+        v0 = objective.gradient(x0)
+        self.assertNumpyArrayAlmostEqual(v0.array, self.f.gradient(x0).array, 4)
+
+        v1 = objective.gradient(x1)
+        expected = self.n_subsets*(self.f_subsets[0].gradient(x1) -
+                                   self.f_subsets[0].gradient(x0)) + v0
+        self.assertNumpyArrayAlmostEqual(v1.array, expected.array, 4)
+
+        v2 = objective.gradient(x2)
+        expected = self.n_subsets*(self.f_subsets[1].gradient(x2) -
+                                   self.f_subsets[1].gradient(x1)) + v1
+        self.assertNumpyArrayAlmostEqual(v2.array, expected.array, 4)
+
+        self.assertNumpyArrayAlmostEqual(
+            np.array(objective.data_passes), np.array([1., 6./5, 7./5]))
+
+    def test_LSARAH_seed_is_reproducible(self):
+        # the same seed must give the same sequence of snapshot decisions
+        passes = []
+        for _ in range(2):
+            objective = LSARAHFunction(self.f_subsets, self.sampler, seed=3)
+            alg_stochastic = GD(initial=self.initial, f=objective,
+                                update_objective_interval=500, step_size=5e-8)
+            alg_stochastic.run(10, verbose=0)
+            passes.append(np.array(objective.data_passes))
+        self.assertNumpyArrayAlmostEqual(passes[0], passes[1])
+
+        # each iteration either takes a full gradient (1 data pass) or one recursion step (1/n)
+        increments = np.diff(np.concatenate([[0.], passes[0]]))
+        for increment in increments:
+            self.assertTrue(np.isclose(increment, 1.) or
+                            np.isclose(increment, 1./self.n_subsets))
+        # the first iteration is always a full gradient
+        self.assertAlmostEqual(passes[0][0], 1.)
+
+    def test_LSARAH_out(self):
+        reference = LSARAHFunction(self.f_subsets, Sampler.sequential(self.n_subsets), seed=7)
+        objective = LSARAHFunction(self.f_subsets, Sampler.sequential(self.n_subsets), seed=7)
         out = self.initial.copy()
 
         for x in [self.initial, self.initial+1., self.initial+3.]:

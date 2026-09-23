@@ -18,6 +18,7 @@
 
 from .ApproximateGradientSumFunction import ApproximateGradientSumFunction
 import numbers
+import numpy as np
 
 
 class SARAHFunction(ApproximateGradientSumFunction):
@@ -34,21 +35,22 @@ class SARAHFunction(ApproximateGradientSumFunction):
     -----
     Compared with the literature, we multiply by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.
 
-    Note
-    -----
-    Each intermediate iteration evaluates two stochastic gradients, at :math:`x_k` and :math:`x_{k-1}`, but both use the data of a single :math:`f_{i_k}`, so `data_passes` counts :math:`1/n`. 
-
-    Note
-    -----
-    Algorithm 1 of the reference restarts each outer loop from a uniformly random inner iterate; to reduce memory requirements,  this implementation continues from the last one.
-
+   
     Note
     ----
     The additional memory requirement is 3 times the image size (the running gradient estimator, the previous iterate and one lot of intermediary calculations).
 
-    Reference
-    ---------
+    Note
+    ----
+    Convergence theory is available for the smooth case, i.e. for use with :class:`~cil.optimisation.algorithms.GD`. 
+    - With :class:`~cil.optimisation.algorithms.ISTA`, this is the :math:`\gamma_t = 1` case of Algorithm 1 of Pham et al., 
+    - With :class:`~cil.optimisation.algorithms.FISTA` we are not aware of results in the literature. 
+
+    References
+    ----------
     Nguyen, L.M., Liu, J., Scheinberg, K. and Takáč, M., 2017. SARAH: A novel method for machine learning problems using stochastic recursive gradient. Proceedings of the 34th International Conference on Machine Learning, PMLR 70:2613-2621. https://proceedings.mlr.press/v70/nguyen17b.html
+
+    Pham, N.H., Nguyen, L.M., Phan, D.T. and Tran-Dinh, Q., 2020. ProxSARAH: An efficient algorithmic framework for stochastic composite nonconvex optimization. Journal of Machine Learning Research, 21(110):1-48. https://jmlr.org/papers/v21/19-248.html
 
     Parameters
     ----------
@@ -192,3 +194,88 @@ class SARAHFunction(ApproximateGradientSumFunction):
 
         out.fill(self._gradient_estimator)
         return out
+
+
+class LSARAHFunction(SARAHFunction):
+
+    r"""
+    The LoopLess SARAH (L2S) function calculates the approximate gradient of :math:`\sum_{i=0}^{n-1}f_i`. This is similar to :class:`~cil.optimisation.functions.SARAHFunction`, except the full gradient is calculated at random intervals rather than at a fixed number of iterations. At each iteration, with probability `snapshot_update_probability` a full gradient is calculated and the recursion is restarted, and otherwise an index :math:`i_k` is sampled and the estimator is updated *recursively* from the one returned on the previous iteration:
+
+    .. math ::
+        v_k = n*\nabla f_{i_k}(x_k) - n*\nabla f_{i_k}(x_{k-1}) + v_{k-1},
+
+    where :math:`x_{k-1}` is the point `gradient` was called with on the previous iteration and :math:`v_{k-1}` is the value it returned.
+
+    Note
+    -----
+    Compared with the literature, we multiply by :math:`n`, the number of functions, so that we return an approximate gradient of the whole sum function and not an average gradient.
+
+    Note
+    -----
+    This implements Algorithm 2 of the reference, which covers the convex and non-convex cases. The strongly convex variant (Algorithm 3 of the reference) additionally steps the iterate back, setting :math:`x_k = x_{k-1}` before taking the snapshot, which cannot be done from within a function because it modifies the state of the algorithm.
+
+    Note
+    -----
+    There is no convergence theory for the proximal case. The reference covers the smooth problem only, so combining this function with :class:`~cil.optimisation.algorithms.ISTA` or :class:`~cil.optimisation.algorithms.FISTA` is unsupported: Pham et al. analyse proximal SARAH with a fixed inner loop length, and this reference analyses the loopless method without a proximal term, but neither covers the two together. 
+    Note
+    ----
+    The additional memory requirement is 3 times the image size, the same as for :class:`~cil.optimisation.functions.SARAHFunction`.
+
+    Reference
+    ---------
+    Li, B., Ma, M. and Giannakis, G.B., 2020. On the convergence of SARAH and beyond. Proceedings of the 23rd International Conference on Artificial Intelligence and Statistics, PMLR 108:223-233. https://proceedings.mlr.press/v108/li20a.html
+
+    Parameters
+    ----------
+    functions : `list`  of functions
+        A list of functions: :code:`[f_{0}, f_{1}, ..., f_{n-1}]`. Each function is assumed to be smooth with an implemented :func:`~Function.gradient` method. All functions must have the same domain. The number of functions must be strictly greater than 1.
+    sampler: An instance of a CIL Sampler class ( :meth:`~optimisation.utilities.sampler`) or of another class which has a `next` function implemented to output integers in {0, 1, ..., n-1}.
+        This sampler is called each time gradient is called and  sets the internal `function_num` passed to the `approximate_gradient` function.  Default is `Sampler.random_with_replacement(len(functions))`.
+    snapshot_update_probability: positive float, default: 1/n
+        The probability of calculating a full gradient and restarting the recursion at each iteration, written :math:`1/m` in the reference. The default is :math:`1./n` so, in expectation, a full gradient is calculated every :math:`n` iterations, matching both the default of :class:`~cil.optimisation.functions.LSVRGFunction` and the choice :math:`m = \Theta(n)` used for the complexity results of the reference.
+    seed: int
+        Seed for the random snapshot decisions (generated using numpy.random).
+
+    """
+
+    def __init__(self, functions, sampler=None, snapshot_update_probability=None, seed=None):
+
+        super(LSARAHFunction, self).__init__(functions, sampler=sampler)
+
+        #  The inherited `update_frequency` is unused: the snapshots are decided by `snapshot_update_probability` instead.
+        self.snapshot_update_probability = snapshot_update_probability
+        #  Default snapshot_update_probability for Loopless SARAH
+        if self.snapshot_update_probability is None:
+            self.snapshot_update_probability = 1./self.num_functions
+
+        #  The random generator used to decide if the gradient calculation is a full gradient or an approximate gradient
+        self.generator = np.random.default_rng(seed=seed)
+
+    def gradient(self, x, out=None):
+        r""" Selects a random function using the `sampler` and then calls the approximate gradient at :code:`x` or calculates a full gradient depending on the update probability.
+
+        Parameters
+        ----------
+        x : DataContainer (e.g. ImageData object)
+        out: return DataContainer, if `None` a new DataContainer is returned, default `None`.
+
+        Returns
+        --------
+        DataContainer (e.g. ImageData object)
+            the value of the approximate gradient of the sum function at :code:`x`
+        """
+
+        #  The first call must be a full gradient, to initialise the recursion.
+        if self._sarah_iter_number == 0 or self.generator.uniform() < self.snapshot_update_probability:
+
+            return self._update_full_gradient_and_return(x, out=out)
+
+        else:
+
+            self.function_num = self.sampler.next()
+            if not isinstance(self.function_num, numbers.Number):
+                raise ValueError("Batch gradient is not yet implemented")
+            if self.function_num >= self.num_functions or self.function_num < 0:
+                raise IndexError(
+                    f"The sampler has produced the index {self.function_num} which does not match the expected range of available functions to sample from. Please ensure your sampler only selects from [0,1,...,len(functions)-1] ")
+            return self.approximate_gradient(x, self.function_num, out=out)

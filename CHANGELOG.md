@@ -2,6 +2,7 @@
   - New features:
     - Added `Huber Loss` function (#2281)
     - Added `SARAHFunction`, an `ApproximateGradientSumFunction` implementing the stochastic recursive gradient (SARAH) estimator, which combined with `GD`, `ISTA` or `FISTA` gives SARAH, Prox-SARAH or Acc-Prox-SARAH (#2274)
+    - Added `LSARAHFunction`, the loopless variant of `SARAHFunction` (#2274)
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
 

@@ -77,3 +77,30 @@ class OperatorCompositionFunction(Function):
         self.function.gradient(tmp, out=tmp)
         return self.operator.adjoint(tmp, out=out)
 
+    def proximal(self, x, tau, out=None):
+    
+        if not self.operator.is_orthogonal():
+            raise ValueError("Semi-orthogonality is required for operator.")
+       
+        tmp = self.operator.range_geometry().allocate()
+        self.operator.direct(x, out=tmp)
+    
+        if out is None:
+            return x + (1./self.operator.orthogonal_scalar)*self.operator.adjoint(self.function.proximal(tmp, tau=tau*self.operator.orthogonal_scalar) - tmp)
+        else:
+            self.operator.adjoint(self.function.proximal(tmp, tau=tau*self.operator.orthogonal_scalar) - tmp, out=out)
+            x.sapyb(1., out, 1./(self.operator.orthogonal_scalar), out=out)
+        
+
+
+
+        
+
+
+
+
+        
+            
+
+
+

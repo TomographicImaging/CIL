@@ -456,7 +456,11 @@ class Parallel2D(SystemConfiguration):
 
         if abs(dot_product) < 1e-8:
             return SystemConfiguration.SYSTEM_SIMPLE
-        
+
+        #an offset purely along the ray direction has no effect in parallel geometry
+        vec_a = vec / numpy.sqrt(dot_product)
+        if ComponentDescription.test_parallel(self.ray.direction, vec_a):
+            return SystemConfiguration.SYSTEM_SIMPLE
         else:
             return SystemConfiguration.SYSTEM_OFFSET
 

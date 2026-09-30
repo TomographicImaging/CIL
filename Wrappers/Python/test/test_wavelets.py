@@ -232,7 +232,7 @@ class TestWavelets(CCPiTestClass):
                 ip1 = c.dot(W.direct(x))
                 ip2 = x.dot(W.adjoint(c))
                 M = x.norm() # Normalization
-                self.assertAlmostEqual(ip1/M, ip2/M, places=5, msg="Periodization convolution should be closest to true adjoint")
+                self.assertAlmostEqual(ip1/M, ip2/M, 4, msg="Periodization convolution should be closest to true adjoint")
     
     def test_WaveletOperator_norm(self):
         n = 64

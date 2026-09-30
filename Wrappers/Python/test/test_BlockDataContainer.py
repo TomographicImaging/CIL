@@ -471,7 +471,7 @@ class TestBlockDataContainer(BDCUnittest):
 
         cp0 = BlockDataContainer(data0,data2)
         cp1 = BlockDataContainer(data1,data3)
-    
+
 
         out = cp0 * 0. - 10
 
@@ -485,10 +485,10 @@ class TestBlockDataContainer(BDCUnittest):
         res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
-        
+
         #With out is None
         out = cp0.sapyb(3,cp1,-2, num_threads=4)
-        
+
         self.assertBlockDataContainerEqual(out, res)
 
     def test_sapyb_a_blockdc(self):
@@ -522,10 +522,10 @@ class TestBlockDataContainer(BDCUnittest):
         res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
-        
+
         #With out is None
         out = cp0.sapyb(a,cp1,-2, num_threads=4)
-        
+
         self.assertBlockDataContainerEqual(out, res)
 
 
@@ -559,10 +559,10 @@ class TestBlockDataContainer(BDCUnittest):
         res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
-        
+
         #With out is None
         out = cp0.sapyb(3,cp1, b, num_threads=4)
-        
+
         self.assertBlockDataContainerEqual(out, res)
 
     def test_sapyb_ab_blockdc(self):
@@ -599,10 +599,10 @@ class TestBlockDataContainer(BDCUnittest):
         res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
-        
+
         #With out is None
         out = cp0.sapyb(a,cp1,b, num_threads=4)
-        
+
         self.assertBlockDataContainerEqual(out, res)
 
 
@@ -638,10 +638,10 @@ class TestBlockDataContainer(BDCUnittest):
         res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
-        
+
         #With out is None
         out = cp0.sapyb(a,data1,b, num_threads=4)
-        
+
         self.assertBlockDataContainerEqual(out, res)
 
     def test_BlockDataContainer_mixed_arithmetic(self):
@@ -954,7 +954,7 @@ class TestBlockDataContainerGeometry(BDCUnittest):
         bg = BlockGeometry(ig0, ig1)
         self.assertBlockDataContainerAlmostEqual(bg.allocate(0), cp1)
         self.assertBlockDataContainerAlmostEqual(cp1.geometry.allocate(0), cp1)
-        
+
     def test_pnorm2(self):
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
@@ -968,7 +968,7 @@ class TestBlockDataContainerGeometry(BDCUnittest):
             cp0.pnorm(2)
 
         cp0 = BlockDataContainer(data2,data2)
-        np.testing.assert_allclose(cp0.pnorm(2).as_array(), np.sqrt(1**2 + 1**2)*data2.as_array())
+        np.testing.assert_allclose(cp0.pnorm(2).as_array(), (2**0.5)*data2.as_array())
 
     def test_pnorm1(self):
         ig0 = ImageGeometry(2,3,4)
@@ -988,7 +988,7 @@ class TestBlockDataContainerGeometry(BDCUnittest):
 
     def test_equals(self):
         ig0 = ImageGeometry(2,3,4)
-        
+
         data0 = ig0.allocate(0)
         data2 = ig0.allocate(1)
 
@@ -1007,12 +1007,12 @@ class TestBlockDataContainerGeometry(BDCUnittest):
 
     def test_geometry_None(self):
         ig0 = ImageGeometry(2,3,4)
-        
+
         data0 = ig0.allocate(0)
-        
+
         from cil.framework import DataContainer
         X, Y, Z = 2, 12, 5
-        
+
         a = numpy.ones((X, Y, Z), dtype='float32')
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
 

@@ -50,6 +50,7 @@ Table of Contents
    :maxdepth: 3
    :name: mastertoc
 
+   dependencies
    introduction
    framework
    io

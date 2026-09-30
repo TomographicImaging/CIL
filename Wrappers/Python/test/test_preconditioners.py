@@ -21,19 +21,19 @@ class TestPreconditioners(CCPiTestClass):
         test_precon = MagicMock(None)
         f = LeastSquares(A=A, b=data, c=0.5)
         alg = GD(initial=ig.allocate('random', seed=10), f=f, preconditioner=test_precon,
-                 max_iteration=100, update_objective_interval=1, step_size=0.0000001)
+                 update_objective_interval=1, step_size=0.0000001)
         alg.run(5)
         self.assertEqual(len(test_precon.apply.mock_calls), 5)
         test_precon=Sensitivity(A)
         test_precon.apply = MagicMock(None)
         alg = ISTA(initial=ig.allocate('random', seed=10), f=f, g=IndicatorBox(lower=0), preconditioner=test_precon,
-                   max_iteration=100, update_objective_interval=1, step_size=0.0000001)
+                   update_objective_interval=1, step_size=0.0000001)
         alg.run(5)
         self.assertEqual(len(test_precon.apply.mock_calls), 5)
 
         test_precon = MagicMock(None)
         alg = FISTA(initial=ig.allocate('random', seed=10), f=f, g=IndicatorBox(lower=0), preconditioner=test_precon,
-                    max_iteration=100, update_objective_interval=1, step_size=0.0000001)
+                    update_objective_interval=1, step_size=0.0000001)
         alg.run(5)
         self.assertEqual(len(test_precon.apply.mock_calls), 5)
 
@@ -64,7 +64,7 @@ class TestPreconditioners(CCPiTestClass):
 
         f = LeastSquares(A, data)
         alg = GD(initial=ig.allocate(0), f=f,
-                 max_iteration=100, update_objective_interval=1, step_size=1.)
+                 update_objective_interval=1, step_size=1.)
         alg.gradient_update = ig.allocate(2)
         preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
         self.assertNumpyArrayAlmostEqual(alg.gradient_update.as_array(), np.array([
@@ -85,11 +85,11 @@ class TestPreconditioners(CCPiTestClass):
         preconditioner = Sensitivity(A)
 
         alg = GD(initial=ig.allocate(0), f=f,
-                 max_iteration=100, update_objective_interval=1, step_size=step_size)
+                 update_objective_interval=1, step_size=step_size)
         self.assertEqual(alg.preconditioner, None)
 
         precond_pwls = GD(initial=ig.allocate(0), f=f,   preconditioner=preconditioner,
-                          max_iteration=100, update_objective_interval=1, step_size=step_size)
+                          update_objective_interval=1, step_size=step_size)
 
         def correct_update_objective(alg):
             # SIRT computes |Ax_{k} - b|_2^2
@@ -119,11 +119,11 @@ class TestPreconditioners(CCPiTestClass):
         preconditioner = Sensitivity(A)
 
         alg = ISTA(initial=ig.allocate(0), f=f, g=g,
-                   max_iteration=100, update_objective_interval=1, step_size=step_size)
+                   update_objective_interval=1, step_size=step_size)
         self.assertEqual(alg.preconditioner, None)
 
         precond_pwls = GD(initial=ig.allocate(0), f=f,   preconditioner=preconditioner,
-                          max_iteration=100, update_objective_interval=1, step_size=step_size)
+                          update_objective_interval=1, step_size=step_size)
 
         def correct_update_objective(alg):
             # SIRT computes |Ax_{k} - b|_2^2
@@ -186,7 +186,7 @@ class TestPreconditioners(CCPiTestClass):
 
         f = LeastSquares(A, data)
         alg = GD(initial=ig.allocate(0), f=f,
-                 max_iteration=100, update_objective_interval=1, step_size=1.)
+                 update_objective_interval=1, step_size=1.)
         alg.gradient_update = ig.allocate(1)
         preconditioner.apply(alg, alg.gradient_update, out=alg.gradient_update)
         self.assertNumpyArrayAlmostEqual(preconditioner.freezing_point.as_array(

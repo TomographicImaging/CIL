@@ -74,7 +74,7 @@ class SIRT(Algorithm):
     The preconditioning arrays (weights) :code:`M` and :code:`D` used in SIRT are defined as
 
     .. math:: M = \frac{1}{A\mathbb{1}}
-    
+
     .. math:: D = \frac{1}{A^T\mathbb{1}} 
 
 
@@ -86,18 +86,18 @@ class SIRT(Algorithm):
 
     """
 
-
     def __init__(self, initial=None, operator=None, data=None, lower=None, upper=None, constraint=None, **kwargs):
         """Constructor of SIRT algorithm"""
 
         super(SIRT, self).__init__(**kwargs)
 
-        self.set_up(initial=initial, operator=operator, data=data, lower=lower, upper=upper, constraint=constraint)
+        self.set_up(initial=initial, operator=operator, data=data,
+                    lower=lower, upper=upper, constraint=constraint)
 
     def set_up(self, initial, operator, data, lower=None, upper=None, constraint=None):
         """Initialisation of the algorithm"""
         log.info("%s setting up", self.__class__.__name__)
-        
+
         warning = 0
         if operator is None:
             warning += 1
@@ -109,11 +109,11 @@ class SIRT(Algorithm):
             else:
                 msg = "`data`"
         if warning > 0:
-            raise ValueError(f'You must pass {msg} to the SIRT algorithm' )
-        
+            raise ValueError(f'You must pass {msg} to the SIRT algorithm')
+
         if initial is None:
             initial = operator.domain_geometry().allocate(0)
-        
+
         self.x = initial.copy()
         self.tmp_x = self.x * 0.0
         self.operator = operator
@@ -125,7 +125,7 @@ class SIRT(Algorithm):
         if constraint is None:
             if lower is not None or upper is not None:
                 # IndicatorBox accepts None for lower and/or upper
-                self.constraint=IndicatorBox(lower=lower,upper=upper)
+                self.constraint = IndicatorBox(lower=lower, upper=upper)
 
         self._relaxation_parameter = 1
 
@@ -155,21 +155,24 @@ class SIRT(Algorithm):
 
         """
         if value <= 0 or value >= 2:
-            raise ValueError("Expected relaxation parameter to be in range 0-2. Got {}".format(value))
+            raise ValueError(
+                "Expected relaxation parameter to be in range 0-2. Got {}".format(value))
 
         self._relaxation_parameter = value
         self._set_up_weights()
         self._Dscaled *= self._relaxation_parameter
 
-
     def _set_up_weights(self):
         """Set up the preconditioning arrays M and D"""
-        self.M = 1./self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))
-        self._Dscaled = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
+        self.M = 1. / \
+            self.operator.direct(
+                self.operator.domain_geometry().allocate(value=1.0))
+        self._Dscaled = 1. / \
+            self.operator.adjoint(
+                self.operator.range_geometry().allocate(value=1.0))
 
         for arr in [self.M, self._Dscaled]:
             self._remove_nan_or_inf(arr, replace_with=1.0)
-
 
     def _remove_nan_or_inf(self, datacontainer, replace_with=1.0):
         """Replace nan and inf in datacontainer with a given value.
@@ -190,12 +193,11 @@ class SIRT(Algorithm):
                 self._remove_nan_or_inf(block, replace_with=replace_with)
             return
         tmp = datacontainer.as_array()
-        numpy.nan_to_num(tmp, copy=False, nan=replace_with, posinf=replace_with, neginf=replace_with)
+        numpy.nan_to_num(tmp, copy=False, nan=replace_with,
+                         posinf=replace_with, neginf=replace_with)
         datacontainer.fill(tmp)
 
-
     def update(self):
-
         r""" Performs a single iteration of the SIRT algorithm. The update step for iteration :math:`k` is given by
 
         .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + \omega  D ( A^{T} ( M (b - Ax^{k}) ) ) )
@@ -215,7 +217,7 @@ class SIRT(Algorithm):
             try:
                 self.constraint.proximal(self.x, tau=1, out=self.x)
             except InPlaceError:
-                self.x=self.constraint.proximal(self.x, tau=1)
+                self.x = self.constraint.proximal(self.x, tau=1)
 
     def update_objective(self):
         r""" Appends the current objective value to the list of previous objective values

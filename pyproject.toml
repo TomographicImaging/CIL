@@ -15,6 +15,8 @@ sdist.include = ["Wrappers/Python/cil/version.py"]
 sdist.exclude = ["scripts", "docs", "Wrappers/Python/data", "Wrappers/Python/test", ".*"]
 [tool.scikit-build.wheel.packages]
 cil = "Wrappers/Python/cil"
+[tool.scikit-build.cmake.define]
+CIL_FORCE_IPP = {env="CIL_FORCE_IPP", default="OFF"}
 
 [tool.setuptools]
 package-dir = {"" = "Wrappers/Python"}
@@ -42,12 +44,10 @@ readme = "README.md"
 keywords = ["tomography", "optimisation"]
 dependencies = [
     #"cil-data>=22", # missing from PyPI
-    "dxchange>=0.2.1",  # Minimal release for OLE dtype fix: https://github.com/data-exchange/dxchange/pull/124#issue-3828961474
     "h5py",
     #"ipp==2021.12.*", # PyPI conflicts with conda package
     "numba",
-    "numpy>=1.23, <2.0.0",
-    "olefile>=0.46",
+    "numpy>=1.23,<3",
     "pillow",
     "pywavelets",
     "scipy>=1.4.0",
@@ -57,18 +57,19 @@ dependencies = [
 [project.optional-dependencies]
 plugins = [
     "ipywidgets",
-    #"tomophantom==2.0.0", # [linux] # missing from PyPI
+    "dxchange>=0.2.1",
+    "olefile>=0.46",
+    #"tomophantom>=3.0.3", # [linux] # missing from PyPI
 ]
 gpu = [
-    "astra-toolbox>=1.9.9.dev5,<=2.1", # [not osx]
-    #"tigre>=2.4,<=2.6", # missing from PyPI
+    "astra-toolbox>=2,<3", # [not osx]
+    #"tigre>=3.1.3,<4", # missing from PyPI
 ]
 [dependency-groups]
 test = [
-    #"ccpi-regulariser=24.0.1", # [not osx] # missing from PyPI
+    #"ccpi-regulariser>=24", # [not osx] # missing from PyPI
     "cvxpy",
     "matplotlib-base>=3.3",
-    "packaging",
     "scikit-image",
     "unittest-parametrize",
     "wget",

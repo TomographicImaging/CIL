@@ -149,7 +149,6 @@ class TIFFWriter(object):
             for sliceno in range(self.data_container.shape[0]):
                 # save single slice
                 # pattern = self.file_name.split('.')
-                dimension = self.data_container.dimension_labels[0]
                 fname = "{}_idx_{:04d}.tiff".format(
                     os.path.join(self.dir_name, self.file_name),
                     sliceno + self.counter_offset)
@@ -166,7 +165,6 @@ class TIFFWriter(object):
             for sliceno1 in range(self.data_container.shape[0]):
                 # save single slice
                 # pattern = self.file_name.split('.')
-                dimension = [ self.data_container.dimension_labels[0] ]
                 for sliceno2 in range(self.data_container.shape[1]):
                     fname = format_string.format(os.path.join(self.dir_name, self.file_name),
                         self.data_container.shape[0], self.data_container.shape[1], self.data_container.shape[2],
@@ -533,8 +531,8 @@ class TIFFStackReader(object):
         '''reads the TIFF stack as an ImageData with the provided geometry'''
         data = self.read()
         if len(geometry.shape) == 4:
-            gsize = functools.reduce(lambda x,y: x*y, geometry.shape, 1)
-            dsize = functools.reduce(lambda x,y: x*y, data.shape, 1)
+            gsize = np.prod(geometry.shape)
+            dsize = np.prod(data.shape)
             if gsize != dsize:
                 added_dims = len(geometry.shape) - len(data.shape)
                 if data.shape[0] != functools.reduce(lambda x,y: x*y, geometry.shape[:1+added_dims], 1):

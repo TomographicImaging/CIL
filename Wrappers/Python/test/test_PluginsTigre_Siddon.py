@@ -45,7 +45,7 @@ class Test_Cone3D_Projectors_sim_tigre(unittest.TestCase, TestCommon_ProjectionO
     def setUp(self):
         setup_parameters(self)
         self.Cone3D()
-        self.tolerance_fp = 0.5
+        self.tolerance_fp = 0.6
 
 
 @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")

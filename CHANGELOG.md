@@ -4,7 +4,7 @@
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
   - Bug fixes:
-    - Fix `Parallel2D` `system_description` incorrectly reporting `offset` when the detector and rotation axis are only offset along the ray direction (#2316)
+    - Fix `Parallel2D` `system_description` raising exception for near-zero vectors (#2316)
 
 * 26.0.0
   - New features:
@@ -23,7 +23,6 @@
     - `cilacc` path lookup no longer broken for editable installations (#2257)
     - update `version.py` to use `importlib` & fix tagless installation #2255 (#2269)
     - Fixed behaviour of `ZeissDataReader` when negative values are passed in the ROI (#2244)
-    - Fix `Parallel2D` `system_description` raising exception for near-zero vectors (#2316)
     - Fix `show2D` truncating plots when count is not a multiple of `num_cols` (#2315)
   - Dependencies:
     - `olefile` and `dxchange` are optional dependencies, instead of required (#2209, #2321)

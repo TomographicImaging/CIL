@@ -430,8 +430,8 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         np.testing.assert_allclose(AG.get_angles('degree'), angles, rtol=1E-6)
         np.testing.assert_allclose(AG.get_angles('radian'), np.deg2rad(angles), rtol=1E-6)
 
-        np.testing.assert_allclose(AG.get_angles(include_initial_angle=True), angles + 10.0, rtol=1E-6)
-        np.testing.assert_allclose(AG.get_angles('radian', include_initial_angle=True),
+        np.testing.assert_allclose(AG.get_angles(apply_offset=True), angles + 10.0, rtol=1E-6)
+        np.testing.assert_allclose(AG.get_angles('radian', apply_offset=True),
                                    np.deg2rad(angles + 10.0), rtol=1E-6)
 
         #stored in radians
@@ -441,8 +441,8 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         #the default is still degrees
         np.testing.assert_allclose(AG.get_angles(), angles, rtol=1E-5)
-        np.testing.assert_allclose(AG.get_angles('degree', include_initial_angle=True), angles + 10.0, rtol=1E-5)
-        np.testing.assert_allclose(AG.get_angles('radian', include_initial_angle=True),
+        np.testing.assert_allclose(AG.get_angles('degree', apply_offset=True), angles + 10.0, rtol=1E-5)
+        np.testing.assert_allclose(AG.get_angles('radian', apply_offset=True),
                                    np.deg2rad(angles + 10.0), rtol=1E-5)
 
         #units are not case sensitive

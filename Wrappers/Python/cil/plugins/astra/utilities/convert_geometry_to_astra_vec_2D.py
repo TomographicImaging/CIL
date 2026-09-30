@@ -77,7 +77,7 @@ def convert_geometry_to_astra_vec_2D(volume_geometry, sinogram_geometry_in):
 
     vectors = np.zeros((angles.num_positions, 6))
 
-    for i, theta in enumerate(sinogram_geometry.get_angles(AngleUnit.RADIAN, include_initial_angle=True)):
+    for i, theta in enumerate(sinogram_geometry.get_angles(AngleUnit.RADIAN, apply_offset=True)):
         ang = + theta
 
         rotation_matrix = rotation_matrix_z_from_euler(ang, degrees=False)

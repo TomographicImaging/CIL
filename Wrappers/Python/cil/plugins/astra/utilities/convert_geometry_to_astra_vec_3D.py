@@ -128,7 +128,7 @@ def convert_standard_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry
     #Build for astra 3D only
     vectors = np.zeros((angles.num_positions, 12))
 
-    for i, theta in enumerate(sinogram_geometry.get_angles(AngleUnit.RADIAN, include_initial_angle=True)):
+    for i, theta in enumerate(sinogram_geometry.get_angles(AngleUnit.RADIAN, apply_offset=True)):
         ang = - theta
 
         rotation_matrix = rotation_matrix_z_from_euler(ang, degrees=False)

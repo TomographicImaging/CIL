@@ -30,7 +30,7 @@ class CIL2TIGREGeometry(object):
         tg = TIGREGeometry(ig, ag)
 
         #angles
-        angles = ag.get_angles(AngleUnit.RADIAN, include_initial_angle=True)
+        angles = ag.get_angles(AngleUnit.RADIAN, apply_offset=True)
 
         #convert CIL to TIGRE angles s
         angles += np.pi/2 + tg.theta

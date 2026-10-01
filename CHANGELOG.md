@@ -1,10 +1,13 @@
 * x.x.x
   - New features:
     - Added `Huber Loss` function (#2281)
-    - TIGRE support for tilted rotation axis (laminography) is now avaliable with TIGRE `FBP`, the `matched` back-projector and the `interpolated` forward-projector (#2362)
+    - `AcquisitionGeometry.get_angles` returns the angles in the requested unit, optionally including the initial angle (#2368)
+    - `AcquisitionGeometry.set_initial_angle` updates the initial angle without re-setting the angle data (#2368)
+    - TIGRE support for tilted rotation axis (laminography) is now avaliable with TIGRE `FBP`, the `matched` back-projector and the `interpolated` forward-projector (#2362)    
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
   - Bug fixes:
+    - Fix `Parallel2D` `system_description` raising exception for near-zero vectors (#2316)
     - The interpolated TIGRE cone-beam projector now supports tilted rotation axis (laminography): the previously-broken case (axis pointing at the source) no longer returns zeros (#2362)
 
 * 26.0.0
@@ -18,6 +21,7 @@
     a folder (#2239)
     - Update ASTRA interface to `direct_FP3D/BP3D` removing copies for GPU `ProjectionOperator` calls (#2134)
   - Bug fixes:
+    - `LSQR` now documents and warns that a non-zero scalar `alpha` regularises towards `initial`, minimising `||Ax-b||^2 + alpha^2||x-initial||^2` rather than `||Ax-b||^2 + alpha^2||x||^2` (#2357)
     - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)
     - `cilacc` path lookup no longer broken for editable installations (#2257)

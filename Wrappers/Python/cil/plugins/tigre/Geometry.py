@@ -49,6 +49,7 @@ class CIL2TIGREGeometry(object):
         converter = CIL2TIGREGeometry(ig, ag)
         return converter.tg_geometry, converter.tg_angles
 
+class TIGREGeometry(Geometry):
     def __init__(self, ig, ag):
         if Geometry is object:
             raise ModuleNotFoundError(
@@ -250,10 +251,7 @@ class CIL2TIGREGeometry(object):
     def _convert_angles(self):
         """Convert the CIL scan angles to TIGRE's angle convention, wrapped to (-pi, pi).
         """
-        config = self._ag.config.angles
-        angles = config.angle_data + config.initial_angle
-        if config.angle_unit == AngleUnit.DEGREE:
-            angles *= (np.pi/180.)
+        angles = self._ag.get_angles(AngleUnit.RADIAN, apply_offset=True)
         angles += np.pi/2 + self.theta
         angles *= -1
         return (angles + np.pi) % (2*np.pi) - np.pi

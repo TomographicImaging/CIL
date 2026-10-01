@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.acquisition_geometry &#8212; CIL 26.0.1.dev6+g8d7471f06.d20260930 documentation</title>
+    <title>cil.framework.acquisition_geometry &#8212; CIL 26.0.1.dev7+g1e4bb4330.d20261001 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../../../../_static/documentation_options.js?v=71c2dd9c"></script>
+    <script src="../../../../_static/documentation_options.js?v=32dd1715"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.23.0rc0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev6+g8d7471f06.d20260930';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev7+g1e4bb4330.d20261001';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="26.0.1.dev6+g8d7471f06.d20260930" />
+  <meta name="docsearch:version" content="26.0.1.dev7+g1e4bb4330.d20261001" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -966,24 +966,21 @@
 <span class="sd">            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets</span>
 <span class="sd">        '''</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">test_parallel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">normal</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_ADVANCED</span>
+        
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">create_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">dot_product</span> <span class="o">=</span> <span class="n">vec</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
 
-        <span class="n">rays_perpendicular_detector</span> <span class="o">=</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">test_parallel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">normal</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dot_product</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-8</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_SIMPLE</span>
 
-        <span class="c1">#rotation axis position + ray direction hits detector position</span>
-        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span><span class="p">):</span> <span class="c1">#points are equal so on ray path</span>
-            <span class="n">rotation_axis_centred</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1">#an offset purely along the ray direction has no effect in parallel geometry</span>
+        <span class="n">vec_a</span> <span class="o">=</span> <span class="n">vec</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dot_product</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">test_parallel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="n">vec_a</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_SIMPLE</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">vec_a</span> <span class="o">=</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">create_unit_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
-            <span class="n">rotation_axis_centred</span> <span class="o">=</span> <span class="n">ComponentDescription</span><span class="o">.</span><span class="n">test_parallel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="n">vec_a</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">rays_perpendicular_detector</span><span class="p">:</span>
-            <span class="n">config</span> <span class="o">=</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_ADVANCED</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">rotation_axis_centred</span><span class="p">:</span>
-            <span class="n">config</span> <span class="o">=</span>  <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_OFFSET</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">config</span> <span class="o">=</span>  <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_SIMPLE</span>
-
-        <span class="k">return</span> <span class="n">config</span>
+            <span class="k">return</span> <span class="n">SystemConfiguration</span><span class="o">.</span><span class="n">SYSTEM_OFFSET</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">rotation_axis_on_detector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

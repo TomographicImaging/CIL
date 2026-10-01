@@ -161,7 +161,7 @@ class TestDataContainer(CCPiTestClass):
 
         # Check the equality of two ImageData with different labels
         data_different_labels = data.copy()
-        data_different_labels.geometry.set_labels([ImageDimension("VERTICAL"), ImageDimension("HORIZONTAL_X")])
+        data_different_labels.geometry.set_labels([ImageDimension("HORIZONTAL_Y"), ImageDimension("VERTICAL"), ImageDimension("HORIZONTAL_X")])
         self.assertFalse(data == data_different_labels)
 
 
@@ -397,7 +397,7 @@ class TestDataContainer(CCPiTestClass):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         #vol = ImageData(geometry=vgeometry)
         vol = vgeometry.allocate()
-        self.assertEqual(vol.shape, (2, 3, 4))
+        self.assertEqual(vol.shape, (2, 1, 3, 4))
 
         vol1 = vol + 1
         self.assertNumpyArrayEqual(vol1.as_array(), np.ones(vol.shape))
@@ -416,7 +416,7 @@ class TestDataContainer(CCPiTestClass):
         vol1 = (vol + 2) ** 2
         self.assertNumpyArrayEqual(vol1.as_array(), np.ones(vol.shape) * 4)
 
-        self.assertEqual(vol.number_of_dimensions, 3)
+        self.assertEqual(vol.number_of_dimensions, 4)
 
         ig2 = ImageGeometry (voxel_num_x=2,voxel_num_y=3,voxel_num_z=4,
                      dimension_labels=[ImageDimension["HORIZONTAL_X"], ImageDimension["HORIZONTAL_Y"],
@@ -563,29 +563,30 @@ class TestDataContainer(CCPiTestClass):
     def test_ImageGeometry_allocate(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         image = vgeometry.allocate()
-        self.assertEqual(0,image.as_array()[0][0][0])
+        self.assertEqual(0,image.as_array()[0][0][0][0])
         image = vgeometry.allocate(1)
-        self.assertEqual(1,image.as_array()[0][0][0])
-        default_order = ['channel' , 'horizontal_y' , 'horizontal_x']
+        self.assertEqual(1,image.as_array()[0][0][0][0])
+        default_order = ['channel' , 'vertical', 'horizontal_y' , 'horizontal_x']
         self.assertEqual(default_order[0], image.dimension_labels[0])
         self.assertEqual(default_order[1], image.dimension_labels[1])
         self.assertEqual(default_order[2], image.dimension_labels[2])
-        order = [ 'horizontal_x' , 'horizontal_y', 'channel' ]
+        self.assertEqual(default_order[3], image.dimension_labels[3])
+        order = ['horizontal_x' , 'horizontal_y', 'channel' ]
         vgeometry.set_labels(order)
         image = vgeometry.allocate(0)
-        self.assertEqual(order[0], image.dimension_labels[0])
-        self.assertEqual(order[1], image.dimension_labels[1])
-        self.assertEqual(order[2], image.dimension_labels[2])
+        # ImageGeometry auto adds a 'vertical' dimension if it hasn't been provided:
+        self.assertEqual('vertical', image.dimension_labels[0])
+        self.assertEqual(order[0], image.dimension_labels[1])
+        self.assertEqual(order[1], image.dimension_labels[2])
+        self.assertEqual(order[2], image.dimension_labels[3])
 
         ig = ImageGeometry(2,3,2)
-        try:
-            z = ImageData(np.random.randint(10, size=(2,3)), geometry=ig)
-            self.assertTrue(False)
-        except ValueError as ve:
-            log.info(str(ve))
-            self.assertTrue(True)
 
-        #vgeometry.allocate('')
+        # assert raises value error:
+        with self.assertRaises(ValueError):
+            ImageData(np.random.randint(10, size=(2,3)), geometry=ig)
+
+
     def test_AcquisitionGeometry_allocate(self):
         ageometry = AcquisitionGeometry.create_Parallel3D().set_angles(np.linspace(0, 180, num=10)).set_panel((5,3)).set_channels(2)
         sino = ageometry.allocate(0)
@@ -840,7 +841,7 @@ class TestDataContainer(CCPiTestClass):
 
 
     def test_ImageDataSubset(self):
-        new_order = ['horizontal_x', 'channel', 'horizontal_y']
+        new_order = ['vertical', 'horizontal_x', 'channel', 'horizontal_y']
 
 
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2, dimension_labels=new_order)
@@ -851,16 +852,19 @@ class TestDataContainer(CCPiTestClass):
         vol = vgeometry.allocate()
 
         # test reshape
-        new_order = ['channel', 'horizontal_y','horizontal_x']
+        new_order = ['channel', 'vertical', 'horizontal_y','horizontal_x']
         vol.reorder(new_order)
 
         self.assertListEqual(new_order, list(vol.geometry.dimension_labels))
 
+
+        # We expect getting a slice still maintains all dimensions, unless
+        # we slice on channels:
         ss1 = vol.get_slice(horizontal_x = 0)
-        self.assertListEqual(['channel', 'horizontal_y'], list(ss1.geometry.dimension_labels))
+        self.assertListEqual(['channel','vertical', 'horizontal_y', 'horizontal_x'], list(ss1.geometry.dimension_labels))
 
         ss2 = vol.get_slice(channel=0)
-        self.assertListEqual([ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]], list(ss2.geometry.dimension_labels))
+        self.assertListEqual([ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]], list(ss2.geometry.dimension_labels))
 
         vg = ImageGeometry(3,4,5,channels=2)
         self.assertListEqual([ImageDimension["CHANNEL"], ImageDimension["VERTICAL"],
@@ -869,7 +873,7 @@ class TestDataContainer(CCPiTestClass):
         vol2 = vg.allocate()
 
         ss3 = vol2.get_slice(vertical=0)
-        self.assertListEqual([ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]], 
+        self.assertListEqual([ImageDimension["CHANNEL"], ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]], 
                                 list(ss3.geometry.dimension_labels))
 
 
@@ -930,10 +934,10 @@ class TestDataContainer(CCPiTestClass):
         ig = ImageGeometry(2,2)
         data = ig.allocate(0)
         np_arr = data.as_array()
-        np_arr[0][0] = 0
-        np_arr[0][1] = 1
-        np_arr[1][0] = 2
-        np_arr[1][1] = 3
+        np_arr[0][0][0] = 0
+        np_arr[0][0][1] = 1
+        np_arr[0][1][0] = 2
+        np_arr[0][1][1] = 3
         data.fill(np_arr)
 
         mean = data.mean()
@@ -986,15 +990,14 @@ class TestDataContainer(CCPiTestClass):
         # create ImageData test class
         id = ImageGeometry(2,2,2).allocate(0)
         id.fill(np_arr)
-        id_out = ImageGeometry(2,2).allocate(0)
+        id_out = DataContainer(np.zeros((2,2)), dimension_labels=id.dimension_labels[1:])
         # create complex ImageData test class
         id_complex = ImageGeometry(2,2,2).allocate(0, dtype=complex)
         complex_arr = np.empty((2,2,2), dtype=complex)
         complex_arr.real = np_arr
         complex_arr.imag = np.array([[[7,6],[5,4]],[[3,2],[1,0]]])
         id_complex.fill(complex_arr)
-        id_complex_out = ImageGeometry(2,2).allocate(0, dtype=complex)
-        id_complex_out.fill(np.zeros((2,2), dtype=complex))
+        id_complex_out = DataContainer(np.zeros((2,2), dtype=complex), dimension_labels=id_complex.dimension_labels[1:])
         # create AcquisitionData test class
         ag = AcquisitionGeometry.create_Parallel3D().set_angles(np.linspace(0, 180, num=2)).set_panel((2,2))
         ad = ag.allocate()
@@ -1430,7 +1433,7 @@ class TestDataContainer(CCPiTestClass):
 
 
     def test_fill_dimension_ImageData(self):
-        ig = ImageGeometry(2,3,4)
+        ig = ImageGeometry(voxel_num_x=2,voxel_num_y=3,voxel_num_z=4)
         u = ig.allocate(0)
         a = np.ones((4,2))
         # default_labels = [ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]]
@@ -1439,6 +1442,8 @@ class TestDataContainer(CCPiTestClass):
         axis_number = u.get_dimension_axis('horizontal_y')
 
         u.fill(a, horizontal_y=0)
+
+        a = a.reshape((4,1,2)) # when we slice Image Data it maintains the sliced axis with dimension 1
         np.testing.assert_array_equal(u.get_slice(horizontal_y=0).as_array(), a)
 
         u.fill(2, horizontal_y=1)
@@ -1447,8 +1452,7 @@ class TestDataContainer(CCPiTestClass):
         u.fill(2, horizontal_y=1)
         np.testing.assert_array_equal(u.get_slice(horizontal_y=1).as_array(), 2 * a)
 
-        b = u.get_slice(horizontal_y=2)
-        b.fill(3)
+        b = DataContainer(np.ones((4,2))*3, dimension_labels = ['vertical', 'horizontal_x'])
         u.fill(b, horizontal_y=2)
         np.testing.assert_array_equal(u.get_slice(horizontal_y=2).as_array(), 3 * a)
 

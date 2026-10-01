@@ -190,7 +190,7 @@ class ProjectionOperator_ag(ProjectionOperator):
 
         data = x.as_array()
 
-        if self.tigre_geom.is2D:
+        if self.tigre_geom.is2D and data.ndim == 2:
             data_temp = np.expand_dims(data, axis=0)
             arr_out = self.__call_Ax(data_temp)
             arr_out = np.squeeze(arr_out, axis=1)

@@ -84,7 +84,7 @@ class Test_reorder(unittest.TestCase):
     def test_reorder_with_tuple(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         data = vgeometry.allocate(0)
-        new_order = ('horizontal_y','horizontal_x', 'channel')
+        new_order = ('horizontal_y', 'vertical', 'horizontal_x', 'channel')
         data.reorder(new_order)
         self.assertListEqual(list(new_order), list(data.geometry.dimension_labels))
         self.assertListEqual(list(new_order), list(data.dimension_labels))
@@ -92,7 +92,7 @@ class Test_reorder(unittest.TestCase):
     def test_reorder_with_list(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         data = vgeometry.allocate(0)
-        new_order = ['horizontal_y','horizontal_x', 'channel']
+        new_order = ['horizontal_y','vertical', 'horizontal_x', 'channel']
         data.reorder(new_order)
         self.assertListEqual(list(new_order), list(data.geometry.dimension_labels))
         self.assertListEqual(list(new_order), list(data.dimension_labels))

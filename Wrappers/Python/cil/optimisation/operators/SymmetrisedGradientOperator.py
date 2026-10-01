@@ -70,9 +70,19 @@ class SymmetrisedGradientOperator(LinearOperator):
 
         tmp_gm = len(domain_geometry.geometries)*domain_geometry.geometries
 
+        # The blocks of the domain are the gradients along the dimensions the
+        # GradientOperator differentiates, i.e. the non-singleton dimensions,
+        # without the channels if the correlation is 'Space'. self.ind maps a
+        # block of the domain onto the dimension it was differentiated along.
+        image_geometry = domain_geometry.get_item(0)
+        self.ind = [i for i, size in enumerate(image_geometry.shape) if size > 1]
+
+        if self.correlation == SymmetrisedGradientOperator.CORRELATION_SPACE and \
+            'channel' in getattr(image_geometry, 'dimension_labels', []):
+            self.ind.remove(image_geometry.dimension_labels.index('channel'))
 
         # Define FD operator. We need one geometry from the BlockGeometry of the domain
-        self.FD = FiniteDifferenceOperator(domain_geometry.get_item(0), direction = 0,
+        self.FD = FiniteDifferenceOperator(image_geometry, direction = self.ind[0],
                              bnd_cond = self.bnd_cond)
 
         if domain_geometry.shape[0]==2:
@@ -102,7 +112,7 @@ class SymmetrisedGradientOperator(LinearOperator):
             tmp = []
             for i in range(self.domain_geometry().shape[0]):
                 for j in range(x.shape[0]):
-                    self.FD.direction = i
+                    self.FD.direction = self.ind[i]
                     tmp.append(self.FD.adjoint(x.get_item(j)))
 
             tmp1 = [tmp[i] for i in self.order_ind]
@@ -116,7 +126,7 @@ class SymmetrisedGradientOperator(LinearOperator):
             ind = 0
             for i in range(self.domain_geometry().shape[0]):
                 for j in range(x.shape[0]):
-                    self.FD.direction = i
+                    self.FD.direction = self.ind[i]
                     self.FD.adjoint(x.get_item(j), out=out[ind])
                     ind+=1
             out1 = BlockDataContainer(*[out[i] for i in self.order_ind])
@@ -142,7 +152,7 @@ class SymmetrisedGradientOperator(LinearOperator):
             for k in range(self.domain_geometry().shape[0]):
                 tmp1 = 0
                 for j in range(self.domain_geometry().shape[0]):
-                    self.FD.direction = j
+                    self.FD.direction = self.ind[j]
                     tmp1 += self.FD.direct(x[i])
                     i+=1
                 tmp[k] = tmp1
@@ -156,7 +166,7 @@ class SymmetrisedGradientOperator(LinearOperator):
             for k in range(self.domain_geometry().shape[0]):
                 tmp1 = 0
                 for j in range(self.domain_geometry().shape[0]):
-                    self.FD.direction = j
+                    self.FD.direction = self.ind[j]
                     self.FD.direct(x[i], out=tmp[j])
                     i+=1
                     tmp1+=tmp[j]

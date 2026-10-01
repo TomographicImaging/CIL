@@ -77,7 +77,9 @@ class SimData(object):
         self.ig_single_slice.voxel_num_z = 1
         self.ig_single_slice.center_z = slice_offset*self.ig_roi.voxel_size_z
 
-        self.gold_roi_single_slice = self.img_data.array[slice_index,:,:]
+        # an ImageGeometry always has a vertical dimension, which is a
+        # singleton for the single slice geometry
+        self.gold_roi_single_slice = self.img_data.array[slice_index:slice_index+1,:,:]
 
 
     def _get_roi_2D(self):
@@ -90,13 +92,15 @@ class SimData(object):
         self.ig_roi.center_x = center_offset[1]*self.ig_roi.voxel_size_x
         self.ig_roi.center_y = center_offset[0]*self.ig_roi.voxel_size_y
 
+        # an ImageGeometry always has a vertical dimension, which is a
+        # singleton here, so the two spatial dimensions are the trailing ones
         index_roi = [None]*2
         for i in range(2):
-            ind0 = center_offset[i] + (self.img_data.shape[i] - roi[i])//2
+            ind0 = center_offset[i] + (self.img_data.shape[i+1] - roi[i])//2
             ind1 = ind0 + roi[i]
             index_roi[i] = (ind0, ind1)
 
-        self.gold_roi = self.img_data.array[index_roi[0][0]:index_roi[0][1],index_roi[1][0]:index_roi[1][1]]
+        self.gold_roi = self.img_data.array[:,index_roi[0][0]:index_roi[0][1],index_roi[1][0]:index_roi[1][1]]
 
 
     def Cone3D(self):
@@ -497,7 +501,7 @@ class TestCommon_ProjectionOperator(object):
 
         if AcquisitionType.DIM2 & self.ag.dimension:
             checker = checker[0]
-            res = res[0]
+            res = res[0:1]
 
         if self.ag.geom_type & AcquisitionType.CONE_FLEX:
             ig = create_cone_flex_default_ig(self.ag)
@@ -533,7 +537,7 @@ class TestCommon_ProjectionOperator(object):
 
         if AcquisitionType.DIM2 & self.ag.dimension:
             checker = checker[0]
-            res = res[0]
+            res = res[0:1]
 
         if self.ag.geom_type & AcquisitionType.CONE_FLEX:
             ig = create_cone_flex_default_ig(self.ag)

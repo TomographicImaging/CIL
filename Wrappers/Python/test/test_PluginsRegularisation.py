@@ -144,10 +144,12 @@ class TestPlugin(unittest.TestCase):
         d = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
         ig = ImageGeometry(160, 135, channels=91)
         data = ig.allocate(None)
-        data.fill(d.as_array())
+        # an ImageGeometry always has a vertical dimension, a singleton here
+        data.fill(d.as_array().reshape(data.shape))
         del d
 
-        datarr = data.as_array()
+        # the regularisation toolkit works on the 2D+channel array
+        datarr = data.as_array().squeeze()
         tau = 1.
 
         # CIL defaults
@@ -155,7 +157,7 @@ class TestPlugin(unittest.TestCase):
 
         fcil = TNV()
         outcil = fcil.proximal(data, tau=tau)
-        np.testing.assert_almost_equal(outrgl, outcil.as_array())
+        np.testing.assert_almost_equal(outrgl, outcil.as_array().squeeze())
 
 
     @unittest.skipUnless(has_ccpi_regularisation, "Skipping as CCPi Regularisation Toolkit is not installed")

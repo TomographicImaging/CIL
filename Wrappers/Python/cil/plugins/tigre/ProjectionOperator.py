@@ -190,13 +190,11 @@ class ProjectionOperator_ag(ProjectionOperator):
 
         data = x.as_array()
 
-        if self.tigre_geom.is2D and data.ndim == 2:
-            data_temp = np.expand_dims(data, axis=0)
-            arr_out = self.__call_Ax(data_temp)
+        arr_out = self.__call_Ax(data)
+        if self.tigre_geom.is2D:
+            # if singleton vertical dimension, remove it for CIL AcquisitionData
             arr_out = np.squeeze(arr_out, axis=1)
-        else:
-            arr_out = self.__call_Ax(data)
-
+     
         #if single angle projection remove the dimension for CIL
         if arr_out.shape[0] == 1:
             arr_out = np.squeeze(arr_out, axis=0)

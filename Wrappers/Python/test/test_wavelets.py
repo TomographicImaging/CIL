@@ -25,7 +25,7 @@ class TestWavelets(CCPiTestClass):
         self.assertEqual(W.bnd_cond, 'symmetric')
         self.assertEqual(W._trueAdj, True )
         self.assertEqual(W.level,int(np.log2(min(n,m))))
-        self.assertNumpyArrayEqual(np.array((n,m)), W.domain_geometry().shape)    
+        self.assertNumpyArrayEqual(np.array((1,n,m)), W.domain_geometry().shape)    
                 
         #Check is_linear
         self.assertTrue(W.is_linear())
@@ -51,7 +51,7 @@ class TestWavelets(CCPiTestClass):
         self.assertEqual(W.bnd_cond, 'zero')
         self.assertEqual(W._trueAdj, False)
         self.assertEqual(W.level,0)
-        self.assertNumpyArrayEqual(np.array((n,m)), W.domain_geometry().shape)
+        self.assertNumpyArrayEqual(np.array((1,n,m)), W.domain_geometry().shape)
         
         
     def test_wavelet_norm_init(self):

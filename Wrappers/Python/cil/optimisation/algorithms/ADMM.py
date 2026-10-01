@@ -17,7 +17,10 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 from cil.optimisation.algorithms import Algorithm
+from cil.optimisation.utilities import StepSizeRule, LADMMConstantStepSize
+from cil.optimisation.utilities.StepSizeMethods import _validate_ladmm_step_sizes
 import logging
+import warnings
 
 log = logging.getLogger(__name__)
 
@@ -26,20 +29,20 @@ class LADMM(Algorithm):
     r"""
     LADMM is the Linearized Alternating Direction Method of Multipliers (LADMM).
 
-    The general form of ADMM is given by the following optimization problem: 
-    
+    The general form of ADMM is given by the following optimization problem:
+
     .. math::
-    
+
         \min_{x} f(x) + g(y), \text{ subject to } Ax + By = b
 
-    In CIL, we have implemented the case where :math:`A = Id`, :math:`B = -K`, :math:`b = 0`  which gives 
-    
+    In CIL, we have implemented the case where :math:`A = Id`, :math:`B = -K`, :math:`b = 0`  which gives
+
     .. math::
-        
+
         \min_x f(Kx) + g(x).
-        
+
     The algorithm is given by the following iteration, for :math:`k\geq 1`:
-    
+
     .. math::
 
         \begin{cases}
@@ -47,10 +50,10 @@ class LADMM(Algorithm):
             z_{k} = \mathrm{prox}_{\sigma g} \left(Ax_{k} + u_{k-1}\right) \\
             u_{k} = u_{k-1} + Ax_{k} - z_{k}
         \end{cases}
-        
+
     where :math:`\mathrm{prox}_{\tau f}` is the proximal operator of :math:`f` and :math:`\mathrm{prox}_{\sigma g}` is the proximal operator of :math:`g`.
-    
-    
+
+
     Parameters
     ------------
     operator:  CIL Linear Operator
@@ -59,40 +62,58 @@ class LADMM(Algorithm):
         Convex function with "simple" proximal
     g: CIL Function
         Convex function with "simple" proximal
-    sigma: float, positive, defaults to 1.
-        Positive step size parameter
-    tau: float, positive, defaults to :math:`\frac{\sigma}{\|K\|^{2}}`
-        Positive step size parameter
+    step_size: :class:`~cil.optimisation.utilities.StepSizeRule`, or `list` or `tuple` of length two, optional, default=None
+        Either a LADMM compatible step size rule, or a pair :math:`(\tau, \sigma)` of the primal and dual step
+        sizes. Either entry may be ``None``, in which case :math:`\sigma = 1` and :math:`\tau = \sigma/\|K\|^{2}`.
     initial: DataContainer, defaults to DataContainer filled with zeros
-        Initial guess 
-            
-    
-    Note
-    ----
-    This implementation of ADMM minimises the same objective function as the Primal-Dual Hybrid Gradient (PDHG) method.
-    The main algorithmic difference is that in ADMM we compute the proximal of :math:`f` and :math:`g` 
-    where in the PDHG this is a proximal-conjugate and proximal.
-    
-    
+        Initial guess
+
+    Other Parameters
+    ----------------
+    sigma: float, positive
+        Deprecated. Pass as part of `step_size` instead.
+    tau: float, positive
+        Deprecated. Pass as part of `step_size` instead.
+
+
+
     Note
     -----
     Reference (Section 8) : O’Connor, D., Vandenberghe, L. On the equivalence of the primal-dual hybrid gradient method and Douglas–Rachford splitting. Math. Program. 179, 85–108 (2020). https://doi.org/10.1007/s10107-018-1321-1
 
     """
 
-
-    def __init__(self, f=None, g=None, operator=None, \
-                       tau = None, sigma = 1.,
+    def __init__(self, f=None, g=None, operator=None, step_size=None,
                        initial = None, **kwargs):
 
         """Initialisation of the algorithm."""
 
+        sigma = kwargs.pop('sigma', None)  # To be deprecated
+        tau = kwargs.pop('tau', None)  # To be deprecated
+
+        if step_size is not None and (sigma is not None or tau is not None):  # To be deprecated
+            raise ValueError("The parameters `sigma` and `tau` are being deprecated in favour of `step_size`. You have passed both. Instead please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.")
+
+        if sigma is not None or tau is not None:  # To be deprecated
+            warnings.warn("The parameters `sigma` and `tau` are being deprecated. In the future, please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.", category=DeprecationWarning, stacklevel=2)
+            step_size = (tau, sigma)
+
         super(LADMM, self).__init__(**kwargs)
 
-        self.set_up(f = f, g = g, operator = operator, tau = tau,\
-             sigma = sigma, initial=initial)
+        self.set_up(f = f, g = g, operator = operator, step_size = step_size,
+             initial=initial)
 
-    def set_up(self, f, g, operator, tau = None, sigma=1., initial=None):
+    @property
+    def tau(self):
+        """The primal step-size currently in use. May be updated at each iteration by a step size rule."""
+        return self._tau
+
+    @property
+    def sigma(self):
+        """The dual step-size currently in use. May be updated at each iteration by a step size rule."""
+        return self._sigma
+
+    def set_up(self, f, g, operator, step_size=[None, None], initial=None):
         """Set up of the algorithm."""
         log.info("%s setting up", self.__class__.__name__)
 
@@ -100,12 +121,18 @@ class LADMM(Algorithm):
         self.g = g
         self.operator = operator
 
-        self.tau = tau
-        self.sigma = sigma
-
-        if self.tau is None:
-            normK = self.operator.norm()
-            self.tau = self.sigma / normK ** 2
+        if step_size is None:  # This line can be removed when sigma and tau deprecated
+            step_size = (None, None)
+        if isinstance(step_size, StepSizeRule):
+            if not hasattr(step_size, 'get_initial_step_size'):
+                raise ValueError(
+                    "The step-size rule {} does not provide initial primal/dual step sizes "
+                    "and is not compatible with LADMM.".format(type(step_size).__name__))
+            self.step_size_rule = step_size
+        elif isinstance(step_size, (tuple, list)):
+            self.step_size_rule = LADMMConstantStepSize(step_size=step_size)
+        else:
+            raise ValueError("The `step_size` argument must be either None, a LADMM compatible step size rule or a tuple of (tau, sigma) where sigma is the step size for the dual problem and tau is the step size for the primal problem.")
 
         if initial is None:
             self.x = self.operator.domain_geometry().allocate(0)
@@ -119,12 +146,19 @@ class LADMM(Algorithm):
         self.z = self.operator.range_geometry().allocate(0)
         self.u = self.operator.range_geometry().allocate(0)
 
+        # the first update uses tmp_dir as Kx, so it must hold Kx of the initial point
+        self.operator.direct(self.x, out=self.tmp_dir)
+
+        self._tau, self._sigma = self.step_size_rule.get_initial_step_size(self)
+        _validate_ladmm_step_sizes(self._tau, self._sigma, self.operator)
+
         self.configured = True
 
         log.info("%s configured", self.__class__.__name__)
 
     def update(self):
-        """Performs a single iteration of the LADMM algorithm"""
+        """Performs a single iteration of the LADMM algorithm.
+        """
         self.tmp_dir += self.u
         self.tmp_dir -= self.z
         self.operator.adjoint(self.tmp_dir, out = self.tmp_adj)
@@ -145,6 +179,11 @@ class LADMM(Algorithm):
 
         # update
         self.u -= self.z
+
+        tau, sigma = self.step_size_rule.get_step_size(self)
+        if sigma is not self._sigma:
+            self.u *= sigma / self._sigma #self.u = self.u/rho where rho is the adaptive penalty factor
+        self._tau, self._sigma = tau, sigma
 
     def update_objective(self):
         """Update the objective function value"""

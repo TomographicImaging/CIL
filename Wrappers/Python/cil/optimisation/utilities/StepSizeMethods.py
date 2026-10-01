@@ -23,9 +23,52 @@ import logging
 
 log = logging.getLogger(__name__)
 
+
+def _resolve_ladmm_step_sizes(tau, sigma, operator):
+    """Fills in the LADMM default step sizes: ``sigma = 1.0`` and ``tau = sigma/||K||**2``."""
+    if sigma is None:
+        sigma = 1.0
+    if tau is None:
+        tau = sigma / operator.norm() ** 2
+    _validate_ladmm_step_sizes(tau, sigma, operator)
+    return tau, sigma
+
+
+def _validate_ladmm_step_sizes(tau, sigma, operator):
+    """Checks ``tau`` and ``sigma`` are positive numbers, or arrays matching the domain/range geometry."""
+    for name, value, shape in (
+            ("tau", tau, operator.domain_geometry().shape),
+            ("sigma", sigma, operator.range_geometry().shape)):
+        if isinstance(value, Number):
+            if value <= 0:
+                raise ValueError(
+                    "The step-sizes of LADMM must be positive, got {0} = {1}.".format(name, value))
+        elif hasattr(value, "shape"):
+            if value.shape != shape:
+                raise ValueError(
+                    "The shape of {0} = {1} is not the same as the expected shape = {2}. "
+                    "This step-size rule may not be compatible with LADMM.".format(name, value.shape, shape))
+        else:
+            raise ValueError(
+                "The step-sizes of LADMM must be a positive number or an array-like object (e.g. a DataContainer, "
+                "BlockDataContainer or numpy array) of the expected shape = {0}, got {1} = {2!r} of type {3}. "
+                "This step-size rule may not be compatible with LADMM.".format(
+                    shape, name, value, type(value).__name__))
+
+
 class StepSizeRule(ABC):
     """
     Abstract base class for a step size rule. The abstract method, `get_step_size` takes in an algorithm and thus can access all parts of the algorithm (e.g. current iterate, current gradient, objective functions etc) and from this  should return a float as a step size.
+
+    Notes
+    -----
+    Gradient-based algorithms (:class:`~cil.optimisation.algorithms.GD`, :class:`~cil.optimisation.algorithms.ISTA`,
+    :class:`~cil.optimisation.algorithms.FISTA`) expect :meth:`get_step_size` to return a single scalar and need
+    nothing else. Primal-dual algorithms (:class:`~cil.optimisation.algorithms.LADMM`) additionally require a
+    ``get_initial_step_size(self, algorithm)`` method, called once during set-up, returning the initial
+    ``(tau, sigma)`` pair; their :meth:`get_step_size` is called at the end of each iteration and returns the
+    updated ``(tau, sigma)`` pair. The algorithms check for ``get_initial_step_size`` with ``hasattr`` and raise
+    if an incompatible, gradient-only, rule is passed.
     """
 
     def __init__(self):
@@ -256,3 +299,156 @@ class BarzilaiBorweinStepSizeRule(StepSizeRule):
             self.is_short =  not self.is_short
 
         return ret
+
+
+class LADMMConstantStepSize(StepSizeRule):
+    r"""Step-size rule returning a constant ``(tau, sigma)`` pair for :class:`~cil.optimisation.algorithms.LADMM`.
+
+    Defaults are :math:`\sigma = 1` and :math:`\tau = \sigma/\|K\|^{2}`.
+
+    Parameters
+    ----------
+    step_size : list or tuple of length two, default=[None, None]
+        The primal and dual step sizes :math:`(\tau, \sigma)`. Either entry may be ``None``, in which case the
+        default above is used.
+    """
+
+    def __init__(self, step_size=[None, None]):
+        if len(step_size) != 2:
+            raise ValueError(
+                "step_size should be a list or tuple of length two, step_size = {}".format(step_size))
+        self.tau = step_size[0]
+        self.sigma = step_size[1]
+
+    def get_initial_step_size(self, algorithm):
+        """Returns the initial ``(tau, sigma)``, filling in any defaults from the operator norm."""
+        self.tau, self.sigma = _resolve_ladmm_step_sizes(
+            self.tau, self.sigma, algorithm.operator)
+        return self.tau, self.sigma
+
+    def get_step_size(self, algorithm):
+        """Returns the unchanged ``(tau, sigma)``."""
+        return self.tau, self.sigma
+
+
+class LADMMAdaptiveStepSizeSRA(StepSizeRule):
+    r"""Adaptive penalty selection for :class:`~cil.optimisation.algorithms.LADMM` by spectral radius approximation.
+
+    The LADMM penalty parameter :math:`\rho` rescales the step sizes, :math:`(\tau, \sigma) = (\tau_{0}/\rho, \sigma_{0}/\rho)`
+    This rule re-estimates :math:`\rho` every ``update_interval``
+    iterations as the ratio :math:`\sqrt{p/q}` based on the primal and dual residuals :math:`p` and :math:`q` defined in Lozenski et al. (2026). 
+    If either :math:`p` or :math:`q` is non-positive, the penalty is multiplied or divided by a multiplicative safeguard.
+
+    Parameters
+    ----------
+    initial_step_size : list or tuple of length two, default=[None, 0.9]
+        The base step sizes :math:`(\tau_{0}, \sigma_{0})`. Either entry may be ``None``, in which case
+        :math:`\sigma_{0} = 1` and :math:`\tau_{0} = \sigma_{0}/\|K\|^{2}`. :math:`\sigma_{0}` must not exceed 1
+        and :math:`\tau_{0}\|K\|^{2}` must not exceed 1, else the residual quantities are not non-negative.
+    initial_penalty : float, positive, default=1.0
+        The initial penalty :math:`\rho`.
+    update_interval : int, positive, default=5
+        Number of iterations between penalty updates.
+    penalty_incr, penalty_decr : float, greater than 1, default=10.
+        Multiplicative safeguards used when one of the two residual quantities is non-positive.
+
+    Reference
+    ---------
+    Lozenski, L., McCann, M. T., Wohlberg, B. An Adaptive Multiparameter Penalty Selection Method for
+    Multiconstraint and Multiblock ADMM. IEEE Open Journal of Signal Processing, 7, 410-427 (2026).
+    https://doi.org/10.1109/OJSP.2026.3664275
+    """
+
+    def __init__(self, initial_step_size=[None, 0.9], initial_penalty=1.0,
+                 update_interval=5, penalty_incr=10., penalty_decr=10.):
+        if len(initial_step_size) != 2:
+            raise ValueError(
+                "initial_step_size should be a list or tuple of length two, initial_step_size = {}".format(
+                    initial_step_size))
+        if not (isinstance(initial_penalty, Number) and initial_penalty > 0):
+            raise ValueError(
+                "initial_penalty must be a positive number, got initial_penalty = {}".format(initial_penalty))
+        if not (isinstance(update_interval, int) and update_interval > 0):
+            raise ValueError(
+                "update_interval must be a positive integer, got update_interval = {}".format(update_interval))
+        for name, value in (("penalty_incr", penalty_incr), ("penalty_decr", penalty_decr)):
+            if not (isinstance(value, Number) and value > 1):
+                raise ValueError("{0} must be a number greater than 1, got {0} = {1}".format(name, value))
+
+        self.tau0 = initial_step_size[0]
+        self.sigma0 = initial_step_size[1]
+        self.rho = initial_penalty
+        self.update_interval = update_interval
+        self.penalty_incr = penalty_incr
+        self.penalty_decr = penalty_decr
+
+        self._x_prev = None
+        self._x_prevprev = None
+        self._z_prev = None
+        self._z_prevprev = None
+
+    def get_initial_step_size(self, algorithm):
+        """Resolves the base step sizes, checks the metric preconditions, and returns ``(tau0/rho, sigma0/rho)``."""
+        self.tau0, self.sigma0 = _resolve_ladmm_step_sizes(
+            self.tau0, self.sigma0, algorithm.operator)
+
+        if not isinstance(self.sigma0, Number) or not isinstance(self.tau0, Number):
+            raise ValueError(
+                "LADMMAdaptiveStepSizeSRA requires scalar step sizes, got tau0 = {0!r}, sigma0 = {1!r}.".format(
+                    self.tau0, self.sigma0))
+        if self.sigma0 > 1:
+            raise ValueError(
+                "LADMMAdaptiveStepSizeSRA requires sigma <= 1, got sigma = {}.".format(self.sigma0))
+        if self.tau0 * algorithm.operator.norm() ** 2 > 1:
+            raise ValueError(
+                "LADMMAdaptiveStepSizeSRA requires tau*||K||**2 <= 1, got tau = {0} and ||K|| = {1}.".format(
+                    self.tau0, algorithm.operator.norm()))
+
+        # seed the iterate history with the initial point, so the first update can use it
+        self._x_prev = algorithm.x.copy()
+        self._z_prev = algorithm.z.copy()
+
+        return self.tau0 / self.rho, self.sigma0 / self.rho
+
+    def get_step_size(self, algorithm):
+        """Updates the penalty if this is an update iteration, and returns ``(tau0/rho, sigma0/rho)``."""
+        x = algorithm.x
+        z = algorithm.z
+
+        if (self._x_prevprev is not None
+                and algorithm.iteration % self.update_interval == 1):
+            self._update_penalty(algorithm, x, z)
+
+        self._x_prevprev = self._x_prev
+        self._z_prevprev = self._z_prev
+        self._x_prev = x.copy()
+        self._z_prev = z.copy()
+
+        return self.tau0 / self.rho, self.sigma0 / self.rho
+
+    def _update_penalty(self, algorithm, x, z):
+        """Applies one spectral radius approximation update to ``self.rho``."""
+        operator = algorithm.operator
+        # algorithm.tmp_dir holds K x on exit from LADMM.update()
+        primal_residual = algorithm.tmp_dir - z
+
+        dx = x - self._x_prev
+        dz = z - self._z_prev
+        d2x = x - 2 * self._x_prev + self._x_prevprev
+        d2z = z - 2 * self._z_prev + self._z_prevprev
+
+        p2 = 3 * primal_residual.norm() ** 2
+        p2 += 2 * (1 / self.sigma0 - 1) * d2z.norm() ** 2
+        p2 += (1 / self.tau0) * d2x.norm() ** 2
+        p2 -= operator.direct(d2x).norm() ** 2
+
+        q2 = (2 / self.sigma0 - 1) * dz.norm() ** 2
+        q2 += (1 / self.tau0) * dx.norm() ** 2
+        q2 -= operator.direct(dx).norm() ** 2
+
+        if p2 > 0 and q2 > 0:
+            self.rho *= (p2 / q2) ** 0.5
+        elif p2 <= 0 < q2:
+            self.rho /= self.penalty_decr
+        elif q2 <= 0 < p2:
+            self.rho *= self.penalty_incr

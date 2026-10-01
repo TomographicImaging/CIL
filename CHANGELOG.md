@@ -5,6 +5,8 @@
     - `AcquisitionGeometry.set_initial_angle` updates the initial angle without re-setting the angle data (#2368)
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
+  - Bug fixes:
+    - Fix `Parallel2D` `system_description` raising exception for near-zero vectors (#2316)
 
 * 26.0.0
   - New features:

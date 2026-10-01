@@ -902,10 +902,20 @@ class Test_Parallel2D(unittest.TestCase):
         AG = AcquisitionGeometry.create_Parallel2D(detector_position=[5,0], rotation_axis_position=[5,0])
         self.assertTrue(AG.system_description=='simple')
 
+        #offset along the ray direction has no effect in parallel geometry
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,10], rotation_axis_position=[0,0])
+        self.assertTrue(AG.system_description=='simple')
+
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0,-7], rotation_axis_position=[0,0])
+        self.assertTrue(AG.system_description=='simple')
+
         AG = AcquisitionGeometry.create_Parallel2D(ray_direction=[1,1])
         self.assertTrue(AG.system_description=='advanced')
 
         AG = AcquisitionGeometry.create_Parallel2D(rotation_axis_position=[5,0])
+        self.assertTrue(AG.system_description=='offset')
+
+        AG = AcquisitionGeometry.create_Parallel2D(detector_position=[5,10], rotation_axis_position=[0,0])
         self.assertTrue(AG.system_description=='offset')
 
     def test_get_centre_slice(self):
@@ -1039,6 +1049,9 @@ class Test_Parallel3D(unittest.TestCase):
         self.assertTrue(AG.system_description=='simple')
 
         AG = AcquisitionGeometry.create_Parallel3D(detector_position=[5,0,0], rotation_axis_position=[5,0,0])
+        self.assertTrue(AG.system_description=='simple')
+
+        AG = AcquisitionGeometry.create_Parallel3D(detector_position=[0,10,0], rotation_axis_position=[0,0,0])
         self.assertTrue(AG.system_description=='simple')
 
         AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[5,0,0])

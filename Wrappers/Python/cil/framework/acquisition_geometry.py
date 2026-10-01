@@ -448,24 +448,21 @@ class Parallel2D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''
 
+        if not ComponentDescription.test_parallel(self.ray.direction, self.detector.normal):
+            return SystemConfiguration.SYSTEM_ADVANCED
+        
+        vec = ComponentDescription.create_vector(self.detector.position - self.rotation_axis.position)
+        dot_product = vec.dot(vec)
 
-        rays_perpendicular_detector = ComponentDescription.test_parallel(self.ray.direction, self.detector.normal)
+        if abs(dot_product) < 1e-8:
+            return SystemConfiguration.SYSTEM_SIMPLE
 
-        #rotation axis position + ray direction hits detector position
-        if numpy.allclose(self.rotation_axis.position, self.detector.position): #points are equal so on ray path
-            rotation_axis_centred = True
+        #an offset purely along the ray direction has no effect in parallel geometry
+        vec_a = vec / numpy.sqrt(dot_product)
+        if ComponentDescription.test_parallel(self.ray.direction, vec_a):
+            return SystemConfiguration.SYSTEM_SIMPLE
         else:
-            vec_a = ComponentDescription.create_unit_vector(self.detector.position - self.rotation_axis.position)
-            rotation_axis_centred = ComponentDescription.test_parallel(self.ray.direction, vec_a)
-
-        if not rays_perpendicular_detector:
-            config = SystemConfiguration.SYSTEM_ADVANCED
-        elif not rotation_axis_centred:
-            config =  SystemConfiguration.SYSTEM_OFFSET
-        else:
-            config =  SystemConfiguration.SYSTEM_SIMPLE
-
-        return config
+            return SystemConfiguration.SYSTEM_OFFSET
 
 
     def rotation_axis_on_detector(self):

@@ -427,7 +427,8 @@ class Slicer(DataProcessor):
                 data_out = DataContainer(processed_array,False, self._labels_out)
         else:
             try:
-                out.array = np.asarray(out.array, dtype=np.float32, order='C').reshape(self._shape_out)
+                output_shape = new_geometry.shape if new_geometry is not None else self._shape_out
+                out.array = np.asarray(out.array, dtype=np.float32, order='C').reshape(output_shape)
             except:
                 raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self._shape_out, np.float32, out.array.shape, out.array.dtype))
 

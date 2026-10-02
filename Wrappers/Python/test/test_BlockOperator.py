@@ -552,7 +552,7 @@ class TestBlockOperator(CCPiTestClass):
 
         ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N)
         u = ig.allocate('random_int', seed=3)
-        G = FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann')
+        G = FiniteDifferenceOperator(ig, direction='horizontal_y', bnd_cond = 'Neumann')
         log.info("%s %s", type(u), u.as_array())
         log.info("%s", G.direct(u).as_array())
         # Gradient Operator norm, for one direction should be close to 2

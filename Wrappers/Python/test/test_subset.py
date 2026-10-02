@@ -84,7 +84,7 @@ class Test_reorder(unittest.TestCase):
     def test_reorder_with_tuple(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         data = vgeometry.allocate(0)
-        new_order = ('horizontal_y','horizontal_x', 'channel')
+        new_order = ('horizontal_y', 'vertical', 'horizontal_x', 'channel')
         data.reorder(new_order)
         self.assertListEqual(list(new_order), list(data.geometry.dimension_labels))
         self.assertListEqual(list(new_order), list(data.dimension_labels))
@@ -92,7 +92,7 @@ class Test_reorder(unittest.TestCase):
     def test_reorder_with_list(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         data = vgeometry.allocate(0)
-        new_order = ['horizontal_y','horizontal_x', 'channel']
+        new_order = ['horizontal_y','vertical', 'horizontal_x', 'channel']
         data.reorder(new_order)
         self.assertListEqual(list(new_order), list(data.geometry.dimension_labels))
         self.assertListEqual(list(new_order), list(data.dimension_labels))
@@ -161,12 +161,12 @@ class Test_get_slice(unittest.TestCase):
         self.assertEqual(data_new.shape,(5,))
         numpy.testing.assert_array_equal(data_new.array, arr[1,1,3,:])
 
-    def test_ImageData(self):
+    def test_ImageData(self): 
         ig = ImageGeometry(voxel_num_x=5, voxel_num_y=4, voxel_num_z=3, channels=2,  dimension_labels=['channel','vertical','horizontal_y','horizontal_x'])
         data = ig.allocate(None)
         data_new = data.get_slice(vertical=1)
-        self.assertEqual(data_new.shape,(2,4,5))
-        self.assertEqual(data_new.geometry.dimension_labels,('channel','horizontal_y','horizontal_x'))
+        self.assertEqual(data_new.shape,(2,1,4,5))
+        self.assertEqual(data_new.geometry.dimension_labels,('channel','vertical','horizontal_y','horizontal_x'))
 
     def test_AcquisitionData(self):
         ag = AcquisitionGeometry.create_Parallel3D().set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['channel','angle','vertical','horizontal'])
@@ -205,7 +205,7 @@ class Test_get_slice(unittest.TestCase):
         data = ag.allocate('random')
         data_new = data.get_slice(projection=1)
         self.assertEqual(data_new.shape,(6, 4, 5))
-        self.assertEqual(data_new.geometry.dimension_labels,('channel','vertical','horizontal'))
+        self.assertEqual(data_new.geometry.dimension_labels,('channel', 'vertical','horizontal'))
 
 
 
@@ -266,7 +266,7 @@ class TestSubset(unittest.TestCase):
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         sub = data.get_slice(horizontal_y = 1)
-        self.assertTrue( sub.shape == (2,5,4))
+        self.assertTrue( sub.shape == (2,5,1,4))
 
     def test_ImageDataSubset2a(self):
         non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
@@ -274,7 +274,7 @@ class TestSubset(unittest.TestCase):
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         sub = data.get_slice(horizontal_x = 1)
-        self.assertTrue( sub.shape == (5,3,4))
+        self.assertTrue( sub.shape == (1,5,3,4))
 
     def test_ImageDataSubset3a(self):
         non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
@@ -290,14 +290,21 @@ class TestSubset(unittest.TestCase):
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         sub = data.get_slice(vertical = 1)
-        self.assertTrue( sub.shape == (2,5,3))
+        self.assertTrue( sub.shape == (2,5,3,1))
 
     def test_ImageDataSubset5a(self):
         non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["HORIZONTAL_Y"]]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
         sub = data.get_slice(horizontal_y = 1)
-        self.assertTrue( sub.shape == (2,))
+        #vertica; will be labelled as first dimension by default
+        self.assertTrue( sub.shape == (4,2,1))
+
+    def test_ImageDataCentreSubset(self):
+        data = self.ig.allocate()
+        sub = data.get_centre_slice()
+        sub2 = data.get_slice(vertical='centre')
+        self.assertTrue( sub == sub2)
 
     def test_ImageDataSubset1b(self):
         non_default_dimension_labels = [ImageDimension["HORIZONTAL_X"], ImageDimension["CHANNEL"], ImageDimension["HORIZONTAL_Y"],
@@ -312,7 +319,6 @@ class TestSubset(unittest.TestCase):
         data = self.ig.allocate()
         sub = data.get_slice(channel=0,horizontal_x=0,horizontal_y=0)
         self.assertTrue( sub.shape == (4,))
-
 
     def test_AcquisitionDataAllocate1a(self):
         data = self.ag.allocate()
@@ -429,3 +435,9 @@ class TestSubset(unittest.TestCase):
         sub = data.get_slice(projection = 0)
         sub = sub.get_slice(channel = 0)
         self.assertTrue(sub.shape == (2, 20))
+
+    def test_AcquisitionDataCentreSubset(self):
+        data = self.ag.allocate()
+        sub = data.get_centre_slice()
+        sub2 = data.get_slice(vertical='centre')
+        self.assertTrue( sub == sub2)

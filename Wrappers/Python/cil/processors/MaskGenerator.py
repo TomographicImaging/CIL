@@ -267,20 +267,8 @@ class MaskGenerator(DataProcessor):
 
             # if mean along specific axis
             if axis_index is not None:
-                tile_par = []
-                slice_obj = []
-                for i in range(ndim):
-                    if i == axis_index:
-                        tile_par.append(axis_index)
-                        slice_obj.append(numpy.newaxis)
-                    else:
-                        tile_par.append(1)
-                        slice_obj.append(slice(None, None, 1))
-                tile_par = tuple(tile_par)
-                slice_obj = tuple(slice_obj)
-
-                tmp_mean = numpy.tile((numpy.mean(arr, axis=axis_index))[slice_obj], tile_par)
-                tmp_std = numpy.tile((numpy.std(arr, axis=axis_index))[slice_obj], tile_par)
+                tmp_mean = numpy.mean(arr, axis=axis_index, keepdims=True)
+                tmp_std = numpy.std(arr, axis=axis_index, keepdims=True)
                 mask[numpy.abs(arr - tmp_mean) > self.threshold_factor * tmp_std] = 0
 
             # if global mean
@@ -293,20 +281,8 @@ class MaskGenerator(DataProcessor):
 
             # if median along specific axis
             if axis_index is not None:
-                tile_par = []
-                slice_obj = []
-                for i in range(ndim):
-                    if i == axis_index:
-                        tile_par.append(axis_index)
-                        slice_obj.append(numpy.newaxis)
-                    else:
-                        tile_par.append(1)
-                        slice_obj.append(slice(None, None, 1))
-                tile_par = tuple(tile_par)
-                slice_obj = tuple(slice_obj)
-
-                tmp = numpy.abs(arr - numpy.tile((numpy.median(arr, axis=axis_index))[slice_obj], tile_par))
-                median_absolute_dev = numpy.tile((numpy.median(tmp, axis=axis_index))[slice_obj], tile_par)
+                tmp = numpy.abs(arr - numpy.median(arr, axis=axis_index, keepdims=True))
+                median_absolute_dev = numpy.median(tmp, axis=axis_index, keepdims=True)
                 mask[tmp > dtype_like(self.threshold_factor * c, arr) * median_absolute_dev] = 0
 
             # if global median

@@ -153,8 +153,8 @@ class TestOperator(CCPiTestClass):
 
         mask = ig.allocate(True,dtype=bool)
         amask = mask.as_array()
-        amask[2,1:3] = False
-        amask[0,0] = False
+        amask[0,2,1:3] = False
+        amask[0,0,0] = False
 
         MO = MaskOperator(mask)
 
@@ -247,7 +247,8 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(N, M)
         Id = IdentityOperator(ig)
 
-        FD = FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann')
+
+        FD = FiniteDifferenceOperator(ig, direction = 'horizontal_y', bnd_cond = 'Neumann')
         u = FD.domain_geometry().allocate('random', seed=5)
         res = FD.domain_geometry().allocate(FillType["RANDOM"], seed=6)
         FD.adjoint(u, out=res)
@@ -282,14 +283,15 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_size_x=0.1, voxel_size_y=0.4)
         x = ig.allocate('random', seed=10)
 
-        labels = ["horizontal_y", "horizontal_x"]
+        # the dimensions are ('vertical', 'horizontal_y', 'horizontal_x')
+        labels = [(1, "horizontal_y"), (2, "horizontal_x")]
 
-        for i, dir in enumerate(labels):
+        for i, dir in labels:
             FD1 = FiniteDifferenceOperator(ig, direction=i)
             res1 = FD1.direct(x)
             res1b = FD1.adjoint(x)
 
-            FD2 = FiniteDifferenceOperator(ig, direction=labels[i])
+            FD2 = FiniteDifferenceOperator(ig, direction=dir)
             res2 = FD2.direct(x)
             res2b = FD2.adjoint(x)
 
@@ -301,13 +303,14 @@ class TestOperator(CCPiTestClass):
         ig1 = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=K, voxel_size_x=0.1, voxel_size_y=0.4)
         x = ig1.allocate('random', seed=11)
 
-        labels = ["channel","horizontal_y", "horizontal_x"]
+        # the dimensions are ('channel', 'vertical', 'horizontal_y', 'horizontal_x')
+        labels = [(0, "channel"), (2, "horizontal_y"), (3, "horizontal_x")]
 
-        for i, dir in enumerate(labels):
+        for i, dir in labels:
             FD1 = FiniteDifferenceOperator(ig1, direction=i)
             res1 = FD1.direct(x)
             res1b = FD1.adjoint(x)
-            FD2 = FiniteDifferenceOperator(ig1, direction=labels[i])
+            FD2 = FiniteDifferenceOperator(ig1, direction=dir)
             res2 = FD2.direct(x)
             res2b = FD2.adjoint(x)
 

@@ -80,7 +80,6 @@ def convert_standard_geometry_to_astra_vec_3D(volume_geometry, sinogram_geometry
         #create a 3D astra geom from 2D CIL geometry
         volume_geometry_temp.voxel_num_z = 1
 
-        volume_geometry_temp.voxel_size_z = volume_geometry_temp.voxel_size_x
         panel.pixel_size[1] =  volume_geometry_temp.voxel_size_z * sinogram_geometry.magnification
 
         row = np.zeros((3,1))

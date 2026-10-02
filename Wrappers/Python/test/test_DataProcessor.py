@@ -1448,7 +1448,7 @@ class TestSlicer(unittest.TestCase):
         proc = Slicer(roi)
 
         geometry_gold = ImageGeometry(2,2,1, 2,2,2, -0.5,0, -0.5)
-        data_gold = numpy.squeeze(data_in.array[::2,::2,::2])
+        data_gold = data_in.array[::2,::2,::2]
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()
@@ -1469,6 +1469,17 @@ class TestSlicer(unittest.TestCase):
         self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
+        # test with out and singleton dimension
+        roi = {'horizontal_x': (0, 1, 1)}
+        proc = Slicer(roi)
+        proc.set_input(data_in)
+
+        data_out = proc.process()
+        self.assertEqual(data_out.shape, (2, 3, 1))
+
+        data_out_preallocated = ImageGeometry(1,3,2).allocate(0)
+        proc.process(out=data_out_preallocated)
+        numpy.testing.assert_array_equal(data_out.array, data_out_preallocated.array)
 
     def test_process_data_container(self):
 
@@ -1497,6 +1508,7 @@ class TestSlicer(unittest.TestCase):
         proc.set_input(data_in)
         data_out = proc.process()
         numpy.testing.assert_array_equal(data_gold, data_out.array)
+
 
 class TestCofR_xcorrelation(unittest.TestCase):
     def setUp(self):
@@ -2080,9 +2092,11 @@ class TestPadder(unittest.TestCase):
 
         shape_padded = (3+width*2, 3+width*2)
         arr_gold = numpy.ones((shape_padded), dtype=numpy.float32) * value
-        arr_gold[width:-width,width:-width] = self.data_test.array
+        arr_gold[width:-width,width:-width] = self.data_test.array[0]
 
-        numpy.testing.assert_array_equal(arr_gold, data_out.array)
+        # the geometry is 2D so the output keeps a singleton vertical dimension
+        self.assertEqual(data_out.shape, (1, *shape_padded))
+        numpy.testing.assert_array_equal(arr_gold, data_out.array[0])
 
 
     def test_results_edge(self):
@@ -2114,7 +2128,8 @@ class TestPadder(unittest.TestCase):
         arr_gold[:,0] = [0,0,3,6,6]
         arr_gold[:,-1] = [2,2,5,8,8]
 
-        numpy.testing.assert_array_equal(arr_gold, data_out.array)
+        self.assertEqual(data_out.shape, (1, *shape_padded))
+        numpy.testing.assert_array_equal(arr_gold, data_out.array[0])
 
 
     def test_results_linear_ramp(self):
@@ -2145,7 +2160,8 @@ class TestPadder(unittest.TestCase):
         arr_gold[-2,:] = (arr_gold[-3,:] + arr_gold[-1,:])/2
         arr_gold[:,-2] = (arr_gold[:,-3] + arr_gold[:,-1])/2
 
-        numpy.testing.assert_array_equal(arr_gold, data_out.array)
+        self.assertEqual(data_out.shape, (1, *shape_padded))
+        numpy.testing.assert_array_equal(arr_gold, data_out.array[0])
 
 
     def test_results_reflect(self):
@@ -2176,7 +2192,8 @@ class TestPadder(unittest.TestCase):
         arr_gold[:,0] = [4,1,4,7,4]
         arr_gold[:,-1] = [4,1,4,7,4]
 
-        numpy.testing.assert_array_equal(arr_gold, data_out.array)
+        self.assertEqual(data_out.shape, (1, *shape_padded))
+        numpy.testing.assert_array_equal(arr_gold, data_out.array[0])
 
     def test_results_symmetric(self):
         """
@@ -2206,7 +2223,9 @@ class TestPadder(unittest.TestCase):
         arr_gold[:,0] = [0,0,3,6,6]
         arr_gold[:,-1] = [2,2,5,8,8]
 
-        numpy.testing.assert_array_equal(arr_gold, data_out.array)
+        # the geometry is 2D so the output keeps a singleton vertical dimension
+        self.assertEqual(data_out.shape, (1, *shape_padded))
+        numpy.testing.assert_array_equal(arr_gold, data_out.array[0])
 
 
     def test_results_wrap(self):
@@ -2237,7 +2256,9 @@ class TestPadder(unittest.TestCase):
         arr_gold[:,0] = [8,2,5,8,2]
         arr_gold[:,-1] = [6,0,3,6,0]
 
-        numpy.testing.assert_array_equal(arr_gold, data_out.array)
+        # the geometry is 2D so the output keeps a singleton vertical dimension
+        self.assertEqual(data_out.shape, (1, *shape_padded))
+        numpy.testing.assert_array_equal(arr_gold, data_out.array[0])
 
 
     @unittest.skipUnless(has_tigre and has_nvidia, "TIGRE GPU not installed")
@@ -2332,6 +2353,35 @@ class TestPadder(unittest.TestCase):
         fp_new = PO.direct(phantom_padded)
 
         numpy.testing.assert_allclose(fp_orig.array, fp_new.array, atol=1e-3)
+
+    def test_padder_out_with_2D_ig(self):
+        # Test doesn't pad on singleton dim by default
+        ig2d = ImageGeometry(5, 4)
+        data_in = ig2d.allocate(1)
+
+        proc = Padder.constant(pad_width=2, constant_values=0)
+        proc.set_input(data_in)
+
+        geometry_out = ImageGeometry(9,8,1)
+
+        # Process with out=; must not raise
+        data_out = geometry_out.allocate(0)
+        proc.process(out=data_out)
+        self.assertEqual(data_out.shape, (1, 8, 9))
+
+    def test_padder_with_2D_ig_and_singleton_axis_specified(self):
+        # Test it pads on singleton dim if specified:
+        ig2d = ImageGeometry(5, 4)
+        data_in = ig2d.allocate(2)
+
+        proc = Padder.constant(pad_width={'vertical': (1, 1)}, constant_values=0)
+        proc.set_input(data_in)
+        data_out = proc.get_output()
+
+        self.assertEqual(data_out.shape, (3, 4, 5))
+        numpy.testing.assert_array_equal(data_out.array[0], 0)
+        numpy.testing.assert_array_equal(data_out.array[-1], 0)
+        numpy.testing.assert_array_equal(data_out.array[1], 2)
 
 
 class TestDataProcessor(unittest.TestCase):
@@ -2480,12 +2530,13 @@ class TestMaskGenerator(unittest.TestCase):
 
         data = IG.allocate('random', seed=42)
 
-        data.as_array()[2,3] = float('inf')
-        data.as_array()[4,5] = float('nan')
+        # random 
 
+        data.as_array()[0, 2,3] = float('inf')
+        data.as_array()[0, 4,5] = float('nan')
    
         data_as_image_data = data
-        data_as_data_container = DataContainer(data.as_array().copy())
+        data_as_data_container = DataContainer(data.as_array()[0].copy())
         data_as_acq_data = AcquisitionData(array=data.as_array().copy(), geometry=AG)
 
         data_objects = [data_as_image_data, data_as_data_container, data_as_acq_data]
@@ -2493,6 +2544,7 @@ class TestMaskGenerator(unittest.TestCase):
 
         for i, data in enumerate(data_objects):
             with self.subTest(data_type=data_type_name[i]):
+                data_type = data_type_name[i]
 
                 # check special values - default
                 m = MaskGenerator.special_values()
@@ -2503,6 +2555,8 @@ class TestMaskGenerator(unittest.TestCase):
                 mask_manual[2,3] = 0
                 mask_manual[4,5] = 0
 
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 # check nan
@@ -2512,6 +2566,9 @@ class TestMaskGenerator(unittest.TestCase):
 
                 mask_manual = numpy.ones((10,10), dtype=bool)
                 mask_manual[4,5] = 0
+
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
 
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
@@ -2523,13 +2580,16 @@ class TestMaskGenerator(unittest.TestCase):
                 mask_manual = numpy.ones((10,10), dtype=bool)
                 mask_manual[2,3] = 0
 
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
+
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 # check threshold
-                data.as_array()[2,3] = numpy.random.rand()
-                data.as_array()[4,5] = numpy.random.rand()
-                data.as_array()[6,8] = 100
-                data.as_array()[1,3] = 80
+                data.as_array()[...,2,3] = numpy.random.rand()
+                data.as_array()[...,4,5] = numpy.random.rand()
+                data.as_array()[...,6,8] = 100
+                data.as_array()[...,1,3] = 80
 
                 m = MaskGenerator.threshold(None, 70)
                 m.set_input(data)
@@ -2538,6 +2598,9 @@ class TestMaskGenerator(unittest.TestCase):
                 mask_manual = numpy.ones((10,10), dtype=bool)
                 mask_manual[6,8] = 0
                 mask_manual[1,3] = 0
+
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
 
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
@@ -2548,11 +2611,14 @@ class TestMaskGenerator(unittest.TestCase):
                 mask_manual = numpy.ones((10,10), dtype=bool)
                 mask_manual[6,8] = 0
 
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
+
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 # check quantile
-                data.as_array()[6,8] = 100
-                data.as_array()[1,3] = 80
+                data.as_array()[...,6,8] = 100
+                data.as_array()[...,1,3] = 80
 
                 m = MaskGenerator.quantile(None, 0.98)
                 m.set_input(data)
@@ -2561,6 +2627,9 @@ class TestMaskGenerator(unittest.TestCase):
                 mask_manual = numpy.ones((10,10), dtype=bool)
                 mask_manual[6,8] = 0
                 mask_manual[1,3] = 0
+
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
 
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
@@ -2571,6 +2640,9 @@ class TestMaskGenerator(unittest.TestCase):
                 mask_manual = numpy.ones((10,10), dtype=bool)
                 mask_manual[6,8] = 0
 
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
+
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
 
@@ -2580,22 +2652,29 @@ class TestMaskGenerator(unittest.TestCase):
 
         AG = AcquisitionGeometry.create_Parallel3D().set_panel((200,200)).set_angles(1)
         data = IG.allocate('random', seed=2)
-        data.as_array()[7,4] += 10 * numpy.std(data.as_array()[7,:])
+        data.as_array()[...,7,4] += 10 * numpy.std(data.as_array()[...,7,:])
 
-        data_as_data_container = DataContainer(data.as_array().copy())
+        data_as_data_container = DataContainer(data.as_array()[0].copy())
         data_as_image_data = data
         data_as_acq_data = AcquisitionData(array=data.as_array().copy(), geometry=AG)
         data_objects = [data_as_image_data, data_as_data_container, data_as_acq_data]
+        # the same spatial axis for each data type, as the ImageData also has
+        # a vertical dimension
+        axes = ['horizontal_x', 'dimension_01', 1]
+        axes_y = ['horizontal_y', 'dimension_00', 0]
 
         for i, data in enumerate(data_objects):
             with self.subTest(data_type=data_type_name[i]):
-
-                m = MaskGenerator.mean(axis=1) # this gives horizontal_x for ImageData, or 'dimension_01' for DataContainer
+                data_type = data_type_name[i]
+                m = MaskGenerator.mean(axis=axes[i]) # this gives horizontal_x for ImageData, or 'dimension_01' for DataContainer
                 m.set_input(data)
                 mask = m.process()
 
                 mask_manual = numpy.ones((200,200), dtype=bool)
                 mask_manual[7,4] = 0
+
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
 
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
@@ -2606,15 +2685,21 @@ class TestMaskGenerator(unittest.TestCase):
                 mask_manual = numpy.ones((200,200), dtype=bool)
                 mask_manual[7,4] = 0
 
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
+
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 # check median
-                m = MaskGenerator.median(axis=1)
+                m = MaskGenerator.median(axis=axes[i])
                 m.set_input(data)
                 mask = m.process()
 
                 mask_manual = numpy.ones((200,200), dtype=bool)
                 mask_manual[7,4] = 0
+
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
 
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
@@ -2624,6 +2709,10 @@ class TestMaskGenerator(unittest.TestCase):
 
                 mask_manual = numpy.ones((200,200), dtype=bool)
                 mask_manual[7,4] = 0
+
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
+
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 # check movmean
@@ -2633,15 +2722,21 @@ class TestMaskGenerator(unittest.TestCase):
 
                 mask_manual = numpy.ones((200,200), dtype=bool)
                 mask_manual[7,4] = 0
+
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 #
-                m = MaskGenerator.mean(window=20, axis=0) # this gives horizontal_y for ImageData, or 'dimension_00' for DataContainer
+                m = MaskGenerator.mean(window=20, axis=axes_y[i]) # this gives horizontal_y for ImageData, or 'dimension_00' for DataContainer
                 m.set_input(data)
                 mask = m.process()
 
                 mask_manual = numpy.ones((200,200), dtype=bool)
                 mask_manual[7,4] = 0
+
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 m = MaskGenerator.mean(window=10, threshold_factor=10)
@@ -2649,6 +2744,8 @@ class TestMaskGenerator(unittest.TestCase):
                 mask = m.process()
 
                 mask_manual = numpy.ones((200,200), dtype=bool)
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 # check movmedian
@@ -2658,6 +2755,8 @@ class TestMaskGenerator(unittest.TestCase):
 
                 mask_manual = numpy.ones((200,200), dtype=bool)
                 mask_manual[7,4] = 0
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
                 # check movmedian
@@ -2667,6 +2766,8 @@ class TestMaskGenerator(unittest.TestCase):
 
                 mask_manual = numpy.ones((200,200), dtype=bool)
                 mask_manual[7,4] = 0
+                if data_type == 'ImageData':
+                    mask_manual = numpy.expand_dims(mask_manual, axis=0)
                 numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
 class TestTransmissionAbsorptionConverter(unittest.TestCase):
@@ -2768,13 +2869,12 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
 class TestMasker(unittest.TestCase):
 
     def setUp(self):
-        IG_2D = ImageGeometry(voxel_num_x=10,
-                        voxel_num_y=10)
+        array_2D = numpy.random.rand(10,10)
         IG_3D = ImageGeometry(voxel_num_x=5, 
                             voxel_num_y=5,
                             voxel_num_z=5)
         
-        self.data_2D_init = IG_2D.allocate('random', seed=42)
+        self.data_2D_init = DataContainer(array_2D, dimension_labels=['horizontal_y', 'horizontal_x'])
         self.data_3D_init = IG_3D.allocate('random', seed=42)
 
         self.data_2D = self.data_2D_init.copy()
@@ -2827,8 +2927,6 @@ class TestMasker(unittest.TestCase):
         mask = self.mask_3D_manual.copy()
         self.Masker_check(self.mask_3D_manual, self.data_3D, self.data_3D_init, self.mask_coords_3D)
         numpy.testing.assert_array_equal(mask.as_array(), self.mask_3D_manual.as_array())
-
-
 
     def test_Masker_doesnt_modify_input_integer_mask(self):
         mask = self.mask_int_manual.copy()
@@ -2895,19 +2993,15 @@ class TestMasker(unittest.TestCase):
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6) 
         
         # test axis str
-        m = Masker.mean(mask=mask, axis=data.dimension_labels[1])
+        m = Masker.mean(mask=mask, axis='horizontal_x')
         m.set_input(data)
         res = m.process()
 
         data_test = data.copy().as_array()
         for mask_coord in mask_coords:
             # get elements in mask_coord:
-            if len(mask_coord) == 2:
-                x, y = mask_coord
-                tmp = data.as_array()[x,:][numpy.isfinite(data.as_array()[x,:])]
-            else:
-                x, y, z = mask_coord
-                tmp = data.as_array()[x,:,z][numpy.isfinite(data.as_array()[x,:,z])]
+            # horizontal_x is the last dimension of both the 2D and the 3D data
+            tmp = data.as_array()[mask_coord[:-1]][numpy.isfinite(data.as_array()[mask_coord[:-1]])]
             data_test[mask_coord] = numpy.sum(tmp) / len(tmp)
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)

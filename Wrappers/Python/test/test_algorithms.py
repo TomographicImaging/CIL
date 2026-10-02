@@ -844,7 +844,6 @@ class TestPDHG(CCPiTestClass):
         # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
         data = dataexample.PEPPERS.get(size=(256, 256))
         ig = data.geometry
-        ag = ig
 
         which_noise = 0
         # Create noisy data.

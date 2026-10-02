@@ -285,7 +285,7 @@ class FGP_TV(TV_Base):
             self.alpha *= scalar
             return self
     def check_input(self, input):
-        if len(input.shape) > 3:
+        if sum(1 for i in input.shape if i!=1) > 3:
             raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
 
 class TGV(RegulariserFunction):
@@ -371,9 +371,10 @@ class TGV(RegulariserFunction):
         # f = alpha * f
 
     def check_input(self, input):
-        if len(input.shape) == 2:
+        ndim = sum(1 for i in input.shape if i!=1)
+        if ndim == 2:
             self.LipshitzConstant = 12
-        elif len(input.shape) == 3:
+        elif ndim == 3:
             self.LipshitzConstant = 16 # Vaggelis to confirm
         else:
             raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
@@ -456,8 +457,8 @@ class FGP_dTV(RegulariserFunction):
             return self
 
     def check_input(self, input):
-        if len(input.shape) > 3:
-            raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
+        if sum(1 for i in input.shape if i!=1) > 3:
+            raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.shape))
 
 class TNV(RegulariserFunction):
 
@@ -483,13 +484,14 @@ class TNV(RegulariserFunction):
 
     def proximal_numpy(self, in_arr, tau):
         # remove any dimension of size 1
+        shape = in_arr.shape
         in_arr = np.squeeze(in_arr)
 
         res = regularisers.TNV(in_arr,
               self.alpha * tau,
               self.max_iteration,
               self.tolerance)
-        return res, []
+        return res.reshape(shape), []
 
     def convex_conjugate(self, x):
         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
@@ -509,7 +511,8 @@ class TNV(RegulariserFunction):
         '''TNV requires 2D+channel data with the first dimension as the channel dimension'''
         if isinstance(input, DataContainer):
             ImageDimension.check_order_for_engine('cil', input.geometry)
-            if ( input.geometry.channels == 1 ) or ( not input.geometry.ndim == 3) :
+            # discard any dimension of size 1
+            if ( input.geometry.channels == 1 ) or ( sum(1 for i in input.shape if i!=1) != 3) :
                 raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
         else:
             # if it is not a CIL DataContainer we assume that the data is passed in the correct order

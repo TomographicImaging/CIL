@@ -286,6 +286,14 @@ class ImageGeometry(metaclass=BackwardCompat):
     def get_centre_slice(self):
         '''
         Returns a new ImageGeometry of the centre slice in the vertical direction.
+
+        Example
+        -------
+        >>> ig = ImageGeometry(voxel_num_x=128, voxel_num_y=128, voxel_num_z=9)
+        >>> ig_slice = ig.get_slice(vertical=4)
+        >>> ig_slice_2 = ig.get_slice(vertical='centre')
+        >>> ig_slice == ig_slice_2
+        True
         '''
         return self.get_slice(vertical='centre')
 

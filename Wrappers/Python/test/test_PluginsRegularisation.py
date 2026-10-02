@@ -144,7 +144,8 @@ class TestPlugin(unittest.TestCase):
         d = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
         ig = ImageGeometry(160, 135, channels=91)
         data = ig.allocate(None)
-        # an ImageGeometry always has a vertical dimension, a singleton here
+        # dataexample array is acquisition data with 3 dims
+        # we are filling image data with 4 dims (as always has singelton vertical dim):
         data.fill(d.as_array().reshape(data.shape))
         del d
 

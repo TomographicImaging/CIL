@@ -213,6 +213,10 @@ class ImageGeometry(metaclass=BackwardCompat):
         self.dimension_labels = kwargs.get('dimension_labels', None)
         self.dtype = kwargs.get('dtype', numpy.float32)
 
+        if self.voxel_size_x != self.voxel_size_y != self.voxel_size_z:
+            warnings.warn("Created ImageGeometry with non-cubic voxels. Voxel sizes: ({}, {}, {})".format(
+                self.voxel_size_x, self.voxel_size_y, self.voxel_size_z), UserWarning)
+
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
         '''

@@ -117,11 +117,14 @@ class TIGREGeometry(Geometry):
         if AcquisitionType.DIM2 & ag_in.dimension:
             self.is2D = True
 
-            #fix IG to single slice in z
-            self.nVoxel[0]=1
-            self.dVoxel[0]= ag_in.config.panel.pixel_size[1] / ag_in.magnification
-
             self.offOrigin = np.array( [0, 0, 0] )
+
+            if ig.voxel_num_z != 1:
+                #fix IG to single slice in z
+                self.nVoxel[0] = 1
+                self.dVoxel[0] = ag_in.config.panel.pixel_size[1] / ag_in.magnification
+            else:
+                self.offOrigin[0] += ig.center_z
 
             # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
             if ag_in.geom_type == 'cone':

@@ -281,7 +281,7 @@ class TestCommon_ProjectionOperator_TOY(object):
 
         ig_test_1 = ag_test_1.get_ImageGeometry()
         norm_1 = 4
-        self.test_geometries.append((ag_test_1, ig_test_1, 4))
+        self.test_geometries.append((ag_test_1, ig_test_1, norm_1))
 
 
         ag_test_2 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,0])\

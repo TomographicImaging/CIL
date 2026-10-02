@@ -149,9 +149,13 @@ Implemented examples are:
 PDHG
 ----
 .. autoclass:: cil.optimisation.algorithms.PDHG
-   :members: update, set_step_sizes, update_step_sizes, update_objective
+   :members: update, update_objective, check_convergence
    :member-order: bysource
    :inherited-members: run, update_objective_interval
+
+The primal and dual step sizes of PDHG are controlled by a step-size rule passed via the
+``step_size`` argument. See :ref:`PDHG step-size rules` for the available rules, including
+adaptive and Bayesian-optimisation options.
 
 LADMM
 -----
@@ -192,8 +196,12 @@ Each iteration considers just one index of the sum, potentially reducing computa
 
 
 .. autoclass:: cil.optimisation.algorithms.SPDHG
-   :members: update, set_step_sizes, set_step_sizes_from_ratio, update_objective
+   :members: update, update_objective, check_convergence
    :inherited-members: run, update_objective_interval
+
+The primal step size and the per-operator dual step sizes of SPDHG are controlled by a
+step-size rule passed via the ``step_size`` argument. See :ref:`SPDHG step-size rules` for the
+available rules.
 
 
 Approximate gradient methods
@@ -714,16 +722,18 @@ In each iteration of the :code:`TestAlgo`, the objective :math:`x` is reduced by
     15%|███                 | 3/20 [00:00<00:00, 11770.73it/s, objective=3.05e-5]
 
 
-Step size methods 
+Step size methods
 ------------------
-A step size method is a class which acts on an algorithm and can be passed to  `cil.optimisation.algorithm.GD`, `cil.optimisation.algorithm.ISTA`  `cil.optimisation.algorithm.FISTA` and it's method `get_step_size` is called after the calculation of the gradient before the gradient descent step is taken. It outputs a float value to be used as the step-size. 
+A step size method is a class which acts on an algorithm and can be passed to a selection of the CIL algorithms.
 
 Currently in CIL we have a base class:
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.StepSizeRule
    :members:
 
-We also have a number of example classes:
+Gradient-based step-size rules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+For the gradient based algorithms `cil.optimisation.algorithms.GD`, `cil.optimisation.algorithms.ISTA` and `cil.optimisation.algorithms.FISTA`, the method `get_step_size` is called after the calculation of the gradient, before the gradient descent step is taken. It outputs a single float value to be used as the step-size.
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.ConstantStepSize
    :members:
@@ -733,6 +743,52 @@ We also have a number of example classes:
 
 .. autoclass:: cil.optimisation.utilities.StepSizeMethods.BarzilaiBorweinStepSizeRule
    :members:
+
+.. _PDHG step-size rules:
+
+PDHG step-size rules
+~~~~~~~~~~~~~~~~~~~~~~
+For `cil.optimisation.algorithms.PDHG`, the rule's `get_initial_step_size` method sets the initial primal and dual step sizes during set-up, and `get_step_size` is called at the end of each iteration to output the primal and dual step sizes for the next iteration. The rules below span four strategies: a fixed step size (`PDHGConstantStepSize`); acceleration exploiting strong convexity (`PDHGStronglyConvexUpdate`); per-iteration backtracking with residual balancing (`PDHGAdaptiveStepSize2013`, `PDHGAdaptiveStepSize2015`); and a one-off Bayesian-optimisation search for the best step-size ratio (`PDHGBayesOptimisationStepSize`). The two adaptive rules are faster but memory-hungry, while the Bayesian-optimisation rule trades compute time for lower memory use.
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.PDHGConstantStepSize
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.PDHGStronglyConvexUpdate
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.PDHGAdaptiveStepSize2013
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.PDHGAdaptiveStepSize2015
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.PDHGBayesOptimisationStepSize
+   :members:
+   :inherited-members:
+
+.. _SPDHG step-size rules:
+
+SPDHG step-size rules
+~~~~~~~~~~~~~~~~~~~~~~~
+For `cil.optimisation.algorithms.SPDHG`, the rule's `get_initial_step_size` method sets the initial step sizes during set-up and `get_step_size` is called at the end of each iteration. Here the primal step size ``tau`` is a scalar while the dual step size ``sigma`` is a list with one entry per operator. The rules below span a fixed step size (`SPDHGConstantStepSize`), a fixed primal/dual ratio (`SPDHGStepSizesFromRatio`), a one-off Bayesian-optimisation search for the best ratio (`SPDHGBayesOptimisationStepSize`), and two per-iteration adaptive rules from :cite:`chambolle2023stochastic` that rescale the step sizes as the algorithm runs — one balancing the primal and dual progress residuals (`SPDHGAdaptiveStepSizeBalancing`) and one exploiting the alignment of successive primal directions (`SPDHGAdaptiveStepSizeAngle`).
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.SPDHGConstantStepSize
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.SPDHGStepSizesFromRatio
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.SPDHGBayesOptimisationStepSize
+   :members:
+   :inherited-members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.SPDHGAdaptiveStepSizeBalancing
+   :members:
+   :inherited-members:
+
+.. autoclass:: cil.optimisation.utilities.StepSizeMethods.SPDHGAdaptiveStepSizeAngle
+   :members:
+   :inherited-members:
 
 
 

@@ -2833,7 +2833,7 @@ class TestMasker(unittest.TestCase):
                             voxel_num_y=5,
                             voxel_num_z=5)
         
-        self.data_2D_init = DataContainer(array_2D) # TODO: add labels
+        self.data_2D_init = DataContainer(array_2D, dimension_labels=['horizontal_y', 'horizontal_x'])
         self.data_3D_init = IG_3D.allocate('random', seed=42)
 
         self.data_2D = self.data_2D_init.copy()
@@ -2886,8 +2886,6 @@ class TestMasker(unittest.TestCase):
         mask = self.mask_3D_manual.copy()
         self.Masker_check(self.mask_3D_manual, self.data_3D, self.data_3D_init, self.mask_coords_3D)
         numpy.testing.assert_array_equal(mask.as_array(), self.mask_3D_manual.as_array())
-
-
 
     def test_Masker_doesnt_modify_input_integer_mask(self):
         mask = self.mask_int_manual.copy()
@@ -2954,20 +2952,15 @@ class TestMasker(unittest.TestCase):
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6) 
         
         # test axis str
-        axis_string = 2 if data.shape[0] == 1 else 1 #TODO: just use string
-        m = Masker.mean(mask=mask, axis=data.dimension_labels[axis_string])
+        m = Masker.mean(mask=mask, axis='horizontal_x')
         m.set_input(data)
         res = m.process()
 
         data_test = data.copy().as_array()
         for mask_coord in mask_coords:
             # get elements in mask_coord:
-            if len(mask_coord) == 2:
-                x, y = mask_coord
-                tmp = data.as_array()[x,:][numpy.isfinite(data.as_array()[x,:])]
-            else:
-                x, y, z = mask_coord
-                tmp = data.as_array()[x,:,z][numpy.isfinite(data.as_array()[x,:,z])]
+            # horizontal_x is the last dimension of both the 2D and the 3D data
+            tmp = data.as_array()[mask_coord[:-1]][numpy.isfinite(data.as_array()[mask_coord[:-1]])]
             data_test[mask_coord] = numpy.sum(tmp) / len(tmp)
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)

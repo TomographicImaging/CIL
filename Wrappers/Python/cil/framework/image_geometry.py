@@ -17,7 +17,6 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 import copy
 import warnings
-from numbers import Number
 
 import numpy
 

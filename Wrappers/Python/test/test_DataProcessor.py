@@ -1469,6 +1469,17 @@ class TestSlicer(unittest.TestCase):
         self.assertEqual(data_out.geometry, geometry_gold,
         msg="Slicer failed with geometry mismatch. Got:\n{0}\nExpected:\n{1}".format(data_out.geometry, geometry_gold))
 
+        # test with out and singleton dimension
+        roi = {'horizontal_x': (0, 1, 1)}
+        proc = Slicer(roi)
+        proc.set_input(data_in)
+
+        data_out = proc.process()
+        self.assertEqual(data_out.shape, (2, 3, 1))
+
+        data_out_preallocated = ImageGeometry(1,3,2).allocate(0)
+        proc.process(out=data_out_preallocated)
+        numpy.testing.assert_array_equal(data_out.array, data_out_preallocated.array)
 
     def test_process_data_container(self):
 
@@ -1497,6 +1508,7 @@ class TestSlicer(unittest.TestCase):
         proc.set_input(data_in)
         data_out = proc.process()
         numpy.testing.assert_array_equal(data_gold, data_out.array)
+
 
 class TestCofR_xcorrelation(unittest.TestCase):
     def setUp(self):
@@ -2341,6 +2353,35 @@ class TestPadder(unittest.TestCase):
         fp_new = PO.direct(phantom_padded)
 
         numpy.testing.assert_allclose(fp_orig.array, fp_new.array, atol=1e-3)
+
+    def test_padder_out_with_2D_ig(self):
+        # Test doesn't pad on singleton dim by default
+        ig2d = ImageGeometry(5, 4)
+        data_in = ig2d.allocate(1)
+
+        proc = Padder.constant(pad_width=2, constant_values=0)
+        proc.set_input(data_in)
+
+        geometry_out = ImageGeometry(9,8,1)
+
+        # Process with out=; must not raise
+        data_out = geometry_out.allocate(0)
+        proc.process(out=data_out)
+        self.assertEqual(data_out.shape, (1, 8, 9))
+
+    def test_padder_with_2D_ig_and_singleton_axis_specified(self):
+        # Test it pads on singleton dim if specified:
+        ig2d = ImageGeometry(5, 4)
+        data_in = ig2d.allocate(2)
+
+        proc = Padder.constant(pad_width={'vertical': (1, 1)}, constant_values=0)
+        proc.set_input(data_in)
+        data_out = proc.get_output()
+
+        self.assertEqual(data_out.shape, (3, 4, 5))
+        numpy.testing.assert_array_equal(data_out.array[0], 0)
+        numpy.testing.assert_array_equal(data_out.array[-1], 0)
+        numpy.testing.assert_array_equal(data_out.array[1], 2)
 
 
 class TestDataProcessor(unittest.TestCase):

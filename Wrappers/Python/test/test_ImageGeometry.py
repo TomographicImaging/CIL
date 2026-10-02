@@ -17,6 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
+import warnings
 from utils import initialise_tests
 from cil.framework import ImageGeometry
 from cil.framework.labels import ImageDimension
@@ -112,3 +113,75 @@ class TestImageGeometry(unittest.TestCase):
         new_dimension_labels = [ImageDimension["HORIZONTAL_Y"], ImageDimension["CHANNEL"], ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_X"]]
         self.ig.set_labels(new_dimension_labels)
         self.assertTrue( self.ig.shape == (3,5,4,2))
+
+    # voxel_num setters -------------------------------------------------------------------------------------------------------------
+
+    def test_voxel_num_zero_saved_as_one_in_constructor(self):
+        # ImageGeometry always has a vertical dimension
+        for axis in ['voxel_num_x', 'voxel_num_y', 'voxel_num_z']:
+            with self.subTest(axis=axis):
+                with self.assertWarns(UserWarning):
+                    ig = ImageGeometry(**{axis: 0})
+                self.assertEqual(getattr(ig, axis), 1)
+
+    def test_voxel_num_zero_saved_as_one_in_setter(self):
+        ig = ImageGeometry(2, 3, 4)
+        with self.assertWarns(UserWarning):
+            ig.voxel_num_z = 0
+        self.assertEqual(ig.voxel_num_z, 1)
+
+    def test_voxel_num_z_zero_or_one_gives_single_slice_3D_geometry(self):
+        igs = []
+        with self.assertWarns(UserWarning):
+            ig = ImageGeometry(2, 3, 0)
+        igs.append(ig)
+        igs.append(ImageGeometry(2, 3, 1))
+        for ig in igs:
+            self.assertEqual(ig.shape, (1, 3, 2))
+            self.assertEqual(ig.ndim, 3)
+            self.assertEqual(ig.dimension_labels,
+                             (ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]))
+
+    def test_voxel_num_valid_values_not_changed(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            ig = ImageGeometry(2, 3, 4)
+        self.assertEqual((ig.voxel_num_x, ig.voxel_num_y, ig.voxel_num_z), (2, 3, 4))
+        # check for no warnings:
+        self.assertEqual([str(w.message) for w in caught], [])
+
+    # set_labels validation ---------------------------------------------------------------------------------------------------------
+
+    def test_set_labels_inserts_missing_vertical(self):
+        ig = ImageGeometry(2, 3, 4)
+        with self.assertWarns(UserWarning):
+            ig.set_labels(['horizontal_y', 'horizontal_x'])
+        self.assertEqual(ig.dimension_labels,
+                         (ImageDimension["VERTICAL"], ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]))
+        self.assertEqual(ig.shape, (4, 3, 2))
+
+    def test_set_labels_inserts_missing_vertical_with_channels(self):
+        ig = ImageGeometry(2, 3, 4, channels=5)
+        with self.assertWarns(UserWarning):
+            ig.set_labels(['channel', 'horizontal_y', 'horizontal_x'])
+        # vertical is prepended, the rest of the requested order is preserved
+        self.assertEqual(ig.dimension_labels,
+                         (ImageDimension["VERTICAL"], ImageDimension["CHANNEL"],
+                          ImageDimension["HORIZONTAL_Y"], ImageDimension["HORIZONTAL_X"]))
+        self.assertEqual(ig.shape, (4, 5, 3, 2))
+
+    def test_set_labels_missing_horizontal_x(self):
+        ig = ImageGeometry(2, 3, 4)
+        with self.assertRaises(ValueError):
+            ig.set_labels(['vertical', 'horizontal_y'])
+
+    def test_set_labels_missing_horizontal_y(self):
+        ig = ImageGeometry(2, 3, 4)
+        with self.assertRaises(ValueError):
+            ig.set_labels(['vertical', 'horizontal_x'])
+
+    def test_set_labels_none(self):
+        ig = ImageGeometry(2, 3, 4)
+        before = ig.dimension_labels
+        ig.set_labels(None)
+        self.assertEqual(ig.dimension_labels, before)

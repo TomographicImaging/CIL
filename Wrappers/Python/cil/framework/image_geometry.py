@@ -219,6 +219,9 @@ class ImageGeometry(metaclass=BackwardCompat):
         '''
         Returns a new ImageGeometry of a single slice in the requested direction.
 
+        This is a 2D slice in 3D space, with offset calculated from where it was in the 3D original object.
+        The slice is placed at the location where it was requested. The offset is the distance of the slice from the centre.
+
         Parameters
         ----------
         channel : int or 'centre', optional
@@ -239,6 +242,15 @@ class ImageGeometry(metaclass=BackwardCompat):
         Slicing on vertical with 'centre' will return the central slice in that dimension.
         Slicing on channels returns a geometry with a single channel, however the channel label is not
         typically stored in the geometry.
+
+        Example
+        -------
+        >>> ig = ImageGeometry(voxel_num_x=128, voxel_num_y=128, voxel_num_z=9, voxel_size_x=1.0, voxel_size_y=1.0, voxel_size_z=1.0)
+        >>> ig_slice = ig.get_slice(vertical=1)
+        >>> ig_slice.voxel_num_z
+        1
+        >>> print(ig_slice.center_z)
+        -3.0 
         '''
 
         geometry_new = self.copy()

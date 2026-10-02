@@ -185,3 +185,40 @@ class TestImageGeometry(unittest.TestCase):
         before = ig.dimension_labels
         ig.set_labels(None)
         self.assertEqual(ig.dimension_labels, before)
+
+    # get_min_* / get_max_* ---------------------------------------------------------------------------------------------------------
+
+    def test_get_min_max_z_single_slice(self):
+        ig = ImageGeometry(2, 3, 1, voxel_size_z=0.5)
+        self.assertEqual(ig.get_min_z(), -0.25)
+        self.assertEqual(ig.get_max_z(), 0.25)
+
+        # voxel_num_z=0 is saved as 1, so it has the extent of a single slice
+        with self.assertWarns(UserWarning):
+            ig = ImageGeometry(2, 3, 0, voxel_size_z=0.5)
+        self.assertEqual(ig.get_min_z(), -0.25)
+        self.assertEqual(ig.get_max_z(), 0.25)
+
+    def test_get_min_max_z_multiple_slices(self):
+        voxel_size_z=0.5
+        for voxel_num_z in [2, 4, 5]:
+            with self.subTest(voxel_num_z=voxel_num_z):
+                ig = ImageGeometry(2, 3, voxel_num_z, voxel_size_z=voxel_size_z)
+                self.assertAlmostEqual(ig.get_max_z() - ig.get_min_z(), voxel_num_z * voxel_size_z)
+
+    def test_get_min_max_z_offset_by_center_z(self):
+        voxel_size_z=0.5
+        ig = ImageGeometry(2, 3, 1, voxel_size_z=voxel_size_z, center_z=10)
+        self.assertEqual(ig.get_min_z(), 9.75)
+        self.assertEqual(ig.get_max_z(), 10.25)
+
+    def test_get_min_max_x_and_y(self):
+        # non-cubic voxels, so a warning is expected
+        with self.assertWarns(UserWarning):
+            ig = ImageGeometry(2, 3, 4, voxel_size_x=0.5, voxel_size_y=2, center_x=1, center_y=-1)
+        self.assertEqual(ig.get_min_x(), 0.5)
+        self.assertEqual(ig.get_max_x(), 1.5)
+        self.assertEqual(ig.get_min_y(), -4.0)
+        self.assertEqual(ig.get_max_y(), 2.0)
+
+

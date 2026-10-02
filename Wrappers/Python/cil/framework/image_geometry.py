@@ -57,6 +57,38 @@ class BackwardCompat(type):
 
 
 class ImageGeometry(metaclass=BackwardCompat):
+    """
+    ImageGeometry holds metadata describing the reconstruction volume of interest.
+    
+    Parameters
+    ----------
+    voxel_num_x : int, default=1
+        Number of voxels in the x direction
+    voxel_num_y : int, default=1
+        Number of voxels in the y direction
+    voxel_num_z : int, default=1
+        Number of voxels in the z direction
+    voxel_size_x : float, default=1
+        Size of voxels in the x direction
+    voxel_size_y : float, default=1
+        Size of voxels in the y direction
+    voxel_size_z : float, default=None
+        Size of voxels in the z direction. If None, it will be set to the same value as voxel_size_x.
+    center_x : float, default=0
+        Center of the image in the x direction
+    center_y : float, default=0
+        Center of the image in the y direction
+    center_z : float, default=0
+        Center of the image in the z direction
+    channels : int, default=1
+        Number of channels in the image
+    dtype : numpy data type, optional
+        The data type of the image. Default is numpy.float32.
+    dimension_labels : tuple of ImageDimension, optional
+        The order of the dimensions in the image.
+        Default is (ImageDimension.VERTICAL, ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X) if channels = 0 or 1,
+         or (ImageDimension.CHANNEL, ImageDimension.VERTICAL, ImageDimension.HORIZONTAL_Y, ImageDimension.HORIZONTAL_X) if channels > 1.
+    """
     @property
     def shape(self):
         shape_dict = {ImageDimension.CHANNEL: self.channels,
@@ -191,7 +223,7 @@ class ImageGeometry(metaclass=BackwardCompat):
                  voxel_num_z=1,
                  voxel_size_x=1,
                  voxel_size_y=1,
-                 voxel_size_z=1,
+                 voxel_size_z=None,
                  center_x=0,
                  center_y=0,
                  center_z=0,
@@ -203,7 +235,10 @@ class ImageGeometry(metaclass=BackwardCompat):
         self.voxel_num_z = int(voxel_num_z)
         self.voxel_size_x = float(voxel_size_x)
         self.voxel_size_y = float(voxel_size_y)
-        self.voxel_size_z = float(voxel_size_z)
+        if voxel_size_z is None:
+            self.voxel_size_z = float(voxel_size_x)
+        else:
+            self.voxel_size_z = float(voxel_size_z)
         self.center_x = center_x
         self.center_y = center_y
         self.center_z = center_z

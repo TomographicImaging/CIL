@@ -122,7 +122,6 @@ class TIGREGeometry(Geometry):
             if ig.voxel_num_z != 1:
                 #fix IG to single slice in z
                 self.nVoxel[0] = 1
-                self.dVoxel[0] = ag_in.config.panel.pixel_size[1] / ag_in.magnification
             else:
                 self.offOrigin[0] += ig.center_z
 

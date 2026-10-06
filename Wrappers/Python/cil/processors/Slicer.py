@@ -176,8 +176,13 @@ class Slicer(DataProcessor):
         self._configure()
         # set boolean of dimensions to process
         self._processed_dims = [0 if self._shape_out_full[i] == self._shape_in[i] else 1 for i in range(4)]
-        self._shape_out = tuple([i for i in self._shape_out_full if i > 1])
-        self._labels_out = [self._labels_in[i] for i,x in enumerate(self._shape_out_full) if x > 1]
+        if isinstance(data, (ImageData, ImageGeometry)):
+            # image geometries keep singleton dimensions
+            self._shape_out = tuple(self._shape_out_full)
+            self._labels_out = list(self._labels_in)
+        else:
+            self._shape_out = tuple([i for i in self._shape_out_full if i > 1])
+            self._labels_out = [self._labels_in[i] for i,x in enumerate(self._shape_out_full) if x > 1]
 
     def _parse_roi(self, ndim, shape, dimension_labels):
         '''
@@ -388,7 +393,7 @@ class Slicer(DataProcessor):
         """
         slice_obj = tuple([slice(x.start, x.stop, x.step) for x in self._roi_ordered])
         arr_in = dc_in.array.reshape(self._shape_in)
-        dc_out.fill(np.squeeze(arr_in[slice_obj]))
+        dc_out.fill(arr_in[slice_obj].reshape(dc_out.shape))
 
     def process(self, out=None):
         """

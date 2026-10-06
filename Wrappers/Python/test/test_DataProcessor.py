@@ -1139,21 +1139,28 @@ class TestSlicer(unittest.TestCase):
                 {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None, None,8),'horizontal_y':(None,None,16)},
         ]
 
-        offset_x =0.1*(8-1-1*4)/2
-        offset_y =0.2*(16-1-3 * 5)/2
-        offset_z =0.3*(28-1-3 * 7)/2
+        slice_all_offset_x =0.1*(8-1-1*4)/2
+        slice_all_offset_y =0.2*(16-1-3 * 5)/2
+        slice_all_offset_z =0.3*(28-1-3 * 7)/2
+
+        single_dim_offset_x = 0.1*(8-1-4*(2-1))/2
+        single_dim_offset_y = 0.2*(16-1-16*(1-1))/2
+        single_dim_offset_z = 0.3*(28-1-28*(1-1))/2
+
+        single_element_offset_x = 0.1*(8-1-8*(1-1))/2
 
         ig_gold = [ ImageGeometry(8,16,28,0.1,0.2,0.3,channels=4),
-                    ImageGeometry(2,4,4,0.4,1.0,2.1,center_x=-offset_x,center_y=-offset_y,center_z=-offset_z,channels=2),
+                    ImageGeometry(2,4,4,0.4,1.0,2.1,center_x=-slice_all_offset_x,center_y=-slice_all_offset_y,center_z=-slice_all_offset_z,channels=2),
                     ImageGeometry(3,2,4,0.2,0.4,1.2,center_x=-0.05,center_y=-0.5,center_z=-1.05,channels=2),
-                    VectorGeometry(2, dimension_labels='horizontal_x'),
-                    None
+                    ImageGeometry(2,1,1,0.1*4,0.2*16,0.3*28,center_x=-single_dim_offset_x,center_y=-single_dim_offset_y,center_z=-single_dim_offset_z,channels=1),
+                    ImageGeometry(1,1,1,0.1*8,0.2*16,0.3*28,center_x=-single_element_offset_x,center_y=-single_dim_offset_y,center_z=-single_dim_offset_z,channels=1)
         ]
 
         #channel spacing isn't an initialisation argument
         ig_gold[1].channel_spacing=3
         ig_gold[2].channel_spacing=2
         ig_gold[3].channel_spacing=4
+        ig_gold[4].channel_spacing=4
 
 
         for i, roi in enumerate(rois):
@@ -1444,6 +1451,7 @@ class TestSlicer(unittest.TestCase):
         geometry = ImageGeometry(4,3,2)
         data_in = ImageData(arr, False, geometry)
 
+        # Single slice on vertical:
         roi = {'vertical':(None,None,2),'horizontal_y':(None,None,2),'horizontal_x':(None,None,2)}
         proc = Slicer(roi)
 
@@ -1477,7 +1485,8 @@ class TestSlicer(unittest.TestCase):
         data_out = proc.process()
         self.assertEqual(data_out.shape, (2, 3, 1))
 
-        data_out_preallocated = ImageGeometry(1,3,2).allocate(0)
+        # keeping only the first x pixel shifts the centre by -(4-1)/2 voxels
+        data_out_preallocated = ImageGeometry(1,3,2,center_x=-1.5).allocate(0)
         proc.process(out=data_out_preallocated)
         numpy.testing.assert_array_equal(data_out.array, data_out_preallocated.array)
 
@@ -1508,7 +1517,6 @@ class TestSlicer(unittest.TestCase):
         proc.set_input(data_in)
         data_out = proc.process()
         numpy.testing.assert_array_equal(data_gold, data_out.array)
-
 
 class TestCofR_xcorrelation(unittest.TestCase):
     def setUp(self):

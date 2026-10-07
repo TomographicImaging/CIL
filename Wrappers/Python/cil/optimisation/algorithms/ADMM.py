@@ -32,7 +32,7 @@ class LADMM(Algorithm):
     
         \min_{x,y} f(x) + g(y), \text{ subject to } Ax + By = b
 
-    In CIL, we have implemented the case where :math:`A = K`, :math:`B = -Id`, :math:`b = 0`  which gives
+    In CIL, we have implemented the case where :math:`A = K`, :math:`B = -Id` (the identity), :math:`b = 0`  which gives
 
     .. math::
 
@@ -53,19 +53,22 @@ class LADMM(Algorithm):
     
     Parameters
     ------------
-    operator:  CIL Linear Operator
-        Operator :math:`K` in the objective function
     f: CIL Function
         Convex function with "simple" proximal. The function should act on the domain of the operator.
     g: CIL Function
         Convex function with "simple" proximal. The function should act on the range of the operator.
-    sigma: float, positive, defaults to 1.
-        Positive step size parameter
+    operator:  CIL Linear Operator
+            Operator :math:`K` in the objective function.
     tau: float, positive, defaults to :math:`\frac{\sigma}{\|K\|^{2}}`
-        Positive step size parameter
+        Positive step size parameter.
+    sigma: float, positive, defaults to 1.
+        Positive step size parameter.
     initial: DataContainer, defaults to DataContainer filled with zeros
-        Initial guess 
-              
+        Initial guess.
+    
+      Note
+    ----
+    This LADMM implementation is equivalent to PDHG (:class:`cil.optimisation.algorithms.PDHG`) with primal step size :math:`\tau` and dual step size :math:`1/\sigma`, applied with the primal and dual updates in swapped order.
     
     
     Note

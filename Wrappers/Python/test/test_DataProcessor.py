@@ -415,7 +415,7 @@ class TestBinner(unittest.TestCase):
                 # crop and bin
                 {'channel':(1,None,2),'vertical':(4,-8,4),'horizontal_x':(1,7,2),'horizontal_y':(4,-8,2)},
 
-                # bin to vector
+                # bin to single dimension on channel, vertical and horizontal_y
                 {'channel':(None,None,4),'vertical':(None,None,28),'horizontal_x':(None,None,4),'horizontal_y':(None,None,16)},
 
                 #bin to single element
@@ -426,14 +426,15 @@ class TestBinner(unittest.TestCase):
         ig_gold = [ ImageGeometry(8,16,28,0.1,0.2,0.3,channels=4),
                     ImageGeometry(2,3,4,0.4,1.0,2.1,center_y=-0.1,channels=1),
                     ImageGeometry(3,2,4,0.2,0.4,1.2,center_y=-0.4, center_z=-0.6, channels=1),
-                    VectorGeometry(2, dimension_labels='horizontal_x'),
-                    None
+                    ImageGeometry(2,1,1,0.4,3.2,8.4,channels=1),
+                    ImageGeometry(1,1,1,0.8,3.2,8.4,channels=1)
         ]
 
         #channel spacing isn't an initialisation argument
         ig_gold[1].channel_spacing=3
         ig_gold[2].channel_spacing=2
         ig_gold[3].channel_spacing=4
+        ig_gold[4].channel_spacing=4
 
 
         for i, roi in enumerate(rois):
@@ -627,7 +628,6 @@ class TestBinner(unittest.TestCase):
 
 
     def test_process_image(self):
-
         arr=numpy.arange(24,dtype=numpy.float32).reshape(2,3,4)
         geometry = ImageGeometry(4,3,2)
         data_in = ImageData(arr, False, geometry)
@@ -635,10 +635,10 @@ class TestBinner(unittest.TestCase):
         roi = {'vertical':(None,None,2),'horizontal_y':(None,None,2),'horizontal_x':(None,None,2)}
         proc = Binner(roi)
 
-        geometry_gold = VectorGeometry(2,dimension_labels='horizontal_x')
+        geometry_gold = ImageGeometry(2,1,1,2,2,2,channels=1, center_y=-0.5)
         el1 = (0+1+4+5+12+13+16+17)/8
         el2 = (2+3+6+7+14+15+18+19)/8
-        data_gold = numpy.array([el1,el2],dtype=numpy.float32)
+        data_gold = numpy.array([el1,el2],dtype=numpy.float32).reshape(1,1,2)
 
         proc.set_input(data_in.geometry)
         geometry_out = proc.process()

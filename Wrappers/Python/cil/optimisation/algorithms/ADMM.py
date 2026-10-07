@@ -66,8 +66,8 @@ class LADMM(Algorithm):
     initial: DataContainer, defaults to DataContainer filled with zeros
         Initial guess.
     
-      Note
-    ----
+    Note
+    -----
     This LADMM implementation is equivalent to PDHG (:class:`cil.optimisation.algorithms.PDHG`) with primal step size :math:`\tau` and dual step size :math:`1/\sigma`, applied with the primal and dual updates in swapped order.
     
     

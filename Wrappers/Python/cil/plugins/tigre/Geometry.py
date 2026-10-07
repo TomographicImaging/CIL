@@ -49,7 +49,6 @@ class CIL2TIGREGeometry(object):
         converter = CIL2TIGREGeometry(ig, ag)
         return converter.tg_geometry, converter.tg_angles
 
-class TIGREGeometry(Geometry):
     def __init__(self, ig, ag):
         if Geometry is object:
             raise ModuleNotFoundError(
@@ -136,6 +135,19 @@ class TIGREGeometry(Geometry):
         """Volume-centre offset in TIGRE (Z, Y, X)"""
         center_z = 0. if AcquisitionType.DIM2 & self._ag.dimension else self._ig.center_z
         return np.array([center_z, self._ig.center_y, self._ig.center_x])
+
+    def _offset_off_origin(self, det_pos, angles):
+        """Per-view volume offset (Z, Y, X) that reproduces the lateral detector shift 'det_pos'
+        while keeping the rays orthogonal to the detector. The shift co-rotates with the gantry."""
+        base = self._off_origin().astype(float)
+        sy = -det_pos[0]   # detector U shift, undone on the volume
+        sz = -det_pos[2]   # detector V shift, undone on the volume
+        a = np.asarray(angles, dtype=float)
+        oo = np.tile(base, (len(a), 1))
+        oo[:, 0] += sz               # Z
+        oo[:, 1] += sy * np.cos(a)   # Y
+        oo[:, 2] += -sy * np.sin(a)  # X
+        return oo
 
     def _view_vectors_3d(self, beam):
         """Return acquisition geometry vectors as 3D
@@ -226,10 +238,11 @@ class TIGREGeometry(Geometry):
             euler_base = Rotation.from_euler('z', np.pi/2).as_matrix() @ B
             return calculate_euler_angles(self._convert_angles(), euler_base)
 
-        # axis-aligned: the lateral detector shift is the component perpendicular to the ray
         det_pos = D - det_dist * ray
-        self.tg_geometry.offDetector = np.array([det_pos[2], det_pos[0], 0])
-        return self._convert_angles()
+        self.tg_geometry.offDetector = np.zeros(3)
+        angles = self._convert_angles()
+        self.tg_geometry.offOrigin = self._offset_off_origin(det_pos, angles)
+        return angles
 
     def _set_panel_origin(self):
         """Rotate the panel around it's centre based on the panel origin to reflect the data direction

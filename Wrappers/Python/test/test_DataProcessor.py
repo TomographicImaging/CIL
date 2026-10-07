@@ -2721,6 +2721,27 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
     def test_TransmissionAbsorptionConverter_accelerated(self):
         self.test_TransmissionAbsorptionConverter(accelerated=True)
 
+    def test_TransmissionAbsorptionConverter_on_DataContainer(self):
+
+        arr = numpy.random.rand(2, 5, 1, 3).astype(numpy.float32)
+        dc = DataContainer(arr)
+
+        s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1)
+        s.set_input(dc)
+        data_exp = s.get_output()
+
+        data_new = arr.copy()
+        data_new /= 10
+        data_new[data_new < 0.1] = 0.1
+        data_new = -1 * numpy.log(data_new)
+
+        numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
+
+        out = data_exp.copy()
+        out.fill(0)
+        s.process(out=out)
+        numpy.testing.assert_allclose(out.as_array(), data_new, rtol=1E-6)
+
 class TestAbsorptionTransmissionConverter(unittest.TestCase):
 
     def test_AbsorptionTransmissionConverter(self):

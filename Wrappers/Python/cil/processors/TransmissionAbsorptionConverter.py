@@ -83,7 +83,11 @@ class TransmissionAbsorptionConverter(DataProcessor):
         data = self.get_input()
 
         if out is None:
-            out = data.geometry.allocate(None)
+            try:
+                out = data.geometry.allocate(0)
+            except AttributeError:
+                out_array = numpy.zeros_like(data.array)
+                out = DataContainer(out_array, dimension_labels=data.dimension_labels)
 
         arr_in = data.as_array()
         arr_out = out.as_array()

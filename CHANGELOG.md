@@ -6,8 +6,10 @@
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
   - Documentation:
+    - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     -  Corrected the `LADMM` docstring and user guide: the objective is `f(x) + g(Kx)` (not `f(Kx) + g(x)`), with fixed iteration formulas and a note on its equivalence to `PDHG` (#2367)
   - Bug fixes:
+    - `LSQR` now documents and warns that a non-zero scalar `alpha` regularises towards `initial`, minimising `||Ax-b||^2 + alpha^2||x-initial||^2` rather than `||Ax-b||^2 + alpha^2||x||^2` (#2357)
     - Fix `Parallel2D` `system_description` raising exception for near-zero vectors (#2316)
 
 
@@ -22,8 +24,6 @@
     a folder (#2239)
     - Update ASTRA interface to `direct_FP3D/BP3D` removing copies for GPU `ProjectionOperator` calls (#2134)
   - Bug fixes:
-    - `LSQR` now documents and warns that a non-zero scalar `alpha` regularises towards `initial`, minimising `||Ax-b||^2 + alpha^2||x-initial||^2` rather than `||Ax-b||^2 + alpha^2||x||^2` (#2357)
-    - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)
     - `cilacc` path lookup no longer broken for editable installations (#2257)
     - update `version.py` to use `importlib` & fix tagless installation #2255 (#2269)

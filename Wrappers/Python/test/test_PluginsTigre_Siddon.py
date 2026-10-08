@@ -19,7 +19,7 @@
 import unittest
 from utils_projectors import TestCommon_ProjectionOperator_SIM
 from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
-from utils_projectors import TestCommon_ProjectionOperator_Geometry
+from utils_projectors import TestCommon_ProjectionOperator_Geometry, TestCommon_ProjectionOperator_SIM_Geometry
 from utils import has_tigre, has_nvidia, initialise_tests
 
 if has_tigre:
@@ -38,7 +38,7 @@ class Test_Cone3D_Projectors_basic_tigre(unittest.TestCase, TestCommon_Projectio
     def setUp(self):
         setup_parameters(self)
         self.Cone3D()
-        self.tolerance_fp=0.16
+        self.tolerance_fp=0.03
 
 
 @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
@@ -63,8 +63,7 @@ class Test_Cone3D_Geometry_tigre(unittest.TestCase, TestCommon_ProjectionOperato
     def setUp(self):
         setup_parameters(self)
         self.Cone3D()
-        self.tolerance_fp = 0.02
-        self.tolerance_mass = 0.1
+        self.tolerance_fp = 1e-2
 
 
 @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
@@ -72,7 +71,7 @@ class Test_Cone2D_Projectors_basic_tigre(unittest.TestCase, TestCommon_Projectio
     def setUp(self):
         setup_parameters(self)
         self.Cone2D()
-        self.tolerance_fp=0.16
+        self.tolerance_fp=0.03
 
 
 @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
@@ -142,3 +141,45 @@ class Test_Parallel2D_Projectors_toy_tigre(unittest.TestCase, TestCommon_Project
         self.Parallel2D()
         self.tolerance_linearity = 1e-6
         self.tolerance_norm = 1e-5
+
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Cone3D_Projectors_sim_geometry_tigre(unittest.TestCase, TestCommon_ProjectionOperator_SIM_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3D()
+        self.tolerance_fp_crop = 1e-5
+        self.tolerance_fp_crop_horizontal = 1.2e-2
+
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Cone2D_Projectors_sim_geometry_tigre(unittest.TestCase, TestCommon_ProjectionOperator_SIM_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone2D()
+        self.tolerance_fp_crop = 1e-5
+        self.tolerance_fp_crop_horizontal = 1e-3
+
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Parallel3D_Projectors_sim_geometry_tigre(unittest.TestCase, TestCommon_ProjectionOperator_SIM_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Parallel3D()
+        self.tolerance_fp_crop = 1e-5
+        # Tigre Siddon computes some rays wrong at isolated angles, 0.22 at 206.4 deg here, all other views are within 3e-3
+        self.tolerance_fp_crop_horizontal = 0.25
+
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Parallel2D_Projectors_sim_geometry_tigre(unittest.TestCase, TestCommon_ProjectionOperator_SIM_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Parallel2D()
+        self.tolerance_fp_crop = 1e-5
+        self.tolerance_fp_crop_horizontal = 2e-3
+
+    def test_forward_projector_cropped_panel_horizontal(self):
+        # TIGRE Siddon returns a zero projection at 180 deg for a sideways shifted parallel panel
+        # https://github.com/CERN/TIGRE/issues/334, fixed by https://github.com/CERN/TIGRE/pull/752
+        self.skipTest("skipped pending CERN/TIGRE#752")

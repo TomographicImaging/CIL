@@ -261,18 +261,25 @@ class Test_convert_geometry(unittest.TestCase):
 
         tg_geometry, tg_angles= CIL2TIGREGeometry.getTIGREGeometry(self.ig, ag)
 
-        det_offset = np.array([0,-1,0])
-        np.testing.assert_allclose(tg_geometry.offDetector,det_offset)
-
         for i, ang in enumerate(tg_angles):
             ang2 = -(self.angles_rad[i] + np.pi/2)
             self.compare_angles(ang,ang2,1e-6)
+
+        #the detector sits 1 unit along -x from the rotation axis. The detector stays centred and the volume is
+        #shifted 1 unit the other way instead, perpendicular to the beam at each view: (Z, Y, X) = (0, cos, -sin)
+        np.testing.assert_allclose(tg_geometry.offDetector, 0)
+
+        tg_angles = np.asarray(tg_angles)
+        off_origin = np.asarray(tg_geometry.offOrigin)
+        self.assertEqual(off_origin.shape, (len(tg_angles), 3))
+        np.testing.assert_allclose(off_origin[:, 0], 0, atol=1e-12)
+        np.testing.assert_allclose(off_origin[:, 1], np.cos(tg_angles), atol=1e-6)
+        np.testing.assert_allclose(off_origin[:, 2], -np.sin(tg_angles), atol=1e-6)
 
         self.assertTrue(tg_geometry.mode=='parallel')
         np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
         np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
         np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
-        np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
         np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
         np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])

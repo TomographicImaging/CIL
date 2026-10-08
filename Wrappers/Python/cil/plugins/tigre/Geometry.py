@@ -175,10 +175,7 @@ class CIL2TIGREGeometry(object):
         h /= h_norm
         v = np.cross(e0, h)
         B = np.column_stack([e0, h, v])
-
-        # force the detector normal to face the source (its sign depends on panel handedness)
         n = np.cross(dx, dy)
-        n *= np.sign((S - D) @ n)
         RD = B.T @ np.column_stack([n, dx, dy])
 
         DSO = np.linalg.norm(S)

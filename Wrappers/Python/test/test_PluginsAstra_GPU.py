@@ -19,7 +19,7 @@
 import unittest
 from utils_projectors import TestCommon_ProjectionOperator_SIM
 from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
-from utils_projectors import TestCommon_ProjectionOperator_Geometry
+from utils_projectors import TestCommon_ProjectionOperator_Geometry, TestCommon_ProjectionOperator_SIM_Geometry
 from utils import disable_print, enable_prints
 from utils import has_astra, has_nvidia, initialise_tests
 
@@ -59,8 +59,7 @@ class Test_Cone3D_Geometry_GPU(unittest.TestCase, TestCommon_ProjectionOperator_
     def setUp(self):
         setup_parameters(self)
         self.Cone3D()
-        self.tolerance_fp = 0.02
-        self.tolerance_mass = 0.1
+        self.tolerance_fp = 1e-2
 
 
 @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
@@ -68,8 +67,7 @@ class Test_Parallel3D_Geometry_GPU(unittest.TestCase, TestCommon_ProjectionOpera
     def setUp(self):
         setup_parameters(self)
         self.Parallel3D()
-        self.tolerance_fp = 0.02
-        self.tolerance_mass = 0.1
+        self.tolerance_fp = 1e-2
 
 
 @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
@@ -186,3 +184,39 @@ class Test_Cone3DFlex_Projectors_GPU_toy(unittest.TestCase, TestCommon_Projectio
         self.Cone3DFlex()
         self.tolerance_linearity = 1e-3
         self.tolerance_norm = 0.1
+
+
+@unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+class Test_Cone3D_Projectors_sim_geometry_GPU(unittest.TestCase, TestCommon_ProjectionOperator_SIM_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3D()
+        self.tolerance_fp_crop = 1e-3
+        self.tolerance_fp_crop_horizontal = 3e-2
+
+
+@unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+class Test_Cone2D_Projectors_sim_geometry_GPU(unittest.TestCase, TestCommon_ProjectionOperator_SIM_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone2D()
+        self.tolerance_fp_crop = 1e-3
+        self.tolerance_fp_crop_horizontal = 2e-2
+
+
+@unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+class Test_Parallel3D_Projectors_sim_geometry_GPU(unittest.TestCase, TestCommon_ProjectionOperator_SIM_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Parallel3D()
+        self.tolerance_fp_crop = 1e-3
+        self.tolerance_fp_crop_horizontal = 1e-3
+
+
+@unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+class Test_Parallel2D_Projectors_sim_geometry_GPU(unittest.TestCase, TestCommon_ProjectionOperator_SIM_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Parallel2D()
+        self.tolerance_fp_crop = 1e-3
+        self.tolerance_fp_crop_horizontal = 1e-3

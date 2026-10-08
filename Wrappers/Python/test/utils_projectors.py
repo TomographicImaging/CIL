@@ -21,6 +21,7 @@ from cil.optimisation.operators import LinearOperator
 from cil.utilities import dataexample
 from cil.framework import AcquisitionGeometry, ImageGeometry
 from cil.framework.labels import AcquisitionDimension, AcquisitionType
+from cil.processors import Slicer
 
 def create_cone_flex_default_ig(ag):
     '''
@@ -46,6 +47,27 @@ def create_cone_flex_default_ig(ag):
     ig = ImageGeometry(num_voxel_xy, num_voxel_xy, num_voxel_z, voxel_size_xy, voxel_size_xy, voxel_size_z)
     return ig
 
+
+
+def crop_panel(data, roi):
+    '''
+    Crops the panel with `Slicer`, then corrects the initial angle so the cropped data describes the same rotation.
+    '''
+    cropped = Slicer(roi=roi)(data)
+    if cropped.geometry.geom_type != 'cone':
+        return cropped
+
+    def spin(ag):
+        system = ag.config.system
+        offset = (system.detector.position - system.source.position) @ system.detector.direction_x
+        return np.arctan2(offset, ag.dist_source_center + ag.dist_center_detector)
+
+    angles = cropped.geometry.config.angles
+    delta = spin(cropped.geometry) - spin(data.geometry)
+    if angles.angle_unit == 'degree':
+        delta = np.degrees(delta)
+    cropped.geometry.set_angles(angles.angle_data, initial_angle=angles.initial_angle + delta, angle_unit=angles.angle_unit)
+    return cropped
 
 
 class SimData(object):
@@ -568,22 +590,25 @@ class TestCommon_ProjectionOperator_Geometry(object):
     def Cone3D(self):
         self._is_cone = True
         #a distant source (SOD >> object) makes a single cone view effectively parallel
-        def create_geometry(rotation_axis, angles, num_pix):
-            return AcquisitionGeometry.create_Cone3D(source_position=[0, -10000, 0], detector_position=[0, 10, 0],
-                                                     detector_direction_x=[1, 0, 0], detector_direction_y=[0, 0, 1],
+        def create_geometry(rotation_axis, angles, num_pix, ray_direction=[0, 1, 0],
+                            detector_direction_x=[1, 0, 0], detector_direction_y=[0, 0, 1], origin='bottom-left'):
+            ray = np.asarray(ray_direction, dtype=float)
+            return AcquisitionGeometry.create_Cone3D(source_position=-10000 * ray, detector_position=10 * ray,
+                                                     detector_direction_x=detector_direction_x, detector_direction_y=detector_direction_y,
                                                      rotation_axis_direction=rotation_axis)\
-                                       .set_panel([num_pix, num_pix], [1, 1], origin='bottom-left')\
+                                       .set_panel([num_pix, num_pix], [1, 1], origin=origin)\
                                        .set_angles(angles, angle_unit='degree')
 
         self.create_geometry = create_geometry
 
     def Parallel3D(self):
         self._is_cone = False
-        def create_geometry(rotation_axis, angles, num_pix):
-            return AcquisitionGeometry.create_Parallel3D(ray_direction=[0, 1, 0],
-                                                         detector_direction_x=[1, 0, 0], detector_direction_y=[0, 0, 1],
+        def create_geometry(rotation_axis, angles, num_pix, ray_direction=[0, 1, 0],
+                            detector_direction_x=[1, 0, 0], detector_direction_y=[0, 0, 1], origin='bottom-left'):
+            return AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction,
+                                                         detector_direction_x=detector_direction_x, detector_direction_y=detector_direction_y,
                                                          rotation_axis_direction=rotation_axis)\
-                                       .set_panel([num_pix, num_pix], [1, 1], origin='bottom-left')\
+                                       .set_panel([num_pix, num_pix], [1, 1], origin=origin)\
                                        .set_angles(angles, angle_unit='degree')
         
         self.create_geometry = create_geometry
@@ -700,6 +725,42 @@ class TestCommon_ProjectionOperator_Geometry(object):
         np.testing.assert_allclose(bp[:, :, mask], 0.0, atol=self.tolerance_fp)
 
 
+    def test_forward_projector_panel_origin(self):
+        # forward projects an asymmetric phantom at 0 and 90 degrees, with the beam along +-y and +-z and each
+        # panel origin. A 'top' origin flips the projection vertically, a 'right' origin flips it horizontally.
+        ag = self.create_geometry(self.axis_vertical, [0], self.N)
+        ig = ag.get_ImageGeometry()
+
+        phantom = ig.allocate(0)
+        phantom.array[1:3, 2:6, 2:4] = 0.5
+        phantom.array[1:3, 2:6, 4:6] = 1.0
+        phantom.array[5:7, 1:3, 3:7] = 0.25
+        vol = phantom.array
+
+        #ray direction, detector x, detector y, and the projections at 0 and 90 degrees with a 'bottom-left' origin
+        beam_y = [vol.sum(axis=1), np.fliplr(vol.sum(axis=2))]
+        beam_z = [np.flipud(vol.sum(axis=0)), np.flipud(np.fliplr(vol.sum(axis=0).T))]
+        directions = [([0,  1,  0], [ 1, 0, 0], [0,  0, 1], beam_y),
+                      ([0, -1,  0], [-1, 0, 0], [0,  0, 1], beam_y),
+                      ([0,  0,  1], [ 1, 0, 0], [0, -1, 0], beam_z),
+                      ([0,  0, -1], [ 1, 0, 0], [0, -1, 0], beam_z)]
+
+        for ray, dx, dy, expected in directions:
+            for origin in ['bottom-left', 'bottom-right', 'top-left', 'top-right']:
+                with self.subTest(ray_direction=ray, origin=origin):
+                    ag = self.create_geometry(self.axis_vertical, [0, 90], self.N, ray_direction=ray,
+                                              detector_direction_x=dx, detector_direction_y=dy, origin=origin)
+                    fp = self._forward_project(ag, ig, phantom)
+
+                    gold = np.array(expected)
+                    if 'top' in origin:
+                        gold = gold[:, ::-1, :]
+                    if 'right' in origin:
+                        gold = gold[:, :, ::-1]
+
+                    # show2D([fp[0], gold[0], fp[1], gold[1]], title=['fp 0', 'gold 0', 'fp 90', 'gold 90'], num_cols=2)
+                    np.testing.assert_allclose(fp, gold, atol=self.tolerance_fp)
+
 class TestCommon_ProjectionOperator_SIM(SimData):
     '''
     Tests forward and backward operators function with and without 'out'
@@ -756,6 +817,50 @@ class TestCommon_ProjectionOperator_SIM(SimData):
             Op = self.ProjectionOperator(acquisition_geometry=self.ag, **self.PO_args)
             fp = Op.direct(self.img_data)
             np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)
+
+
+class TestCommon_ProjectionOperator_SIM_Geometry(SimData):
+    '''
+    Forward projections of the same rays described through a different geometry must match.
+
+    Requires `self.tolerance_fp_crop` and `self.tolerance_fp_crop_horizontal` to be set by `setUp`. A vertical crop
+    keeps the ray sampling, a horizontal crop of cone data rotates it, so the horizontal comparison also carries
+    the projector's interpolation error.
+    '''
+
+    def test_forward_projector_cropped_panel_vertical(self):
+        # projecting onto a vertically cropped panel matches cropping the full projection
+        if not AcquisitionType.DIM3 & self.ag.dimension:
+            self.skipTest("a 2D panel has no vertical axis")
+
+        full = self.ProjectionOperator(self.ig, self.ag, **self.PO_args).direct(self.img_data)
+        gold = crop_panel(full, {'vertical': (0, 50)})
+
+        fp = self.ProjectionOperator(self.ig, gold.geometry, **self.PO_args).direct(self.img_data)
+
+        # show2D([gold, fp, fp - gold], title=['cropped fp', 'fp to cropped panel', 'difference'], num_cols=3)
+        np.testing.assert_allclose(fp.as_array(), gold.as_array(), atol=self.tolerance_fp_crop)
+
+    def test_forward_projector_cropped_panel_horizontal(self):
+        # projecting onto a horizontally cropped panel and correcting for the frame rotationmatches cropping the full projection
+        full = self.ProjectionOperator(self.ig, self.ag, **self.PO_args).direct(self.img_data)
+        gold = crop_panel(full, {'horizontal': (10, 90)})
+
+        fp = self.ProjectionOperator(self.ig, gold.geometry, **self.PO_args).direct(self.img_data)
+
+        # show2D([gold, fp, fp - gold], title=['cropped fp', 'fp to cropped panel', 'difference'], num_cols=3)
+        np.testing.assert_allclose(fp.as_array(), gold.as_array(), atol=self.tolerance_fp_crop_horizontal)
+
+    def test_forward_projector_initial_angle(self):
+        # the initial angle is added to each angle, so offsetting the angles by -initial_angle describes the same scan
+        ag = self.ag.copy()
+        ag.set_angles(self.ag.get_angles('degree') - 30.0, initial_angle=30.0, angle_unit='degree')
+
+        gold = self.ProjectionOperator(self.ig, self.ag, **self.PO_args).direct(self.img_data)
+        fp = self.ProjectionOperator(self.ig, ag, **self.PO_args).direct(self.img_data)
+
+        # show2D([gold, fp, fp - gold], title=['angles', 'initial angle', 'difference'], num_cols=3)
+        np.testing.assert_allclose(fp.as_array(), gold.as_array(), atol=self.tolerance_fp_crop)
 
 
 class TestCommon_FBP_SIM(SimData):
@@ -850,6 +955,133 @@ class TestCommon_FBP_Laminography(SimData):
         rec = reco.array[sl].ravel()
         corr = np.corrcoef(orig, rec)[0, 1]
         self.assertGreater(corr, self.tolerance_fbp_laminography)
+
+
+class TestCommon_FBP_Geometry(SimData):
+
+    def _forward_project(self, ag):
+        if self.backend == 'tigre':
+            from cil.plugins.tigre import ProjectionOperator
+        else:
+            from cil.plugins.astra import ProjectionOperator
+        return ProjectionOperator(self.ig, ag).direct(self.img_data)
+
+    def _reconstruct(self, data, ig=None):
+        ig = self.ig if ig is None else ig
+        return self.FBP(ig, data.geometry, **self.FBP_args)(data)
+
+    def test_FBP_centre_of_rotation_offset(self):
+        ag = self.ag.copy()
+        ag.set_centre_of_rotation(5.5 * self.ag.pixel_size_h)
+        self.assertEqual(ag.system_description, 'offset')
+
+        reco = self._reconstruct(self._forward_project(ag))
+
+        # show2D([self.img_data, reco, reco - self.img_data], title=['phantom', 'reco', 'difference'], num_cols=3)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(), atol=self.tolerance_fbp_fp)
+
+    def test_FBP_advanced_geometry(self):
+        # an offset centre of rotation and a rotation axis roll
+        if not AcquisitionType.DIM3 & self.ag.dimension:
+            self.skipTest("a 2D system has no rotation axis to tilt")
+
+        tilt = np.deg2rad(5)
+        ag = self.ag.copy()
+        ag.set_centre_of_rotation(0.5 * self.ag.pixel_size_h)
+        ag.config.system.rotation_axis.direction = [np.sin(tilt), 0.0, np.cos(tilt)]
+        self.assertEqual(ag.system_description, 'advanced')
+
+        reco = self._reconstruct(self._forward_project(ag))
+
+        # show2D([self.img_data, reco, reco - self.img_data], title=['phantom', 'reco', 'difference'], num_cols=3)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(), atol=self.tolerance_fbp_fp)
+
+    def test_FBP_cropped_panel_vertical(self):
+        # issue 1423: the bottom 50 rows reconstruct the matching slab of the full reconstruction
+        if not AcquisitionType.DIM3 & self.ag.dimension:
+            self.skipTest("a 2D panel has no vertical axis")
+
+        rows = 50
+        data = crop_panel(self.acq_data, {'vertical': (0, rows)})
+
+        #a 20 slice volume centred on the cropped panel
+        shift = rows / 2 - self.ag.pixel_num_v / 2
+        ig = self.ig.copy()
+        ig.voxel_num_z = 20
+        ig.center_z = shift * self.ag.pixel_size_v / self.ag.magnification
+        first = int(round(shift + self.ig.voxel_num_z / 2 - ig.voxel_num_z / 2))
+
+        reco = self._reconstruct(data, ig).as_array()
+        gold = self._reconstruct(self.acq_data).as_array()[first:first + ig.voxel_num_z]
+
+        #cone data is truncated towards the cropped edge, so only the central slices are compared
+        # show2D([gold, reco, reco - gold], title=['full reco slab', 'cropped panel reco', 'difference'], num_cols=3)
+        np.testing.assert_allclose(reco[8:12], gold[8:12], atol=self.tolerance_fbp_crop)
+
+    def test_FBP_odd_panel(self):
+        data = crop_panel(self.acq_data, {'horizontal': (7, None)})
+        self.assertEqual(data.geometry.pixel_num_h % 2, 1)
+
+        reco = self._reconstruct(data)
+
+        # show2D([self.img_data, reco, reco - self.img_data], title=['phantom', 'reco', 'difference'], num_cols=3)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(), atol=self.tolerance_fbp_fp)
+
+    def test_FBP_initial_angle(self):
+        # the initial angle is added to each angle, so offsetting the angles by -initial_angle describes the same scan
+        data = self.acq_data.copy()
+        data.geometry.set_angles(self.ag.get_angles('degree') - 30.0, initial_angle=30.0, angle_unit='degree')
+
+        gold = self._reconstruct(self.acq_data)
+        reco = self._reconstruct(data)
+
+        # show2D([gold, reco, reco - gold], title=['angles', 'initial angle', 'difference'], num_cols=3)
+        np.testing.assert_allclose(reco.as_array(), gold.as_array(), atol=1e-5)
+
+    def test_FBP_angle_unit(self):
+        # the same angles described in radians reconstruct the same volume
+        data = self.acq_data.copy()
+        data.geometry.set_angles(np.deg2rad(self.ag.get_angles('degree')), angle_unit='radian')
+
+        gold = self._reconstruct(self.acq_data)
+        reco = self._reconstruct(data)
+
+        # show2D([gold, reco, reco - gold], title=['degrees', 'radians', 'difference'], num_cols=3)
+        np.testing.assert_allclose(reco.as_array(), gold.as_array(), atol=1e-5)
+
+    def test_FBP_non_square_pixels(self):
+        if not AcquisitionType.DIM3 & self.ag.dimension:
+            self.skipTest("a 2D panel has a single pixel size")
+
+        ag = self.ag.copy()
+        ag.set_panel(self.ag.config.panel.num_pixels, [self.ag.pixel_size_h, self.ag.pixel_size_v * 2])
+
+        reco = self._reconstruct(self._forward_project(ag))
+
+        # show2D([self.img_data, reco, reco - self.img_data], title=['phantom', 'reco', 'difference'], num_cols=3)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(), atol=self.tolerance_fbp_fp)
+
+    def test_FBP_custom_voxel_size(self):
+        # voxels twice the default size, shifted half a default voxel so each centre lands on a phantom voxel centre
+        ig = self.ig.copy()
+        ig.voxel_num_x //= 2
+        ig.voxel_num_y //= 2
+        ig.voxel_size_x *= 2
+        ig.voxel_size_y *= 2
+        ig.center_x = self.ig.voxel_size_x / 2
+        ig.center_y = self.ig.voxel_size_y / 2
+        gold = self.img_data.as_array()[..., 1::2, 1::2]
+
+        if AcquisitionType.DIM3 & self.ag.dimension:
+            ig.voxel_num_z //= 2
+            ig.voxel_size_z *= 2
+            ig.center_z = self.ig.voxel_size_z / 2
+            gold = gold[1::2]
+
+        reco = self._reconstruct(self.acq_data, ig)
+
+        # show2D([gold, reco, reco - gold], title=['phantom sampled', 'reco', 'difference'], num_cols=3)
+        np.testing.assert_allclose(reco.as_array(), gold, atol=self.tolerance_fbp_fp)
 
 
 class TestCommon_ProjectionOperatorBlockOperator(object):

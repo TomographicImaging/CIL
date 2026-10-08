@@ -9,8 +9,9 @@
   - Bug fixes:
     - Fix `Parallel2D` `system_description` raising exception for near-zero vectors (#2316)
     - The interpolated TIGRE cone-beam projector now supports tilted rotation axis (laminography): the previously-broken case (axis pointing at the source) no longer returns zeros (#2362)
-    - TIGRE `ProjectionOperator` forward projection of parallel-beam data handles horizontal detector offsets (#2362)
-    - TIGRE cone-beam geometries with a detector facing away from the source (a mirrored panel) are now projected correctly (#2362)
+    - TIGRE `ProjectionOperator` forward projection of parallel-beam data with a detector or centre-of-rotation offset is now correct (#2362)
+    - TIGRE: reversing `detector_direction_x` no longer rotates the scan by 180 degrees (#2362)
+    - TIGRE cone-beam geometries with a horizontal detector offset now use the same angle 0 as ASTRA, the ray from the source to the detector centre. Results for these geometries are rotated compared with previous versions (#2362)
 
 * 26.0.0
   - New features:

@@ -53,7 +53,8 @@ class ProjectionOperator(LinearOperator):
             A description of the acquisition data. If passed a BlockGeometry it will return a BlockOperator.
 
         direct_method : str,  default 'interpolated'
-            The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection
+            The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection.
+            'Siddon' does not support parallel-beam geometries with a tilted rotation axis and raises a NotImplementedError.
 
         adjoint_weights : str, default 'matched'
             The weighting method used by the cone-beam backward projector, 'matched' for weights to approximately match the 'interpolated' forward projector, 'FDK' for FDK weights
@@ -111,7 +112,8 @@ class ProjectionOperator_ag(ProjectionOperator):
             A description of the acquisition data
 
         direct_method : str,  default 'interpolated'
-            The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection
+            The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection.
+            'Siddon' does not support parallel-beam geometries with a tilted rotation axis and raises a NotImplementedError.
 
         adjoint_weights : str, default 'matched'
             The weighting method used by the cone-beam backward projector, 'matched' for weights to approximately match the 'interpolated' forward projector, 'FDK' for FDK weights

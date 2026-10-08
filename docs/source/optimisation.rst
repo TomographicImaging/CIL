@@ -47,7 +47,7 @@ For a particular optimisation objective, one or more algorithms may be suitable.
 
 - Primal Dual Hybrid Gradient (PDHG) solves problems of the form :math:`min_x f(Ax)+g(x)` where f  is convex and has a “simple” proximal method of its conjugate and g is convex with a “simple” proximal. Primal-Dual 3 Operator (PD3O) solves a similar problem to PDHG but with an additional convex differentiable term.
 
-- Linearized Alternating Direction Method of Multipliers (LADMM) solves problems of the form :math:`min_x f(Ax)+g(x)` where both f and g have a "simple" proximal.
+- Linearized Alternating Direction Method of Multipliers (LADMM) solves problems of the form :math:`min_x f(x)+g(Kx)` where both f and g have a "simple" proximal.
 
 
 After initialising the algorithms, they are called using the :code:`run` method. The algorithms are also iterators that can be called using :code:`next` or in a :code:`for` loop.

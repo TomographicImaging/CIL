@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.algorithms.ADMM &#8212; CIL 26.0.1.dev7+g1e4bb4330.d20261001 documentation</title>
+    <title>cil.optimisation.algorithms.ADMM &#8212; CIL 26.0.1.dev8+gefade2dc2.d20261008 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../../../../../_static/documentation_options.js?v=32dd1715"></script>
+    <script src="../../../../../_static/documentation_options.js?v=db1eb675"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -47,9 +47,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/cil/optimisation/algorithms/ADMM';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.23.0rc0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.24.0dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev7+g1e4bb4330.d20261001';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev8+gefade2dc2.d20261008';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -59,7 +59,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="26.0.1.dev7+g1e4bb4330.d20261001" />
+  <meta name="docsearch:version" content="26.0.1.dev8+gefade2dc2.d20261008" />
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -550,22 +550,22 @@
 <span class="sd">    </span>
 <span class="sd">    .. math::</span>
 <span class="sd">    </span>
-<span class="sd">        \min_{x} f(x) + g(y), \text{ subject to } Ax + By = b</span>
+<span class="sd">        \min_{x,y} f(x) + g(y), \text{ subject to } Ax + By = b</span>
 
-<span class="sd">    In CIL, we have implemented the case where :math:`A = Id`, :math:`B = -K`, :math:`b = 0`  which gives </span>
-<span class="sd">    </span>
+<span class="sd">    In CIL, we have implemented the case where :math:`A = K`, :math:`B = -Id` (the identity), :math:`b = 0`  which gives</span>
+
 <span class="sd">    .. math::</span>
-<span class="sd">        </span>
-<span class="sd">        \min_x f(Kx) + g(x).</span>
+
+<span class="sd">        \min_x f(x) + g(Kx).</span>
 <span class="sd">        </span>
 <span class="sd">    The algorithm is given by the following iteration, for :math:`k\geq 1`:</span>
 <span class="sd">    </span>
 <span class="sd">    .. math::</span>
 
 <span class="sd">        \begin{cases}</span>
-<span class="sd">            x_{k} = \mathrm{prox}_{\tau f} \left(x_{k-1} - \dfrac{\tau}{\sigma} A_{T}\left(Ax_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\</span>
-<span class="sd">            z_{k} = \mathrm{prox}_{\sigma g} \left(Ax_{k} + u_{k-1}\right) \\</span>
-<span class="sd">            u_{k} = u_{k-1} + Ax_{k} - z_{k}</span>
+<span class="sd">            x_{k} = \mathrm{prox}_{\tau f} \left(x_{k-1} - \dfrac{\tau}{\sigma} K^{T}\left(Kx_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\</span>
+<span class="sd">            z_{k} = \mathrm{prox}_{\sigma g} \left(Kx_{k} + u_{k-1}\right) \\</span>
+<span class="sd">            u_{k} = u_{k-1} + Kx_{k} - z_{k}</span>
 <span class="sd">        \end{cases}</span>
 <span class="sd">        </span>
 <span class="sd">    where :math:`\mathrm{prox}_{\tau f}` is the proximal operator of :math:`f` and :math:`\mathrm{prox}_{\sigma g}` is the proximal operator of :math:`g`.</span>
@@ -573,25 +573,22 @@
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ------------</span>
-<span class="sd">    operator:  CIL Linear Operator</span>
-<span class="sd">        Operator :math:`K` in the objective function</span>
 <span class="sd">    f: CIL Function</span>
-<span class="sd">        Convex function with "simple" proximal</span>
+<span class="sd">        Convex function with "simple" proximal. The function should act on the domain of the operator.</span>
 <span class="sd">    g: CIL Function</span>
-<span class="sd">        Convex function with "simple" proximal</span>
-<span class="sd">    sigma: float, positive, defaults to 1.</span>
-<span class="sd">        Positive step size parameter</span>
+<span class="sd">        Convex function with "simple" proximal. The function should act on the range of the operator.</span>
+<span class="sd">    operator:  CIL Linear Operator</span>
+<span class="sd">            Operator :math:`K` in the objective function.</span>
 <span class="sd">    tau: float, positive, defaults to :math:`\frac{\sigma}{\|K\|^{2}}`</span>
-<span class="sd">        Positive step size parameter</span>
+<span class="sd">        Positive step size parameter.</span>
+<span class="sd">    sigma: float, positive, defaults to 1.</span>
+<span class="sd">        Positive step size parameter.</span>
 <span class="sd">    initial: DataContainer, defaults to DataContainer filled with zeros</span>
-<span class="sd">        Initial guess </span>
-<span class="sd">            </span>
+<span class="sd">        Initial guess.</span>
 <span class="sd">    </span>
 <span class="sd">    Note</span>
-<span class="sd">    ----</span>
-<span class="sd">    This implementation of ADMM minimises the same objective function as the Primal-Dual Hybrid Gradient (PDHG) method.</span>
-<span class="sd">    The main algorithmic difference is that in ADMM we compute the proximal of :math:`f` and :math:`g` </span>
-<span class="sd">    where in the PDHG this is a proximal-conjugate and proximal.</span>
+<span class="sd">    -----</span>
+<span class="sd">    This LADMM implementation is equivalent to PDHG (:class:`cil.optimisation.algorithms.PDHG`) with primal step size :math:`\tau` and dual step size :math:`1/\sigma`, applied with the primal and dual updates in swapped order.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 <span class="sd">    Note</span>

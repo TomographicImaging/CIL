@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimisation framework &#8212; CIL 26.0.1.dev7+g1e4bb4330.d20261001 documentation</title>
+    <title>Optimisation framework &#8212; CIL 26.0.1.dev8+gefade2dc2.d20261008 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../_static/documentation_options.js?v=32dd1715"></script>
+    <script src="../_static/documentation_options.js?v=db1eb675"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,9 +50,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'optimisation';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.23.0rc0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.24.0dev0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/CIL/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev7+g1e4bb4330.d20261001';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '26.0.1.dev8+gefade2dc2.d20261008';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -64,7 +64,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="26.0.1.dev7+g1e4bb4330.d20261001" />
+  <meta name="docsearch:version" content="26.0.1.dev8+gefade2dc2.d20261008" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -627,7 +627,7 @@
 <li><p>Conjugate gradient Least Squares (CGLS), Least Squares and QR-factorisation (LSQR) and SIRT solve problems of the form <span class="math notranslate nohighlight">\(Ax=b\)</span>.</p></li>
 <li><p>Iterative Shrinkage-Thresholding Algorithm (ISTA) and Fast ISTA (FISTA) both solve problems of the form <span class="math notranslate nohighlight">\(min_x f(x)+g(x)\)</span> where f is convex and differentiable and g is convex with a simple proximal operator.</p></li>
 <li><p>Primal Dual Hybrid Gradient (PDHG) solves problems of the form <span class="math notranslate nohighlight">\(min_x f(Ax)+g(x)\)</span> where f  is convex and has a “simple” proximal method of its conjugate and g is convex with a “simple” proximal. Primal-Dual 3 Operator (PD3O) solves a similar problem to PDHG but with an additional convex differentiable term.</p></li>
-<li><p>Linearized Alternating Direction Method of Multipliers (LADMM) solves problems of the form <span class="math notranslate nohighlight">\(min_x f(Ax)+g(x)\)</span> where both f and g have a “simple” proximal.</p></li>
+<li><p>Linearized Alternating Direction Method of Multipliers (LADMM) solves problems of the form <span class="math notranslate nohighlight">\(min_x f(x)+g(Kx)\)</span> where both f and g have a “simple” proximal.</p></li>
 </ul>
 <p>After initialising the algorithms, they are called using the <code class="code docutils literal notranslate"><span class="pre">run</span></code> method. The algorithms are also iterators that can be called using <code class="code docutils literal notranslate"><span class="pre">next</span></code> or in a <code class="code docutils literal notranslate"><span class="pre">for</span></code> loop.</p>
 <p>New algorithms can be easily created by extending the <code class="code docutils literal notranslate"><span class="pre">Algorithm</span></code> class.
@@ -2612,35 +2612,33 @@ The case where both functions are strongly convex is not available at the moment
 <dd><p>LADMM is the Linearized Alternating Direction Method of Multipliers (LADMM).</p>
 <p>The general form of ADMM is given by the following optimization problem:</p>
 <div class="math notranslate nohighlight">
-\[\min_{x} f(x) + g(y), \text{ subject to } Ax + By = b\]</div>
-<p>In CIL, we have implemented the case where <span class="math notranslate nohighlight">\(A = Id\)</span>, <span class="math notranslate nohighlight">\(B = -K\)</span>, <span class="math notranslate nohighlight">\(b = 0\)</span>  which gives</p>
+\[\min_{x,y} f(x) + g(y), \text{ subject to } Ax + By = b\]</div>
+<p>In CIL, we have implemented the case where <span class="math notranslate nohighlight">\(A = K\)</span>, <span class="math notranslate nohighlight">\(B = -Id\)</span> (the identity), <span class="math notranslate nohighlight">\(b = 0\)</span>  which gives</p>
 <div class="math notranslate nohighlight">
-\[\min_x f(Kx) + g(x).\]</div>
+\[\min_x f(x) + g(Kx).\]</div>
 <p>The algorithm is given by the following iteration, for <span class="math notranslate nohighlight">\(k\geq 1\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{cases}
-    x_{k} = \mathrm{prox}_{\tau f} \left(x_{k-1} - \dfrac{\tau}{\sigma} A_{T}\left(Ax_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\
-    z_{k} = \mathrm{prox}_{\sigma g} \left(Ax_{k} + u_{k-1}\right) \\
-    u_{k} = u_{k-1} + Ax_{k} - z_{k}
+    x_{k} = \mathrm{prox}_{\tau f} \left(x_{k-1} - \dfrac{\tau}{\sigma} K^{T}\left(Kx_{k-1} - z_{k-1} + u_{k-1} \right)  \right)\\
+    z_{k} = \mathrm{prox}_{\sigma g} \left(Kx_{k} + u_{k-1}\right) \\
+    u_{k} = u_{k-1} + Kx_{k} - z_{k}
 \end{cases}\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\mathrm{prox}_{\tau f}\)</span> is the proximal operator of <span class="math notranslate nohighlight">\(f\)</span> and <span class="math notranslate nohighlight">\(\mathrm{prox}_{\sigma g}\)</span> is the proximal operator of <span class="math notranslate nohighlight">\(g\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>operator</strong> (<em>CIL Linear Operator</em>) – Operator <span class="math notranslate nohighlight">\(K\)</span> in the objective function</p></li>
-<li><p><strong>f</strong> (<em>CIL Function</em>) – Convex function with “simple” proximal</p></li>
-<li><p><strong>g</strong> (<em>CIL Function</em>) – Convex function with “simple” proximal</p></li>
-<li><p><strong>sigma</strong> (<em>float</em><em>, </em><em>positive</em><em>, </em><em>defaults to 1.</em>) – Positive step size parameter</p></li>
-<li><p><strong>tau</strong> (float, positive, defaults to <span class="math notranslate nohighlight">\(\frac{\sigma}{\|K\|^{2}}\)</span>) – Positive step size parameter</p></li>
-<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>defaults to DataContainer filled with zeros</em>) – Initial guess</p></li>
+<li><p><strong>f</strong> (<em>CIL Function</em>) – Convex function with “simple” proximal. The function should act on the domain of the operator.</p></li>
+<li><p><strong>g</strong> (<em>CIL Function</em>) – Convex function with “simple” proximal. The function should act on the range of the operator.</p></li>
+<li><p><strong>operator</strong> (<em>CIL Linear Operator</em>) – Operator <span class="math notranslate nohighlight">\(K\)</span> in the objective function.</p></li>
+<li><p><strong>tau</strong> (float, positive, defaults to <span class="math notranslate nohighlight">\(\frac{\sigma}{\|K\|^{2}}\)</span>) – Positive step size parameter.</p></li>
+<li><p><strong>sigma</strong> (<em>float</em><em>, </em><em>positive</em><em>, </em><em>defaults to 1.</em>) – Positive step size parameter.</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="../framework/#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>defaults to DataContainer filled with zeros</em>) – Initial guess.</p></li>
 </ul>
 </dd>
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This implementation of ADMM minimises the same objective function as the Primal-Dual Hybrid Gradient (PDHG) method.
-The main algorithmic difference is that in ADMM we compute the proximal of <span class="math notranslate nohighlight">\(f\)</span> and <span class="math notranslate nohighlight">\(g\)</span>
-where in the PDHG this is a proximal-conjugate and proximal.</p>
+<p>This LADMM implementation is equivalent to PDHG (<a class="reference internal" href="#cil.optimisation.algorithms.PDHG" title="cil.optimisation.algorithms.PDHG"><code class="xref py py-class docutils literal notranslate"><span class="pre">cil.optimisation.algorithms.PDHG</span></code></a>) with primal step size <span class="math notranslate nohighlight">\(\tau\)</span> and dual step size <span class="math notranslate nohighlight">\(1/\sigma\)</span>, applied with the primal and dual updates in swapped order.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>

@@ -3,12 +3,14 @@
     - Added `Huber Loss` function (#2281)
     - `AcquisitionGeometry.get_angles` returns the angles in the requested unit, optionally including the initial angle (#2368)
     - `AcquisitionGeometry.set_initial_angle` updates the initial angle without re-setting the angle data (#2368)
-    - TIGRE support for tilted rotation axis (laminography) is now avaliable with TIGRE `FBP`, the `matched` back-projector and the `interpolated` forward-projector (#2362)    
+    - TIGRE support for tilted rotation axis (laminography) is now available with TIGRE `FBP`, the `matched` back-projector and the `interpolated` forward-projector. The `Siddon` forward-projector supports it for cone-beam only, and raises `NotImplementedError` for parallel-beam (#2362)
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
   - Bug fixes:
     - Fix `Parallel2D` `system_description` raising exception for near-zero vectors (#2316)
     - The interpolated TIGRE cone-beam projector now supports tilted rotation axis (laminography): the previously-broken case (axis pointing at the source) no longer returns zeros (#2362)
+    - TIGRE `ProjectionOperator` forward projection of parallel-beam data handles horizontal detector offsets (#2362)
+    - TIGRE cone-beam geometries with a detector facing away from the source (a mirrored panel) are now projected correctly (#2362)
 
 * 26.0.0
   - New features:

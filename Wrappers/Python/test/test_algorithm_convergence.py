@@ -41,7 +41,7 @@ class TestSPDHG(CCPiTestClass):
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
 
-        detectors = ig.shape[0]
+        detectors = ig.voxel_num_x
         angles = np.linspace(0, np.pi, 90)
         ag = AcquisitionGeometry.create_Parallel2D().set_angles(
             angles, angle_unit='radian').set_panel(detectors, 0.1)

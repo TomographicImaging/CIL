@@ -402,7 +402,6 @@ class Test_FDK_tigre(unittest.TestCase):
                                      .set_angles(angles)\
                                      .set_panel((det_pix_x,det_pix_y), (pix_size,pix_size))\
                                      .set_labels(['angle','vertical','horizontal'])
-        self.ig3D = self.ag3D.get_ImageGeometry()
 
         self.ad3D = self.ag3D.allocate('random', seed=5)
         self.ig3D = self.ag3D.get_ImageGeometry()
@@ -505,7 +504,6 @@ class Test_FBP_tigre(unittest.TestCase):
                                      .set_angles(angles)\
                                      .set_panel((det_pix_x,det_pix_y), (pix_size,pix_size))\
                                      .set_labels(['angle','vertical','horizontal'])
-        self.ig3D = self.ag3D.get_ImageGeometry()
 
         self.ad3D = self.ag3D.allocate('random', seed=3)
         self.ig3D = self.ag3D.get_ImageGeometry()

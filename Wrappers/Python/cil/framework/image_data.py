@@ -81,15 +81,17 @@ class ImageData(DataContainer):
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
 
-        elif issubclass(type(array) , numpy.ndarray):
-            # remove singleton dimensions
-            array = numpy.squeeze(array)
-
-        else:
+        elif not issubclass(type(array) , numpy.ndarray):
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
 
         if array.shape != geometry.shape:
-            raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
+            array_squeezed_shape = [d for d in array.shape if d != 1]
+            geometry_squeezed_shape = [d for d in geometry.shape if d != 1]
+            if array_squeezed_shape != geometry_squeezed_shape:
+                raise ValueError(f'Shape mismatch {array.shape} {geometry.shape}')
+            else:
+                array = array.reshape(geometry.shape)
+
 
         if array.ndim not in [2,3,4]:
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
@@ -127,7 +129,7 @@ class ImageData(DataContainer):
     
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None, force=False):
         '''
-        Returns a new ImageData of a single slice of in the requested direction.
+        Returns a new ImageData of a single slice in the requested direction.
         '''
         try:
             geometry_new = self.geometry.get_slice(channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
@@ -156,6 +158,13 @@ class ImageData(DataContainer):
             return out
         else:
             return ImageData(out.array, deep_copy=False, geometry=geometry_new)
+        
+    def get_centre_slice(self):
+        '''
+        Returns a new ImageData of the centre slice in the vertical direction.
+        '''
+        return self.get_slice(vertical='centre')
+
 
 
     def apply_circular_mask(self, radius=0.99, in_place=True):

@@ -95,10 +95,10 @@ class Test_Lables(unittest.TestCase):
 
     def test_image_dimension_labels_get_order(self):
         ig = ImageGeometry(4, 8, 1, channels=2)
-        ig.set_labels(['channel', 'horizontal_y', 'horizontal_x'])
+        ig.set_labels(['channel', 'vertical', 'horizontal_y', 'horizontal_x'])
 
         # for 2D all engines have the same order
-        order_gold = ImageDimension.CHANNEL, 'HORIZONTAL_Y', 'horizontal_x'
+        order_gold = ImageDimension.CHANNEL, 'VERTICAL', 'HORIZONTAL_Y', 'horizontal_x'
         self.assertSequenceEqual(ImageDimension.get_order_for_engine('cil', ig), order_gold)
         self.assertSequenceEqual(ImageDimension.get_order_for_engine('tigre', ig), order_gold)
         self.assertSequenceEqual(ImageDimension.get_order_for_engine('astra', ig), order_gold)
@@ -111,7 +111,7 @@ class Test_Lables(unittest.TestCase):
             with self.assertRaises(ValueError):
                 ImageDimension.check_order_for_engine(i, ig)
 
-        ig.set_labels(['channel', 'horizontal_y', 'horizontal_x'])
+        ig.set_labels(['channel', 'vertical', 'horizontal_y', 'horizontal_x'])
         self.assertTrue(ImageDimension.check_order_for_engine("cil", ig))
         self.assertTrue(ImageDimension.check_order_for_engine("tigre", ig))
         self.assertTrue(ImageDimension.check_order_for_engine("astra", ig))

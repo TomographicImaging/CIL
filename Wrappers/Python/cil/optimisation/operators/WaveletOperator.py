@@ -40,7 +40,7 @@ class WaveletOperator(LinearOperator):
             label for wavelet used.
         axes: list of ints, optional, default=`None`
             Defines the dimensions to decompose along. Note that channel is the first dimension: for example, spatial DWT is given by axes=range(1,3) and channelwise DWT is axes=range(1)
-            Default = `None`, meaning all dimensions are transformed. Same as axes = range(ndim)
+            Default = `None`, meaning all dimensions except singleton dimensions are transformed.
 
 
         **kwargs
@@ -75,14 +75,18 @@ class WaveletOperator(LinearOperator):
         self.correlation = kwargs.get('correlation', None)
 
         if axes is None and len(domain_geometry.shape) > 1:
+            # singleton dimensions are not included, e.g. the vertical
+            # dimension of a single slice ImageGeometry.
+            non_singleton = [i for i, n in enumerate(
+                domain_geometry.shape) if n > 1]
             if self.correlation in [None, 'All']:
-                axes = None
+                axes = non_singleton
             elif self.correlation.lower() in ["space", "spatial"]:
-                axes = [i for i, l in enumerate(
-                    domain_geometry.dimension_labels) if l != 'channel']
+                axes = [i for i in non_singleton if
+                    domain_geometry.dimension_labels[i] != 'channel']
             elif self.correlation.lower() in ["channels", "channel"]:
-                axes = [i for i, l in enumerate(
-                    domain_geometry.dimension_labels) if l == 'channel']
+                axes = [i for i in non_singleton if
+                    domain_geometry.dimension_labels[i] == 'channel']
             else:
                 raise AttributeError(
                     f"Unknown correlation type: '{self.correlation}'")

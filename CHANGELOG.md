@@ -6,8 +6,11 @@
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
     - `TransmissionAbsorptionConverter` supports `DataContainers` (#2372)
+  - Documentation:
+    -  Corrected the `LADMM` docstring and user guide: the objective is `f(x) + g(Kx)` (not `f(Kx) + g(x)`), with fixed iteration formulas and a note on its equivalence to `PDHG` (#2367)
   - Bug fixes:
     - Fix `Parallel2D` `system_description` raising exception for near-zero vectors (#2316)
+
 
 * 26.0.0
   - New features:

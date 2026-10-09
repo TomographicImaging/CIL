@@ -20,6 +20,7 @@ import logging
 import numpy as np
 
 from cil.framework import ImageData, AcquisitionData, BlockGeometry
+from cil.framework.labels import AcquisitionType
 from cil.framework.labels import AcquisitionDimension, ImageDimension
 from cil.optimisation.operators import BlockOperator, LinearOperator
 from cil.plugins.tigre import CIL2TIGREGeometry
@@ -52,7 +53,8 @@ class ProjectionOperator(LinearOperator):
             A description of the acquisition data. If passed a BlockGeometry it will return a BlockOperator.
 
         direct_method : str,  default 'interpolated'
-            The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection
+            The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection.
+            'Siddon' does not support parallel-beam geometries with a tilted rotation axis and raises a NotImplementedError.
 
         adjoint_weights : str, default 'matched'
             The weighting method used by the cone-beam backward projector, 'matched' for weights to approximately match the 'interpolated' forward projector, 'FDK' for FDK weights
@@ -110,7 +112,8 @@ class ProjectionOperator_ag(ProjectionOperator):
             A description of the acquisition data
 
         direct_method : str,  default 'interpolated'
-            The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection
+            The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection.
+            'Siddon' does not support parallel-beam geometries with a tilted rotation axis and raises a NotImplementedError.
 
         adjoint_weights : str, default 'matched'
             The weighting method used by the cone-beam backward projector, 'matched' for weights to approximately match the 'interpolated' forward projector, 'FDK' for FDK weights
@@ -142,17 +145,32 @@ class ProjectionOperator_ag(ProjectionOperator):
         super(ProjectionOperator,self).__init__(domain_geometry=image_geometry,\
              range_geometry=acquisition_geometry)
 
-        if direct_method not in ['interpolated', 'Siddon']:
+        _direct_method = {'interpolated': 'interpolated', 'siddon': 'Siddon'}.get(
+            direct_method.lower())
+        
+        if _direct_method is None:
             raise ValueError(
                 "direct_method expected 'interpolated' or 'Siddon' got {}".
                 format(direct_method))
 
-        if adjoint_weights not in ['matched', 'FDK']:
+        _adjoint_weights = {'matched': 'matched', 'fdk': 'FDK'}.get(
+            adjoint_weights.lower())
+        
+        if _adjoint_weights is None:
             raise ValueError(
                 "adjoint_weights expected 'matched' or 'FDK' got {}".format(
                     adjoint_weights))
 
-        self.method = {'direct': direct_method, 'adjoint': adjoint_weights}
+        self.method = {'direct': _direct_method, 'adjoint': _adjoint_weights}
+
+        if self.method['direct'] == 'Siddon' \
+                and acquisition_geometry.geom_type == AcquisitionType.PARALLEL \
+                and acquisition_geometry.system_description == 'advanced':
+
+            raise NotImplementedError(
+                "TIGRE's Siddon forward projector does not support tilted/advanced "
+                "parallel beam geometry: its parallel beam is confined to the x-y "
+                "plane. Use direct_method='interpolated'.")
 
         #set up TIGRE geometry
         tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(

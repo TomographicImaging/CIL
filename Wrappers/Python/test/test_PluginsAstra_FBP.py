@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from utils_projectors import TestCommon_FBP_SIM
+from utils_projectors import TestCommon_FBP_SIM, TestCommon_FBP_Laminography, TestCommon_FBP_Geometry
 from utils import has_astra, has_nvidia, initialise_tests
 
 initialise_tests()
@@ -91,3 +91,61 @@ class Test_Cone3DFlex_FBP_GPU(unittest.TestCase, TestCommon_FBP_SIM):
         self.Cone3DFlex()
         self.tolerance_fbp = 1e-3
         self.tolerance_fbp_roi = 1e-3
+
+
+class Test_Parallel3D_Laminography_FBP_GPU(unittest.TestCase, TestCommon_FBP_Laminography):
+
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    def setUp(self):
+        setup_parameters(self)
+        self.Parallel3D()
+        self.tolerance_fbp_laminography = 0.8
+
+
+class Test_Cone3D_Laminography_FBP_GPU(unittest.TestCase, TestCommon_FBP_Laminography):
+
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3D()
+        self.tolerance_fbp_laminography = 0.8
+
+
+class Test_Cone3D_Geometry_FBP_GPU(unittest.TestCase, TestCommon_FBP_Geometry):
+
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3D()
+        self.tolerance_fbp_fp = 3e-3
+        self.tolerance_fbp_crop = 1e-5
+
+
+class Test_Cone2D_Geometry_FBP_GPU(unittest.TestCase, TestCommon_FBP_Geometry):
+
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone2D()
+        self.tolerance_fbp_fp = 3e-3
+        self.tolerance_fbp_crop = 1e-5
+
+
+class Test_Parallel3D_Geometry_FBP_GPU(unittest.TestCase, TestCommon_FBP_Geometry):
+
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    def setUp(self):
+        setup_parameters(self)
+        self.Parallel3D()
+        self.tolerance_fbp_fp = 3e-3
+        self.tolerance_fbp_crop = 1e-5
+
+
+class Test_Parallel2D_Geometry_FBP_GPU(unittest.TestCase, TestCommon_FBP_Geometry):
+
+    @unittest.skipUnless(has_astra and has_nvidia, "Requires ASTRA GPU")
+    def setUp(self):
+        setup_parameters(self)
+        self.Parallel2D()
+        self.tolerance_fbp_fp = 3e-3
+        self.tolerance_fbp_crop = 1e-5

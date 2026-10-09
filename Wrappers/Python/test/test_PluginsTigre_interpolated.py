@@ -19,8 +19,9 @@
 import unittest
 from utils_projectors import TestCommon_ProjectionOperator_SIM
 from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
+from utils_projectors import TestCommon_ProjectionOperator_Geometry, TestCommon_ProjectionOperator_SIM_Geometry
 from utils import has_tigre, has_nvidia, initialise_tests
-
+from cil.utilities.display import show2D
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator
 
@@ -56,6 +57,22 @@ class Test_Cone3D_Projectors_toy_tigre(unittest.TestCase, TestCommon_ProjectionO
         self.Cone3D()
         self.tolerance_linearity = 1e-3
         self.tolerance_norm = 0.1
+
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Cone3D_Geometry_tigre(unittest.TestCase, TestCommon_ProjectionOperator_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3D()
+        self.tolerance_fp = 1e-2
+
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Parallel3D_Geometry_tigre(unittest.TestCase, TestCommon_ProjectionOperator_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Parallel3D()
+        self.tolerance_fp = 1e-2
 
 
 @unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
@@ -132,3 +149,39 @@ class Test_Parallel2D_Projectors_toy_tigre(unittest.TestCase, TestCommon_Project
         self.Parallel2D()
         self.tolerance_linearity = 1e-3
         self.tolerance_norm = 0.1
+
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Cone3D_Projectors_sim_geometry_tigre(unittest.TestCase, TestCommon_ProjectionOperator_SIM_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone3D()
+        self.tolerance_fp_crop = 1e-5
+        self.tolerance_fp_crop_horizontal = 1e-2
+
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Cone2D_Projectors_sim_geometry_tigre(unittest.TestCase, TestCommon_ProjectionOperator_SIM_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Cone2D()
+        self.tolerance_fp_crop = 1e-5
+        self.tolerance_fp_crop_horizontal = 6e-3
+
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Parallel3D_Projectors_sim_geometry_tigre(unittest.TestCase, TestCommon_ProjectionOperator_SIM_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Parallel3D()
+        self.tolerance_fp_crop = 1e-5
+        self.tolerance_fp_crop_horizontal = 4e-3
+
+
+@unittest.skipUnless(has_tigre and has_nvidia, "Requires TIGRE GPU")
+class Test_Parallel2D_Projectors_sim_geometry_tigre(unittest.TestCase, TestCommon_ProjectionOperator_SIM_Geometry):
+    def setUp(self):
+        setup_parameters(self)
+        self.Parallel2D()
+        self.tolerance_fp_crop = 1e-5
+        self.tolerance_fp_crop_horizontal = 2e-3

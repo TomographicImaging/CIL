@@ -3,6 +3,7 @@
     - Added `Huber Loss` function (#2281)
     - `AcquisitionGeometry.get_angles` returns the angles in the requested unit, optionally including the initial angle (#2368)
     - `AcquisitionGeometry.set_initial_angle` updates the initial angle without re-setting the angle data (#2368)
+    - TIGRE support for tilted rotation axis (laminography) is now available with TIGRE `FBP`, the `matched` back-projector and the `interpolated` forward-projector. The `Siddon` forward-projector supports it for cone-beam only, and raises `NotImplementedError` for parallel-beam (#2362)
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
     - `TransmissionAbsorptionConverter` supports `DataContainers` (#2372)
@@ -10,6 +11,10 @@
     -  Corrected the `LADMM` docstring and user guide: the objective is `f(x) + g(Kx)` (not `f(Kx) + g(x)`), with fixed iteration formulas and a note on its equivalence to `PDHG` (#2367)
   - Bug fixes:
     - Fix `Parallel2D` `system_description` raising exception for near-zero vectors (#2316)
+    - The interpolated TIGRE cone-beam projector now supports tilted rotation axis (laminography): the previously-broken case (axis pointing at the source) no longer returns zeros (#2362)
+    - TIGRE `ProjectionOperator` forward projection of parallel-beam data with a detector or centre-of-rotation offset is now correct (#2362)
+    - TIGRE: reversing `detector_direction_x` no longer rotates the scan by 180 degrees (#2362)
+    - TIGRE cone-beam geometries with a horizontal detector offset now use the same angle 0 as ASTRA, the ray from the source to the detector centre. Results for these geometries are rotated compared with previous versions (#2362)
 
 
 * 26.0.0

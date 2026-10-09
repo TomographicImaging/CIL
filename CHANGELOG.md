@@ -5,6 +5,7 @@
     - `AcquisitionGeometry.set_initial_angle` updates the initial angle without re-setting the angle data (#2368)
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
+    - `TransmissionAbsorptionConverter` supports `DataContainers` (#2372)
   - Documentation:
     -  Corrected the `LADMM` docstring and user guide: the objective is `f(x) + g(Kx)` (not `f(Kx) + g(x)`), with fixed iteration formulas and a note on its equivalence to `PDHG` (#2367)
   - Bug fixes:

@@ -60,7 +60,7 @@ from cil.utilities.quality_measures import mae
 
 from utils import  initialise_tests
 
-from utils import has_astra, has_tigre, has_nvidia
+from utils import has_astra, has_tigre, has_nvidia, has_ipp
 
 
 
@@ -521,6 +521,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
             '\nFor geometry type: \n' + str(data.geometry)
             raise type(e)(error_message + '\n\n' + str(e))
 
+    @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_out(self):
         """
         Tests to check output from Processors, including:

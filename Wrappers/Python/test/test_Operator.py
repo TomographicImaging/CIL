@@ -17,9 +17,9 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from utils import initialise_tests
-from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, DataContainer
+from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, DataContainer, BlockDataContainer
 from cil.framework.labels import FillType
 from cil.optimisation.operators import FiniteDifferenceOperator, SymmetrisedGradientOperator
 import numpy
@@ -145,6 +145,109 @@ class TestOperator(CCPiTestClass):
         # test norm of diagonal with complex value
         norm1 = D.norm()
         numpy.testing.assert_almost_equal(norm1, numpy.max(numpy.abs(diag.array)))
+
+    def test_DiagonalOperator_block(self):
+        ig1 = ImageGeometry(4, 3)
+        ig2 = ImageGeometry(5, 2)
+        diag = BlockDataContainer(ig1.allocate('random', seed=100),
+                                  ig2.allocate('random', seed=101))
+        x = BlockDataContainer(ig1.allocate('random', seed=102),
+                               ig2.allocate('random', seed=103))
+
+        D = DiagonalOperator(diag)
+
+        # domain and range are built from the per-block geometries
+        domain = D.domain_geometry()
+        self.assertIsInstance(domain, BlockGeometry)
+        self.assertEqual(domain.geometries[0].shape, ig1.shape)
+        self.assertEqual(domain.geometries[1].shape, ig2.shape)
+        self.assertIsInstance(D.range_geometry(), BlockGeometry)
+
+        # Apply direct and adjoint and check both act block by block
+        x_before = [x[0].as_array().copy(), x[1].as_array().copy()]
+        z = D.direct(x)
+        y = D.adjoint(x)
+        for i in range(2):
+            numpy.testing.assert_allclose(z[i].as_array(), (diag[i]*x[i]).as_array())
+            numpy.testing.assert_allclose(y[i].as_array(), (diag[i]*x[i]).as_array())
+            # the out=None branch copies x, so the input is left untouched
+            numpy.testing.assert_array_equal(x[i].as_array(), x_before[i])
+
+        out = x.copy()
+        returned = D.direct(x, out=out)
+        self.assertIs(returned, out)
+        for i in range(2):
+            numpy.testing.assert_allclose(out[i].as_array(), z[i].as_array())
+
+        # test norm is the largest entry over all blocks
+        expected = max(numpy.abs(diag[0].as_array()).max(),
+                       numpy.abs(diag[1].as_array()).max())
+        numpy.testing.assert_allclose(D.norm(), expected, rtol=1e-6)
+
+        self.assertTrue(D.dot_test(D))
+
+    def test_DiagonalOperator_nested_block(self):
+        ig = ImageGeometry(4, 3)
+        diag = BlockDataContainer(
+            BlockDataContainer(ig.allocate('random', seed=100),
+                               ig.allocate('random', seed=101)),
+            ig.allocate('random', seed=102))
+        x = BlockDataContainer(
+            BlockDataContainer(ig.allocate('random', seed=103),
+                               ig.allocate('random', seed=104)),
+            ig.allocate('random', seed=105))
+
+        D = DiagonalOperator(diag)
+
+        # a nested BlockDataContainer has no geometry of its own, so the
+        # operator must compose a nested BlockGeometry from the blocks
+        domain = D.domain_geometry()
+        self.assertIsInstance(domain, BlockGeometry)
+        self.assertIsInstance(domain.geometries[0], BlockGeometry)
+        self.assertEqual(domain.geometries[1].shape, ig.shape)
+
+        z = D.direct(x)
+        numpy.testing.assert_allclose(z[0][0].as_array(), (diag[0][0]*x[0][0]).as_array())
+        numpy.testing.assert_allclose(z[0][1].as_array(), (diag[0][1]*x[0][1]).as_array())
+        numpy.testing.assert_allclose(z[1].as_array(), (diag[1]*x[1]).as_array())
+
+        self.assertTrue(D.dot_test(D))
+
+    def test_DiagonalOperator_real_adjoint_no_conjugate(self):
+        ig = ImageGeometry(3, 3)
+        x = ig.allocate('random', seed=100)
+        diag = ig.allocate('random', seed=101)
+
+        D = DiagonalOperator(diag)
+
+        # D^* = D for a real diagonal; conjugate() would allocate a new
+        # container on every call
+        with patch.object(type(diag), 'conjugate',
+                          side_effect=AssertionError('conjugate called')):
+            y = D.adjoint(x)
+            out = ig.allocate(0)
+            D.adjoint(x, out=out)
+        numpy.testing.assert_allclose(y.as_array(), (diag*x).as_array())
+        numpy.testing.assert_allclose(out.as_array(), (diag*x).as_array())
+
+    def test_DiagonalOperator_adjoint_complex_out(self):
+        ig = ImageGeometry(3, 3)
+        x = ig.allocate('random', seed=100, dtype=numpy.complex64)
+        diag = ig.allocate('random', seed=101, dtype=numpy.complex64)
+
+        D = DiagonalOperator(diag)
+        expected = diag.as_array().conjugate() * x.as_array()
+
+        # the conjugate is written through out, not a fresh container
+        out = ig.allocate(0, dtype=numpy.complex64)
+        returned = D.adjoint(x, out=out)
+        self.assertIs(returned, out)
+        numpy.testing.assert_allclose(out.as_array(), expected, rtol=1e-6)
+
+        # out aliasing x stays correct
+        alias = x.copy()
+        D.adjoint(alias, out=alias)
+        numpy.testing.assert_allclose(alias.as_array(), expected, rtol=1e-6)
 
     def test_MaskOperator(self):
         M = 3

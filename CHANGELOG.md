@@ -1,8 +1,12 @@
 * x.x.x
   - New features:
     - Added `Huber Loss` function (#2281)
+    - `IRLS` algorithm added to the CIL algorithm class, solving L1-regularised least squares by iterative reweighting, with an `IRLSEarlyStopping` callback (#2369)
+    - `TikhonovOperator`, `BlockTikhonovOperator` and `WeightedOperator` added to the operators (#2369)
+    - `DiagonalOperator` accepts a `BlockDataContainer` diagonal (#2369)
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
+    - `LSQR` and `CGLS` accept `alpha`, `struct_operator` and `form` for generalised Tikhonov regularisation (#2369)
 
 * 26.0.0
   - New features:

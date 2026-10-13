@@ -17,12 +17,15 @@
 # - CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
+import logging
 from abc import ABC, abstractmethod
 from functools import partialmethod
 
 from tqdm.auto import tqdm as tqdm_auto
 from tqdm.std import tqdm as tqdm_std
 import numpy as np
+
+log = logging.getLogger(__name__)
 
 tqdm_std.monitor_interval = 0  # disable background monitoring thread
 
@@ -190,4 +193,63 @@ class CGLSEarlyStopping(Callback):
         self.normx = algorithm.x.norm()
         if self.normx >= self.omega:
             print('The norm of the solution is greater than {} and so the algorithm is terminated'.format(self.omega))
+            raise StopIteration
+
+
+class IRLSEarlyStopping(Callback):
+    r'''Callback to work with IRLS. It terminates the outer reweighting loop once
+    successive outer iterates stop moving, i.e. once
+
+    .. math:: \|u_k - u_{k-1}\|_2 < \epsilon \|u_{k-1}\|_2
+
+    where :math:`u_k` is the physical solution after the :math:`k`-th outer
+    iteration.
+
+    The callback allocates one :class:`DataContainer` the size of the physical
+    solution, on its first call: a copy of the previous solution in block
+    form, or a buffer for the current one in standard form.
+
+    Parameters
+    ----------
+    epsilon: float, default 1e-4
+        Usually a small number: the algorithm will terminate once the relative
+        change between successive outer iterates falls below it.
+    '''
+    def __init__(self, epsilon=1e-4):
+        self.epsilon = epsilon
+        self.tmp = None
+        self.change = np.inf
+
+    def __call__(self, algorithm):
+        previous = getattr(algorithm, 'tmp_solution', None)
+
+        if self.tmp is None:
+            # First call, at iteration -1: nothing to compare yet. Keep the
+            # fresh container get_output() allocated, or copy the live iterate.
+            current = algorithm.get_output()
+            self.tmp = current.copy() if previous is None else current
+            return
+
+        if previous is None:
+            # Block form: compare the live iterate against the copy in tmp.
+            current = algorithm.get_output()
+            denominator = self.tmp.norm()
+            self.tmp.subtract(current, out=self.tmp)
+            numerator = self.tmp.norm()
+            self.tmp.fill(current)
+        else:
+            # Standard form: tmp receives the current solution.
+            algorithm.get_output(out=self.tmp)
+            denominator = previous.norm()
+            self.tmp.subtract(previous, out=self.tmp)
+            numerator = self.tmp.norm()
+
+        if denominator == 0:
+            return
+        self.change = numerator / denominator
+
+        if self.change < self.epsilon:
+            log.info('The relative change between outer iterates is %.3e, '
+                     'below %s, and so the algorithm is terminated',
+                     self.change, self.epsilon)
             raise StopIteration

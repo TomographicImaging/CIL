@@ -34,12 +34,12 @@ from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sam
 from cil.optimisation.algorithms.APGD import NesterovMomentum, ScalarMomentumCoefficient, ConstantMomentum
 from cil.optimisation.operators import IdentityOperator, AdjointOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
-from cil.optimisation.operators import TikhonovOperator, BlockTikhonovOperator
+from cil.optimisation.operators import TikhonovOperator, BlockTikhonovOperator, WeightedOperator
 
 
 
 from cil.optimisation.functions import Rosenbrock, MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler, IndicatorBox, LeastSquares, ZeroFunction, L2NormSquared, OperatorCompositionFunction, TotalVariation, SGFunction, SVRGFunction, SAGAFunction, SAGFunction, LSVRGFunction, ScaledFunction
-from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD , LSQR
+from cil.optimisation.algorithms import Algorithm, GD, CGLS, SIRT, FISTA, ISTA, SPDHG, PDHG, LADMM, PD3O, PGD, APGD , LSQR, IRLS
 
 
 from cil.utilities import dataexample
@@ -1681,6 +1681,66 @@ class TestCallbacks(unittest.TestCase):
         with self.assertRaises(StopIteration):
             callbacks.EarlyStoppingObjectiveValue(0.1)(alg)
 
+    def test_IRLSEarlyStopping(self):
+        # Test init
+        cb = callbacks.IRLSEarlyStopping(epsilon=0.1)
+        self.assertEqual(cb.epsilon, 0.1)
+
+        # Test default values
+        cb = callbacks.IRLSEarlyStopping()
+        self.assertEqual(cb.epsilon, 1e-4)
+
+        # The first call has nothing to compare against and only records
+        alg = MagicMock(spec=['get_output'])
+        alg.get_output.side_effect = [VectorData(np.array([1.0, 0.0])),
+                                      VectorData(np.array([1.0 + 1e-9, 0.0]))]
+        cb = callbacks.IRLSEarlyStopping(epsilon=1e-4)
+        cb(alg)
+        self.assertEqual(np.inf, cb.change)
+
+        # Test it stops once successive iterates settle
+        with self.assertRaises(StopIteration):
+            cb(alg)
+
+        # Test it keeps going while the iterates move, with the change
+        # relative to the previous iterate
+        alg = MagicMock(spec=['get_output'])
+        alg.get_output.side_effect = [VectorData(np.array([10.0, 0.0])),
+                                      VectorData(np.array([11.0, 0.0]))]
+        cb = callbacks.IRLSEarlyStopping(epsilon=1e-4)
+        cb(alg)
+        cb(alg)
+        self.assertAlmostEqual(0.1, cb.change, places=6)
+
+        # Test a zero iterate does not divide by zero
+        alg = MagicMock(spec=['get_output'])
+        alg.get_output.side_effect = [VectorData(np.array([0.0, 0.0])),
+                                      VectorData(np.array([1.0, 0.0]))]
+        cb = callbacks.IRLSEarlyStopping(epsilon=1e-4)
+        cb(alg)
+        cb(alg)
+        self.assertEqual(np.inf, cb.change)
+
+        # Test standard form compares against the algorithm's tmp_solution
+        # without writing to it
+        alg = MagicMock(spec=['get_output', 'tmp_solution'])
+        alg.tmp_solution = VectorData(np.array([10.0, 0.0]))
+        iterates = [VectorData(np.array([10.0, 0.0])),
+                    VectorData(np.array([11.0, 0.0]))]
+        def get_output(out=None):
+            value = iterates[alg.get_output.call_count - 1]
+            if out is None:
+                return value
+            out.fill(value)
+            return out
+        alg.get_output.side_effect = get_output
+        cb = callbacks.IRLSEarlyStopping(epsilon=0.0)
+        cb(alg)
+        cb(alg)
+        self.assertAlmostEqual(0.1, cb.change, places=6)
+        np.testing.assert_array_equal([10.0, 0.0],
+                                      alg.tmp_solution.as_array())
+
 
 class TestADMM(unittest.TestCase):
     def setUp(self):
@@ -2225,3 +2285,199 @@ class TestLSQR(CCPiTestClass):
                     data=self.bop, alpha=0.3, form='block')
         lsqr.run(5, verbose=0)
         self.assertEqual(5, lsqr.iteration)
+
+
+class TestIRLS(CCPiTestClass):
+
+    def setUp(self):
+        np.random.seed(17)
+        self.n = 5
+        self.m = 8
+
+        A = np.random.uniform(0, 1, (self.m, self.n))
+        b = np.random.uniform(0, 1, self.m)
+
+        self.Aop = MatrixOperator(A)
+        self.bop = VectorData(b)
+        self.ig = self.Aop.domain
+        self.initial = self.ig.allocate(0)
+        self.alpha = 0.5
+
+    def test_set_up(self):
+        irls = IRLS(initial=self.initial, operator=self.Aop, data=self.bop,
+                    alpha=self.alpha, max_inner_iteration=2)
+        # the default inner solver is block-form LSQR, with the weights on
+        # IRLS's own WeightedOperator
+        self.assertIsInstance(irls.inner_solver, LSQR)
+        self.assertTrue(irls.inner_solver.block_form)
+        self.assertIs(irls.weights, irls.weighted_operator.weights)
+        self.assertTrue(irls.configured)
+
+    def test_raises(self):
+        # alpha must be positive: IRLS without regularisation is just least squares
+        for alpha in (0, -0.5):
+            with self.assertRaises(ValueError):
+                IRLS(initial=self.initial, operator=self.Aop, data=self.bop,
+                     alpha=alpha, max_inner_iteration=2)
+
+        # the inner solver is passed as a class, not an instance
+        instance = LSQR(initial=self.initial, operator=self.Aop,
+                        data=self.bop, alpha=self.alpha)
+        with self.assertRaises(TypeError):
+            IRLS(initial=self.initial, operator=self.Aop, data=self.bop,
+                 alpha=self.alpha, inner_solver=instance,
+                 max_inner_iteration=2)
+
+        # the standard form needs (WL)^-1 and the gradient has no inverse
+        ig = ImageGeometry(8, 8)
+        with self.assertRaises(ValueError):
+            IRLS(initial=ig.allocate(0), operator=IdentityOperator(ig),
+                 data=ig.allocate('random', seed=41), alpha=self.alpha,
+                 struct_operator=GradientOperator(ig), form='standard',
+                 max_inner_iteration=2)
+
+        # operator and data are both required
+        with self.assertRaises(ValueError):
+            IRLS(operator=self.Aop, alpha=self.alpha, max_inner_iteration=2)
+        with self.assertRaises(ValueError):
+            IRLS(data=self.bop, alpha=self.alpha, max_inner_iteration=2)
+
+    def test_warm_start(self):
+        # standard-form LSQR damps the step, not the solution, so it cannot
+        # warm start: asking for it warns and forces warm_start=False
+        with self.assertWarns(UserWarning):
+            irls = IRLS(initial=self.initial, operator=self.Aop,
+                        data=self.bop, alpha=self.alpha, form='standard',
+                        max_inner_iteration=2)
+        self.assertTrue(irls.inner_solver.standard_form)
+        self.assertFalse(irls.warm_start)
+
+        # CGLS warm starts in either form, with no warning
+        for form in ('block', 'standard'):
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter('always')
+                irls = IRLS(initial=self.initial, operator=self.Aop,
+                            data=self.bop, alpha=self.alpha,
+                            inner_solver=CGLS, form=form,
+                            max_inner_iteration=2)
+            self.assertEqual([], [str(w.message) for w in caught])
+            self.assertTrue(irls.warm_start)
+
+    def test_update_weights(self):
+        # the weight update is w = (|Lu|^2 + tau^2)^(-1/4), computed here in
+        # numpy with no CIL operator in the way
+        tau = 0.3
+        solution_array = np.random.uniform(-1, 1, self.n)
+        solution = self.ig.allocate(0)
+        solution.fill(solution_array)
+
+        irls = IRLS(initial=self.initial, operator=self.Aop, data=self.bop,
+                    alpha=self.alpha, tau=tau, max_inner_iteration=2)
+        irls._update_weights(solution)
+        expected = (solution_array**2 + tau**2)**-0.25
+        self.assertNumpyArrayAlmostEqual(expected, irls.weights.as_array(),
+                                         decimal=6)
+
+        # with L != I the weights live in Range(L), on Lu
+        matrix = np.array([[1.0, -2.0, 0.0, 0.5, 0.0],
+                           [0.0, 3.0, 1.0, 0.0, -1.0]])
+        irls = IRLS(initial=self.initial, operator=self.Aop, data=self.bop,
+                    alpha=self.alpha, struct_operator=MatrixOperator(matrix),
+                    tau=tau, max_inner_iteration=2)
+        irls._update_weights(solution)
+        expected = ((matrix @ solution_array)**2 + tau**2)**-0.25
+        self.assertNumpyArrayAlmostEqual(expected, irls.weights.as_array(),
+                                         decimal=6)
+
+    def test_tau(self):
+        solution = self.ig.allocate(0)
+        solution.fill(np.random.uniform(-1, 1, self.n))
+
+        # tau falls by its factor on every weight update
+        irls = IRLS(initial=self.initial, operator=self.Aop, data=self.bop,
+                    alpha=self.alpha, tau=1.0, tau_factor=0.25,
+                    max_inner_iteration=2)
+        for expected in (0.25, 0.0625, 0.015625):
+            irls._update_weights(solution)
+            self.assertAlmostEqual(expected, irls.tau, places=12)
+
+        # down to the tau_min floor
+        irls = IRLS(initial=self.initial, operator=self.Aop, data=self.bop,
+                    alpha=self.alpha, tau=1e-7, tau_factor=0.001,
+                    max_inner_iteration=2)
+        for _ in range(5):
+            irls._update_weights(solution)
+        self.assertEqual(1e-8, irls.tau)
+
+    def test_update(self):
+        # one outer iteration, rebuilt step by step against a weighted LSQR
+        # driven by hand: read the iterate, reweight, warm start, reset, run
+        tau = 0.5
+        inner = 4
+        initial = self.ig.allocate(0)
+        initial.fill(np.random.uniform(-1, 1, self.n))
+
+        irls = IRLS(initial=initial.copy(), operator=self.Aop, data=self.bop,
+                    alpha=self.alpha, tau=tau, max_inner_iteration=inner)
+        irls.run(1, verbose=0)
+
+        weighted_operator = WeightedOperator(self.ig)
+        by_hand = LSQR(initial=initial.copy(), operator=self.Aop,
+                       data=self.bop, alpha=self.alpha,
+                       struct_operator=weighted_operator, form='block')
+        solution = by_hand.get_output()
+        weights = (solution.as_array()**2 + tau**2)**-0.25
+        weighted_operator.set_weights(weights)
+        by_hand.initial = solution
+        by_hand.initialise_variables()
+        by_hand.run(inner, verbose=0)
+
+        self.assertNumpyArrayAlmostEqual(by_hand.get_output().as_array(),
+                                         irls.get_output().as_array(),
+                                         decimal=6)
+
+    def test_update_objective(self):
+        # the recorded loss is ||Au-b||^2 + alpha^2 ||u||_1 itself, not the
+        # inner solver's reweighted loss
+        for solver in (LSQR, CGLS):
+            irls = IRLS(initial=self.initial, operator=self.Aop,
+                        data=self.bop, alpha=self.alpha, inner_solver=solver,
+                        max_inner_iteration=6)
+            irls.run(3, verbose=0)
+            u = irls.get_output().as_array()
+            residual = self.Aop.A @ u - self.bop.as_array()
+            expected = residual @ residual + self.alpha**2 * np.abs(u).sum()
+            self.assertAlmostEqual(expected, irls.loss[-1], places=4)
+
+    def test_inner_solvers_agree(self):
+        outputs = {}
+        for solver in (LSQR, CGLS):
+            irls = IRLS(initial=self.ig.allocate(0), operator=self.Aop,
+                        data=self.bop, alpha=0.3, inner_solver=solver,
+                        max_inner_iteration=20)
+            irls.run(8, verbose=0)
+            outputs[solver.__name__] = irls.get_output().as_array().copy()
+        difference = np.linalg.norm(outputs['LSQR'] - outputs['CGLS'])
+        self.assertLess(difference / np.linalg.norm(outputs['LSQR']), 1e-3)
+
+    def test_tol(self):
+        # tol is off by default
+        irls = IRLS(initial=self.initial, operator=self.Aop, data=self.bop,
+                    alpha=0.3, max_inner_iteration=10)
+        self.assertIsNone(irls.tol)
+        irls.run(6, verbose=0)
+        self.assertEqual(6, irls.iteration)
+
+        # tol attaches an IRLSEarlyStopping that stops the outer loop early
+        irls = IRLS(initial=self.initial, operator=self.Aop, data=self.bop,
+                    alpha=0.3, max_inner_iteration=10, tol=1e-3)
+        irls.run(40, verbose=0)
+        self.assertLess(irls.iteration, 40)
+
+        # a caller-supplied stopper takes precedence: with epsilon=1e-12 it
+        # never fires, so IRLS must not also attach its own at 1e-3
+        irls = IRLS(initial=self.initial, operator=self.Aop, data=self.bop,
+                    alpha=0.3, max_inner_iteration=10, tol=1e-3)
+        irls.run(5, callbacks=[callbacks.IRLSEarlyStopping(epsilon=1e-12)],
+                 verbose=0)
+        self.assertEqual(5, irls.iteration)

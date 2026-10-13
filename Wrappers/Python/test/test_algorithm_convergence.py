@@ -1,5 +1,5 @@
 
-from cil.optimisation.algorithms import SPDHG, PDHG, LSQR, FISTA, APGD, GD, PD3O
+from cil.optimisation.algorithms import SPDHG, PDHG, LSQR, FISTA, APGD, GD, PD3O, IRLS
 from cil.optimisation.functions import L2NormSquared, IndicatorBox, BlockFunction, ZeroFunction, KullbackLeibler, OperatorCompositionFunction, LeastSquares, TotalVariation, MixedL21Norm
 from cil.optimisation.operators import BlockOperator, IdentityOperator, MatrixOperator, GradientOperator
 from cil.optimisation.utilities import Sampler, BarzilaiBorweinStepSizeRule, ArmijoStepSizeRule
@@ -141,7 +141,81 @@ class TestLSQR(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(lsqr.solution.as_array(), self.x.as_array(), 3)
         self.assertAlmostEqual(lsqr.objective[-1], (self.Aop.direct(self.x)-self.bop).norm()**2, 1)
 
- 
+
+class TestIRLS(CCPiTestClass):
+
+    def test_sparse_recovery(self):
+        # under-determined system with a sparse truth: least squares returns
+        # the dense minimum-norm solution and IRLS should not
+        np.random.seed(11)
+        rows, columns = 30, 60
+        matrix = np.random.standard_normal((rows, columns)) / np.sqrt(rows)
+        truth = np.zeros(columns)
+        support = np.random.choice(columns, size=5, replace=False)
+        truth[support] = np.random.standard_normal(5)
+
+        operator = MatrixOperator(matrix)
+        geometry = operator.domain
+        data = operator.range.allocate(0)
+        data.fill(matrix @ truth)
+
+        plain = LSQR(operator=operator, data=data,
+                     initial=geometry.allocate(0))
+        plain.run(200, verbose=0)
+
+        irls = IRLS(initial=geometry.allocate(0), operator=operator,
+                    data=data, alpha=0.05, tau=1.0, tau_factor=0.5,
+                    max_inner_iteration=50)
+        irls.run(20, verbose=0)
+
+        norm = np.linalg.norm(truth)
+        plain_error = np.linalg.norm(
+            plain.get_output().as_array() - truth) / norm
+        irls_error = np.linalg.norm(
+            irls.get_output().as_array() - truth) / norm
+
+        self.assertLess(irls_error, plain_error)
+        self.assertLess(irls_error, 0.25)
+
+    def test_tv_denoising(self):
+        # IRLS reweights every entry of Range(L) independently, so with the
+        # gradient as L it solves the anisotropic TV problem that FISTA
+        # solves with a TotalVariation(isotropic=False) proximal term
+        ig = ImageGeometry(16, 16)
+        operator = IdentityOperator(ig)
+        gradient = GradientOperator(ig)
+        alpha = 0.3
+
+        # a piecewise-constant phantom, which is what TV is for, plus noise
+        np.random.seed(2)
+        array = np.zeros((16, 16), dtype=np.float32)
+        array[4:12, 4:12] = 1.0
+        data = ig.allocate(0)
+        data.fill(array + 0.1*np.random.standard_normal(array.shape))
+
+        def objective(image):
+            residual = float((operator.direct(image) - data).norm())**2
+            tv = sum(float(c.abs().sum())
+                     for c in gradient.direct(image).containers)
+            return residual + alpha**2 * tv
+
+        irls = IRLS(initial=ig.allocate(0), operator=operator, data=data,
+                    alpha=alpha, struct_operator=GradientOperator(ig),
+                    max_inner_iteration=25)
+        irls.run(15, verbose=0)
+
+        fista = FISTA(initial=ig.allocate(0),
+                      f=LeastSquares(operator, data, c=1.0),
+                      g=(alpha**2)*TotalVariation(max_iteration=100,
+                                                  isotropic=False))
+        fista.run(300, verbose=0)
+
+        # IRLS smooths the 1-norm with tau, so it cannot beat a true
+        # proximal solver outright; it should get close from above
+        self.assertLess(objective(irls.get_output()),
+                        objective(fista.get_output())*1.05 + 1e-6)
+
+
 
 class TestFISTA(CCPiTestClass):
     def test_FISTA_Denoising(self):

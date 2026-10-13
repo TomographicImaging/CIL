@@ -34,6 +34,7 @@ from cil.optimisation.utilities import ArmijoStepSizeRule, ConstantStepSize, Sam
 from cil.optimisation.algorithms.APGD import NesterovMomentum, ScalarMomentumCoefficient, ConstantMomentum
 from cil.optimisation.operators import IdentityOperator, AdjointOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, MatrixOperator
+from cil.optimisation.operators import TikhonovOperator, BlockTikhonovOperator
 
 
 
@@ -770,6 +771,56 @@ class TestCGLS(CCPiTestClass):
                 (self.data-self.initial)).norm()**2)/4
         self.assertNumpyArrayEqual(self.alg.p.as_array(), ((
             self.data - self.initial-alpha*(self.data-self.initial))+beta*(self.data-self.initial)).as_array())
+
+    def test_block_is_the_default_form(self):
+        alg = CGLS(initial=self.initial, operator=self.operator,
+                   data=self.data, alpha=0.5)
+        self.assertIsInstance(alg.operator, BlockTikhonovOperator)
+        self.assertTrue(alg.block_form)
+        # alpha=0 keeps the bare operator
+        self.assertIs(self.alg.operator, self.operator)
+        self.assertFalse(self.alg.standard_form or self.alg.block_form)
+
+    def test_supports_warm_start_in_either_form(self):
+        # CGLS subtracts the alpha^2 x term explicitly, so unlike LSQR it
+        # warm starts in standard form too, and must not warn
+        for form in ('block', 'standard'):
+            with warnings.catch_warnings():
+                warnings.simplefilter('error', UserWarning)
+                alg = CGLS(initial=self.initial, operator=self.operator,
+                           data=self.data, alpha=0.5, form=form)
+            self.assertTrue(alg.supports_warm_start)
+
+    def test_regularised_convergence_in_both_forms(self):
+        # with A = L = I the minimiser of ||x-b||^2 + alpha^2||x||^2 is
+        # b/(1+alpha^2)
+        alpha = 0.5
+        expected = self.data/(1+alpha**2)
+        for form in ('block', 'standard'):
+            alg = CGLS(initial=self.ig.allocate(0), operator=self.operator,
+                       data=self.data, alpha=alpha, form=form)
+            alg.run(20, verbose=0)
+            self.assertNumpyArrayAlmostEqual(alg.get_output().as_array(),
+                                             expected.as_array(), decimal=4)
+
+    def test_warm_start_reaches_the_same_minimiser(self):
+        alpha = 0.5
+        expected = self.data/(1+alpha**2)
+        for initial in (self.ig.allocate(0), self.initial):
+            alg = CGLS(initial=initial, operator=self.operator,
+                       data=self.data, alpha=alpha, form='standard')
+            alg.run(30, verbose=0)
+            self.assertNumpyArrayAlmostEqual(alg.get_output().as_array(),
+                                             expected.as_array(), decimal=4)
+
+    def test_get_output_honours_out(self):
+        alg = CGLS(initial=self.initial, operator=self.operator,
+                   data=self.data, alpha=0.5, form='standard')
+        alg.run(5, verbose=0)
+        returned = alg.get_output()
+        out = self.ig.allocate(0)
+        self.assertIs(alg.get_output(out=out), out)
+        self.assertNumpyArrayAlmostEqual(out.as_array(), returned.as_array())
 
 
 class TestPDHG(CCPiTestClass):
@@ -1932,8 +1983,15 @@ class TestLSQR(CCPiTestClass):
 
         lsqr = LSQR(initial=self.initial_zero, operator=self.Aop, data=self.bop, alpha=0.5)
         self.assertEqual(lsqr.regalpha, 0.5)
-        self.assertNumpyArrayAlmostEqual(lsqr.operator.direct(self.x).as_array(), self.bop.as_array())
-        self.assertNumpyArrayAlmostEqual(lsqr.u.as_array(), (-lsqr.operator.direct(self.initial_zero).as_array()+ self.bop.as_array())/lsqr.beta)
+        # the default block form stacks [A; alpha*I]
+        Kx = lsqr.operator.direct(self.x)
+        self.assertNumpyArrayAlmostEqual(Kx[0].as_array(), self.bop.as_array())
+        self.assertNumpyArrayAlmostEqual(Kx[1].as_array(), 0.5*self.x.as_array())
+        # from a zero start u is the normalised stacked residual [b; 0]/beta
+        self.assertNumpyArrayAlmostEqual(lsqr.u[0].as_array(),
+                                         self.bop.as_array()/lsqr.beta)
+        self.assertNumpyArrayAlmostEqual(lsqr.u[1].as_array(),
+                                         np.zeros(self.n))
         self.assertTrue(lsqr.configured)
 
     def test_set_up(self):
@@ -1991,8 +2049,8 @@ class TestLSQR(CCPiTestClass):
 
 
     def test_update_regularised(self):
-        # scalar alpha and the explicit block system [A; alpha*I] agree from a zero
-        # initial guess
+        # the default block form and the explicit block system [A; alpha*I]
+        # agree from a zero initial guess
         lsqr_reg = LSQR(initial=self.initial_zero, operator=self.Aop, data=self.bop, alpha=0.5)
 
         L = IdentityOperator(self.ig)
@@ -2015,10 +2073,26 @@ class TestLSQR(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(lsqr_reg.solution.as_array(), lsqr_block.solution.as_array(),4)
 
     def test_warns_on_nonzero_initial_with_regularisation(self):
-        # the scalar penalty is applied to the update, so a warm start silently changes
-        # the objective that is being minimised
+        # the standard-form penalty is applied to the update, so a warm start
+        # silently changes the objective that is being minimised. The default
+        # block form avoids this, so the hazard only remains for an explicit request
         with self.assertWarnsRegex(UserWarning, "non-zero `initial`"):
-            LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5)
+            LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=0.5,
+                 form='standard')
+
+    def test_block_is_the_default_form(self):
+        # the block form carries the penalty on the solution from any starting
+        # point, so it is the default whatever the initial guess, and never warns
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            warm = LSQR(initial=self.initial, operator=self.Aop, data=self.bop,
+                        alpha=0.5)
+            cold = LSQR(initial=self.initial_zero, operator=self.Aop,
+                        data=self.bop, alpha=0.5)
+        self.assertTrue(warm.block_form)
+        self.assertTrue(cold.block_form)
+        self.assertFalse([w for w in caught
+                          if "non-zero `initial`" in str(w.message)])
 
     def test_no_warning_for_zero_initial_or_no_regularisation(self):
         for kwargs in (dict(initial=self.initial_zero, alpha=0.5),
@@ -2032,9 +2106,8 @@ class TestLSQR(CCPiTestClass):
                                   if "non-zero `initial`" in str(w.message)])
 
     def test_regularised_warm_start_solves_shifted_problem(self):
-        # from a non-zero initial guess the
-        # scalar rule converges to the minimiser of ||Ax-b||^2 + alpha^2||x-x0||^2, whereas
-        # the explicit block system converges to the intended ||Ax-b||^2 + alpha^2||x||^2
+        # from a non-zero initial guess standard form minimises
+        # ||Ax-b||^2 + alpha^2||x-x0||^2, the block system ||Ax-b||^2 + alpha^2||x||^2
         alpha = 0.5
         A = self.Aop.A
         b = self.bop.as_array()
@@ -2047,7 +2120,8 @@ class TestLSQR(CCPiTestClass):
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            scalar = LSQR(initial=x0.copy(), operator=self.Aop, data=self.bop, alpha=alpha)
+            scalar = LSQR(initial=x0.copy(), operator=self.Aop, data=self.bop,
+                          alpha=alpha, form='standard')
         scalar.run(200, verbose=0)
 
         L = IdentityOperator(self.ig)
@@ -2063,10 +2137,13 @@ class TestLSQR(CCPiTestClass):
 
 
     def test_update_objective(self):
+        # the standard form is asked for by name: it is the one whose objective is
+        # measured from `initial` rather than from zero
         alpha = 0.5
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            lsqr_reg = LSQR(initial=self.initial, operator=self.Aop, data=self.bop, alpha=alpha)
+            lsqr_reg = LSQR(initial=self.initial, operator=self.Aop, data=self.bop,
+                            alpha=alpha, form='standard')
         lsqr_reg.run(20)
 
         #  before the first update the objective is the plain residual
@@ -2081,3 +2158,70 @@ class TestLSQR(CCPiTestClass):
         self.assertNotAlmostEqual(lsqr_reg.objective[-1], residual + alpha*penalty, 3)
         self.assertNotAlmostEqual(lsqr_reg.objective[-1],
                                   residual + alpha**2*lsqr_reg.solution.norm()**2, 3)
+
+    def test_form_selects_the_operator_class(self):
+        for form, cls in (('block', BlockTikhonovOperator),
+                          ('standard', TikhonovOperator)):
+            lsqr = LSQR(initial=self.initial_zero, operator=self.Aop,
+                        data=self.bop, alpha=0.5, form=form)
+            self.assertIsInstance(lsqr.operator, cls)
+            self.assertEqual(lsqr.standard_form, form == 'standard')
+            self.assertEqual(lsqr.block_form, form == 'block')
+        lsqr = LSQR(initial=self.initial_zero, operator=self.Aop,
+                    data=self.bop, alpha=0)
+        self.assertIs(lsqr.operator, self.Aop)
+        self.assertFalse(lsqr.standard_form or lsqr.block_form)
+
+    def test_supports_warm_start(self):
+        # the standard form damps the step rather than the solution, so only
+        # the block form can resume from a previous iterate
+        for form, expected in (('block', True), ('standard', False)):
+            lsqr = LSQR(initial=self.initial_zero, operator=self.Aop,
+                        data=self.bop, alpha=0.5, form=form)
+            self.assertEqual(lsqr.supports_warm_start, expected)
+
+    def test_get_output_is_in_the_solution_space(self):
+        for form in ('block', 'standard'):
+            lsqr = LSQR(initial=self.initial_zero, operator=self.Aop,
+                        data=self.bop, alpha=0.5, form=form)
+            lsqr.run(5, verbose=0)
+            output = lsqr.get_output()
+            self.assertEqual(output.shape, self.initial_zero.shape)
+            out = self.ig.allocate(0)
+            self.assertIs(lsqr.get_output(out=out), out)
+            self.assertNumpyArrayAlmostEqual(out.as_array(), output.as_array())
+
+    def test_the_two_forms_reach_the_regularised_minimiser(self):
+        alpha = 0.5
+        A = self.Aop.A
+        b = self.bop.as_array()
+        minimiser = np.linalg.solve(A.T @ A + alpha**2*np.eye(self.n), A.T @ b)
+        for form in ('block', 'standard'):
+            lsqr = LSQR(initial=self.initial_zero, operator=self.Aop,
+                        data=self.bop, alpha=alpha, form=form)
+            lsqr.run(200, verbose=0)
+            self.assertNumpyArrayAlmostEqual(lsqr.get_output().as_array(),
+                                             minimiser, 3)
+
+    def test_breakdown_stops_instead_of_returning_nan(self):
+        # K = [I; alpha*I] gives K^T K proportional to the identity, which
+        # LSQR solves exactly in one iteration; running on would divide by zero
+        ig = ImageGeometry(8, 8)
+        data = ig.allocate('random', seed=41)
+        one_step = LSQR(initial=ig.allocate(0), operator=IdentityOperator(ig),
+                        data=data, alpha=0.7, form='block')
+        one_step.run(1, verbose=0)
+        many = LSQR(initial=ig.allocate(0), operator=IdentityOperator(ig),
+                    data=data, alpha=0.7, form='block')
+        many.run(10, verbose=0)
+        self.assertTrue(np.isfinite(many.get_output().as_array()).all())
+        self.assertTrue(np.isfinite(many.loss).all())
+        # stopping keeps the converged iterate rather than overwriting it
+        self.assertNumpyArrayAlmostEqual(one_step.get_output().as_array(),
+                                         many.get_output().as_array())
+
+    def test_breakdown_guard_does_not_fire_early(self):
+        lsqr = LSQR(initial=self.initial_zero, operator=self.Aop,
+                    data=self.bop, alpha=0.3, form='block')
+        lsqr.run(5, verbose=0)
+        self.assertEqual(5, lsqr.iteration)

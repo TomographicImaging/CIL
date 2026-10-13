@@ -27,6 +27,7 @@ from timeit import default_timer as timer
 from cil.optimisation.operators import GradientOperator, IdentityOperator,\
     DiagonalOperator, MaskOperator, ChannelwiseOperator, BlurringOperator
 from cil.optimisation.operators import LinearOperator, MatrixOperator
+from cil.optimisation.operators import BlockOperator, WaveletOperator, WeightedOperator
 import numpy
 from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOperator, ProjectionMap
 
@@ -248,6 +249,131 @@ class TestOperator(CCPiTestClass):
         alias = x.copy()
         D.adjoint(alias, out=alias)
         numpy.testing.assert_allclose(alias.as_array(), expected, rtol=1e-6)
+
+    def test_WeightedOperator(self):
+        ig = ImageGeometry(16, 16)
+        haar = WaveletOperator(ig, wname='haar', level=1)
+
+        # an explicit IdentityOperator behaves exactly like None
+        for L in (None, IdentityOperator(ig), haar, GradientOperator(ig)):
+            op = WeightedOperator(ig, operator=L)
+            self.assertTrue(LinearOperator.dot_test(op, decimal=4))
+            op.set_weights(
+                op.range_geometry().allocate('random', seed=15).abs() + 0.5)
+            self.assertTrue(LinearOperator.dot_test(op, decimal=4))
+
+        # direct is W times L
+        op = WeightedOperator(ig, operator=haar)
+        weights = haar.range_geometry().allocate('random', seed=16).abs() + 0.5
+        op.set_weights(weights)
+        x = ig.allocate('random', seed=17)
+        expected = haar.direct(x) * weights
+        self.assertNumpyArrayAlmostEqual(op.direct(x).as_array(),
+                                         expected.as_array(), decimal=5)
+
+    def test_WeightedOperator_set_weights(self):
+        def leaves(container):
+            if hasattr(container, 'containers'):
+                return [leaf for child in container.containers
+                        for leaf in leaves(child)]
+            return [container]
+
+        ig = ImageGeometry(16, 16)
+        grad = GradientOperator(ig)
+
+        # the weights exist from construction and start at one
+        op = WeightedOperator(ig, operator=grad)
+        for leaf in leaves(op.weights):
+            numpy.testing.assert_allclose(leaf.as_array(),
+                                          numpy.ones(leaf.shape))
+
+        # a BlockOperator struct operator gives a block-of-blocks range,
+        # the case the recursion in set_weights exists for
+        nested = BlockOperator(grad, IdentityOperator(ig), shape=(2, 1))
+        for L in (grad, nested):
+            op = WeightedOperator(ig, operator=L)
+            values = op.range_geometry().allocate('random', seed=14).abs() + 0.5
+            op.set_weights(values)
+            for got, want in zip(leaves(op.weights), leaves(values)):
+                numpy.testing.assert_allclose(got.as_array(), want.as_array())
+
+            op.set_weights(0.25)
+            for leaf in leaves(op.weights):
+                numpy.testing.assert_allclose(leaf.as_array(),
+                                              numpy.full(leaf.shape, 0.25))
+
+    def test_WeightedOperator_inverse(self):
+        ig = ImageGeometry(16, 16)
+        haar = WaveletOperator(ig, wname='haar', level=1)
+
+        for L in (None, haar):
+            for random_weights in (False, True):
+                op = WeightedOperator(ig, operator=L)
+                if random_weights:
+                    op.set_weights(op.range_geometry().allocate(
+                        'random', seed=18).abs() + 0.5)
+
+                x = ig.allocate('random', seed=19)
+                self.assertNumpyArrayAlmostEqual(
+                    op.inverse(op.direct(x)).as_array(), x.as_array(),
+                    decimal=4)
+
+                z = op.range_geometry().allocate('random', seed=20)
+                self.assertNumpyArrayAlmostEqual(
+                    op.direct(op.inverse(z)).as_array(), z.as_array(),
+                    decimal=4)
+
+                # <(WL)^-1 z, u> == <z, (WL)^-* u>, the dot test for the inverse
+                u = op.domain_geometry().allocate('random', seed=21)
+                self.assertAlmostEqual(
+                    op.inverse(z).dot(u) / z.dot(op.inverse_adjoint(u)), 1.0,
+                    places=4)
+
+                out = op.domain_geometry().allocate(0)
+                self.assertIs(op.inverse(z, out=out), out)
+                self.assertNumpyArrayAlmostEqual(
+                    out.as_array(), op.inverse(z).as_array(), decimal=6)
+
+        # (WL)^-1 = L^-1 W^-1 with no assumption that W and L commute
+        op = WeightedOperator(ig, operator=haar)
+        weights = haar.range_geometry().allocate('random', seed=24).abs() + 0.5
+        op.set_weights(weights)
+        z = op.range_geometry().allocate('random', seed=25)
+        expected = haar.adjoint(z / weights)
+        self.assertNumpyArrayAlmostEqual(op.inverse(z).as_array(),
+                                         expected.as_array(), decimal=5)
+
+        # (WL)^-1 is formed as L^* W^-1, which for a non-orthogonal L is
+        # simply a different operator, so it must refuse
+        op = WeightedOperator(ig, operator=GradientOperator(ig))
+        with self.assertRaises(ValueError):
+            op.inverse(op.range_geometry().allocate(0))
+        with self.assertRaises(ValueError):
+            op.inverse_adjoint(op.domain_geometry().allocate(0))
+
+    def test_WeightedOperator_is_invertible(self):
+        # (WL)^-1 exists only for an orthogonal and square L
+        ig = ImageGeometry(16, 16)
+        self.assertTrue(WeightedOperator(ig).is_invertible())
+        self.assertTrue(WeightedOperator(
+            ig, operator=IdentityOperator(ig)).is_invertible())
+        self.assertFalse(WeightedOperator(
+            ig, operator=GradientOperator(ig)).is_invertible())
+
+        # a padded wavelet reports is_orthogonal() == True but is a tall
+        # isometry: L*L = I makes L* a left inverse only
+        padded = WaveletOperator(ig, wname='db4', level=1)
+        self.assertTrue(padded.is_orthogonal())
+        self.assertGreater(numpy.prod(padded.range_geometry().shape),
+                           numpy.prod(padded.domain_geometry().shape))
+        self.assertFalse(WeightedOperator(ig, operator=padded).is_invertible())
+
+        square = WaveletOperator(ig, wname='db2', level=1,
+                                 bnd_cond='periodization')
+        self.assertTrue(square.is_orthogonal())
+        self.assertEqual(numpy.prod(square.range_geometry().shape),
+                         numpy.prod(square.domain_geometry().shape))
+        self.assertTrue(WeightedOperator(ig, operator=square).is_invertible())
 
     def test_MaskOperator(self):
         M = 3

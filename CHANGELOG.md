@@ -1,12 +1,20 @@
 * x.x.x
   - New features:
     - Added `Huber Loss` function (#2281)
+    - `AcquisitionGeometry.get_angles` returns the angles in the requested unit, optionally including the initial angle (#2368)
+    - `AcquisitionGeometry.set_initial_angle` updates the initial angle without re-setting the angle data (#2368)
     - `IRLS` algorithm added to the CIL algorithm class, solving L1-regularised least squares by iterative reweighting, with an `IRLSEarlyStopping` callback (#2369)
     - `TikhonovOperator`, `BlockTikhonovOperator` and `WeightedOperator` added to the operators (#2369)
     - `DiagonalOperator` accepts a `BlockDataContainer` diagonal (#2369)
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
+    - `TransmissionAbsorptionConverter` supports `DataContainers` (#2372)
     - `LSQR` and `CGLS` accept `alpha`, `struct_operator` and `form` for generalised Tikhonov regularisation (#2369)
+  - Documentation:
+    -  Corrected the `LADMM` docstring and user guide: the objective is `f(x) + g(Kx)` (not `f(Kx) + g(x)`), with fixed iteration formulas and a note on its equivalence to `PDHG` (#2367)
+  - Bug fixes:
+    - Fix `Parallel2D` `system_description` raising exception for near-zero vectors (#2316)
+
 
 * 26.0.0
   - New features:

@@ -101,9 +101,7 @@ class CofR_xcorrelation(Processor):
             if angle< 0  or angle>=data.geometry.config.angles.num_positions:
                 raise ValueError('projection_index is out of range. Must be between 0 and {0}. Got {1}'.format(data.geometry.config.angles.num_positions-1, self.projection_index))
 
-        angles_deg = data.geometry.config.angles.angle_data.copy()
-        if data.geometry.config.angles.angle_unit == "radian":
-                angles_deg *= 180/np.pi
+        angles_deg = data.geometry.get_angles('degree')
 
         # if there is only 1 index specified, find the angle in the list closest to 180 degrees away from the index
         if len(index) == 1:

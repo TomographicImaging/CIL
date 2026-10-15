@@ -61,12 +61,12 @@ class CGLS(Algorithm):
 
     * ``form='block'`` (the default) iterates on the stacked operator
       :math:`K = [A;\ \alpha L]` against :math:`[b;\ 0]`. It accepts any
-      :math:`L`, at the price of range containers spanning both
+      :math:`L`, at the memory cost of range containers spanning both
       :math:`\mathrm{Range}(A)` and :math:`\mathrm{Range}(L)`.
 
     * ``form='standard'`` changes variables to :math:`z = Lx` and iterates on
       :math:`K = A L^{-1}`, with the :math:`\alpha^2 x` term subtracted
-      explicitly in the recurrence. It is cheaper -- no stacked containers --
+      explicitly in the recurrence. It is less memory expensive than the block form 
       but requires an orthogonal, square :math:`L`.
 
 
@@ -132,16 +132,11 @@ class CGLS(Algorithm):
             operator, struct_operator=struct_operator,
             regalpha=self.regalpha, form=form)
 
-        # The operator's class records which form was built; alpha == 0
-        # leaves the bare operator and both flags False.
         self.standard_form = isinstance(self.operator, TikhonovOperator)
         self.block_form = isinstance(self.operator, BlockTikhonovOperator)
 
         self.data = data
 
-        # Build the workspace by copying initial and data rather than
-        # allocating from a geometry, which SIRF data does not have. The
-        # values are overwritten in initialise_variables.
         self.initial = initial
         if self.standard_form:
             # Standard form iterates in Range(L): x = L u
@@ -166,7 +161,7 @@ class CGLS(Algorithm):
     @property
     def supports_warm_start(self):
         """Always True: CGLS subtracts the :math:`\\alpha^2 x` term explicitly,
-        so it warm starts in either form."""
+        so it can be started from a non zero initialisation in either form."""
         return True
 
     def solution_geometry(self):

@@ -134,7 +134,6 @@ class IRLS(Algorithm):
                 "IRLS solves a regularised problem; alpha must be positive, "
                 "got {}.".format(alpha))
 
-        # IRLS owns the weights that wrap the structure operator
         self.weighted_operator = WeightedOperator(
             operator.domain_geometry(), struct_operator)
 

@@ -2261,13 +2261,13 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         distance_units : string, default='default'
             Units the offset is specified in. Can be 'default'or 'pixels'.
             'default' interprets the input as same units the system and panel were specified in.
-            'pixels' interprets the input in horizontal pixels.
+            'pixels' interprets the input in horizontal pixels. Can be subpixels.
 
         Returns
         -------
         offset: float
-            The offset of the centre of rotation axis compared to the detector centre
-            This can be sub-pixels
+            The offset of the centre of rotation axis compared to the detector centre, in the units
+            specified
         """
 
         cor = self.get_centre_of_rotation(distance_units)
@@ -2275,7 +2275,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         angle = cor['angle'][0]
 
         if angle != 0:
-            
+
             if distance_units == 'pixels':
                 step = 1 
             else:

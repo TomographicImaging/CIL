@@ -622,6 +622,32 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         out = ag.get_centre_of_rotation()
         self.assertDictEqual(gold_3D, out, "Failed Cone3D")
 
+    def test_get_centre_of_rotation_by_slice(self):
+        #check outputs for each geometry type
+        ag = AcquisitionGeometry.create_Parallel2D().set_panel(10,0.5)
+        ag.set_centre_of_rotation(0.25, distance_units='default')
+        out_pix = ag.get_centre_of_rotation_by_slice(0, 'pixels')
+        self.assertEqual(out_pix, 0.5, "Failed Parallel2D")
+        out_default = ag.get_centre_of_rotation_by_slice(0)
+        self.assertEqual(out_default, 0.25, "Failed Parallel2D")
+        
+
+        ag = AcquisitionGeometry.create_Parallel3D().set_panel([10,10],[0.5,0.5])
+        ag.set_centre_of_rotation(offset=0.25, angle=math.pi/4)
+        self.assertAlmostEqual(ag.get_centre_of_rotation_by_slice(-5, 'pixels'), -4.5, msg="Failed Parallel3D")
+        self.assertAlmostEqual(ag.get_centre_of_rotation_by_slice(5, 'pixels'), 5.5,msg="Failed Parallel3D")
+
+        ag = AcquisitionGeometry.create_Cone2D([0,-50], [0,50]).set_panel(10,0.5)
+        ag.set_centre_of_rotation(0.5)
+        self.assertEqual(0.5, ag.get_centre_of_rotation_by_slice(0), msg="Failed Cone2D")
+        out_pix = ag.get_centre_of_rotation_by_slice(0, 'pixels')
+        self.assertAlmostEqual(out_pix, 1, msg="Failed Cone2D")
+
+        ag = AcquisitionGeometry.create_Cone3D([0,-50,0], [0,50,0]).set_panel([10,10],[0.5,0.5])
+        ag.set_centre_of_rotation(offset=0.25, angle=math.pi/4)
+        self.assertAlmostEqual(ag.get_centre_of_rotation_by_slice(-5, 'pixels'), -4.5, msg="Failed Cone3D")
+        self.assertAlmostEqual(ag.get_centre_of_rotation_by_slice(5, 'pixels'), 5.5,msg="Failed Cone3D")
+
 
     def test_equal(self):
         AG = AcquisitionGeometry.create_Parallel3D()

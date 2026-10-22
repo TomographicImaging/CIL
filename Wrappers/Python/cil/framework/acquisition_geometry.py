@@ -2210,6 +2210,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
          - Offset is specified in pixels
          - Offset can be sub-pixels
          - Offset direction is specified by detector.direction_x
+         - The slice index is defined with respect to the detector centre, and may be negative.
 
         Parameters
         ----------
@@ -2246,6 +2247,43 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
             angle = math.atan2(offset2 - offset1, slice_index2 - slice_index1)
 
         self.set_centre_of_rotation(offset_x_y0, 'pixels', angle, 'radian')
+
+    def get_centre_of_rotation_by_slice(self, slice_index, distance_units='default'):
+        """
+        Returns the requested centre of rotation offset at the detector for the given slice index.
+
+        Parameters
+        ----------
+        slice_index: int
+            The slice index at which to retrieve the offset
+            The slice index is defined with respect to the detector centre, and may be negative.
+
+        distance_units : string, default='default'
+            Units the offset is specified in. Can be 'default'or 'pixels'.
+            'default' interprets the input as same units the system and panel were specified in.
+            'pixels' interprets the input in horizontal pixels.
+
+        Returns
+        -------
+        offset: float
+            The offset of the centre of rotation axis compared to the detector centre
+            This can be sub-pixels
+        """
+
+        cor = self.get_centre_of_rotation(distance_units)
+        offset = cor['offset'][0]
+        angle = cor['angle'][0]
+
+        if angle != 0:
+            
+            if distance_units == 'pixels':
+                step = 1 
+            else:
+                step = self.config.panel.pixel_size[1]
+
+            offset = offset + slice_index*step*math.tan(angle)
+
+        return offset
 
 
     def set_angles(self, angles, initial_angle=0, angle_unit='degree'):

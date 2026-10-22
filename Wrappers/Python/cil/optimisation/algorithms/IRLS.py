@@ -66,8 +66,7 @@ class IRLS(Algorithm):
     alpha : float
         The regularisation parameter :math:`\alpha`. Must be positive and non-zero. 
     struct_operator : Operator, optional
-        The structural operator :math:`L`. ``None`` means the identity,
-        i.e. a plain L1 penalty on the solution.
+        The structural operator :math:`L`. Defaults to ``None``, giving standard L1 regularisation.
     inner_solver : class, default LSQR
         The inner solver class, :class:`LSQR` or :class:`CGLS`. IRLS builds
         and owns the instance itself; pass the class, not an instance.

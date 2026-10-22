@@ -152,8 +152,6 @@ class IRLS(Algorithm):
                 UserWarning, stacklevel=3)
             self.warm_start = False
 
-        # CGLS works with the squared condition number which can cause divergence 
-        # so its inner solves get the early-stopping guard.
         self.inner_callbacks = ([CGLSEarlyStopping()]
                                 if isinstance(self.inner_solver, CGLS) else [])
 

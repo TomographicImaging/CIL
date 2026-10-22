@@ -206,8 +206,6 @@ class IRLS(Algorithm):
         solution. Allocates nothing."""
         weights = self.weighted_operator.weights
 
-        # Map to structure space (Lu), where the weights live: the weights
-        # are a function of Lu, never of WLu.
         self.weighted_operator.operator.direct(solution, out=weights)
 
         # weights = (|Lu|^2 + tau^2)^(-1/4)

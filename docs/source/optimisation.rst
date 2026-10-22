@@ -98,6 +98,13 @@ LSQR
    :inherited-members: run, update_objective_interval
 
 
+IRLS
+----
+.. autoclass:: cil.optimisation.algorithms.IRLS
+   :members:
+   :inherited-members: run, update_objective_interval
+
+
 SIRT
 ----
 .. autoclass:: cil.optimisation.algorithms.SIRT
@@ -326,6 +333,18 @@ A :code:`ScaledOperator` represents the multiplication of any operator with a sc
 
 
 .. autoclass:: cil.optimisation.operators.DiagonalOperator
+   :members:
+
+
+.. autoclass:: cil.optimisation.operators.TikhonovOperator
+   :members:
+
+
+.. autoclass:: cil.optimisation.operators.BlockTikhonovOperator
+   :members:
+
+
+.. autoclass:: cil.optimisation.operators.WeightedOperator
    :members:
 
 
@@ -675,6 +694,9 @@ Built-in callbacks include:
    :members:
 
 .. autoclass:: cil.optimisation.utilities.callbacks.CGLSEarlyStopping
+   :members:
+
+.. autoclass:: cil.optimisation.utilities.callbacks.IRLSEarlyStopping
    :members:
 
 Users can also write custom callbacks.

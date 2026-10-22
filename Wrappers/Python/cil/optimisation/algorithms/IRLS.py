@@ -72,8 +72,7 @@ class IRLS(Algorithm):
         and owns the instance itself; pass the class, not an instance.
     form : {'block', 'standard'}, default 'block'
         Which formulation the inner solver iterates on; see the LSQR and CGLS
-        documentation. The default block form accepts any :math:`L` and warm
-        starts with either solver.
+        documentation. The default block form accepts any :math:`L` and can take any initialisation.
     tau : float, default 1.0
         Initial smoothing parameter of the weight update.
     tau_factor : float, default 0.1

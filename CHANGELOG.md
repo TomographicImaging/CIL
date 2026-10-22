@@ -3,7 +3,7 @@
     - Added `Huber Loss` function (#2281)
     - `AcquisitionGeometry.get_angles` returns the angles in the requested unit, optionally including the initial angle (#2368)
     - `AcquisitionGeometry.set_initial_angle` updates the initial angle without re-setting the angle data (#2368)
-    - Added `AcquisitionGeometry.get_centre_of_rotation_by_slice` to retrieve the Centre of Rotation offset for a given slice index.
+    - Added `AcquisitionGeometry.get_centre_of_rotation_by_slice` to retrieve the Centre of Rotation offset for a given slice index (#2376).
   - Enhancements:
     - `GenericFilteredBackProjection`'s `plot_filter` returns a `matplotlib.figure.Figure` instead of a `matplotlib.pyplot` (#2360)
     - `TransmissionAbsorptionConverter` supports `DataContainers` (#2372)

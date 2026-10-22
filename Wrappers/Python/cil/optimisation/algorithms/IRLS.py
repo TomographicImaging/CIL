@@ -219,10 +219,8 @@ class IRLS(Algorithm):
 
     def update_objective(self):
         """
-        Record the L1 objective ||Au-b||^2 + alpha^2 ||Lu||_1 at the current
-        solution, at the cost of one application of A and of L per entry --
-        throttle with ``update_objective_interval``. The inner solver's
-        reweighted loss stays available through ``inner_solver.loss``.
+        The L1 objective ||Au-b||^2 + alpha^2 ||Lu||_1 at the current
+        solution, at the cost of one application of A and of L per calculation. Called every ``update_objective_interval outer iterations. ``.
         """
         u = self.inner_solver.get_output()
 

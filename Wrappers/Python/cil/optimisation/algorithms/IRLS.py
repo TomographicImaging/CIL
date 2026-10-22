@@ -131,8 +131,8 @@ class IRLS(Algorithm):
 
         if alpha <= 0:
             raise ValueError(
-                "IRLS solves a regularised problem; alpha must be positive, "
-                "got {}.".format(alpha))
+                "The regularisation parameter,  alpha,  must be positive, "
+                "got alpha = {}.".format(alpha))
 
         self.weighted_operator = WeightedOperator(
             operator.domain_geometry(), struct_operator)

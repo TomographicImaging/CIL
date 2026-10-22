@@ -64,8 +64,7 @@ class IRLS(Algorithm):
     data : DataContainer
         The measured data :math:`b`.
     alpha : float
-        The regularisation parameter :math:`\alpha`. Must be positive: IRLS
-        without regularisation is just least squares.
+        The regularisation parameter :math:`\alpha`. Must be positive and non-zero. 
     struct_operator : Operator, optional
         The structural operator :math:`L`. ``None`` means the identity,
         i.e. a plain L1 penalty on the solution.

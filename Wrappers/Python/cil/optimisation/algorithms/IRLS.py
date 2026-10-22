@@ -203,7 +203,7 @@ class IRLS(Algorithm):
 
     def _update_weights(self, solution):
         """Update the diagonal L1 weights in-place from the previous outer
-        solution. Allocates nothing."""
+        solution."""
         weights = self.weighted_operator.weights
 
         self.weighted_operator.operator.direct(solution, out=weights)

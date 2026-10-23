@@ -11,6 +11,7 @@
   - Bug fixes:
     - `LSQR` now documents and warns that a non-zero scalar `alpha` regularises towards `initial`, minimising `||Ax-b||^2 + alpha^2||x-initial||^2` rather than `||Ax-b||^2 + alpha^2||x||^2` (#2357)
     - Fix `Parallel2D` `system_description` raising exception for near-zero vectors (#2316)
+    - `AcquisitionGeometry`'s `get_slice` now correctly checks Geometry type (#2378)
 
 
 * 26.0.0

@@ -24,6 +24,7 @@
     a folder (#2239)
     - Update ASTRA interface to `direct_FP3D/BP3D` removing copies for GPU `ProjectionOperator` calls (#2134)
   - Bug fixes:
+    - `CentreOfRotationCorrector.image_sharpness` data is now correctly smoothed to reduce aliasing artefacts and improve robustness. (#2202)
     - `PaganinProcessor` now correctly applies scaling with magnification for cone-beam geometry (#2225)
     - `cilacc` path lookup no longer broken for editable installations (#2257)
     - update `version.py` to use `importlib` & fix tagless installation #2255 (#2269)

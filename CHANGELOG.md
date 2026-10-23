@@ -10,6 +10,7 @@
     -  Corrected the `LADMM` docstring and user guide: the objective is `f(x) + g(Kx)` (not `f(Kx) + g(x)`), with fixed iteration formulas and a note on its equivalence to `PDHG` (#2367)
   - Bug fixes:
     - Fix `Parallel2D` `system_description` raising exception for near-zero vectors (#2316)
+    - `AcquisitionGeometry`'s `get_slice` now correctly checks Geometry type (#2378)
 
 
 * 26.0.0

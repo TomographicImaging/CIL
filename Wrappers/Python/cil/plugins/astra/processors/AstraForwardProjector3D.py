@@ -97,9 +97,7 @@ class AstraForwardProjector3D(DataProcessor):
 
         IM = self.get_input()
 
-        #ASTRA expects a 3D array with shape 1, CIL removes dimensions of len 1
         new_shape_ig = [self.volume_geometry.voxel_num_z,self.volume_geometry.voxel_num_y,self.volume_geometry.voxel_num_x]
-        new_shape_ig = [x if x>0 else 1 for x in new_shape_ig]
 
         data_temp = IM.as_array().reshape(new_shape_ig)
 

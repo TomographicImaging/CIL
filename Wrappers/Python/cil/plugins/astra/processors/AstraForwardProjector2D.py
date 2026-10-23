@@ -17,7 +17,7 @@
 # CIL Developers, listed at: https://github.com/TomographicImaging/CIL/blob/master/NOTICE.txt
 
 
-from cil.framework import DataProcessor, AcquisitionData
+from cil.framework import DataProcessor, AcquisitionData, ImageData
 from cil.plugins.astra.utilities import convert_geometry_to_astra_vec_2D
 import astra
 import numpy as np
@@ -79,11 +79,14 @@ class AstraForwardProjector2D(DataProcessor):
             NotImplemented
 
     def check_input(self, dataset):
-        if dataset.number_of_dimensions == 1 or\
-           dataset.number_of_dimensions == 2:
-               return True
+        if not isinstance(dataset, ImageData):
+            raise TypeError("Expected input type is ImageData, got {0}"
+                            .format(type(dataset)))
+
+        if dataset.number_of_dimensions == 3 and dataset.geometry.voxel_num_z == 1:
+            return True
         else:
-            raise ValueError("Expected input dimensions is 1 or 2, got {0}"\
+            raise ValueError("Expected input dimensions is 3, got {0}"\
                              .format(dataset.number_of_dimensions))
 
     def _set_up(self):
@@ -106,9 +109,7 @@ class AstraForwardProjector2D(DataProcessor):
 
         IM = self.get_input()
 
-        #ASTRA expects a 2D array with shape 1, CIL removes dimensions of len 1
         new_shape_ig = [self.volume_geometry.voxel_num_y,self.volume_geometry.voxel_num_x]
-        new_shape_ig = [x if x>0 else 1 for x in new_shape_ig]
 
         IM_data_temp = IM.as_array().reshape(new_shape_ig)
 

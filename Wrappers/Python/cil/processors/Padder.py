@@ -42,9 +42,9 @@ class Padder(DataProcessor):
     Notes
     -----
     `pad_width`  behaviour (number of pixels):
-        - int: Each axis will be padded with a border of this size
-        - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-        - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
+        - int: Each non-singleton, spatial axis will be padded with a border of this size
+        - tuple(int, int): Each non-singleton, spatial axis will be padded with an asymmetric border i.e. (before, after)
+        - dict: Specified axes will be padded, singleton axes included: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
     `pad_values`  behaviour:
         - float: Each border will use this value
@@ -95,7 +95,7 @@ class Padder(DataProcessor):
         """
         Padder processor wrapping numpy.pad with mode `constant`.
 
-        Pads the data with a constant value border. Pads in all *spatial*
+        Pads the data with a constant value border. Pads in all non-singleton *spatial*
         dimensions unless a dictionary is passed to either `pad_width` or `constant_values`
 
         Parameters
@@ -108,9 +108,9 @@ class Padder(DataProcessor):
         Notes
         -----
         `pad_width`  behaviour (number of pixels):
-         - int: Each axis will be padded with a border of this size
-         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
+         - int: Each non-singleton, spatial axis will be padded with a border of this size
+         - tuple(int, int): Each non-singleton, spatial axis will be padded with an asymmetric border i.e. (before, after)
+         - dict: Specified axes will be padded, singleton axes included: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
         `constant_values`  behaviour (value of pixels):
          - float: Each border will be set to this value
@@ -147,7 +147,7 @@ class Padder(DataProcessor):
         """
         Padder processor wrapping numpy.pad with mode `edge`.
 
-        Pads the data by extending the edge values in to the border. Pads in all *spatial*
+        Pads the data by extending the edge values in to the border. Pads in all non-singleton *spatial*
         dimensions unless a dictionary is passed to `pad_width`.
 
         pad_width: int, tuple, dict
@@ -156,9 +156,9 @@ class Padder(DataProcessor):
         Notes
         -----
         `pad_width` behaviour (number of pixels):
-         - int: Each axis will be padded with a border of this size
-         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
+         - int: Each non-singleton, spatial axis will be padded with a border of this size
+         - tuple(int, int): Each non-singleton, spatial axis will be padded with an asymmetric border i.e. (before, after)
+         - dict: Specified axes will be padded, singleton axes included: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
         If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
         and the last two angles in geometry.angles. The user should ensure the output is as expected.
@@ -189,7 +189,7 @@ class Padder(DataProcessor):
         """Padder processor wrapping numpy.pad with mode `linear_ramp`
 
         Pads the data with values calculated from a linear ramp between the array edge
-        value and the set end_value. Pads in all *spatial* dimensions unless a dictionary
+        value and the set end_value. Pads in all non-singleton *spatial* dimensions unless a dictionary
         is passed to either `pad_width` or `constant_values`
 
         pad_width: int, tuple, dict
@@ -200,9 +200,9 @@ class Padder(DataProcessor):
         Notes
         -----
         `pad_width` behaviour (number of pixels):
-         - int: Each axis will be padded with a border of this size
-         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
+         - int: Each non-singleton, spatial axis will be padded with a border of this size
+         - tuple(int, int): Each non-singleton, spatial axis will be padded with an asymmetric border i.e. (before, after)
+         - dict: Specified axes will be padded, singleton axes included: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
         `end_values` behaviour:
          - float: Each border will use this end value
@@ -241,7 +241,7 @@ class Padder(DataProcessor):
         Padder processor wrapping numpy.pad with mode `reflect`.
 
         Pads with the reflection of the data mirrored along first and last values each axis.
-        Pads in all *spatial* dimensions unless a dictionary is passed to `pad_width`.
+        Pads in all non-singleton *spatial* dimensions unless a dictionary is passed to `pad_width`.
 
         pad_width: int, tuple, dict
             The size of the border along each axis, see usage notes
@@ -249,9 +249,9 @@ class Padder(DataProcessor):
         Notes
         -----
         `pad_width` behaviour (number of pixels):
-         - int: Each axis will be padded with a border of this size
-         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
+         - int: Each non-singleton, spatial axis will be padded with a border of this size
+         - tuple(int, int): Each non-singleton, spatial axis will be padded with an asymmetric border i.e. (before, after)
+         - dict: Specified axes will be padded, singleton axes included: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
         If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
         and the last two angles in geometry.angles. The user should ensure the output is as expected.
@@ -283,7 +283,7 @@ class Padder(DataProcessor):
         Padder processor wrapping numpy.pad with mode `symmetric`.
 
         Pads with the reflection of the data mirrored along the edge of the array.
-        Pads in all *spatial* dimensions unless a dictionary is passed to `pad_width`.
+        Pads in all non-singleton *spatial* dimensions unless a dictionary is passed to `pad_width`.
 
         Parameters
         ----------
@@ -293,9 +293,9 @@ class Padder(DataProcessor):
         Notes
         -----
         `pad_width` behaviour (number of pixels):
-         - int: Each axis will be padded with a border of this size
-         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
+         - int: Each non-singleton, spatial axis will be padded with a border of this size
+         - tuple(int, int): Each non-singleton, spatial axis will be padded with an asymmetric border i.e. (before, after)
+         - dict: Specified axes will be padded, singleton axes included: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
         If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
         and the last two angles in geometry.angles. The user should ensure the output is as expected.
@@ -327,7 +327,7 @@ class Padder(DataProcessor):
         Padder processor wrapping numpy.pad with mode `wrap`.
 
         Pads with the wrap of the vector along the axis. The first values are used to pad the
-        end and the end values are used to pad the beginning. Pads in all *spatial* dimensions
+        end and the end values are used to pad the beginning. Pads in all non-singleton *spatial* dimensions
         unless a dictionary is passed to `pad_width`.
 
         Parameters
@@ -338,9 +338,9 @@ class Padder(DataProcessor):
         Notes
         -----
         `pad_width` behaviour (number of pixels):
-         - int: Each axis will be padded with a border of this size
-         - tuple(int, int): Each axis will be padded with an asymmetric border i.e. (before, after)
-         - dict: Specified axes will be padded: e.g. {'horizontal':(8, 23), 'vertical': 10}
+         - int: Each non-singleton, spatial axis will be padded with a border of this size
+         - tuple(int, int): Each non-singleton, spatial axis will be padded with an asymmetric border i.e. (before, after)
+         - dict: Specified axes will be padded, singleton axes included: e.g. {'horizontal':(8, 23), 'vertical': 10}
 
         If padding angles the angular values assigned to the padded axis will be extrapolated from the first two,
         and the last two angles in geometry.angles. The user should ensure the output is as expected.
@@ -508,7 +508,10 @@ class Padder(DataProcessor):
                         'horizontal_x'
                     ]
 
-            dimensions = list(set(spatial_dimensions) & set(self._labels_in))
+            # singleton dimensions are not padded, e.g. the vertical dimension
+            # of a single slice ImageGeometry. Use a dictionary to pad these.
+            dimensions = [dim for i, dim in enumerate(self._labels_in) \
+                if dim in spatial_dimensions and self._shape_in[i] > 1]
 
 
         # get pad_widths for these dimensions
@@ -543,7 +546,9 @@ class Padder(DataProcessor):
                 self._processed_dims[i] = 1
                 self._shape_out_full[i] += self._pad_width_param[i][0] + self._pad_width_param[i][1]
 
-        self._shape_out = tuple(i for i in self._shape_out_full if i > 1)
+        # the output has the same dimensions as the input, only the dimensions
+        # that have been padded change in size
+        self._shape_out = tuple(self._shape_out_full[offset::])
 
 
     def _process_acquisition_geometry(self):
@@ -619,15 +624,15 @@ class Padder(DataProcessor):
         arr_in = dc_in.array.reshape(self._shape_in)
 
         if self.mode in ['reflect', 'symmetric', 'wrap', 'edge']:
-            arr_out = np.pad(arr_in, self._pad_width_param, mode=self.mode,).squeeze()
+            arr_out = np.pad(arr_in, self._pad_width_param, mode=self.mode,)
         elif self.mode == 'constant':
             arr_out = np.pad(arr_in, self._pad_width_param, mode=self.mode, \
-                constant_values=self._pad_values_param).squeeze()
+                constant_values=self._pad_values_param)
         elif self.mode == 'linear_ramp':
             arr_out = np.pad(arr_in, self._pad_width_param, mode=self.mode, \
-                end_values=self._pad_values_param).squeeze()
+                end_values=self._pad_values_param)
 
-        return arr_out
+        return arr_out.reshape(self._shape_out)
 
 
 
@@ -661,9 +666,9 @@ class Padder(DataProcessor):
         else:
             # check size and shape if passed out
             try:
-                out.array = out.array.reshape(self._shape_out_full)
+                out.array = out.array.reshape(self._shape_out)
             except:
-                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self._shape_out_full, np.float32, out.array.shape, out.array.dtype))
+                raise ValueError("Array of `out` not compatible. Expected shape: {0}, data type: {1} Got shape: {2}, data type: {3}".format(self._shape_out, np.float32, out.array.shape, out.array.dtype))
 
             if new_geometry is not None:
                 if out.geometry != new_geometry:

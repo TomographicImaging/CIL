@@ -300,6 +300,9 @@ class CofR_image_sharpness(Processor):
             data_processed = data_filtered
 
         ig = data_processed.geometry.get_ImageGeometry()
+        # ASTRA requires cubic voxels, whereas default would've
+        # got it from the panel_size[1] which was unchanged: 
+        ig.voxel_size_z = ig.voxel_size_x
 
         #binned grid search
         vox_rad = np.ceil(self.search_range /self.initial_binning)
@@ -330,6 +333,9 @@ class CofR_image_sharpness(Processor):
         log.debug("fine search starting at %f", centre)
         data_processed = data_filtered
         ig = data_processed.geometry.get_ImageGeometry()
+        # the reconstruction is a single slice of arbitrary thickness, so make
+        # the voxels cubic, as the ASTRA FDK backend requires
+        ig.voxel_size_z = ig.voxel_size_x
         a = centre - ig.voxel_size_x *2
         b = centre + ig.voxel_size_x *2
         centre = self.gss(data_processed,ig, (a, b), self.tolerance *ig.voxel_size_x, 1 )

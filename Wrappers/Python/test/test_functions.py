@@ -1835,7 +1835,9 @@ class TestIndicatorBox(unittest.TestCase):
     def create_circular_mask(self, ig):
         mask = ig.allocate(1)
         # create circular mask
-        pix_x, pix_y = ig.shape
+        # the spatial dimensions are the trailing ones, as single slice ImageGeometry
+        # has a singleton vertical dimension
+        pix_x, pix_y = ig.shape[-2:]
         center = [int(pix_x / 2.), int(pix_y / 2.)]
 
         Y, X = np.ogrid[:pix_y, :pix_x]
@@ -2307,8 +2309,8 @@ class TestHuberLoss(unittest.TestCase):
         r = self.A.direct(x) - b
         res = f1(x)
 
-        expected_elem0 = 0.5 *c * (r.array[0][0]**2)
-        expected_elem1 = c * huber_delta * (np.abs(r.array[0][1]) - 0.5 * huber_delta)
+        expected_elem0 = 0.5 *c * (r.array[0][0][0]**2)
+        expected_elem1 = c * huber_delta * (np.abs(r.array[0][0][1]) - 0.5 * huber_delta)
 
         numpy.testing.assert_almost_equal(res, (expected_elem0 + expected_elem1)*2)
 
@@ -2316,8 +2318,8 @@ class TestHuberLoss(unittest.TestCase):
         f2 = HuberLoss(A, b,huber_delta, c, weight=weight)
         res = f2(x)
 
-        expected_elem0 = 0.5 *c * (r.array[0][0]**2) * weight.array[0][0]
-        expected_elem1 = c * huber_delta * (np.abs(r.array[0][1]) - 0.5 * huber_delta) * weight.array[0][1]
+        expected_elem0 = 0.5 *c * (r.array[0][0][0]**2) * weight.array[0][0][0]
+        expected_elem1 = c * huber_delta * (np.abs(r.array[0][0][1]) - 0.5 * huber_delta) * weight.array[0][0][1]
 
         numpy.testing.assert_almost_equal(res, (expected_elem0 + expected_elem1)*2)
 

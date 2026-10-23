@@ -79,8 +79,10 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.offDetector,0)
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
+        # a 2D acquisition geometry is reconstructed as a single slice, but the
+        # slice keeps the voxel size of the image geometry it was given
         np.testing.assert_allclose(tg_geometry.nVoxel, [1,self.ig.voxel_num_y,self.ig.voxel_num_x])
-        np.testing.assert_allclose(tg_geometry.dVoxel, [ag.config.panel.pixel_size[1]/ag.magnification,self.ig.voxel_size_y,self.ig.voxel_size_x])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
 
     def test_cone3D_simple(self):
         ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-6,0], detector_position=[0,16,0])\
@@ -209,8 +211,10 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.offDetector,0)
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
+        # a 2D acquisition geometry is reconstructed as a single slice, but the
+        # slice keeps the voxel size of the image geometry it was given
         np.testing.assert_allclose(tg_geometry.nVoxel, [1,self.ig.voxel_num_y,self.ig.voxel_num_x])
-        np.testing.assert_allclose(tg_geometry.dVoxel, [ag.config.panel.pixel_size[1],self.ig.voxel_size_y,self.ig.voxel_size_x])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
 
     def test_parallel3D_simple(self):
         ag = AcquisitionGeometry.create_Parallel3D()\

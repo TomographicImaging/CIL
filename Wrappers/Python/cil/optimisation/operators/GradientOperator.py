@@ -18,7 +18,7 @@
 
 from cil.optimisation.operators import LinearOperator
 from cil.optimisation.operators import FiniteDifferenceOperator
-from cil.framework import BlockGeometry, ImageGeometry, cilacc
+from cil.framework import BlockGeometry, cilacc
 import logging
 from cil.utilities.multiprocessing import NUM_THREADS
 import numpy as np
@@ -171,12 +171,13 @@ class GradientOperator(LinearOperator):
           - 2D geometries :math:`norm = \sqrt{8}`
           - 3D geometries :math:`norm = \sqrt{12}`
 
+        Only the dimensions the gradient is taken over contribute to the norm,
+        i.e. singleton dimensions, and the channel dimension if the correlation
+        is :code:`Space`, are not included.
+
         """
 
-        if self.correlation==CORRELATION_SPACE and self._domain_geometry.channels > 1:
-            norm = np.array(self.operator.voxel_size_order[1::])
-        else:
-            norm = np.array(self.operator.voxel_size_order)
+        norm = np.array(self.operator.voxel_size_gradient)
 
         norm = 4 / (norm * norm)
 
@@ -226,6 +227,10 @@ class Gradient_numpy(LinearOperator):
             self.voxel_size_order = list(domain_geometry.spacing)
         except:
             self.voxel_size_order = [1]*len(domain_geometry.shape)
+
+        # voxel sizes of the dimensions the gradient is taken over
+        self.voxel_size_gradient = [self.voxel_size_order[i] for i in self.ind]
+
         super(Gradient_numpy, self).__init__(domain_geometry = domain_geometry,
                                              range_geometry = range_geometry)
 
@@ -339,6 +344,9 @@ class Gradient_C(LinearOperator):
 
         # Dimension of domain geometry
         self.ndim = len(self.domain_shape)
+
+        # voxel sizes of the dimensions the gradient is taken over
+        self.voxel_size_gradient = list(self.voxel_size_order)
 
         #default is 'Neumann'
         self.bnd_cond = 0

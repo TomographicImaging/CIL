@@ -75,7 +75,7 @@ class TestTestData(CCPiTestClass):
     def test_load_PEPPERS(self):
         image = self.check_load(dataexample.PEPPERS)
 
-        ig_expected = ImageGeometry(512,512,channels=3,dimension_labels=['channel', 'horizontal_y', 'horizontal_x'])
+        ig_expected = ImageGeometry(512,512,channels=3,dimension_labels=['channel', 'vertical', 'horizontal_y', 'horizontal_x'])
         self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")
 
 
@@ -83,7 +83,7 @@ class TestTestData(CCPiTestClass):
 
         image = self.check_load(dataexample.RAINBOW)
 
-        ig_expected = ImageGeometry(1194,1353,channels=3,dimension_labels=['channel', 'horizontal_y', 'horizontal_x'])
+        ig_expected = ImageGeometry(1194,1353,channels=3,dimension_labels=['channel', 'vertical', 'horizontal_y', 'horizontal_x'])
         self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")
 
 

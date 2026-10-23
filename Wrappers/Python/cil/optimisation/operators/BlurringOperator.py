@@ -18,7 +18,6 @@
 
 import numpy as np
 from cil.optimisation.operators import LinearOperator
-import cil
 
 from scipy.ndimage import convolve, correlate
 
@@ -28,7 +27,10 @@ class BlurringOperator(LinearOperator):
     a point spread function for blurring the image. The implementation is
     generic and naive simply using convolution.
 
-        :param PSF: numpy array with point spread function of blur.
+        :param PSF: numpy array with point spread function of blur, with the
+            same number of dimensions as the geometry. The singleton dimensions
+            of the geometry may be omitted, so a 2D PSF is accepted for an `ImageGeometry`
+            with a singleton vertical dimension.
         :param geometry: ImageGeometry of ImageData to work on.
 
      '''
@@ -36,10 +38,28 @@ class BlurringOperator(LinearOperator):
     def __init__(self, PSF, geometry):
         super(BlurringOperator, self).__init__(domain_geometry=geometry,
                                            range_geometry=geometry)
-        if isinstance(PSF,np.ndarray):
+        if not isinstance(PSF,np.ndarray):
+            raise TypeError('PSF must be a number array with the same number of dimensions as geometry.')
+
+        if PSF.ndim == len(geometry.shape):
             self.PSF = PSF
         else:
-            raise TypeError('PSF must be a number array with same number of dimensions as geometry.')
+            # an ImageGeometry always has a vertical dimension, so a single
+            # slice geometry has a singleton dimension. Accept a PSF covering
+            # only the non-singleton dimensions by inserting the singletons.
+            shape = list(PSF.shape)
+            for i, size in enumerate(geometry.shape):
+                if size == 1:
+                    shape.insert(i, 1)
+
+            if len(shape) != len(geometry.shape):
+                num_singletons = sum(1 for size in geometry.shape if size == 1)
+                expected = '{0}'.format(len(geometry.shape)) if num_singletons == 0 \
+                    else '{0} or {1}'.format(len(geometry.shape) - num_singletons, len(geometry.shape))
+                raise ValueError('PSF must have the same number of dimensions as the geometry, excluding the singleton dimensions. Expected {0} dimensions for a geometry of shape {1}. Got {2}.'\
+                    .format(expected, geometry.shape, PSF.ndim))
+
+            self.PSF = PSF.reshape(shape)
 
  
 

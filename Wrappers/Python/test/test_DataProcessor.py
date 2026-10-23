@@ -2671,8 +2671,7 @@ class TestMaskGenerator(unittest.TestCase):
 
 class TestTransmissionAbsorptionConverter(unittest.TestCase):
 
-    def test_TransmissionAbsorptionConverter(self, accelerated=False):
-
+    def setUp(self):
         ray_direction = [0.1, 3.0, 0.4]
         detector_position = [-1.3, 1000.0, 2]
         detector_direction_row = [1.0, 0.2, 0.0]
@@ -2692,34 +2691,49 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
         AG.set_channels(num_channels=10)
         AG.set_angles(angles, initial_angle=10, angle_unit='radian')
         AG.set_panel((10, 5), pixel_size=(0.1, 0.2))
-        AG.dimension_labels = ['vertical',\
-                                'horizontal',\
-                                'angle',\
-                                'channel']
+        AG.dimension_labels = ['vertical', 'horizontal', 'angle', 'channel']
 
-        ad = AG.allocate('random', seed=42)
+        self.acquisition_data_geometry = AG
+        self.acquisition_data = AG.allocate('random', seed=42)
+
+        self.data_container = DataContainer(numpy.random.rand(2, 5, 1, 3).astype(numpy.float32))
+
+    def _check_conversion(self, data, accelerated=False, geometry=None):
+        msg = f"{type(data).__name__} (accelerated={accelerated})"
 
         s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1,
                                             accelerated=accelerated)
-        s.set_input(ad)
+        s.set_input(data)
         data_exp = s.get_output()
 
-        data_new = ad.as_array().copy()
+        data_new = data.as_array().copy()
         data_new /= 10
         data_new[data_new < 0.1] = 0.1
         data_new = -1 * numpy.log(data_new)
 
-        self.assertTrue(data_exp.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
+
+        self._check_output(data_exp, data_new, geometry, msg)
 
         data_exp.fill(0)
         s.process(out=data_exp)
+        self._check_output(data_exp, data_new, geometry, msg + " with out=")
 
-        self.assertTrue(data_exp.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
+    def _check_output(self, out, expected, geometry, msg):
+        if geometry is not None:
+            self.assertTrue(out.geometry == geometry, f"Geometry mismatch for {msg}")
+        numpy.testing.assert_allclose(out.as_array(), expected, rtol=1E-6,
+                                      err_msg=f"Wrong output for {msg}")
+
+    def test_TransmissionAbsorptionConverter(self):
+        self._check_conversion(self.acquisition_data, accelerated=False, geometry=self.acquisition_data_geometry)
+
+    def test_TransmissionAbsorptionConverter_data_container(self):    
+        self._check_conversion(self.data_container, accelerated=False)
 
     def test_TransmissionAbsorptionConverter_accelerated(self):
-        self.test_TransmissionAbsorptionConverter(accelerated=True)
+        self._check_conversion(self.acquisition_data, accelerated=True, geometry=self.acquisition_data_geometry)
+        self._check_conversion(self.data_container, accelerated=True)
+
 
 class TestAbsorptionTransmissionConverter(unittest.TestCase):
 

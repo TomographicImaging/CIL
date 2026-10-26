@@ -264,7 +264,7 @@ class GenericFilteredBackProjection(Reconstructor):
 
         Returns
         -------
-        matplotlib.pyplot
+        matplotlib.figure.Figure
             A plot of the filter
         """
         import matplotlib.pyplot as plt
@@ -281,7 +281,9 @@ class GenericFilteredBackProjection(Reconstructor):
         theta = np.linspace(-1, 1, 9, True)
         plt.xticks(theta, ['-π', '-3π/4', '-π/2', '-π/4', '0', 'π/4', 'π/2', '3π/4', 'π'])
         plt.legend()
-        return plt
+        fig2 = plt.gcf() 
+        plt.show() 
+        return fig2 
 
 
     def _calculate_weights(self):
@@ -386,13 +388,13 @@ class FDK(GenericFilteredBackProjection):
 
     def _calculate_weights(self, acquisition_geometry):
         ag = acquisition_geometry
-        xv = np.arange(-(ag.pixel_num_h -1)/2,(ag.pixel_num_h -1)/2 + 1,dtype=np.float32) * ag.pixel_size_h
-        yv = np.arange(-(ag.pixel_num_v -1)/2,(ag.pixel_num_v -1)/2 + 1,dtype=np.float32) * ag.pixel_size_v
+        xv = np.arange(-(ag.pixel_num_h -1)/2,(ag.pixel_num_h -1)/2 + 1,dtype=np.float32) * np.float32(ag.pixel_size_h)
+        yv = np.arange(-(ag.pixel_num_v -1)/2,(ag.pixel_num_v -1)/2 + 1,dtype=np.float32) * np.float32(ag.pixel_size_v)
         (yy, xx) = np.meshgrid(xv, yv)
 
         principal_ray_length = ag.dist_source_center + ag.dist_center_detector
         scaling = 0.25 * ag.magnification * (2 * np.pi/ ag.num_projections) / ag.pixel_size_h
-        self._weights = scaling * principal_ray_length / np.sqrt((principal_ray_length ** 2 + xx ** 2 + yy ** 2))
+        self._weights = np.float32(scaling * principal_ray_length / np.sqrt((principal_ray_length ** 2 + xx ** 2 + yy ** 2)))
 
 
     def run(self, out=None, verbose=1):

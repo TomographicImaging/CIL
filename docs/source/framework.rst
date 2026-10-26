@@ -88,6 +88,10 @@ For circular geometries, we must set the angles of the projections. This is not 
 
 .. automethod:: cil.framework.AcquisitionGeometry.set_angles
 
+The initial angle can be updated on its own, leaving the angles unchanged:
+
+.. automethod:: cil.framework.AcquisitionGeometry.set_initial_angle
+
 
 Set the detector parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

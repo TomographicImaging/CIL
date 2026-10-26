@@ -104,7 +104,7 @@ def get_compression_scale_offset(data, compression=0):
     else:
         scale = 1.0
         offset = 0.0
-    return scale, offset
+    return float(scale), float(offset)
 
 def save_dict_to_file(fname, dictionary):
     '''Save scale and offset to file

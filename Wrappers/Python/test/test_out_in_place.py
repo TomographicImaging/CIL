@@ -136,7 +136,7 @@ class TestFunctionOutAndInPlace(CCPiTestClass):
         ]
 
         np.random.seed(5)
-        self.data_arrays=[np.random.normal(0,1, (10,10)).astype(np.float32),  np.array(range(0,65500, 655), dtype=np.uint16).reshape((10,10)), np.random.uniform(-0.1,1,(10,10)).astype(np.float32) ]
+        self.data_arrays=[np.random.normal(0,1, (10,10)).astype(np.float32),  np.arange(0,65500, 655, dtype=np.uint16).reshape((10,10)), np.random.uniform(-0.1,1,(10,10)).astype(np.float32) ]
 
     def get_result(self, function, method, x, *args):
         try:
@@ -268,8 +268,8 @@ class TestOperatorOutAndInPlace(CCPiTestClass):
 
 
 
-        self.data_arrays=[np.random.normal(0,1, (3,10,10)).astype(np.float32),  np.array(range(0,65400, 218), dtype=np.uint16).reshape((3,10,10)), np.random.uniform(-0.1,1,(3,10,10)).astype(np.float32)]
-        self.vector_data_arrays=[np.random.normal(0,1, (10)).astype(np.float32),  np.array(range(0,65400, 6540), dtype=np.uint16), np.random.uniform(-0.1,1,(10)).astype(np.float32)]
+        self.data_arrays=[np.random.normal(0,1, (3,10,10)).astype(np.float32),  np.arange(0,65400, 218, dtype=np.uint16).reshape((3,10,10)), np.random.uniform(-0.1,1,(3,10,10)).astype(np.float32)]
+        self.vector_data_arrays=[np.random.normal(0,1, (10)).astype(np.float32),  np.arange(0,65400, 6540, dtype=np.uint16), np.random.uniform(-0.1,1,(10)).astype(np.float32)]
 
     def get_result(self, operator, method, x, *args):
         try:
@@ -424,7 +424,7 @@ class TestProcessorOutandInPlace(CCPiTestClass):
     def setUp(self):
 
         self.data_arrays=[np.random.normal(0,1, (10,20)).astype(np.float32),
-                          np.array(range(0,65500, 328), dtype=np.uint16).reshape((10,20)),
+                          np.arange(0,65500, 328, dtype=np.uint16).reshape((10,20)),
                           np.random.uniform(0,1,(10,20)).astype(np.float64)]
 
         ag_parallel_2D = AcquisitionGeometry.create_Parallel2D(detector_position=[0,1], units='m')

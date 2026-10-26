@@ -104,10 +104,14 @@ if module_info != None:
 
 if module_info is None:
     has_ccpi_regularisation = False
+    has_ccpi_regularisation_cuda = False
 else:
     has_ccpi_regularisation = True
+    from ccpi.filters.utils import cilregcuda
+    has_ccpi_regularisation_cuda = cilregcuda is not None
 
 system_state['has_ccpi_regularisation']= has_ccpi_regularisation
+system_state['has_ccpi_regularisation_cuda']= has_ccpi_regularisation_cuda
 
 
 #tomophantom

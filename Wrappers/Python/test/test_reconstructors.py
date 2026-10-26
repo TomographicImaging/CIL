@@ -28,15 +28,13 @@ from cil.recon.Reconstructor import Reconstructor # checks on baseclass
 from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
 from cil.recon import FDK, FBP
 
-import os, sys
-
 from scipy.fft import fftfreq
-import tempfile
+
+from unittest.mock import patch
 
 initialise_tests()
 
 if has_tigre:
-    from cil.plugins.tigre import ProjectionOperator as ProjectionOperator_tigre
     from cil.plugins.tigre import FBP as FBP_tigre
     from tigre.utilities.filtering import ramp_flat, filter
 
@@ -44,14 +42,12 @@ if has_astra:
     from cil.plugins.astra import ProjectionOperator as ProjectionOperator_astra
     from cil.plugins.astra import FBP as FBP_astra
 
-if has_matplotlib:
-    import matplotlib.testing.compare as compare
 
 if has_skimage:
     from skimage.transform.radon_transform import _get_fourier_filter as skimage_get_fourier_filter
 
-@unittest.skipUnless(has_tigre, "TIGRE not installed")
-class Test_Reconstructor_tigre(unittest.TestCase):
+
+class Test_Reconstructor(unittest.TestCase):
 
     def setUp(self):
         #%% Setup Geometry
@@ -80,7 +76,6 @@ class Test_Reconstructor_tigre(unittest.TestCase):
                                      .set_angles(angles)\
                                      .set_panel((det_pix_x,det_pix_y), (pix_size,pix_size))\
                                      .set_labels(['angle','vertical','horizontal'])
-        self.ig3D = self.ag3D.get_ImageGeometry()
 
         self.ad3D = self.ag3D.allocate('random', seed=3)
         self.ig3D = self.ag3D.get_ImageGeometry()
@@ -134,8 +129,7 @@ class Test_Reconstructor_tigre(unittest.TestCase):
             reconstructor = Reconstructor(self.ad3D, backend='unsupported_backend')
 
 
-@unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
-class Test_GenericFilteredBackProjection_tigre(unittest.TestCase):
+class Test_GenericFilteredBackProjection(unittest.TestCase):
 
     def setUp(self):
         #%% Setup Geometry
@@ -164,7 +158,6 @@ class Test_GenericFilteredBackProjection_tigre(unittest.TestCase):
                                      .set_angles(angles)\
                                      .set_panel((det_pix_x,det_pix_y), (pix_size,pix_size))\
                                      .set_labels(['angle','vertical','horizontal'])
-        self.ig3D = self.ag3D.get_ImageGeometry()
 
         self.ad3D = self.ag3D.allocate('random', seed=4)
         self.ig3D = self.ag3D.get_ImageGeometry()
@@ -185,7 +178,6 @@ class Test_GenericFilteredBackProjection_tigre(unittest.TestCase):
         self.assertEqual(reconstructor.image_geometry,self.ig3D)
 
     def test_defaults(self):
-
         reconstructor = GenericFilteredBackProjection(self.ad3D)
         self.check_defaults(reconstructor)
 
@@ -279,9 +271,9 @@ class Test_GenericFilteredBackProjection_tigre(unittest.TestCase):
         with self.assertRaises(TypeError):
             reconstructor.set_filter_inplace('unsupported_value')
 
-    def create_custom_filter_example(self, cutoff):
+    def create_custom_filter_example(self, cutoff, fft_order):
         """Returns a custom filter array."""
-        filter_length = 256
+        filter_length = 2**fft_order
         freq = fftfreq(filter_length)
         freq *= 2
         ramp = abs(freq)
@@ -289,36 +281,95 @@ class Test_GenericFilteredBackProjection_tigre(unittest.TestCase):
         FBP_filter = ramp*(np.cos(freq*np.pi*4)+1*np.cos(1/5*freq*np.pi/2))/2
         return FBP_filter
 
+    def _compare_plot_properties(self, plot, filter_name, filter_array, fft_order, cutoff):
+        """
+        Tests that the plot has the correct labels, titles, and data for the given filter.
+        """
+        figure = plot.figure
+        axis = figure.axes[0]
+        line = axis.lines[0]
+
+        self.assertEqual(len(axis.lines), 1)
+        self.assertEqual(axis.get_xlabel(), "Frequency (rads/pixel)")
+        self.assertEqual(axis.get_ylabel(), "Magnitude")
+        self.assertEqual(axis.lines[0].get_label(), filter_name)
+
+        x_data = line.get_xdata()
+        y_data = line.get_ydata()
+
+        expected_filter_length = 2**fft_order
+        self.assertEqual(len(x_data), expected_filter_length)
+        self.assertEqual(len(y_data), expected_filter_length)
+        freq = fftfreq(expected_filter_length)*2
+        expected_x_data = np.sort(freq)
+
+        expected_y_data = filter_array[np.argsort(freq)]
+        np.testing.assert_array_almost_equal(x_data, expected_x_data)
+        np.testing.assert_array_almost_equal(y_data, expected_y_data)
+
     @unittest.skipUnless(has_matplotlib, "matplotlib not installed")
-    def test_plot_filter(self):
+    @patch('matplotlib.pyplot.show')
+    def test_plot_filter(self, mock_show):
         """
         Tests that the filters are plotted correctly for two different
-        values of cutoff. This is done for all preset filters and the custom filter.
-        The plots are compared to stored png files.
+        values of cutoff and two different fft_orders.
+        This is done for all preset filters.
         The test will not show any screen output.
-        The temporary directory and files are removed.
         """
+        import matplotlib.pyplot as plt
+
         fdk = GenericFilteredBackProjection(self.ad3D)
-        filter_list = fdk.preset_filters
-        filter_list.append('custom')
-        filter_plots_folder = os.path.join(os.path.dirname(__file__),"test_plots","filters")
-        test_plot_folder = tempfile.mkdtemp(suffix=None, prefix=None, dir=None)
-        test_plot_path = os.path.join(test_plot_folder, 'test_plot_filter.png')
+        
+        filter_list = fdk.preset_filters.copy()
+
         for cutoff in [0.5,1]:
-            for filter_name in filter_list:
-                if filter_name == 'custom':
-                    FBP_filter = self.create_custom_filter_example(cutoff)
-                else:
-                    FBP_filter =filter_name
-                fdk.set_filter(FBP_filter, cutoff)
-                plot = fdk.plot_filter()
-                base_plot_path =os.path.join(filter_plots_folder, filter_name+'_'+str(round(cutoff))+'.png')
-                plot.savefig(test_plot_path)
-                err = compare.compare_images(base_plot_path,  test_plot_path, tol=0)
-                self.assertIsNone(err, f"Filter plots are not the same: {err}")
-                os.remove(test_plot_path)
-                plot.close()
-        os.removedirs(test_plot_folder)
+            for fft_order in [8,9]:
+                fdk.set_fft_order(fft_order)
+                for filter_name in filter_list:
+                    msg = f"plot_filter failed for filter: {filter_name}, cutoff: {cutoff}, fft_order: {fft_order}"
+                    fdk.set_filter(filter_name, cutoff)
+                    try:
+                        plot = fdk.plot_filter()
+                        mock_show.assert_called_once()
+                    except Exception as e:
+                        self.fail(msg + f" and raised an exception: {e}")
+
+                    filter_array = fdk.get_filter_array()
+                    self._compare_plot_properties(plot, filter_name, filter_array, fft_order, cutoff)
+                    mock_show.reset_mock()
+                    plt.close('all')
+
+    @unittest.skipUnless(has_matplotlib, "matplotlib not installed")
+    @patch('matplotlib.pyplot.show')
+    def test_plot_custom_filter(self, mock_show):
+        """
+        Tests that the filters are plotted correctly for two different
+        values of cutoff and two different fft_orders.
+        This is done for a custom filter.
+        The test will not show any screen output.
+        """
+        import matplotlib.pyplot as plt
+
+        fdk = GenericFilteredBackProjection(self.ad3D)
+        filter_name = 'custom'
+
+        for cutoff in [0.5,1]:
+            for fft_order in [8,9]:
+                fdk.set_fft_order(fft_order)
+                msg = f"plot_filter failed for filter: {filter_name}, cutoff: {cutoff}, fft_order: {fft_order}"
+
+                filter_array = self.create_custom_filter_example(cutoff, fft_order)
+                fdk.set_filter(filter_array, cutoff)
+
+                try:
+                    plot = fdk.plot_filter()
+                    mock_show.assert_called_once()
+                except Exception as e:
+                    self.fail(msg + f" and raised an exception: {e}")
+    
+                self._compare_plot_properties(plot, filter_name, filter_array, fft_order, cutoff)
+                mock_show.reset_mock()
+                plt.close('all')
 
 
 @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")

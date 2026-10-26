@@ -46,7 +46,7 @@ class ChannelwiseOperator(LinearOperator):
     >>> ig = ImageGeometry(M, M, channels=channels)
     >>> single_ig = ImageGeometry(M, M)
     >>> x = ImageData( np.stack( [np.ones((M,M)),  2*np.ones((M,M))] , axis=0), geometry=ig )
-    >>> diag = ImageData(np.array(range(M*M), dtype=np.float64).reshape((M,M)), geometry=single_ig)
+    >>> diag = ImageData(np.arange(M*M, dtype=np.float64).reshape((M,M)), geometry=single_ig)
     >>> D = DiagonalOperator(diag)
     >>> C = ChannelwiseOperator(D,channels)
     >>> y = C.direct(x)

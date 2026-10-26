@@ -294,8 +294,7 @@ class Test_APGD(CCPiTestClass):
         with self.assertRaises(NotImplementedError):
             alg.is_provably_convergent()
         
-        
-        
+                
         
 
 class TestFISTA(CCPiTestClass):
@@ -486,6 +485,116 @@ class TestFISTA(CCPiTestClass):
         alg.run(1)
         self.assertEqual(alg.step_size, 0.99/2)
         self.assertEqual(alg.step_size, 0.99/2)
+
+
+class TestProxSkip(CCPiTestClass):
+
+    def setUp(self):
+
+        np.random.seed(10)
+        n = 50
+        m = 500
+
+        A = np.random.uniform(0, 1, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1 *
+             np.random.randn(m)).astype('float32')
+
+        self.Aop = MatrixOperator(A)
+        self.bop = VectorData(b)
+
+        self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
+        self.g = 0.5 * L1Norm()
+        self.step_size = 1.99/self.f.L
+
+        self.ig = self.Aop.domain
+
+        self.initial = self.ig.allocate()
+
+    def tearDown(self):
+        pass
+
+    def test_signature(self):
+
+        # check required arguments (initial, f, g, step size, and prob)
+        with np.testing.assert_raises(TypeError):
+            proxskip = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size)
+
+        # test neg prob
+        with np.testing.assert_raises(ValueError):
+            proxskip = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=-0.1)            
+     
+        # zero prob
+        with np.testing.assert_raises(ValueError):
+            proxskip = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=0.)            
+
+    def test_coin_flip(self):
+
+        seed = 10
+        num_it = 100
+        prob = 0.2
+
+        proxskip1 = ProxSkip(initial=self.initial, f=self.f, g=self.g,
+                            step_size=self.step_size, prob=prob, seed=seed)
+        proxskip1.run(num_it, verbose=0)
+        proxskip1_iterates = proxskip1.get_proximal_iterates()
+
+        rng = np.random.default_rng(seed)
+
+        thetas1 = []
+        for k in range(num_it):   
+            theta = True if k == 0 else rng.random() < prob  
+            thetas1.append(theta)
+
+        assert np.array_equal(thetas1, proxskip1_iterates)
+
+        
+    def test_seeds(self):
+
+        # same seeds
+        proxskip1 = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=0.1, seed=10)
+        proxskip1.run(100, verbose=0)
+
+        proxskip2 = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=0.1, seed=10)
+        proxskip2.run(100, verbose=0)
+
+        np.testing.assert_allclose(proxskip2.get_proximal_iterates(), proxskip1.get_proximal_iterates()) 
+
+        # different seeds
+        proxskip2 = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, 
+                             prob=0.1, seed=20)
+        proxskip2.run(100, verbose=0)     
+
+        assert not np.array_equal(proxskip2.get_proximal_iterates(), proxskip1.get_proximal_iterates())
+
+
+    def test_ista_vs_proxskip(self):
+
+        prox = ProxSkip(initial=self.initial, f=self.f,
+                    g=self.g, step_size = self.step_size, prob = 0.1)
+        prox.run(2000, verbose=0)
+
+        ista = ISTA(initial=self.initial, f=self.f,
+                    g=self.g, step_size = self.step_size)
+        ista.run(1000, verbose=0)        
+       
+        np.testing.assert_allclose(ista.objective[-1], prox.objective[-1], atol=1e-3)
+        np.testing.assert_allclose(
+            prox.solution.array, ista.solution.array, atol=1e-3) 
+
+    def test_case_prob_one(self):  
+
+        with self.assertWarnsRegex(UserWarning,"With prob=1, ProxSkip is equivalent to ISTA/PGD. Consider using ISTA instead."):        
+            prox = ProxSkip(initial=self.initial, f=self.f, g=self.g, 
+                            step_size = self.step_size, prob = 1.0)
+            prox.run(10, verbose=0)
+
+        ista = ISTA(initial=self.initial, f=self.f, g=self.g, step_size = self.step_size)
+        ista.run(10, verbose=0) 
+
+        self.assertNumpyArrayAlmostEqual(np.array(ista.objective), np.array(prox.objective), decimal=3)
+        self.assertEqual(prox.get_proximal_iterates(), [True] * 10)
+
+
 
 class testISTA(CCPiTestClass):
 

@@ -582,16 +582,16 @@ class TestProxSkip(CCPiTestClass):
         proxskip1 = ProxSkip(initial=self.initial, f=self.f, g=self.g,
                             step_size=self.step_size, prob=prob, seed=seed)
         proxskip1.run(num_it, verbose=0)
+        proxskip1_iterates = proxskip1.get_proximal_iterates()
 
         rng = np.random.default_rng(seed)
 
         thetas1 = []
-        for k in range(num_it):
-            tmp = rng.random() < prob     
-            theta = True if k == 0 else tmp
+        for k in range(num_it):   
+            theta = True if k == 0 else rng.random() < prob  
             thetas1.append(theta)
 
-        assert np.array_equal(proxskip1.thetas, thetas1)
+        assert np.array_equal(thetas1, proxskip1_iterates)
 
         
     def test_seeds(self):
@@ -603,14 +603,14 @@ class TestProxSkip(CCPiTestClass):
         proxskip2 = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, prob=0.1, seed=10)
         proxskip2.run(100, verbose=0)
 
-        np.testing.assert_allclose(proxskip2.thetas, proxskip1.thetas) 
+        np.testing.assert_allclose(proxskip2.get_proximal_iterates(), proxskip1.get_proximal_iterates()) 
 
         # different seeds
         proxskip2 = ProxSkip(initial = self.initial, f=self.f, g=self.g, step_size=self.step_size, 
                              prob=0.1, seed=20)
         proxskip2.run(100, verbose=0)     
 
-        assert not np.array_equal(proxskip2.thetas, proxskip1.thetas)
+        assert not np.array_equal(proxskip2.get_proximal_iterates(), proxskip1.get_proximal_iterates())
 
 
     def test_ista_vs_proxskip(self):
@@ -625,7 +625,21 @@ class TestProxSkip(CCPiTestClass):
        
         np.testing.assert_allclose(ista.objective[-1], prox.objective[-1], atol=1e-3)
         np.testing.assert_allclose(
-            prox.solution.array, ista.solution.array, atol=1e-3)    
+            prox.solution.array, ista.solution.array, atol=1e-3) 
+
+    def test_case_prob_one(self):  
+
+        with self.assertWarnsRegex(UserWarning,"With prob=1, ProxSkip is equivalent to ISTA/PGD. Consider using ISTA instead."):        
+            prox = ProxSkip(initial=self.initial, f=self.f, g=self.g, 
+                            step_size = self.step_size, prob = 1.0)
+            prox.run(10, verbose=0)
+
+        ista = ISTA(initial=self.initial, f=self.f, g=self.g, step_size = self.step_size)
+        ista.run(10, verbose=0) 
+
+        self.assertNumpyArrayAlmostEqual(np.array(ista.objective), np.array(prox.objective), decimal=3)
+        self.assertEqual(prox.get_proximal_iterates(), [True] * 10)
+
 
 
 class testISTA(CCPiTestClass):

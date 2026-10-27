@@ -148,7 +148,11 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
 
         G = self.sparse_gradient_matrix(u.shape, direction = direction, order = 1, boundaries = boundaries)
 
-        DX, DY = G[1], G[0]
+        # the TV is taken over the two spatial dimensions, which are the last
+        # two of the shape. An ImageGeometry always has a vertical dimension,
+        # so for a single slice u.shape is (1, N, M) and G[0] is the (zero)
+        # difference along the singleton vertical dimension.
+        DX, DY = G[len(u.shape)-1], G[len(u.shape)-2]
 
         if isotropic:
             return cvxpy.sum(cvxpy.norm(cvxpy.vstack([DX @ cvxpy.vec(u), DY @ cvxpy.vec(u)]), 2, axis = 0))

@@ -53,7 +53,7 @@ class TestTomoPhantom2D(unittest.TestCase):
         phantom = TomoPhantom.get_ImageData(model, self.ig)
 
         assert phantom.geometry.channels == 1
-        assert phantom.shape == (self.N,self.N)
+        assert phantom.shape == (1, self.N,self.N)
 
     @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')
     def test_MC2D_wrong_model(self):

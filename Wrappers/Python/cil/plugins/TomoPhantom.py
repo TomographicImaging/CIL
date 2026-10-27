@@ -93,7 +93,7 @@ def check_model_params(num_model, num_dims=2):
         return params
 
     else:
-        raise ValueError('Unsupported dimensionality. Expected 2 or 3, got {}'.format(dims))
+        raise ValueError('Unsupported dimensionality. Expected 2 or 3, got {}'.format(num_dims))
 
 def get_ImageData(num_model, geometry):
     '''Returns an ImageData relative to geometry with the model num_model from tomophantom
@@ -131,7 +131,12 @@ def get_ImageData(num_model, geometry):
     '''
     ig = geometry.copy()
     ig.set_labels(ImageDimension.get_order_for_engine('cil'))
-    num_dims = len(ig.dimension_labels)
+
+    spatial_shape = [size for label, size in zip(ig.dimension_labels, ig.shape)
+                     if label != ImageDimension.CHANNEL]
+    num_dims = sum(size > 1 for size in spatial_shape) 
+    if ImageDimension.CHANNEL in ig.dimension_labels:
+        num_dims += 1
 
     if ImageDimension.CHANNEL in ig.dimension_labels:
         if not is_model_temporal(num_model):
@@ -146,10 +151,9 @@ def get_ImageData(num_model, geometry):
         elif num_dims == 3:
             # 2D+time for tomophantom
             # output dimensions channel and then spatial,
-            # e.g. [ 'channel', 'horizontal_y', 'horizontal_x' ]
-            N = ig.shape[1]
+            # e.g. [ 'channel', 'vertical', 'horizontal_y', 'horizontal_x' ]
             num_model = num_model
-            phantom_arr = TomoP2D.ModelTemporal(num_model, ig.shape[1], path_library2D)
+            phantom_arr = TomoP2D.ModelTemporal(num_model, ig.voxel_num_x, path_library2D)
         else:
             raise ValueError('Wrong ImageGeometry')
         if ig.channels != phantom_arr.shape[0]:
@@ -162,14 +166,13 @@ def get_ImageData(num_model, geometry):
             phantom_arr = TomoP3D.Model(num_model, ig.shape, path_library3D)
         elif num_dims == 2:
             # 2D
-            if ig.shape[0] != ig.shape[1]:
-                raise ValueError('Can only handle square ImageData, got shape'.format(ig.shape))
-            N = ig.shape[0]
+            if ig.voxel_num_y != ig.voxel_num_x:
+                raise ValueError('Can only handle square ImageData, got shape {}'.format(ig.shape))
+            N = ig.voxel_num_x
             num_model = num_model
             phantom_arr = TomoP2D.Model(num_model, N, path_library2D)
         else:
             raise ValueError('Wrong ImageGeometry')
-
 
     im_data = ImageData(phantom_arr, geometry=ig)
     im_data.reorder(list(geometry.dimension_labels))

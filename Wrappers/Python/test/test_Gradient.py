@@ -106,30 +106,17 @@ class TestGradientOperator(unittest.TestCase):
                     for corr in config.get('correlation'):
                         for method in config.get('method'):
 
-                            if geom.channels == 1:
+                            # the gradient is not taken over singleton dimensions,
+                            # nor over the channels if the correlation is 'Space'
+                            norm_squared = (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2
 
-                                if geom.length == 2:
-                                    norm = numpy.sqrt(
-                                        (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
-                                elif geom.length == 3:
-                                    norm = numpy.sqrt(
-                                        (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
+                            if geom.voxel_num_z > 1:
+                                norm_squared += (2/geom.voxel_size_z)**2
 
-                            else:
+                            if geom.channels > 1 and corr != 'Space':
+                                norm_squared += (2/geom.channel_spacing)**2
 
-                                if corr == 'Space':
-                                    if geom.length ==3:
-                                        norm = numpy.sqrt(
-                                            (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
-                                    else:
-                                        norm = numpy.sqrt((2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
-                                else:
-
-                                    if geom.length ==3:
-                                        norm = numpy.sqrt(
-                                            (2/geom.channel_spacing)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
-                                    else:
-                                        norm = numpy.sqrt((2/geom.channel_spacing)**2 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
+                            norm = numpy.sqrt(norm_squared)
 
 
                             Grad = GradientOperator(geom,

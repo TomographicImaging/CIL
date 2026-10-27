@@ -55,7 +55,7 @@ class TestQualityMeasures(CCPiTestClass):
             self.dc2 = dc2
 
             self.mask=ig.allocate(0)
-            self.mask.array[:50,:50]=1
+            self.mask.array[...,:50,:50]=1
 
             self.bool_mask=self.mask.array.astype('bool')
 

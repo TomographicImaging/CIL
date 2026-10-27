@@ -2642,8 +2642,8 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
             num_voxel_z = int(numpy.ceil(self.config.panel.num_pixels[1] * resolution))
             voxel_size_z = self.config.panel.pixel_size[1] / (resolution * mag)
         else:
-            num_voxel_z = 0
-            voxel_size_z = 1
+            num_voxel_z = 1
+            voxel_size_z = self.config.panel.pixel_size[1] / (resolution * mag)
 
         return ImageGeometry(num_voxel_xy, num_voxel_xy, num_voxel_z, voxel_size_xy, voxel_size_xy, voxel_size_z, channels=self.channels)
 

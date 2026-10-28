@@ -64,18 +64,15 @@ class IRLS(Algorithm):
     data : DataContainer
         The measured data :math:`b`.
     alpha : float
-        The regularisation parameter :math:`\alpha`. Must be positive: IRLS
-        without regularisation is just least squares.
+        The regularisation parameter :math:`\alpha`. Must be positive and non-zero. 
     struct_operator : Operator, optional
-        The structural operator :math:`L`. ``None`` means the identity,
-        i.e. a plain L1 penalty on the solution.
+        The structural operator :math:`L`. Defaults to ``None``, giving standard L1 regularisation.
     inner_solver : class, default LSQR
         The inner solver class, :class:`LSQR` or :class:`CGLS`. IRLS builds
         and owns the instance itself; pass the class, not an instance.
     form : {'block', 'standard'}, default 'block'
         Which formulation the inner solver iterates on; see the LSQR and CGLS
-        documentation. The default block form accepts any :math:`L` and warm
-        starts with either solver.
+        documentation. The default block form accepts any :math:`L` and can take any initialisation.
     tau : float, default 1.0
         Initial smoothing parameter of the weight update.
     tau_factor : float, default 0.1
@@ -134,10 +131,9 @@ class IRLS(Algorithm):
 
         if alpha <= 0:
             raise ValueError(
-                "IRLS solves a regularised problem; alpha must be positive, "
-                "got {}.".format(alpha))
+                "The regularisation parameter,  alpha,  must be positive, "
+                "got alpha = {}.".format(alpha))
 
-        # IRLS owns the weights that wrap the structure operator
         self.weighted_operator = WeightedOperator(
             operator.domain_geometry(), struct_operator)
 
@@ -156,8 +152,6 @@ class IRLS(Algorithm):
                 UserWarning, stacklevel=3)
             self.warm_start = False
 
-        # CGLS works with the squared condition number which can cause divergence 
-        # so its inner solves get the early-stopping guard.
         self.inner_callbacks = ([CGLSEarlyStopping()]
                                 if isinstance(self.inner_solver, CGLS) else [])
 
@@ -203,11 +197,9 @@ class IRLS(Algorithm):
 
     def _update_weights(self, solution):
         """Update the diagonal L1 weights in-place from the previous outer
-        solution. Allocates nothing."""
+        solution."""
         weights = self.weighted_operator.weights
 
-        # Map to structure space (Lu), where the weights live: the weights
-        # are a function of Lu, never of WLu.
         self.weighted_operator.operator.direct(solution, out=weights)
 
         # weights = (|Lu|^2 + tau^2)^(-1/4)
@@ -219,10 +211,8 @@ class IRLS(Algorithm):
 
     def update_objective(self):
         """
-        Record the L1 objective ||Au-b||^2 + alpha^2 ||Lu||_1 at the current
-        solution, at the cost of one application of A and of L per entry --
-        throttle with ``update_objective_interval``. The inner solver's
-        reweighted loss stays available through ``inner_solver.loss``.
+        The L1 objective ||Au-b||^2 + alpha^2 ||Lu||_1 at the current
+        solution, at the cost of one application of A and of L per calculation. Called every ``update_objective_interval outer iterations. ``.
         """
         u = self.inner_solver.get_output()
 

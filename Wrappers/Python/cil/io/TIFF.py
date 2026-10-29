@@ -33,7 +33,7 @@ import re
 import numpy as np
 from cil.io import utilities
 import json
-
+from tqdm import tqdm
 import logging
 
 log = logging.getLogger(__name__)
@@ -463,7 +463,7 @@ class TIFFStackReader(object):
             else:
                 im = np.zeros((num_to_read, n_cols, n_rows), dtype=self.dtype)
 
-            for i in range(0,num_to_read):
+            for i in tqdm(range(0,num_to_read)):
 
                 raw = np.zeros((array_shape_0[1], array_shape_0[2]), dtype=self.dtype)
                 for j in range(roi_par[0][2]):
@@ -496,7 +496,7 @@ class TIFFStackReader(object):
             else:
                 im = np.zeros((num_to_read, n_cols, n_rows), dtype=self.dtype)
 
-            for i in range(roi_par[0][0], roi_par[0][1], roi_par[0][2]):
+            for i in tqdm(range(roi_par[0][0], roi_par[0][1], roi_par[0][2])):
 
                 filename = os.path.abspath(self._tiff_files[i])
                 #try:

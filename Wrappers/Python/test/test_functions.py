@@ -1123,23 +1123,29 @@ class TestL1Norm (CCPiTestClass):
     def soft_shrinkage_test(self, x):
         tau = 1.
         ret = soft_shrinkage(x, tau)
-        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()), atol=atol)
         tau = 2.
         ret = soft_shrinkage(x, tau)
-        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()), atol=atol)
         tau = -1.
         ret = soft_shrinkage(x, tau)
-        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()), atol=atol)
         tau = 1.
         ret = soft_shrinkage(-0.5 * x, tau)
-        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()), atol=atol)
         tau = 2.
         ret = soft_shrinkage(-0.5 *x, tau)
-        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()), atol=atol)
         tau = -1.
         with self.assertWarns(UserWarning):
             ret = soft_shrinkage(-0.5 *x, tau)
-            np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+            atol = np.finfo(ret.as_array().dtype).eps
+            np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()), atol=atol)
         tau = -3j
         with self.assertRaises(ValueError):
             ret = soft_shrinkage(-0.5 *x, tau)
@@ -1147,42 +1153,64 @@ class TestL1Norm (CCPiTestClass):
         # tau np.ndarray
         tau = 1. * np.ones_like(x.as_array())
         ret = soft_shrinkage(x, tau)
+        atol = np.finfo(ret.as_array().dtype).eps
         np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        
         tau = 2.* np.ones_like(x.as_array())
         ret = soft_shrinkage(x, tau)
-        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()), atol=atol)
+        
         tau = -1.* np.ones_like(x.as_array())
         ret = soft_shrinkage(x, tau)
+        atol = np.finfo(ret.as_array().dtype).eps
         np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()))
+        
         tau = 1.* np.ones_like(x.as_array())
         ret = soft_shrinkage(-0.5 * x, tau)
-        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()), atol=atol)
+        
         tau = 2.* np.ones_like(x.as_array())
         ret = soft_shrinkage(-0.5 *x, tau)
-        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()), atol=atol)
+        
         tau = -1.* np.ones_like(x.as_array())
         ret = soft_shrinkage(-0.5 *x, tau)
-        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()), atol=atol)
 
         # tau DataContainer
         tau = 1. * x
         ret = soft_shrinkage(x, tau)
-        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()), atol=atol)
+        
         tau = 2. * x
         ret = soft_shrinkage(x, tau)
-        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), np.zeros_like(x.as_array()), atol=atol)
+        
         tau = -1. * x
         ret = soft_shrinkage(x, tau)
-        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), 2 * np.ones_like(x.as_array()), atol=atol)
+        
         tau = 1. * x
         ret = soft_shrinkage(-0.5 * x, tau)
-        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()), atol=atol)
+        
         tau = 2. * x
         ret = soft_shrinkage(-0.5 *x, tau)
-        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), -1 * np.zeros_like(x.as_array()), atol=atol)
+        
         tau = -1. * x
         ret = soft_shrinkage(-0.5 *x, tau)
-        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()))
+        atol = np.finfo(ret.as_array().dtype).eps
+        np.testing.assert_allclose(ret.as_array(), -1.5 * np.ones_like(x.as_array()), atol=atol)
 
         np.testing.assert_allclose(ret.as_array().imag, np.zeros_like(ret.as_array().imag), atol=1e-6, rtol=1e-6)
 

@@ -22,7 +22,7 @@ build:
       - if: win
         then: pip install . -vv --prefix=%PREFIX%
       - if: osx
-        then: pip install . -vv --prefix=$PREFIX -Ccmake.args="-DOPENMP_LIBRARIES=${CONDA_PREFIX}/lib -DOPENMP_INCLUDES=${CONDA_PREFIX}/include"
+        then: pip install . -vv --prefix=$PREFIX
       - if: linux
         then: pip install . -vv --prefix=$PREFIX
     env:

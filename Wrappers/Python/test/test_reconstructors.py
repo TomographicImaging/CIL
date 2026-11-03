@@ -177,10 +177,12 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
 
         self.assertEqual(reconstructor.image_geometry,self.ig3D)
 
+    @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_defaults(self):
         reconstructor = GenericFilteredBackProjection(self.ad3D)
         self.check_defaults(reconstructor)
 
+    @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_reset(self):
         reconstructor = GenericFilteredBackProjection(self.ad3D)
         reconstructor.set_fft_order(10)
@@ -198,6 +200,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         reconstructor.reset()
         self.check_defaults(reconstructor)
 
+    @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_set_filter(self):
         reconstructor = GenericFilteredBackProjection(self.ad3D)
 
@@ -225,7 +228,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor.set_filter(filter[1:-1])
 
-    @unittest.skipUnless(has_skimage, "SKIMAGE not installed")
+    @unittest.skipUnless(has_skimage and has_ipp, "SKIMAGE or IPP not installed")
     def test_get_filter_array(self):
 
         reconstructor = GenericFilteredBackProjection(self.ad3D)
@@ -255,6 +258,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
             response = skimage_get_fourier_filter(2**order, filter)
             np.testing.assert_almost_equal(arr, response[:,0], 6, "Failed with filter {}".format(filter))
 
+    @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_set_fft_order(self):
         reconstructor = GenericFilteredBackProjection(self.ad3D)
         reconstructor.set_fft_order(10)
@@ -263,6 +267,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor.set_fft_order(2)
 
+    @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_set_filter_inplace(self):
         reconstructor = GenericFilteredBackProjection(self.ad3D)
         reconstructor.set_filter_inplace(True)
@@ -307,7 +312,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         np.testing.assert_array_almost_equal(x_data, expected_x_data)
         np.testing.assert_array_almost_equal(y_data, expected_y_data)
 
-    @unittest.skipUnless(has_matplotlib, "matplotlib not installed")
+    @unittest.skipUnless(has_matplotlib and has_ipp, "matplotlib not installed")
     @patch('matplotlib.pyplot.show')
     def test_plot_filter(self, mock_show):
         """
@@ -339,7 +344,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
                     mock_show.reset_mock()
                     plt.close('all')
 
-    @unittest.skipUnless(has_matplotlib, "matplotlib not installed")
+    @unittest.skipUnless(has_matplotlib and has_ipp, "matplotlib or IPP not installed")
     @patch('matplotlib.pyplot.show')
     def test_plot_custom_filter(self, mock_show):
         """

@@ -26,6 +26,7 @@ import numpy
 from .labels import AcquisitionDimension, AngleUnit, AcquisitionType, FillType
 from .acquisition_data import AcquisitionData
 from .image_geometry import ImageGeometry
+from .data_types import DType
 
 class ComponentDescription(object):
     r'''This class enables the creation of vectors and unit vectors used to describe the components of a tomography system
@@ -2082,7 +2083,21 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
 
     @dtype.setter
     def dtype(self, val):
-        self._dtype = val
+        # If it's already our enum, just set it
+        if isinstance(val, DType):
+            self._dtype = val
+            return
+            
+        # Backward compatibility: Convert standard numpy dtypes to our Enum
+        if val in (numpy.float32, numpy.dtype('float32'), float):
+            self._dtype = DType.NUMPY_FLOAT32
+        elif val in (numpy.float64, numpy.dtype('float64')):
+            self._dtype = DType.NUMPY_FLOAT64
+        elif val in (numpy.complex64, numpy.dtype('complex64'), complex):
+            self._dtype = DType.NUMPY_COMPLEX64
+        else:
+            # Fallback for unexpected dtypes (like int)
+            self._dtype = val
 
 
     def __init__(self):

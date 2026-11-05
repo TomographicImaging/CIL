@@ -27,3 +27,4 @@ from .vector_geometry import VectorGeometry
 from .processors import DataProcessor, Processor, AX, PixelByPixelDataProcessor, CastDataContainer
 from .block import BlockDataContainer, BlockGeometry
 from .partitioner import Partitioner
+from .data_types import DType

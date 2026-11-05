@@ -19,6 +19,7 @@
 # Nicholas Whyatt (UKRI-STFC) [refactorer]
 import copy
 import ctypes
+from math import log
 import warnings
 from functools import reduce
 from numbers import Number
@@ -30,6 +31,11 @@ from cil.utilities.multiprocessing import NUM_THREADS
 from .array_api_compat import squeeze as cil_squeeze
 from .array_api_compat import expand_dims as cil_expand_dims
 from array_api_compat import array_namespace
+
+from .data_types import DType
+
+import logging
+log = logging.getLogger(__name__)
 
 class DataContainer(object):
     '''Generic class to hold data
@@ -322,11 +328,15 @@ class DataContainer(object):
                 warnings.warn("RANDOM_DEPRECATED will be removed in a future version", DeprecationWarning, stacklevel=2)
                 if seed is not None:
                     numpy.random.seed(seed)
-                if numpy.issubdtype(self.dtype, numpy.complexfloating):
-                    r = (numpy.random.random_sample(self.array[index].shape) + 1j * numpy.random.random_sample(self.array[index].shape)).astype(self.dtype)
+                # if numpy.issubdtype(self.dtype, numpy.complexfloating):
+                if self.dtype in [DType.NUMPY_COMPLEX64, DType.CUPY_COMPLEX64, DType.TORCH_COMPLEX64]:
+                    _complex_dtype = np.complex64
+                    r = (numpy.random.random_sample(self.array[index].shape) + 1j * numpy.random.random_sample(self.array[index].shape)).astype(_complex_dtype)
                 else:
-                    r = numpy.random.random_sample(self.array[index].shape).astype(self.dtype)
-                self.array[index] = r
+                    # FIXME assuming it's float32 we want
+                    r = numpy.random.random_sample(self.array[index].shape).astype(numpy.float32)
+                
+                self.array[index] = array_namespace(self.array).asarray(r)
 
             elif array == FillType.RANDOM_INT_DEPRECATED:
                 warnings.warn("RANDOM_INT_DEPRECATED will be removed in a future version", DeprecationWarning, stacklevel=2)
@@ -380,7 +390,12 @@ class DataContainer(object):
         if dimension == {}:
             import warnings
             warnings.filterwarnings('error')
-            self.array.__setitem__(slice(None, None, None), array)
+            import numbers
+            if isinstance(array, numbers.Number):
+                self.array.__setitem__(slice(None, None, None), array)
+            else:
+                # assuming it is an array-like object
+                self.array.__setitem__(slice(None, None, None), array_namespace(self.array).asarray(array))
             warnings.resetwarnings()
         else:
 
@@ -397,7 +412,9 @@ class DataContainer(object):
                 if self.array[index].shape == array.shape:
                     # numpy.copyto(self.array[index], array.array)     
                     array = cil_expand_dims(array, axis=where)
-                    self.array.__setitem__(tuple(slices), array)
+                    # convert to the appropriate array on the backend
+                    xp = array_namespace(array)
+                    self.array.__setitem__(tuple(slices), xp.asarray(array))
                     array = cil_squeeze(array, axis=where)
                 else:
                     raise ValueError('Cannot fill with the provided array.' + \
@@ -536,7 +553,10 @@ class DataContainer(object):
 
         if out is None:
             if isinstance(x2, Number):
-                out = pwop(self.as_array(), self.dtype.type(x2), *args, **kwargs)
+                # try to cast it to the same type as the array elements
+                xp = array_namespace(self.array)
+                self.dtype 
+                out = pwop(self.as_array(), xp.asarray(x2, dtype=self.array.dtype), *args, **kwargs)
             elif issubclass(x2.__class__ , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
             else:
@@ -868,7 +888,12 @@ class DataContainer(object):
         if self.shape == other.shape:
             # FIXME this seems not to have been addressed
             if method == 'numpy':
-                return numpy.dot(self.as_array().ravel(), other.as_array().ravel().conjugate())
+                xp = array_namespace(self.array)
+                if self.array.dtype in [DType.NUMPY_COMPLEX64, DType.CUPY_COMPLEX64, DType.TORCH_COMPLEX64]:
+                    return xp.dot(self.as_array().ravel(), other.as_array().ravel().conjugate())
+                else:
+                    return xp.dot(self.as_array().ravel(), other.as_array().ravel())
+            
             elif method == 'reduce':
                 # see https://github.com/vais-ral/CCPi-Framework/pull/273
                 # notice that Python seems to be smart enough to use
@@ -949,12 +974,17 @@ class DataContainer(object):
         if kwargs.get('dtype') is not None:
             warnings.warn("dtype is ignored (auto-using float64 or complex128)", DeprecationWarning, stacklevel=2)
 
-        if numpy.isrealobj(self.array):
-            kwargs['dtype'] = numpy.float64
-        else:
-            kwargs['dtype'] = numpy.complex128
+        # if numpy.isrealobj(self.array):
+        #     kwargs['dtype'] = numpy.float64
+        # else:
+        #     kwargs['dtype'] = numpy.complex128
+        xp = array_namespace(self.array)
+        if self.array.dtype in [xp.float32]:
+            kwargs['dtype'] = xp.float64
+        elif self.array.dtype in [xp.complex64]:
+            kwargs['dtype'] = xp.complex128
 
-        return self._directional_reduction_unary(numpy.sum, axis=axis, out=out, *args, **kwargs)
+        return self._directional_reduction_unary(xp.sum, axis=axis, out=out, *args, **kwargs)
 
     def min(self, axis=None, out=None, *args, **kwargs):
         """
@@ -1000,7 +1030,8 @@ class DataContainer(object):
         scalar or DataContainer
             The max as a scalar or inside a DataContainer with reduced dimension_labels
         """
-        return self._directional_reduction_unary(numpy.max, axis=axis, out=out, *args, **kwargs)
+        xp = array_namespace(self.array)
+        return self._directional_reduction_unary(xp.max, axis=axis, out=out, *args, **kwargs)
 
     def mean(self, axis=None, out=None, *args, **kwargs):
         """

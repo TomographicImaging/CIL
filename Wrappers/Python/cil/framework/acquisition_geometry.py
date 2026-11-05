@@ -2101,7 +2101,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
 
 
     def __init__(self):
-        self._dtype = numpy.float32
+        self._dtype = DType.NUMPY_FLOAT32
 
 
     def get_centre_of_rotation(self, distance_units='default', angle_units='radian'):

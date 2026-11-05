@@ -184,7 +184,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
          ]) 
     def testInlineAlgebra(self, xp, device, raise_error, err_type):
         if xp is None:
-            self.skipTest(f"xp not available")
+            self.skipTest(f"{xp.__name__} not available")
 
         if xp == torch:
             import array_api_compat.torch as xp
@@ -193,7 +193,7 @@ class TestDataContainer(ParametrizedTestCase, CCPiTestClass):
         elif xp == numpy:
             import array_api_compat.numpy as xp
         else:
-            raise ValueError(f"Unsupported xp: {xp}")
+            raise ValueError(f"Unsupported xp: {xp.__name__}")
         X, Y, Z = 8, 16, 32
         a = xp.ones((X, Y, Z), dtype=xp.float32)
         b = xp.ones((X, Y, Z), dtype=xp.float32)

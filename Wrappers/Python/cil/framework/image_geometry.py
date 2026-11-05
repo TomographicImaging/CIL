@@ -19,7 +19,7 @@ import copy
 import warnings
 from numbers import Number
 
-import numpy
+import numpy as np
 
 from .image_data import ImageData
 from .labels import ImageDimension, FillType
@@ -184,7 +184,7 @@ class ImageGeometry(metaclass=BackwardCompat):
         self.channel_labels = None
         self.channel_spacing = 1.0
         self.dimension_labels = kwargs.get('dimension_labels', None)
-        self.dtype = kwargs.get('dtype', numpy.float32)
+        self.dtype = kwargs.get('dtype', DType.NUMPY_FLOAT32)
 
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):

@@ -20,6 +20,7 @@ from cil.optimisation.functions import Function
 from cil.framework import BlockDataContainer
 import numpy as np
 from numbers import Number
+from array_api_compat import array_namespace
 has_numba = True
 try:
     import numba
@@ -71,8 +72,11 @@ def _proximal_step_numpy(arr, tau):
     '''
     # Note: we divide x by tau so the cases of tau both scalar and
     # DataContainers run
+    
     try:
-        tmp = np.abs(tau, dtype=np.float32)
+        xp = array_namespace(arr.as_array())
+        tau = xp.asarray(tau)
+        tmp = xp.abs(tau)
     except np.core._exceptions._UFuncInputCastingError:
         tmp = tau.abs()
 
@@ -85,7 +89,7 @@ def _proximal_step_numpy(arr, tau):
     arr *= tmp
 
     resarray = res.as_array()
-    resarray[np.isnan(resarray)] = 0
+    resarray[xp.isnan(resarray)] = 0
     res.fill(resarray)
     return res
 
@@ -137,11 +141,12 @@ class MixedL21Norm(Function):
         """
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x)))
-
+        
         tmp = (x.pnorm(2).max() - 1)
         if tmp<=1e-5:
             return 0
         else:
+            #FIXME
             return np.inf
 
     def proximal(self, x, tau, out=None):
@@ -155,7 +160,9 @@ class MixedL21Norm(Function):
         """
 
         tmp = x.pnorm(2)
-        if has_numba and isinstance(tau, Number):
+        
+        is_numpy_backend = isinstance(tmp.as_array(), np.ndarray)
+        if has_numba and isinstance(tau, Number) and is_numpy_backend:
             try:
                 # may involve a copy if the data is not contiguous
                 tmparr = np.asarray(tmp.as_array(), order='C', dtype=tmp.dtype)

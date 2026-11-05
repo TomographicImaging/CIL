@@ -85,8 +85,8 @@ class AcquisitionData(DataContainer, Partitioner):
         if array is None:
             if dtype is None:
                 dtype = geometry.dtype
-            xp = np
-            array = xp.empty(geometry.shape, dtype=dtype)
+            xp = dtype.xp
+            array = xp.empty(geometry.shape, dtype=dtype.api_dtype)
     
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()

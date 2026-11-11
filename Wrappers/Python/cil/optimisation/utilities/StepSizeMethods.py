@@ -471,7 +471,7 @@ class PDHGStronglyConvexUpdate(StepSizeRule):
         '''Initialises the step size rule'''
 
         if gamma_g is not None and gamma_fconj is not None:
-            raise NotImplementedError(
+            raise ValueError(
                 "PDHG strongly convex step size update not implemented for both primal and dual acceleration. Please choose only one of gamma_g or gamma_fconj.")
 
         if not (gamma_g is None or (isinstance(gamma_g, Number) and gamma_g > 0)):
@@ -747,7 +747,7 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
                 self._calculate_pnorm_dnorm(algorithm)
                 log.debug('Started the rebalancing step with p_norm = {}, d_norm = {}'.format(
                     self.p_norm, self.d_norm))
-                if self.p_norm < (self.s/self.delta)*self.d_norm:
+                if self.p_norm < (self.s/self.delta) * self.d_norm:
                     algorithm._tau *= (1 - self.alpha)
                     algorithm._sigma /= (1 - self.alpha)
                     self.alpha *= self.eta
@@ -823,8 +823,8 @@ class PDHGAdaptiveStepSize2013(StepSizeRule):
         cross_term = np.abs(2*algorithm._sigma *
                             algorithm._tau*self.y_resid.dot(algorithm.y_tmp))
 
-        denominator = (self.gamma*algorithm._sigma)*x_change_norm**2 + \
-            (self.gamma*algorithm._tau)*y_change_norm**2
+        denominator = (self.gamma*algorithm._sigma) * x_change_norm**2 + \
+            (self.gamma*algorithm._tau) * y_change_norm**2
         if denominator == 0:
             # No change in the iterate (x == x_old and y == y_old): nothing to
             # backtrack. Return 0 so the caller's `b <= 1` test accepts the step
@@ -1225,8 +1225,8 @@ class _BayesOptimisationStepSizeBase(StepSizeRule):
             return algorithm.objective[-1]
 
         algorithm.update_objective_interval = self.n_iterations-1
-        gp_result = gp_minimize(objective_function, [
-            log_gamma_bounds], n_random_starts=self.n_initial_points, n_calls=self.n_calls, initial_point_generator="lhs", random_state=self.seed)
+        gp_result = gp_minimize(objective_function, [log_gamma_bounds], n_random_starts=self.n_initial_points, 
+        n_calls=self.n_calls, initial_point_generator="lhs", random_state=self.seed)
 
         algorithm.update_objective_interval = update_objective_interval
 

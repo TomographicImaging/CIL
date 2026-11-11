@@ -196,17 +196,34 @@ class PDHG(Algorithm):
         self.initial = initial
         self._sigma = kwargs.pop('sigma', None)  # To be deprecated
         self._tau = kwargs.pop('tau', None)  # To be deprecated
+        if self._sigma is not None or self._tau is not None:  # To be deprecated
+            warnings.warn("The parameters `sigma` and `tau` are being deprecated. If passed together with `step_size` they will be ignored. In the future, please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.", category=DeprecationWarning, stacklevel=2)
         self._theta = kwargs.pop('theta', 1.0)
         if self._theta > 1 or self._theta < 0:
             raise ValueError(
                 "The relaxation parameter theta must be in the range [0,1], passed theta = {}".format(self.theta))
 
-        if step_size is not None:  # To be deprecated
-            if self._sigma is not None or self._tau is not None:  # To be deprecated
-                raise ValueError("The parameters `sigma` and `tau` are being deprecated in favour of `step_size`. You have passed both. Instead please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.")
+        if (
+            (isinstance(step_size, (list, tuple)) and len(step_size)==2) or\
+            (issubclass(step_size, StepSizeRule)
+            ):
+            pass
+        elif step_size is None:
+            if self._sigma is not None or self._tau is not None:
+                # try to get sigma and tau from deprecated keywords
+                warnings.warn("The parameters `sigma` and `tau` are being deprecated. In the future, please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.", category=DeprecationWarning, stacklevel=2)
+                self._sigma = kwargs.pop('sigma', None)  # To be deprecated
+                self._tau = kwargs.pop('tau', None)  # To be deprecated
+            else:
+                # default step size rule
+                # notice that this is the current default method:
+                # sigma * tau < 1/norm(K)^2 instead of
+                # sigma * tau < 4/3/norm(K)^2
+                self._sigma = 1/self.operator.norm()
+                self._tau = 1/self.operator.norm()
+            step_size = (self._tau, self._sigma)
+                
 
-        if self._sigma is not None or self._tau is not None:  # To be deprecated
-            warnings.warn("The parameters `sigma` and `tau` are being deprecated. In the future, please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.", category=DeprecationWarning, stacklevel=2)
             step_size = (self._tau, self._sigma)
 
         self._gamma_g = kwargs.pop('gamma_g', None)  # To be deprecated
@@ -264,8 +281,6 @@ class PDHG(Algorithm):
         self.g = g
         self.operator = operator
 
-        if step_size is None:  # This line can be removed when sigma and tau deprecated
-            step_size = (None, None)
         if isinstance(step_size, StepSizeRule):
             if not hasattr(step_size, 'get_initial_step_size'):
                 raise ValueError(
@@ -314,7 +329,7 @@ class PDHG(Algorithm):
     def _update_previous_solution(self):
         """
         Swaps the references to current and previous solution based on the
-        :func:`~Algorithm.previous_solution` of the base class :class:`Algorithm`.
+        Swaps the references to current and previous solution
         """
         tmp = self.x_old
         self.x_old = self.x

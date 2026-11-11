@@ -1,12 +1,51 @@
 from cil.optimisation.algorithms import SIRT, GD, ISTA, FISTA, PDHG, SPDHG
-from cil.optimisation.functions import BlockFunction, LeastSquares, IndicatorBox, ZeroFunction, L2NormSquared, L1Norm
+from cil.optimisation.functions import (
+    BlockFunction,
+    LeastSquares,
+    IndicatorBox,
+    ZeroFunction,
+    L2NormSquared,
+    L1Norm,
+)
 from cil.framework import ImageGeometry, VectorGeometry, VectorData
-from cil.optimisation.operators import BlockOperator,  IdentityOperator, MatrixOperator, LinearOperator
+from cil.optimisation.operators import (
+    BlockOperator,
+    IdentityOperator,
+    MatrixOperator,
+    LinearOperator,
+)
 
-from cil.optimisation.utilities import Sensitivity, AdaptiveSensitivity, Preconditioner, ConstantStepSize, ArmijoStepSizeRule, BarzilaiBorweinStepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015, PDHGBayesOptimisationStepSize, StepSizeRule
-from cil.optimisation.utilities import SPDHGConstantStepSize, SPDHGBayesOptimisationStepSize, SPDHGStepSizesFromRatio, Sampler
-from cil.optimisation.utilities import SPDHGAdaptiveStepSizeBalancing, SPDHGAdaptiveStepSizeAngle
-from cil.optimisation.utilities.StepSizeMethods import _spdhg_tau_from_sigma
+from cil.optimisation.utilities import (
+    Sensitivity,
+    AdaptiveSensitivity,
+    Preconditioner,
+    ConstantStepSize,
+    ArmijoStepSizeRule,
+    BarzilaiBorweinStepSizeRule,
+    PDHGStronglyConvexUpdate,
+    PDHGConstantStepSize,
+    PDHGAdaptiveStepSize2013,
+    PDHGBayesOptimisationStepSize,
+    StepSizeRule,
+)
+from cil.optimisation.utilities import (
+    SPDHGConstantStepSize,
+    SPDHGBayesOptimisationStepSize,
+    SPDHGStepSizesFromRatio,
+    Sampler,
+)
+from cil.optimisation.utilities import (
+    SPDHGAdaptiveStepSizeBalancing,
+    SPDHGAdaptiveStepSizeAngle,
+)
+from cil.optimisation.utilities import (
+    PDStepSizeRule,
+    PDHGStepSizeRule,
+    SPDHGStepSizeRule,
+)
+from cil.optimisation.utilities.pdhg_adaptive_step_size_2015 import (
+    PDHGAdaptiveStepSize2015,
+)
 import numpy as np
 
 from testclass import CCPiTestClass
@@ -222,13 +261,18 @@ class TestStepSizeBB(CCPiTestClass):
         self.assertFalse(ss_rule.is_short)
         # check long
         alg.run(1)
-        x_change = np.array([.11, .11, .11, .11, .11]) - \
-            np.array([0, 0, 0, 0, 0])
-        grad_change = -np.array([.39, .39, .39, .39, .39]) + \
-            np.array([.5, .5, .5, .5, .5])
-        step = x_change.dot(x_change)/x_change.dot(grad_change)
-        self.assertNumpyArrayAlmostEqual(np.array(
-            [.11, .11, .11, .11, .11])+step*np.array([.39, .39, .39, .39, .39]), alg.x.as_array())
+        x_change = np.array([0.11, 0.11, 0.11, 0.11, 0.11]) - np.array(
+            [0, 0, 0, 0, 0]
+        )
+        grad_change = -np.array([0.39, 0.39, 0.39, 0.39, 0.39]) + np.array(
+            [0.5, 0.5, 0.5, 0.5, 0.5]
+        )
+        step = x_change.dot(x_change) / x_change.dot(grad_change)
+        self.assertNumpyArrayAlmostEqual(
+            np.array([0.11, 0.11, 0.11, 0.11, 0.11])
+            + step * np.array([0.39, 0.39, 0.39, 0.39, 0.39]),
+            alg.x.as_array(),
+        )
         self.assertFalse(ss_rule.is_short)
 
         ss_rule = BarzilaiBorweinStepSizeRule(0.22, 'short', np.inf)
@@ -241,13 +285,18 @@ class TestStepSizeBB(CCPiTestClass):
         self.assertTrue(ss_rule.is_short)
         # check short
         alg.run(1)
-        x_change = np.array([.11, .11, .11, .11, .11]) - \
-            np.array([0, 0, 0, 0, 0])
-        grad_change = -np.array([.39, .39, .39, .39, .39]) + \
-            np.array([.5, .5, .5, .5, .5])
-        step = x_change.dot(grad_change)/grad_change.dot(grad_change)
-        self.assertNumpyArrayAlmostEqual(np.array(
-            [.11, .11, .11, .11, .11])+step*np.array([.39, .39, .39, .39, .39]), alg.x.as_array())
+        x_change = np.array([0.11, 0.11, 0.11, 0.11, 0.11]) - np.array(
+            [0, 0, 0, 0, 0]
+        )
+        grad_change = -np.array([0.39, 0.39, 0.39, 0.39, 0.39]) + np.array(
+            [0.5, 0.5, 0.5, 0.5, 0.5]
+        )
+        step = x_change.dot(grad_change) / grad_change.dot(grad_change)
+        self.assertNumpyArrayAlmostEqual(
+            np.array([0.11, 0.11, 0.11, 0.11, 0.11])
+            + step * np.array([0.39, 0.39, 0.39, 0.39, 0.39]),
+            alg.x.as_array(),
+        )
         self.assertTrue(ss_rule.is_short)
 
         # check stop iteration
@@ -292,8 +341,12 @@ class TestPDHGConstantStepSize(CCPiTestClass):
     def test_deprecated_parameters(self):
 
         with self.assertWarns(DeprecationWarning):
-            pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=IdentityOperator(ImageGeometry(2, 2)),
-                        sigma=0.5)
+            pdhg = PDHG(
+                f=ZeroFunction(),
+                g=ZeroFunction(),
+                operator=IdentityOperator(ImageGeometry(2, 2)),
+                sigma=0.5,
+            )
         self.assertEqual(pdhg.sigma, 0.5)
         self.assertEqual(pdhg.step_size_rule.sigma, 0.5)
         self.assertEqual(pdhg.step_size_rule.tau, 1. /
@@ -301,8 +354,12 @@ class TestPDHGConstantStepSize(CCPiTestClass):
         self.assertTrue(isinstance(pdhg.step_size_rule, PDHGConstantStepSize))
 
         with self.assertWarns(DeprecationWarning):
-            pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=IdentityOperator(ImageGeometry(2, 2)),
-                        tau=0.5)
+            pdhg = PDHG(
+                f=ZeroFunction(),
+                g=ZeroFunction(),
+                operator=IdentityOperator(ImageGeometry(2, 2)),
+                tau=0.5,
+            )
         self.assertEqual(pdhg.tau, 0.5)
         self.assertEqual(pdhg.step_size_rule.tau, 0.5)
         self.assertEqual(pdhg.step_size_rule.sigma, 1. /
@@ -310,8 +367,13 @@ class TestPDHGConstantStepSize(CCPiTestClass):
         self.assertTrue(isinstance(pdhg.step_size_rule, PDHGConstantStepSize))
 
         with self.assertWarns(DeprecationWarning):
-            pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=IdentityOperator(ImageGeometry(2, 2)),
-                        sigma=0.5, tau=0.5)
+            pdhg = PDHG(
+                f=ZeroFunction(),
+                g=ZeroFunction(),
+                operator=IdentityOperator(ImageGeometry(2, 2)),
+                sigma=0.5,
+                tau=0.5,
+            )
         self.assertEqual(pdhg.sigma, 0.5)
         self.assertEqual(pdhg.tau, 0.5)
         self.assertTrue(isinstance(pdhg.step_size_rule, PDHGConstantStepSize))
@@ -373,14 +435,22 @@ class TestPDHGConstantStepSize(CCPiTestClass):
             pdhg = PDHG(f=f, g=g, operator=operator, step_size=(tau, None))
 
         # check tau neither a Number nor an array-like object
-        with self.assertRaisesRegex(ValueError, "must be None, a positive number or an array-like object"):
-            pdhg = PDHG(f=f, g=g, operator=operator,
-                        step_size=("banana", None))
+        with self.assertRaisesRegex(
+            ValueError,
+            "must be None, a positive number or an array-like object",
+        ):
+            pdhg = PDHG(
+                f=f, g=g, operator=operator, step_size=("banana", None)
+            )
 
         # check sigma neither a Number nor an array-like object
-        with self.assertRaisesRegex(ValueError, "must be None, a positive number or an array-like object"):
-            pdhg = PDHG(f=f, g=g, operator=operator,
-                        step_size=(None, "banana"))
+        with self.assertRaisesRegex(
+            ValueError,
+            "must be None, a positive number or an array-like object",
+        ):
+            pdhg = PDHG(
+                f=f, g=g, operator=operator, step_size=(None, "banana")
+            )
 
         # check warning message if condition is not satisfied
         sigma = 4/operator.norm()
@@ -407,17 +477,27 @@ class TestPDHGConstantStepSize(CCPiTestClass):
         self.assertTrue(isinstance(pdhg.tau, Number))
         self.assertEqual(warnings_log, [])
 
-    def test_step_size_and_deprecated_sigma_tau_raises_valueerror(self):
-        # Passing both `step_size` and the deprecated `sigma`/`tau` must raise a
-        # clear ValueError. Regression: this branch previously passed keyword
-        # arguments to ValueError, which raised a TypeError instead.
+    def test_step_size_and_deprecated_sigma_tau_warns_and_is_ignored(self):
+        # Passing both `step_size` and the deprecated `sigma`/`tau` raises a
+        # DeprecationWarning and `step_size` takes precedence.
         operator = IdentityOperator(ImageGeometry(2, 2))
-        with self.assertRaises(ValueError):
-            PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator,
-                 step_size=(0.1, 0.1), sigma=0.5)
-        with self.assertRaises(ValueError):
-            PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator,
-                 step_size=(0.1, 0.1), tau=0.5)
+        with self.assertWarns(DeprecationWarning):
+            pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator,
+                        step_size=(0.1, 0.2), sigma=0.5)
+        self.assertEqual(pdhg.tau, 0.1)
+        self.assertEqual(pdhg.sigma, 0.2)
+        with self.assertWarns(DeprecationWarning):
+            pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator,
+                        step_size=(0.1, 0.2), tau=0.5)
+        self.assertEqual(pdhg.tau, 0.1)
+        self.assertEqual(pdhg.sigma, 0.2)
+
+    def test_default_step_sizes(self):
+        operator = 2 * IdentityOperator(ImageGeometry(2, 2))
+        pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator)
+        self.assertIsInstance(pdhg.step_size_rule, PDHGConstantStepSize)
+        self.assertAlmostEqual(pdhg.tau, 1/operator.norm())
+        self.assertAlmostEqual(pdhg.sigma, 1/operator.norm())
 
     def test_incompatible_gd_rule_raises_valueerror(self):
         # A GD-style step-size rule returns a single scalar and has no
@@ -429,11 +509,11 @@ class TestPDHGConstantStepSize(CCPiTestClass):
                  step_size=ConstantStepSize(0.1))
 
     def test_wrong_shape_rule_raises_valueerror(self):
-        # A rule that provides get_initial_step_size but returns step sizes that
-        # are neither a positive number nor an array-like (here a list, as an
-        # SPDHG rule would return) must raise a clear ValueError from the PDHG
-        # step-size validation.
-        class _BadRule(StepSizeRule):
+        # A rule that provides get_initial_step_size but returns step sizes
+        # that are neither a positive number nor an array-like (here a list, as
+        # an SPDHG rule would return) must raise a clear ValueError from the
+        # PDHG step-size validation.
+        class _BadRule(PDHGStepSizeRule):
             def get_initial_step_size(self, algorithm):
                 return 0.1, [0.1, 0.1]
 
@@ -441,24 +521,36 @@ class TestPDHGConstantStepSize(CCPiTestClass):
                 return 0.1, [0.1, 0.1]
 
         operator = IdentityOperator(ImageGeometry(2, 2))
-        with self.assertRaisesRegex(ValueError, "must be a positive number or an array-like object"):
-            PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator,
-                 step_size=_BadRule())
+        with self.assertRaisesRegex(
+            ValueError, "must be a positive number or an array-like object"
+        ):
+            PDHG(
+                f=ZeroFunction(),
+                g=ZeroFunction(),
+                operator=operator,
+                step_size=_BadRule(),
+            )
 
         # A rule returning an array-like of the wrong shape must still report a
         # shape mismatch.
         wrong_shape = ImageGeometry(3, 3).allocate(0.1)
 
-        class _WrongShapeRule(StepSizeRule):
+        class _WrongShapeRule(PDHGStepSizeRule):
             def get_initial_step_size(self, algorithm):
                 return 0.1, wrong_shape
 
             def get_step_size(self, algorithm):
                 return 0.1, wrong_shape
 
-        with self.assertRaisesRegex(ValueError, "is not the same as the expected shape"):
-            PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=operator,
-                 step_size=_WrongShapeRule())
+        with self.assertRaisesRegex(
+            ValueError, "is not the same as the expected shape"
+        ):
+            PDHG(
+                f=ZeroFunction(),
+                g=ZeroFunction(),
+                operator=operator,
+                step_size=_WrongShapeRule(),
+            )
 
 
 class TestStepSizePDHGStronglyConvex(CCPiTestClass):
@@ -466,18 +558,26 @@ class TestStepSizePDHGStronglyConvex(CCPiTestClass):
     # TODO: remove when deprecated parameters are removed from PDHG
     def test_deprecated_parameters(self):
         with self.assertWarns(DeprecationWarning):
-            pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=IdentityOperator(ImageGeometry(2, 2)),
-                        gamma_g=0.5)
+            pdhg = PDHG(
+                f=ZeroFunction(),
+                g=ZeroFunction(),
+                operator=IdentityOperator(ImageGeometry(2, 2)),
+                gamma_g=0.5,
+            )
 
         with self.assertWarns(DeprecationWarning):
-            pdhg = PDHG(f=ZeroFunction(), g=ZeroFunction(), operator=IdentityOperator(ImageGeometry(2, 2)),
-                        gamma_fconj=0.5)
+            pdhg = PDHG(
+                f=ZeroFunction(),
+                g=ZeroFunction(),
+                operator=IdentityOperator(ImageGeometry(2, 2)),
+                gamma_fconj=0.5,
+            )
         self.assertEqual(pdhg.step_size_rule.gamma_fconj, 0.5)
 
     def test_init_invalid_initial_step_size_length(self):
-        # initial_step_size must be a length-two list/tuple. A wrong length must
-        # raise ValueError (regression: the error path previously referenced an
-        # undefined `step_size` and raised NameError instead).
+        # initial_step_size must be a length-two list/tuple. A wrong length
+        # must raise ValueError (regression: the error path previously
+        # referenced an undefined `step_size` and raised NameError instead).
         with self.assertRaises(ValueError):
             PDHGStronglyConvexUpdate(initial_step_size=(1.0,), gamma_g=0.5)
         with self.assertRaises(ValueError):
@@ -561,7 +661,7 @@ class TestStepSizePDHGStronglyConvex(CCPiTestClass):
         g = L2NormSquared()
         operator = IdentityOperator(ig)
 
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator,
                         gamma_g=0.5, gamma_fconj=0.5)
             pdhg.run(verbose=0)
@@ -569,7 +669,6 @@ class TestStepSizePDHGStronglyConvex(CCPiTestClass):
 
 class TestPDHGAdaptive2013(CCPiTestClass):
 
-  
     NORM_SCALING = 2.
 
     def setUp(self):
@@ -595,11 +694,11 @@ class TestPDHGAdaptive2013(CCPiTestClass):
             PDHGAdaptiveStepSize2013(initial_step_size=[1.0])
 
     def test_no_false_nonconvergence_warning(self):
-        # Regression: the non-convergence warning used `k == inner_iterations-1`,
-        # which false-fired when backtracking legitimately converged on the last
-        # inner iteration. With inner_iterations=1 a converging step (b <= 1)
-        # breaks at that last index, so no "did not converge" warning should be
-        # logged.
+        # Regression: the non-convergence warning used `k ==
+        # inner_iterations-1`, which false-fired when backtracking legitimately
+        # converged on the last inner iteration. With inner_iterations=1 a
+        # converging step (b <= 1) breaks at that last index, so no "did not
+        # converge" warning should be logged.
         rule = PDHGAdaptiveStepSize2013(
             initial_step_size=[1.0, 1.0], inner_iterations=1)
         pdhg = PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
@@ -620,7 +719,8 @@ class TestPDHGAdaptive2013(CCPiTestClass):
                                  ([None, 3.2], (default, 3.2)):
             with self.subTest(initial_step_size=initial):
                 rule = PDHGAdaptiveStepSize2013(initial_step_size=initial)
-                pdhg = PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+                pdhg = PDHG(f=self.F, g=self.G,
+                            operator=self.A, step_size=rule)
                 self.assertEqual(rule.get_initial_step_size(pdhg), expected)
 
     def test_backtracking_calculation(self):
@@ -645,8 +745,8 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(
             self.NORM_SCALING * rule.x_resid.as_array(), pdhg.y_tmp.as_array())
         self.assertEqual(rule.y_resid.dot(pdhg.y_tmp), 18)
-        # b = |2 sigma tau <dy, K dx>| / (gamma sigma ||dx||^2 + gamma tau ||dy||^2)
-        #   = |2*18| / (9 + 9) = 2
+        # b = |2 sigma tau <dy, K dx>| / (gamma sigma ||dx||^2 + gamma
+        # tau ||dy||^2) = |2*18| / (9 + 9) = 2
         self.assertEqual(b, 2)
 
     def test_backtracking_no_change_returns_zero(self):
@@ -657,17 +757,20 @@ class TestPDHGAdaptive2013(CCPiTestClass):
             initial_step_size=[1.0, 1.0], initial_alpha=0, gamma=1)
         pdhg = PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         pdhg.x_old = self.A.domain.allocate(1)
-        pdhg.x = self.A.domain.allocate(1)          # x == x_old  -> no primal change
+        # x == x_old  -> no primal change
+        pdhg.x = self.A.domain.allocate(1)
         pdhg.y = self.A.range.allocate(1)
         pdhg.y_tmp = self.A.range.allocate(0)
         rule.x_resid = self.A.domain.allocate(0)
         rule.y_resid = self.A.range.allocate(0)
-        rule.y_old = self.A.range.allocate(1)        # y == y_old  -> no dual change
+        # y == y_old  -> no dual change
+        rule.y_old = self.A.range.allocate(1)
 
         b = rule._calculate_backtracking(pdhg)
         self.assertTrue(np.isfinite(b))
         self.assertEqual(b, 0.0)
-        self.assertLessEqual(b, 1)                     # caller would accept, not backtrack
+        # caller would accept, not backtrack
+        self.assertLessEqual(b, 1)
 
     def test_backtracking(self):
         rule = PDHGAdaptiveStepSize2013(
@@ -690,8 +793,10 @@ class TestPDHGAdaptive2013(CCPiTestClass):
             rule.d_norm = 3
         rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
 
-    # Capture logs
-        with self.assertLogs('cil.optimisation.utilities.StepSizeMethods', level='DEBUG') as log:
+        # Capture logs
+        with self.assertLogs(
+            'cil.optimisation.utilities.StepSizeMethods', level='DEBUG'
+        ) as log:
             rule.get_step_size(pdhg)
 
         # Combine log messages
@@ -707,23 +812,25 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         self.assertEqual(mock_func.call_count, 3)
 
     def test_changing_ratio(self):
-        # The rebalancing step compares the primal and dual residuals against a band
-        # [s/delta, s*delta] scaled by s, which defaults to ||K|| 
-        # Backtracking and the residuals themselves are mocked, leaving only the
-        # branch choice and the resulting rescaling under test.
+        # The rebalancing step compares the primal and dual residuals against a
+        # band [s/delta, s*delta] scaled by s, which defaults to ||K||
+        # Backtracking and the residuals themselves are mocked, leaving only
+        # the branch choice and the resulting rescaling under test.
         delta, alpha, eta = 1.5, 0.95, 0.95
         cases = [
             # p_norm < (s/delta)*d_norm: the dual is behind, so tau is shrunk
             (1., 10., 'p_norm < (s/delta)*d_norm',
              1. * (1 - alpha), 1. / (1 - alpha), alpha * eta),
-            # equal residuals are still below the lower edge s/delta = 4/3, so this
-            # case only lands in the shrink branch because s = ||K|| = 2 > 1
+            # equal residuals are still below the lower edge s/delta = 4/3, so
+            # this case only lands in the shrink branch because s = ||K|| = 2 >
+            # 1
             (1., 1., 'p_norm < (s/delta)*d_norm',
              1. * (1 - alpha), 1. / (1 - alpha), alpha * eta),
-            # inside the band [s/delta, s*delta] = [4/3, 3]: nothing changes, and
-            # alpha does not decay. Below the upper edge only because s > 1
+            # inside the band [s/delta, s*delta] = [4/3, 3]: nothing changes,
+            # and alpha does not decay. Below the upper edge only because s > 1
             (2., 1., 'No change', 1., 1., alpha),
-            # (s*delta)*d_norm < p_norm: the primal is behind, so tau is boosted
+            # (s*delta)*d_norm < p_norm: the primal is behind, so tau is
+            # boosted
             (10., 1., '(s*delta)*d_norm < p_norm',
              1. / (1 - alpha), 1. * (1 - alpha), alpha * eta),
         ]
@@ -732,7 +839,8 @@ class TestPDHGAdaptive2013(CCPiTestClass):
                 rule = PDHGAdaptiveStepSize2013(
                     initial_step_size=[1.0, 1.0], initial_alpha=alpha, gamma=1,
                     delta=delta)
-                pdhg = PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+                pdhg = PDHG(f=self.F, g=self.G,
+                            operator=self.A, step_size=rule)
                 pdhg.x_old = self.A.domain.allocate(0)
                 pdhg.y_old = self.A.range.allocate(0)
                 pdhg.x = self.A.domain.allocate(1)
@@ -750,10 +858,13 @@ class TestPDHGAdaptive2013(CCPiTestClass):
                     rule.d_norm = d_norm
                 rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
 
-                with self.assertLogs('cil.optimisation.utilities.StepSizeMethods', level='DEBUG') as log:
+                with self.assertLogs(
+                    'cil.optimisation.utilities.StepSizeMethods', level='DEBUG'
+                ) as log:
                     rule.get_step_size(pdhg)
 
-                self.assertEqual(rule.s, self.A.norm())   # s defaulted to ||K||
+                # s defaulted to ||K||
+                self.assertEqual(rule.s, self.A.norm())
                 self.assertIn(message, "\n".join(log.output))
                 self.assertAlmostEqual(pdhg.tau, tau)
                 self.assertAlmostEqual(pdhg.sigma, sigma)
@@ -775,8 +886,10 @@ class TestPDHGAdaptive2013(CCPiTestClass):
 
         rule._calculate_backtracking = mock_func
 
-    # Capture logs
-        with self.assertLogs('cil.optimisation.utilities.StepSizeMethods', level='WARNING') as log:
+        # Capture logs
+        with self.assertLogs(
+            'cil.optimisation.utilities.StepSizeMethods', level='WARNING'
+        ) as log:
             rule.get_step_size(pdhg)
 
         # Combine log messages
@@ -788,9 +901,10 @@ class TestPDHGAdaptive2013(CCPiTestClass):
         self.assertEqual(mock_func.call_count, 51)
 
     def test_first_backtracking_retry_restores_initial_dual(self):
-        # Regression: y_old used to be allocated as zeros on the first get_step_size
-        # call, so a backtracking retry during iteration 0 restored the dual variable
-        # to zero rather than to the dual the algorithm was started from.
+        # Regression: y_old used to be allocated as zeros on the first
+        # get_step_size call, so a backtracking retry during iteration 0
+        # restored the dual variable to zero rather than to the dual the
+        # algorithm was started from.
         y0 = self.A.range.allocate(7.0)
         rule = PDHGAdaptiveStepSize2013(initial_step_size=[50.0, 50.0])
         pdhg = PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
@@ -812,9 +926,12 @@ class TestPDHGAdaptive2013(CCPiTestClass):
 
     def test_stopping_criterion(self):
 
-
         rule = PDHGAdaptiveStepSize2013(
-            initial_step_size=[1.0, 1.0], initial_alpha=0.95, gamma=1, auto_stop=True)
+            initial_step_size=[1.0, 1.0],
+            initial_alpha=0.95,
+            gamma=1,
+            auto_stop=True,
+        )
         pdhg = PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         pdhg.x_old = self.A.domain.allocate(0)
         pdhg.y_old = self.A.range.allocate(0)
@@ -832,12 +949,14 @@ class TestPDHGAdaptive2013(CCPiTestClass):
             rule.p_norm = 2
             rule.d_norm = 1
         rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
-        # s = ||K|| = 2 and delta = 1.5, so p_norm = 2, d_norm = 1 sits inside the
-        # band [s/delta, s*delta] = [4/3, 3] and the rule reports no change
+        # s = ||K|| = 2 and delta = 1.5, so p_norm = 2, d_norm = 1 sits inside
+        # the band [s/delta, s*delta] = [4/3, 3] and the rule reports no change
         rule.delta = 1.5
 
-    # Capture logs
-        with self.assertLogs('cil.optimisation.utilities.StepSizeMethods', level='DEBUG') as log:
+        # Capture logs
+        with self.assertLogs(
+            'cil.optimisation.utilities.StepSizeMethods', level='DEBUG'
+        ) as log:
             for i in range(15):
                 rule.get_step_size(pdhg)
 
@@ -865,7 +984,6 @@ class TestPDHGAdaptive2013(CCPiTestClass):
 
 
 class TestPDHGAdaptive2015(CCPiTestClass):
-
 
     NORM_SCALING = 2.
 
@@ -901,7 +1019,8 @@ class TestPDHGAdaptive2015(CCPiTestClass):
                                  ([None, 3.2], (default, 3.2)):
             with self.subTest(initial_step_size=initial):
                 rule = PDHGAdaptiveStepSize2015(initial_step_size=initial)
-                pdhg = PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+                pdhg = PDHG(f=self.F, g=self.G,
+                            operator=self.A, step_size=rule)
                 self.assertEqual(rule.get_initial_step_size(pdhg), expected)
 
     def test_backtracking_calculation(self):
@@ -951,8 +1070,11 @@ class TestPDHGAdaptive2015(CCPiTestClass):
             rule.d_norm = 3
         rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
 
-    # Capture logs
-        with self.assertLogs('cil.optimisation.utilities.StepSizeMethods', level='DEBUG') as log:
+        # Capture logs
+        with self.assertLogs(
+            'cil.optimisation.utilities.pdhg_adaptive_step_size_2015',
+            level='DEBUG',
+        ) as log:
             rule.get_step_size(pdhg)
 
         # Combine log messages
@@ -968,15 +1090,16 @@ class TestPDHGAdaptive2015(CCPiTestClass):
         self.assertEqual(mock_func.call_count, 3)
 
     def test_changing_ratio(self):
-        # The 2015 rebalancing step compares the residuals against a fixed factor of
-        # two rather than the 2013 rule's s-scaled band, so unlike that rule the
-        # branch taken here does not depend on ||K||.
+        # The 2015 rebalancing step compares the residuals against a fixed
+        # factor of two rather than the 2013 rule's s-scaled band, so unlike
+        # that rule the branch taken here does not depend on ||K||.
         alpha, eta = 0.95, 0.95
         cases = [
             # 2*p_norm < d_norm: the dual is behind, so tau is shrunk
             (1., 10., '2*p_norm < d_norm',
              1. * (1 - alpha), 1. / (1 - alpha), alpha * eta),
-            # neither residual dominates: nothing changes, and alpha does not decay
+            # neither residual dominates: nothing changes, and alpha does not
+            # decay
             (1., 1., 'No change', 1., 1., alpha),
             # 2*d_norm < p_norm: the primal is behind, so tau is boosted
             (10., 1., '2*d_norm < p_norm',
@@ -986,7 +1109,8 @@ class TestPDHGAdaptive2015(CCPiTestClass):
             with self.subTest(p_norm=p_norm, d_norm=d_norm):
                 rule = PDHGAdaptiveStepSize2015(
                     initial_step_size=[1.0, 1.0], initial_alpha=alpha, c=1)
-                pdhg = PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+                pdhg = PDHG(f=self.F, g=self.G,
+                            operator=self.A, step_size=rule)
                 pdhg.x_old = self.A.domain.allocate(0)
                 pdhg.y_old = self.A.range.allocate(0)
                 pdhg.x = self.A.domain.allocate(1)
@@ -1004,7 +1128,10 @@ class TestPDHGAdaptive2015(CCPiTestClass):
                     rule.d_norm = d_norm
                 rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
 
-                with self.assertLogs('cil.optimisation.utilities.StepSizeMethods', level='DEBUG') as log:
+                with self.assertLogs(
+                    'cil.optimisation.utilities.pdhg_adaptive_step_size_2015',
+                    level='DEBUG',
+                ) as log:
                     rule.get_step_size(pdhg)
 
                 self.assertIn(message, "\n".join(log.output))
@@ -1028,8 +1155,11 @@ class TestPDHGAdaptive2015(CCPiTestClass):
 
         rule._calculate_backtracking = mock_func
 
-    # Capture logs
-        with self.assertLogs('cil.optimisation.utilities.StepSizeMethods', level='WARNING') as log:
+        # Capture logs
+        with self.assertLogs(
+            'cil.optimisation.utilities.pdhg_adaptive_step_size_2015',
+            level='WARNING',
+        ) as log:
             rule.get_step_size(pdhg)
 
         # Combine log messages
@@ -1041,9 +1171,10 @@ class TestPDHGAdaptive2015(CCPiTestClass):
         self.assertEqual(mock_func.call_count, 51)
 
     def test_first_backtracking_retry_restores_initial_dual(self):
-        # Regression: y_old used to be allocated as zeros on the first get_step_size
-        # call, so a backtracking retry during iteration 0 restored the dual variable
-        # to zero rather than to the dual the algorithm was started from.
+        # Regression: y_old used to be allocated as zeros on the first
+        # get_step_size call, so a backtracking retry during iteration 0
+        # restored the dual variable to zero rather than to the dual the
+        # algorithm was started from.
         y0 = self.A.range.allocate(7.0)
         rule = PDHGAdaptiveStepSize2015(initial_step_size=[50.0, 50.0])
         pdhg = PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
@@ -1065,9 +1196,12 @@ class TestPDHGAdaptive2015(CCPiTestClass):
 
     def test_stopping_criterion(self):
 
-
         rule = PDHGAdaptiveStepSize2015(
-            initial_step_size=[1.0, 1.0], initial_alpha=0.95, c=1, auto_stop=True)
+            initial_step_size=[1.0, 1.0],
+            initial_alpha=0.95,
+            c=1,
+            auto_stop=True,
+        )
         pdhg = PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         pdhg.x_old = self.A.domain.allocate(0)
         pdhg.y_old = self.A.range.allocate(0)
@@ -1086,8 +1220,11 @@ class TestPDHGAdaptive2015(CCPiTestClass):
             rule.d_norm = 1
         rule._calculate_pnorm_dnorm = mock_pnorm_dnorm
 
-    # Capture logs
-        with self.assertLogs('cil.optimisation.utilities.StepSizeMethods', level='DEBUG') as log:
+        # Capture logs
+        with self.assertLogs(
+            'cil.optimisation.utilities.pdhg_adaptive_step_size_2015',
+            level='DEBUG',
+        ) as log:
             for i in range(15):
                 rule.get_step_size(pdhg)
 
@@ -1173,11 +1310,16 @@ class TestPDHGBayesOpt(CCPiTestClass):
                     PDHGBayesOptimisationStepSize(gamma_bounds=bounds)
 
     def test_init_invalid_call_counts(self):
-        for kwargs in (dict(n_initial_points=0), dict(n_initial_points=-1),
-                       dict(n_initial_points=2.5), dict(n_calls=-5),
-                       dict(n_calls=0), dict(n_calls=2.5),
-                       # skopt cannot draw more initial points than it has calls
-                       dict(n_initial_points=5, n_calls=3)):
+        for kwargs in (
+            dict(n_initial_points=0),
+            dict(n_initial_points=-1),
+            dict(n_initial_points=2.5),
+            dict(n_calls=-5),
+            dict(n_calls=0),
+            dict(n_calls=2.5),
+            # skopt cannot draw more initial points than it has calls
+            dict(n_initial_points=5, n_calls=3),
+        ):
             with self.subTest(**kwargs):
                 with self.assertRaises(ValueError):
                     PDHGBayesOptimisationStepSize(**kwargs)
@@ -1192,10 +1334,15 @@ class TestPDHGBayesOpt(CCPiTestClass):
 
     def test_init_accepts_valid_call_counts(self):
         rule = PDHGBayesOptimisationStepSize(
-            n_initial_points=1, n_calls=1, n_iterations=2, gamma_bounds=[1e-3, 1e3])
+            n_initial_points=1,
+            n_calls=1,
+            n_iterations=2,
+            gamma_bounds=[1e-3, 1e3],
+        )
         self.assertEqual(rule.n_calls, 1)
         self.assertEqual(rule.n_iterations, 2)
-        self.assertIsNone(PDHGBayesOptimisationStepSize(n_iterations=None).n_iterations)
+        self.assertIsNone(PDHGBayesOptimisationStepSize(
+            n_iterations=None).n_iterations)
 
     def test_default_n_iterations(self):
         rule = PDHGBayesOptimisationStepSize(n_iterations=None)
@@ -1209,7 +1356,8 @@ class TestPDHGBayesOpt(CCPiTestClass):
         PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
 
         self.assertEqual(rule.n_iterations, 10)
-        # the bounds are derived from the objective at the zero image and the operator norm
+        # the bounds are derived from the objective at the zero image and the
+        # operator norm
         zero_x = self.A.domain_geometry().allocate(0)
         ratio = np.sqrt(self.F(self.A.direct(zero_x)) +
                         self.G(zero_x)) / self.A.norm()
@@ -1244,7 +1392,8 @@ class TestPDHGBayesOpt(CCPiTestClass):
             gamma_bounds=None, n_initial_points=2, n_calls=3,
             n_iterations=2, seed=42)
         with self.assertRaises(ValueError):
-            PDHG(f=L1Norm(), g=L2NormSquared(), operator=self.A, step_size=rule)
+            PDHG(f=L1Norm(), g=L2NormSquared(),
+                 operator=self.A, step_size=rule)
 
     # ------------------------------------------------------------------
     # the gamma -> (tau, sigma) mapping
@@ -1268,7 +1417,8 @@ class TestPDHGBayesOpt(CCPiTestClass):
 
     @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_step_sizes_match_the_gamma_the_optimiser_returned(self):
-        # bounds force gamma to be very close to 2.5, so the rule's step sizes are known in advance
+        # bounds force gamma to be very close to 2.5, so the rule's step sizes
+        # are known in advance
         gamma = 2.5
         rule = PDHGBayesOptimisationStepSize(
             gamma_bounds=[gamma * (1 - 1e-6), gamma * (1 + 1e-6)],
@@ -1286,7 +1436,9 @@ class TestPDHGBayesOpt(CCPiTestClass):
 
     @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_step_sizes_are_consistent_for_whichever_gamma_is_chosen(self):
-        # Test returned gamma is in the right range and the step sizes are consistent with it. The optimiser is free to choose any gamma in the range, so the test cannot assert a particular value.
+        # Test returned gamma is in the right range and the step sizes are
+        # consistent with it. The optimiser is free to choose any gamma in the
+        # range, so the test cannot assert a particular value.
         rule = PDHGBayesOptimisationStepSize(
             gamma_bounds=[2., 3.], n_initial_points=2, n_calls=3,
             n_iterations=4, seed=42)
@@ -1295,16 +1447,20 @@ class TestPDHGBayesOpt(CCPiTestClass):
         gamma = np.sqrt(pdhg.sigma / pdhg.tau)
         self.assertTrue(2. - 1e-9 <= gamma <= 3. + 1e-9,
                         "gamma {} outside the requested bounds".format(gamma))
-        # the gamma the rule reports must be the one its step sizes were built from
+        # the gamma the rule reports must be the one its step sizes were built
+        # from
         self.assertAlmostEqual(rule.gamma, gamma)
 
         self.assertAlmostEqual(pdhg.tau, 1. / (gamma * self.NORM_SCALING))
         self.assertAlmostEqual(pdhg.sigma, gamma / self.NORM_SCALING)
-        self.assertAlmostEqual(pdhg.tau * pdhg.sigma, 1. / self.NORM_SCALING ** 2)
+        self.assertAlmostEqual(pdhg.tau * pdhg.sigma,
+                               1. / self.NORM_SCALING ** 2)
 
     @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_algorithm_state_is_clean_after_the_search(self):
-        # the rule temporarily sets the algorithm's iteration and objective to score the trial, but must restore them to run the algorithm from scratch afterwards
+        # the rule temporarily sets the algorithm's iteration and objective to
+        # score the trial, but must restore them to run the algorithm from
+        # scratch afterwards
         rule = PDHGBayesOptimisationStepSize(
             gamma_bounds=[2., 3.], n_initial_points=2, n_calls=3,
             n_iterations=4, seed=42)
@@ -1328,7 +1484,8 @@ class TestPDHGBayesOpt(CCPiTestClass):
 
         self.assertTrue(np.isfinite(pdhg.tau) and pdhg.tau > 0.)
         self.assertTrue(np.isfinite(pdhg.sigma) and pdhg.sigma > 0.)
-        self.assertAlmostEqual(pdhg.tau * pdhg.sigma, 1. / self.NORM_SCALING ** 2)
+        self.assertAlmostEqual(pdhg.tau * pdhg.sigma,
+                               1. / self.NORM_SCALING ** 2)
 
     @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_step_sizes_are_constant_during_the_run(self):
@@ -1350,15 +1507,16 @@ class TestPDHGBayesOpt(CCPiTestClass):
             rule = PDHGBayesOptimisationStepSize(
                 gamma_bounds=[2., 3.], n_initial_points=2, n_calls=3,
                 n_iterations=4, seed=42)
-            pdhgs.append(PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule))
+            pdhgs.append(
+                PDHG(f=self.F, g=self.G, operator=self.A, step_size=rule))
 
         first, second = pdhgs
         self.assertEqual(first.tau, second.tau)
         self.assertEqual(first.sigma, second.sigma)
 
     def test_missing_skopt_raises_an_informative_importerror(self):
-        # the one path that must behave *without* scikit-optimize, so the import
-        # is blocked rather than the optimiser replaced
+        # the one path that must behave *without* scikit-optimize, so the
+        # import is blocked rather than the optimiser replaced
         rule = PDHGBayesOptimisationStepSize(
             gamma_bounds=[2., 3.], n_initial_points=2, n_calls=3,
             n_iterations=4, seed=42)
@@ -1370,9 +1528,10 @@ class TestPDHGBayesOpt(CCPiTestClass):
 
 class TestSPDHGConstantStepSize(CCPiTestClass):
 
-    # Scaled identities, so the operator norms are exactly NORM_SCALINGS. With ten
-    # unscaled identities every candidate rho*p_i/(sigma_i ||K_i||^2) is the same
-    # number, and the min, the square and the p_i weighting are all invisible.
+    # Scaled identities, so the operator norms are exactly NORM_SCALINGS. With
+    # ten unscaled identities every candidate rho*p_i/(sigma_i ||K_i||^2) is
+    # the same number, and the min, the square and the p_i weighting are all
+    # invisible.
     NORM_SCALINGS = [1., 2., 3., 4., 5., 6., 7., 8., 9., 10.]
 
     def setUp(self):
@@ -1389,37 +1548,76 @@ class TestSPDHGConstantStepSize(CCPiTestClass):
         gamma = 1.
         rho = .99
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
-        
-        self.assertListEqual(
-            spdhg.sigma, [rho / ni for ni in spdhg._norms])
-        self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni,
-                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+
+        self.assertListEqual(spdhg.sigma, [rho / ni for ni in spdhg._norms])
+        self.assertEqual(
+            spdhg.tau,
+            min(
+                [
+                    rho * pi / (si * ni**2)
+                    for pi, ni, si in zip(
+                        spdhg._prob_weights, spdhg._norms, spdhg.sigma
+                    )
+                ]
+            ),
+        )
         self.assertNumpyArrayEqual(
-            spdhg.x.as_array(), self.A.domain_geometry().allocate(0).as_array())
+            spdhg.x.as_array(), self.A.domain_geometry().allocate(0).as_array()
+        )
         self.assertEqual(spdhg.update_objective_interval, 1)
 
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=(100, [1]*self.subsets))
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,
+                      step_size=(100, [1]*self.subsets))
         self.assertListEqual(spdhg.sigma, [1]*self.subsets)
         self.assertEqual(spdhg.tau, 100)
 
         # Test SPDHG setters - set_step_sizes with sigma
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=(None, [1]*self.subsets))
-        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
-        self.assertEqual(spdhg.tau, min([(rho*pi / (si * ni**2)) for pi, ni,
-                                         si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+        spdhg = SPDHG(
+            f=self.F,
+            g=self.G,
+            operator=self.A,
+            step_size=(None, [1] * self.subsets),
+        )
+        self.assertListEqual(spdhg.sigma, [1] * self.subsets)
+        self.assertEqual(
+            spdhg.tau,
+            min(
+                [
+                    (rho * pi / (si * ni**2))
+                    for pi, ni, si in zip(
+                        spdhg._prob_weights, spdhg._norms, spdhg.sigma
+                    )
+                ]
+            ),
+        )
 
         # Test SPDHG setters - set_step_sizes with tau
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=(100, None))
-        self.assertListEqual(spdhg.sigma, [
-                             gamma * rho*pi / (spdhg.tau*ni**2) for ni, pi in zip(spdhg._norms, spdhg._prob_weights)])
+        spdhg = SPDHG(
+            f=self.F, g=self.G, operator=self.A, step_size=(100, None)
+        )
+        self.assertListEqual(
+            spdhg.sigma,
+            [
+                gamma * rho * pi / (spdhg.tau * ni**2)
+                for ni, pi in zip(spdhg._norms, spdhg._prob_weights)
+            ],
+        )
         self.assertEqual(spdhg.tau, 100)
-        
 
     def test_init_and_constant_step_size_invalid(self):
         with self.assertRaises(ValueError):
             SPDHGConstantStepSize(step_size=[1.0])
         with self.assertRaises(ValueError):
-            SPDHGConstantStepSize(step_size=[1.0, 2.0]).get_initial_step_size(SPDHG(f=self.F, g=self.G, operator=self.A))
+            SPDHGConstantStepSize(step_size=[1.0, -2.0]).get_initial_step_size(
+                SPDHG(f=self.F, g=self.G, operator=self.A)
+            )
+
+    def test_constant_step_size_scalar_sigma(self):
+        # a single dual step size is used for every operator
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,
+                      step_size=(0.05, 2.0))
+        self.assertEqual(spdhg.tau, 0.05)
+        self.assertListEqual(spdhg.sigma, [2.0]*self.subsets)
 
     def test_init_and_constant_step_size_invalid_sigma(self):
         # sigma must be a list of positive numbers with one entry per operator
@@ -1434,14 +1632,14 @@ class TestSPDHGConstantStepSize(CCPiTestClass):
         with self.assertRaises(ValueError):
             SPDHG(f=self.F, g=self.G, operator=self.A,
                   step_size=(-1.0, [1.0]*self.subsets))
-        # tau = 0 must give the same clear error rather than a ZeroDivisionError
-        # from computing sigma_i = rho p_i / (tau ||K_i||^2)
+        # tau = 0 must give the same clear error rather than a
+        # ZeroDivisionError from computing sigma_i = rho p_i / (tau ||K_i||^2)
         with self.assertRaises(ValueError):
             SPDHG(f=self.F, g=self.G, operator=self.A, step_size=(0.0, None))
 
     def test_deprecated_parameters(self):
-        # sigma and tau are deprecated in favour of step_size, but until they are
-        # removed they must still warn and still reach the algorithm
+        # sigma and tau are deprecated in favour of step_size, but until they
+        # are removed they must still warn and still reach the algorithm
         with self.assertWarns(DeprecationWarning):
             spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,
                           tau=0.05, sigma=[1.0]*self.subsets)
@@ -1458,9 +1656,10 @@ class TestSPDHGConstantStepSize(CCPiTestClass):
         self.assertListEqual(list(spdhg.sigma), [1.0]*self.subsets)
 
     def test_wrong_shape_rule_raises_valueerror(self):
-        # a rule with the right interface but the wrong output shape must be caught
-        # by the SPDHG step-size validation, not fail later with an opaque error
-        class _BadRule(StepSizeRule):
+        # a rule with the right interface but the wrong output shape must be
+        # caught by the SPDHG step-size validation, not fail later with an
+        # opaque error
+        class _BadRule(SPDHGStepSizeRule):
             def __init__(self, step_size):
                 self.step_size = step_size
 
@@ -1475,7 +1674,8 @@ class TestSPDHGConstantStepSize(CCPiTestClass):
             ([0.1], [1.0]*self.subsets),                 # tau not a scalar
             (0.1, 0.5),                                  # scalar sigma
             (0.1, [1.0]*(self.subsets - 1)),             # wrong-length sigma
-            (0.1, [1.0]*(self.subsets - 1) + [0.0]),     # non-positive sigma entry
+            # non-positive sigma entry
+            (0.1, [1.0]*(self.subsets - 1) + [0.0]),
         ]
         for step_size in bad_step_sizes:
             with self.assertRaises(ValueError):
@@ -1485,23 +1685,30 @@ class TestSPDHGConstantStepSize(CCPiTestClass):
     def test_constant_step_size_unchanged_by_iterations(self):
         # get_step_size returns the same values every
         # iteration
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,
-                      step_size=(0.05, [1.0]*self.subsets),
-                      sampler=Sampler.random_with_replacement(self.subsets, seed=42))
+        spdhg = SPDHG(
+            f=self.F,
+            g=self.G,
+            operator=self.A,
+            step_size=(0.05, [1.0] * self.subsets),
+            sampler=Sampler.random_with_replacement(self.subsets, seed=42),
+        )
         tau, sigma = spdhg.tau, list(spdhg.sigma)
         spdhg.run(5, verbose=0)
         self.assertEqual(spdhg.tau, tau)
         self.assertListEqual(list(spdhg.sigma), sigma)
 
-    def test_step_size_and_deprecated_sigma_tau_raises_valueerror(self):
-        # Passing both `step_size` and the deprecated `sigma`/`tau` must raise a
-        # clear ValueError.
-        with self.assertRaises(ValueError):
-            SPDHG(f=self.F, g=self.G, operator=self.A,
-                  step_size=(100, [1]*self.subsets), sigma=0.5)
-        with self.assertRaises(ValueError):
-            SPDHG(f=self.F, g=self.G, operator=self.A,
-                  step_size=(100, [1]*self.subsets), tau=0.5)
+    def test_step_size_and_deprecated_sigma_tau_warns_and_is_ignored(self):
+        # Passing both `step_size` and the deprecated `sigma`/`tau` raises a
+        # DeprecationWarning and `step_size` takes precedence.
+        with self.assertWarns(DeprecationWarning):
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,
+                          step_size=(100, [1]*self.subsets), sigma=0.5)
+        self.assertEqual(spdhg.tau, 100)
+        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
+        with self.assertWarns(DeprecationWarning):
+            spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,
+                          step_size=(100, [1]*self.subsets), tau=0.5)
+        self.assertEqual(spdhg.tau, 100)
 
     def test_incompatible_gd_rule_raises_valueerror(self):
         # A GD-style step-size rule has no get_initial_step_size and is not
@@ -1509,31 +1716,50 @@ class TestSPDHGConstantStepSize(CCPiTestClass):
         with self.assertRaises(ValueError):
             SPDHG(f=self.F, g=self.G, operator=self.A,
                   step_size=ConstantStepSize(0.1))
-            
+
     def test_tau_from_sigma_raises_when_no_usable_block(self):
-        # every block is skipped -- zero operator norm, or zero probability weight --
-        # so no tau can be formed and the helper must say so rather than return inf
+        # every block is skipped -- zero operator norm, or zero probability
+        # weight -- so no tau can be formed and the helper must say so rather
+        # than return inf
         with self.assertRaises(ValueError):
-            _spdhg_tau_from_sigma([1., 1.], [0., 0.], [0.5, 0.5], 0.99)
+            SPDHGStepSizeRule.tau_from_sigma(
+                [1., 1.], [0., 0.], [0.5, 0.5], 0.99)
         with self.assertRaises(ValueError):
-            _spdhg_tau_from_sigma([1., 1.], [1., 1.], [0., 0.], 0.99)
+            SPDHGStepSizeRule.tau_from_sigma(
+                [1., 1.], [1., 1.], [0., 0.], 0.99)
 
     def test_tau_from_sigma_skips_unusable_blocks(self):
-        # a block with a zero norm or a zero probability weight is skipped, and tau is
-        # the min over what is left -- the skipped block must not contribute at all
+        # a block with a zero norm or a zero probability weight is skipped, and
+        # tau is the min over what is left -- the skipped block must not
+        # contribute at all
         self.assertAlmostEqual(
-            _spdhg_tau_from_sigma([1., 1.], [0., 2.], [0.5, 0.5], 0.99), 0.99*0.5/4)
+            SPDHGStepSizeRule.tau_from_sigma(
+                [1.0, 1.0], [0.0, 2.0], [0.5, 0.5], 0.99
+            ),
+            0.99 * 0.5 / 4,
+        )
         self.assertAlmostEqual(
-            _spdhg_tau_from_sigma([1., 1.], [2., 2.], [0., 0.5], 0.99), 0.99*0.5/4)
+            SPDHGStepSizeRule.tau_from_sigma(
+                [1.0, 1.0], [2.0, 2.0], [0.0, 0.5], 0.99
+            ),
+            0.99 * 0.5 / 4,
+        )
 
     def test_tau_is_the_minimising_block(self):
-    
+
         rho = 0.99
         norms = self.NORM_SCALINGS
-        probs = [0.19] + [0.09]*(self.subsets - 1)
-        sigma = [1.]*self.subsets
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=(None, sigma),
-                      sampler=Sampler.random_with_replacement(self.subsets, prob=probs, seed=42))
+        probs = [0.19] + [0.09] * (self.subsets - 1)
+        sigma = [1.0] * self.subsets
+        spdhg = SPDHG(
+            f=self.F,
+            g=self.G,
+            operator=self.A,
+            step_size=(None, sigma),
+            sampler=Sampler.random_with_replacement(
+                self.subsets, prob=probs, seed=42
+            ),
+        )
 
         candidates = [rho*pi / (si * ni**2) for pi, ni, si
                       in zip(spdhg._prob_weights, norms, sigma)]
@@ -1546,7 +1772,8 @@ class TestSPDHGConstantStepSize(CCPiTestClass):
         rho = 0.99
         tau = 100.
         norms = self.NORM_SCALINGS
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=(tau, None))
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A,
+                      step_size=(tau, None))
 
         self.assertEqual(spdhg.tau, tau)
         for si, ni, pi in zip(spdhg.sigma, norms, spdhg._prob_weights):
@@ -1555,12 +1782,22 @@ class TestSPDHGConstantStepSize(CCPiTestClass):
     def test_step_sizes_from_ratio(self):
         gamma = 3.7
         rho = 5.6
-        rule = SPDHGStepSizesFromRatio(gamma,rho)
+        rule = SPDHGStepSizesFromRatio(gamma, rho)
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
         self.assertListEqual(
-            spdhg.sigma, [gamma * rho / ni for ni in spdhg._norms])
-        self.assertEqual(spdhg.tau, min([pi*rho / (si * ni**2) for pi, ni,
-                                            si in zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+            spdhg.sigma, [gamma * rho / ni for ni in spdhg._norms]
+        )
+        self.assertEqual(
+            spdhg.tau,
+            min(
+                [
+                    pi * rho / (si * ni**2)
+                    for pi, ni, si in zip(
+                        spdhg._prob_weights, spdhg._norms, spdhg.sigma
+                    )
+                ]
+            ),
+        )
 
     def test_step_sizes_from_ratio_invalid(self):
         # gamma and rho must both be positive scalars
@@ -1572,7 +1809,6 @@ class TestSPDHGConstantStepSize(CCPiTestClass):
 
 
 class TestSPDHGBayesStepSize(CCPiTestClass):
-
 
     NORM_SCALINGS = [1., 2., 3., 4.]
     PROB_WEIGHTS = [0.4, 0.3, 0.2, 0.1]
@@ -1593,15 +1829,15 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
     def _gamma_from_step_sizes(algorithm):
         r"""Recover the gamma the rule settled on.
 
-        With :math:`\sigma_i=\gamma\rho/\|K_i\|` the primal step size collapses to
-        :math:`\tau=\min_i(p_i/(\gamma\|K_i\|))`, so gamma is recovered as
+        With :math:`\sigma_i=\gamma\rho/\|K_i\|` the primal step size collapses
+        to :math:`\tau=\min_i(p_i/(\gamma\|K_i\|))`, so gamma is recovered as
         :math:`\min_i(p_i/(\tau\|K_i\|))` independently of rho.
         """
         return min(pi / (algorithm.tau * ni) for pi, ni
                    in zip(algorithm._prob_weights, algorithm._norms))
 
     # ------------------------------------------------------------------
-    # construction 
+    # construction
     # ------------------------------------------------------------------
 
     def test_init(self):
@@ -1651,11 +1887,16 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
                     SPDHGBayesOptimisationStepSize(gamma_bounds=bounds)
 
     def test_init_invalid_call_counts(self):
-        for kwargs in (dict(n_initial_points=0), dict(n_initial_points=-1),
-                       dict(n_initial_points=2.5), dict(n_calls=-5),
-                       dict(n_calls=0), dict(n_calls=2.5),
-                       # skopt cannot draw more initial points than it has calls
-                       dict(n_initial_points=5, n_calls=3)):
+        for kwargs in (
+            dict(n_initial_points=0),
+            dict(n_initial_points=-1),
+            dict(n_initial_points=2.5),
+            dict(n_calls=-5),
+            dict(n_calls=0),
+            dict(n_calls=2.5),
+            # skopt cannot draw more initial points than it has calls
+            dict(n_initial_points=5, n_calls=3),
+        ):
             with self.subTest(**kwargs):
                 with self.assertRaises(ValueError):
                     SPDHGBayesOptimisationStepSize(**kwargs)
@@ -1668,17 +1909,21 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
 
     def test_init_accepts_valid_call_counts(self):
         rule = SPDHGBayesOptimisationStepSize(
-            n_initial_points=1, n_calls=1, n_iterations=2, gamma_bounds=[1e-3, 1e3])
+            n_initial_points=1,
+            n_calls=1,
+            n_iterations=2,
+            gamma_bounds=[1e-3, 1e3],
+        )
         self.assertEqual(rule.n_calls, 1)
         self.assertEqual(rule.n_iterations, 2)
-        self.assertIsNone(SPDHGBayesOptimisationStepSize(n_iterations=None).n_iterations)
+        self.assertIsNone(SPDHGBayesOptimisationStepSize(
+            n_iterations=None).n_iterations)
 
     def test_default_n_iterations_scales_with_number_of_operators(self):
         rule = SPDHGBayesOptimisationStepSize()
         self.assertEqual(
             rule._default_n_iterations(SimpleNamespace(_norms=[1.] * 7)), 70)
-        
-        
+
     @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_defaults_are_resolved_from_the_problem_at_set_up(self):
         rule = SPDHGBayesOptimisationStepSize(
@@ -1690,7 +1935,8 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
 
         # n_iterations follows the number of operators
         self.assertEqual(rule.n_iterations, 10 * self.subsets)
-        # and the bounds are derived from the objective at the zero image and the operator norm
+        # and the bounds are derived from the objective at the zero image and
+        # the operator norm
         zero_x = self.A.domain_geometry().allocate(0)
         ratio = np.sqrt(self.F(self.A.direct(zero_x)) +
                         self.G(zero_x)) / self.A.norm()
@@ -1729,11 +1975,10 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
             SPDHG(f=f, g=self.G, operator=self.A, step_size=rule,
                   sampler=Sampler.random_with_replacement(
                       self.subsets, prob=self.PROB_WEIGHTS, seed=42))
-        
+
     # ------------------------------------------------------------------
     # the gamma -> (tau, sigma) mapping
     # ------------------------------------------------------------------
-
 
     def test_step_sizes_from_gamma(self):
         rule = SPDHGBayesOptimisationStepSize()
@@ -1747,8 +1992,12 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
         for actual, expected in zip(sigma, expected_sigma):
             self.assertAlmostEqual(actual, expected)
 
-        expected_tau = min(self.RHO * pi / (si * ni ** 2) for pi, ni, si
-                           in zip(self.PROB_WEIGHTS, self.NORM_SCALINGS, expected_sigma))
+        expected_tau = min(
+            self.RHO * pi / (si * ni**2)
+            for pi, ni, si in zip(
+                self.PROB_WEIGHTS, self.NORM_SCALINGS, expected_sigma
+            )
+        )
         self.assertAlmostEqual(tau, expected_tau)
         self.assertAlmostEqual(tau, 0.01)
 
@@ -1758,7 +2007,8 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
 
     @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_step_sizes_match_the_gamma_the_optimiser_returned(self):
-        # bounds force gamma to be very close to 2.5, so the rule's step sizes are known in advance
+        # bounds force gamma to be very close to 2.5, so the rule's step sizes
+        # are known in advance
         gamma = 2.5
         rule = SPDHGBayesOptimisationStepSize(
             gamma_bounds=[gamma * (1 - 1e-6), gamma * (1 + 1e-6)],
@@ -1768,14 +2018,15 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
                           self.subsets, prob=self.PROB_WEIGHTS, seed=42))
 
         self.assertAlmostEqual(rule.gamma, gamma, places=5)
-        self.assertAlmostEqual(self._gamma_from_step_sizes(spdhg), gamma, places=5)
+        self.assertAlmostEqual(
+            self._gamma_from_step_sizes(spdhg), gamma, places=5)
         self.assertEqual(len(spdhg.sigma), self.subsets)
         for si, ni in zip(spdhg.sigma, self.NORM_SCALINGS):
             self.assertAlmostEqual(si, gamma * self.RHO / ni, places=5)
         self.assertAlmostEqual(spdhg.tau, 0.01, places=5)
 
-        # the rule and the algorithm must agree, and get_step_size keeps returning
-        # what was installed
+        # the rule and the algorithm must agree, and get_step_size keeps
+        # returning what was installed
         self.assertAlmostEqual(spdhg.tau, rule.tau)
         tau, sigma = rule.get_step_size(spdhg)
         self.assertAlmostEqual(tau, rule.tau)
@@ -1783,7 +2034,9 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
 
     @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_step_sizes_are_consistent_for_whichever_gamma_is_chosen(self):
-        # Test returned gamma is in the right range and the step sizes are consistent with it. The optimiser is free to choose any gamma in the range, so the test cannot assert a particular value.    
+        # Test returned gamma is in the right range and the step sizes are
+        # consistent with it. The optimiser is free to choose any gamma in the
+        # range, so the test cannot assert a particular value.
         rule = SPDHGBayesOptimisationStepSize(
             gamma_bounds=[2., 3.], n_initial_points=2, n_calls=3,
             n_iterations=4, seed=42)
@@ -1794,7 +2047,8 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
         gamma = self._gamma_from_step_sizes(spdhg)
         self.assertTrue(2. - 1e-9 <= gamma <= 3. + 1e-9,
                         "gamma {} outside the requested bounds".format(gamma))
-        # the gamma the rule reports must be the one its step sizes were built from
+        # the gamma the rule reports must be the one its step sizes were built
+        # from
         self.assertAlmostEqual(rule.gamma, gamma)
 
         products = [si * ni for si, ni in zip(spdhg.sigma, self.NORM_SCALINGS)]
@@ -1802,14 +2056,20 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
             self.assertAlmostEqual(product, gamma * self.RHO)
 
         self.assertAlmostEqual(
-            spdhg.tau, min(self.RHO * pi / (si * ni ** 2) for pi, ni, si
-                           in zip(self.PROB_WEIGHTS, self.NORM_SCALINGS, spdhg.sigma)))
-
-
+            spdhg.tau,
+            min(
+                self.RHO * pi / (si * ni**2)
+                for pi, ni, si in zip(
+                    self.PROB_WEIGHTS, self.NORM_SCALINGS, spdhg.sigma
+                )
+            ),
+        )
 
     @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_algorithm_state_is_clean_after_the_search(self):
-        # the rule temporarily sets the algorithm's iteration and objective to score the trial, but must restore them to run the algorithm from scratch afterwards
+        # the rule temporarily sets the algorithm's iteration and objective to
+        # score the trial, but must restore them to run the algorithm from
+        # scratch afterwards
         rule = SPDHGBayesOptimisationStepSize(
             gamma_bounds=[2., 3.], n_initial_points=2, n_calls=3,
             n_iterations=4, seed=42)
@@ -1818,13 +2078,13 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
                           self.subsets, prob=self.PROB_WEIGHTS, seed=42),
                       update_objective_interval=4)
 
-
         self.assertEqual(spdhg.iteration, -1)
         self.assertEqual(spdhg.objective, [])
 
         self.assertEqual(spdhg.update_objective_interval, 4)
         self.assertNumpyArrayEqual(
-            spdhg.x.as_array(), self.A.domain_geometry().allocate(0).as_array())
+            spdhg.x.as_array(), self.A.domain_geometry().allocate(0).as_array()
+        )
 
     @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_non_uniform_prob_weights_survive_the_search(self):
@@ -1836,14 +2096,15 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
                           self.subsets, prob=self.PROB_WEIGHTS, seed=42))
 
         self.assertListEqual(list(spdhg._prob_weights), self.PROB_WEIGHTS)
-        self.assertListEqual(list(spdhg._sampler.prob_weights), self.PROB_WEIGHTS)
+        self.assertListEqual(
+            list(spdhg._sampler.prob_weights), self.PROB_WEIGHTS)
 
     @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_sampler_is_left_at_the_start_of_the_users_sequence(self):
-        # each trial is handed a fresh copy of the caller's sampler, so once the
-        # search is over the algorithm must be about to draw the same subsets it
-        # would have drawn without any Bayesian optimisation at all -- not resume
-        # from wherever the last trial left the generator
+        # each trial is handed a fresh copy of the caller's sampler, so once
+        # the search is over the algorithm must be about to draw the same
+        # subsets it would have drawn without any Bayesian optimisation at all
+        # -- not resume from wherever the last trial left the generator
         rule = SPDHGBayesOptimisationStepSize(
             gamma_bounds=[2., 3.], n_initial_points=2, n_calls=3,
             n_iterations=4, seed=42)
@@ -1858,7 +2119,9 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
 
     @unittest.skipUnless(has_skopt, "scikit-optimize (skopt) not installed")
     def test_diverging_trials_are_penalised_instead_of_raising(self):
-        # Trials by gp minimise that return NaN or Inf are scored as +Inf, so the optimiser can continue to search for a valid gamma. The algorithm must be left with finite step sizes.
+        # Trials by gp minimise that return NaN or Inf are scored as +Inf, so
+        # the optimiser can continue to search for a valid gamma. The algorithm
+        # must be left with finite step sizes.
         rule = SPDHGBayesOptimisationStepSize(
             gamma_bounds=[1e55, 1e65], n_initial_points=2, n_calls=4,
             n_iterations=4, seed=1)
@@ -1890,19 +2153,31 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
         spdhgs = []
         for _ in range(2):
             rule = SPDHGBayesOptimisationStepSize(
-                gamma_bounds=[2., 3.], n_initial_points=2, n_calls=3,
-                n_iterations=4, seed=42)
-            spdhgs.append(SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
-                                sampler=Sampler.random_with_replacement(
-                                    self.subsets, prob=self.PROB_WEIGHTS, seed=42)))
+                gamma_bounds=[2.0, 3.0],
+                n_initial_points=2,
+                n_calls=3,
+                n_iterations=4,
+                seed=42,
+            )
+            spdhgs.append(
+                SPDHG(
+                    f=self.F,
+                    g=self.G,
+                    operator=self.A,
+                    step_size=rule,
+                    sampler=Sampler.random_with_replacement(
+                        self.subsets, prob=self.PROB_WEIGHTS, seed=42
+                    ),
+                )
+            )
 
         first, second = spdhgs
         self.assertEqual(first.tau, second.tau)
         self.assertListEqual(list(first.sigma), list(second.sigma))
 
     def test_missing_skopt_raises_an_informative_importerror(self):
-        # the one path that must behave *without* scikit-optimize, so the import
-        # is blocked rather than the optimiser replaced
+        # the one path that must behave *without* scikit-optimize, so the
+        # import is blocked rather than the optimiser replaced
         rule = SPDHGBayesOptimisationStepSize(
             gamma_bounds=[2., 3.], n_initial_points=2, n_calls=3,
             n_iterations=4, seed=42)
@@ -1913,9 +2188,10 @@ class TestSPDHGBayesStepSize(CCPiTestClass):
                           self.subsets, prob=self.PROB_WEIGHTS, seed=42))
         self.assertIn('scikit-optimize', str(context.exception))
 
-class TestSPDHGAdaptiveStepSize(CCPiTestClass):
-    """Tests for the adaptive SPDHG step-size rules based on arXiv:2301.02511."""
 
+class TestSPDHGAdaptiveStepSize(CCPiTestClass):
+    """Tests for the adaptive SPDHG step-size rules based on arXiv:2301.02511.
+    """
 
     NORM_SCALINGS = [1., 2., 3., 4., 5., 6., 7., 8., 9., 10.]
     PROB_WEIGHTS = [0.19] + [0.09]*9
@@ -1929,7 +2205,6 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         self.F = BlockFunction(*[L2NormSquared(b=self.data)
                                  for _ in range(self.subsets)])
         self.G = 0.025 * IndicatorBox(lower=0)
- 
 
     def test_balancing_init(self):
         rule = SPDHGAdaptiveStepSizeBalancing(
@@ -1983,23 +2258,40 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         with self.assertRaises(ValueError):
             SPDHGAdaptiveStepSizeAngle(initial_step_size=[1.0, 2.0, 3.0])
 
-
     def test_initial_step_size_defaults(self):
         rho = 0.99
-        for RuleCls in (SPDHGAdaptiveStepSizeBalancing, SPDHGAdaptiveStepSizeAngle):
+        for RuleCls in (
+            SPDHGAdaptiveStepSizeBalancing,
+            SPDHGAdaptiveStepSizeAngle,
+        ):
             with self.subTest(rule=RuleCls.__name__):
                 rule = RuleCls()
-                spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+                spdhg = SPDHG(f=self.F, g=self.G,
+                              operator=self.A, step_size=rule)
                 # tau scalar, sigma list of length n, all positive
                 self.assertTrue(isinstance(spdhg.tau, Number))
                 self.assertEqual(len(spdhg.sigma), self.subsets)
                 self.assertTrue(all(s > 0 for s in spdhg.sigma))
                 # matches the standard SPDHG relations
-                self.assertListEqual(spdhg.sigma, [rho / ni for ni in spdhg._norms])
-                self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni, si in
-                                                 zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
-                # per-operator convergence criterion  sigma_i * tau * ||A_i||^2 <= p_i
-                for si, ni, pi in zip(spdhg.sigma, spdhg._norms, spdhg._prob_weights):
+                self.assertListEqual(
+                    spdhg.sigma, [rho / ni for ni in spdhg._norms]
+                )
+                self.assertEqual(
+                    spdhg.tau,
+                    min(
+                        [
+                            rho * pi / (si * ni**2)
+                            for pi, ni, si in zip(
+                                spdhg._prob_weights, spdhg._norms, spdhg.sigma
+                            )
+                        ]
+                    ),
+                )
+                # per-operator convergence criterion sigma_i * tau * ||A_i||^2
+                # <= p_i
+                for si, ni, pi in zip(
+                    spdhg.sigma, spdhg._norms, spdhg._prob_weights
+                ):
                     self.assertLessEqual(si * spdhg.tau * ni**2, pi + 1e-9)
 
     def test_initial_step_size_scalar_sigma_broadcast(self):
@@ -2012,32 +2304,54 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
     def test_initial_step_size_tau_from_sigma_list(self):
         # sigma given as a list, tau derived
         rho = 0.99
-        rule = SPDHGAdaptiveStepSizeAngle(initial_step_size=[None, [0.7]*self.subsets])
+        rule = SPDHGAdaptiveStepSizeAngle(
+            initial_step_size=[None, [0.7]*self.subsets])
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
-        self.assertListEqual(spdhg.sigma, [0.7]*self.subsets)
-        self.assertEqual(spdhg.tau, min([rho*pi / (si * ni**2) for pi, ni, si in
-                                         zip(spdhg._prob_weights, spdhg._norms, spdhg.sigma)]))
+        self.assertListEqual(spdhg.sigma, [0.7] * self.subsets)
+        self.assertEqual(
+            spdhg.tau,
+            min(
+                [
+                    rho * pi / (si * ni**2)
+                    for pi, ni, si in zip(
+                        spdhg._prob_weights, spdhg._norms, spdhg.sigma
+                    )
+                ]
+            ),
+        )
 
     def test_initial_step_size_sigma_from_tau(self):
         # tau given, sigma derived one entry per operator
         rho = 0.99
-        for RuleCls in (SPDHGAdaptiveStepSizeBalancing, SPDHGAdaptiveStepSizeAngle):
+        for RuleCls in (
+            SPDHGAdaptiveStepSizeBalancing,
+            SPDHGAdaptiveStepSizeAngle,
+        ):
             with self.subTest(rule=RuleCls.__name__):
                 rule = RuleCls(initial_step_size=[0.5, None])
-                spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
+                spdhg = SPDHG(f=self.F, g=self.G,
+                              operator=self.A, step_size=rule)
                 self.assertEqual(spdhg.tau, 0.5)
-                self.assertListEqual(spdhg.sigma, [rho * pi / (0.5 * ni**2) for ni, pi in
-                                                   zip(spdhg._norms, spdhg._prob_weights)])
+                self.assertListEqual(
+                    spdhg.sigma,
+                    [
+                        rho * pi / (0.5 * ni**2)
+                        for ni, pi in zip(spdhg._norms, spdhg._prob_weights)
+                    ],
+                )
 
     def test_auto_stop_patience_default(self):
         # left as None until set-up, then ten times the number of operators
-        for RuleCls in (SPDHGAdaptiveStepSizeBalancing, SPDHGAdaptiveStepSizeAngle):
+        for RuleCls in (
+            SPDHGAdaptiveStepSizeBalancing,
+            SPDHGAdaptiveStepSizeAngle,
+        ):
             with self.subTest(rule=RuleCls.__name__):
                 rule = RuleCls()
                 self.assertIsNone(rule.auto_stop_patience)
                 SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule)
                 self.assertEqual(rule.auto_stop_patience, 10 * self.subsets)
-            
+
     def test_balancing_default_s_is_operator_norm(self):
         # s=None is filled in lazily with ||A|| on the first rebalance
         rule = SPDHGAdaptiveStepSizeBalancing(initial_step_size=[1.0, 1.0],
@@ -2054,18 +2368,20 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         self.assertAlmostEqual(rule.s, spdhg.operator.norm())
 
     def test_balancing_adapts_step_sizes(self):
-        # from a deliberately imbalanced ratio, the rule should rescale the step sizes
+        # from a deliberately imbalanced ratio, the rule should rescale the
+        # step sizes
         rule = SPDHGAdaptiveStepSizeBalancing(
             initial_step_size=[10.0, 0.001], auto_stop=False)
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
                       sampler=Sampler.random_with_replacement(
                           self.subsets, prob=self.PROB_WEIGHTS, seed=42))
         spdhg.run(20, verbose=0)
-        # tau started far too large relative to sigma, so the rule must bring it down
-        # (and push sigma up) 
+        # tau started far too large relative to sigma, so the rule must bring
+        # it down (and push sigma up)
         self.assertLess(spdhg.tau, 1.0)
         self.assertGreater(spdhg.sigma[0], 0.001)
-        # check step sizes remain valid (positive scalar tau, positive sigma list)
+        # check step sizes remain valid (positive scalar tau, positive sigma
+        # list)
         self.assertGreater(spdhg.tau, 0)
         self.assertEqual(len(spdhg.sigma), self.subsets)
         self.assertTrue(all(s > 0 for s in spdhg.sigma))
@@ -2073,8 +2389,9 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         self.assertLess(rule.alpha, 0.95)
 
     def test_angle_adapts_step_sizes(self):
-        # a permissive threshold (c=0) makes every iteration rebalance, exercising the
-        # angle-alignment mechanism (the default c=0.999 is deliberately conservative).
+        # a permissive threshold (c=0) makes every iteration rebalance,
+        # exercising the angle-alignment mechanism (the default c=0.999 is
+        # deliberately conservative).
         rule = SPDHGAdaptiveStepSizeAngle(
             initial_step_size=[10.0, 0.001], c=0.0, auto_stop=False)
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
@@ -2090,13 +2407,25 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         self.assertTrue(all(s > 0 for s in spdhg.sigma))
 
     def test_products_preserved_under_rescaling(self):
-        # rescaling multiplies tau by 1/f and every sigma_i by f, so tau*sigma_i is fixed
-        for RuleCls in (SPDHGAdaptiveStepSizeBalancing, SPDHGAdaptiveStepSizeAngle):
+        # rescaling multiplies tau by 1/f and every sigma_i by f, so
+        # tau*sigma_i is fixed
+        for RuleCls in (
+            SPDHGAdaptiveStepSizeBalancing,
+            SPDHGAdaptiveStepSizeAngle,
+        ):
             with self.subTest(rule=RuleCls.__name__):
-                rule = RuleCls(initial_step_size=[10.0, 0.001], auto_stop=False)
-                spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
-                              sampler=Sampler.random_with_replacement(
-                                  self.subsets, prob=self.PROB_WEIGHTS, seed=42))
+                rule = RuleCls(
+                    initial_step_size=[10.0, 0.001], auto_stop=False
+                )
+                spdhg = SPDHG(
+                    f=self.F,
+                    g=self.G,
+                    operator=self.A,
+                    step_size=rule,
+                    sampler=Sampler.random_with_replacement(
+                        self.subsets, prob=self.PROB_WEIGHTS, seed=42
+                    ),
+                )
                 prod0 = [spdhg.tau * si for si in spdhg.sigma]
                 spdhg.run(15, verbose=0)
                 prod1 = [spdhg.tau * si for si in spdhg.sigma]
@@ -2104,23 +2433,36 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
                     self.assertAlmostEqual(a, b)
 
     def test_convergence_condition_preserved_under_rescaling(self):
-        # preserving tau*sigma_i also preserves  sigma_i * tau * ||A_i||^2 <= p_i, the
-        # condition the whole rule is only valid under
-        for RuleCls in (SPDHGAdaptiveStepSizeBalancing, SPDHGAdaptiveStepSizeAngle):
+        # preserving tau*sigma_i also preserves sigma_i * tau * ||A_i||^2 <=
+        # p_i, the condition the whole rule is only valid under
+        for RuleCls in (
+            SPDHGAdaptiveStepSizeBalancing,
+            SPDHGAdaptiveStepSizeAngle,
+        ):
             for seed in (1, 8, 42):
                 with self.subTest(rule=RuleCls.__name__, seed=seed):
                     rule = RuleCls(auto_stop=False)
-                    spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
-                                  sampler=Sampler.random_with_replacement(
-                                      self.subsets, prob=self.PROB_WEIGHTS, seed=seed))
+                    spdhg = SPDHG(
+                        f=self.F,
+                        g=self.G,
+                        operator=self.A,
+                        step_size=rule,
+                        sampler=Sampler.random_with_replacement(
+                            self.subsets, prob=self.PROB_WEIGHTS, seed=seed
+                        ),
+                    )
                     spdhg.run(20, verbose=0)
-                    for si, ni, pi in zip(spdhg.sigma, spdhg._norms, spdhg._prob_weights):
+                    for si, ni, pi in zip(
+                        spdhg.sigma, spdhg._norms, spdhg._prob_weights
+                    ):
                         self.assertLessEqual(si * spdhg.tau * ni**2, pi + 1e-9)
 
     def test_auto_stop_freezes_and_frees(self):
-        # force the "no change" branch every iteration by making the tolerance gate
-        # impossible to pass; the rule should then stop after auto_stop_patience.
-        rule = SPDHGAdaptiveStepSizeBalancing(auto_stop=True, auto_stop_patience=3)
+        # force the "no change" branch every iteration by making the tolerance
+        # gate impossible to pass; the rule should then stop after
+        # auto_stop_patience.
+        rule = SPDHGAdaptiveStepSizeBalancing(
+            auto_stop=True, auto_stop_patience=3)
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
                       sampler=Sampler.random_with_replacement(
                           self.subsets, prob=self.PROB_WEIGHTS, seed=42))
@@ -2138,8 +2480,8 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         self.assertListEqual(list(spdhg.sigma), sigma_frozen)
 
     def test_auto_stop_on_alpha_tolerance(self):
-        # the second stop criterion: alpha decays below alpha_tolerance before the
-        # patience counter could ever trip.
+        # the second stop criterion: alpha decays below alpha_tolerance before
+        # the patience counter could ever trip.
         rule = SPDHGAdaptiveStepSizeAngle(
             c=0.0, initial_alpha=1e-3, eta=0.5, alpha_tolerance=1e-3,
             auto_stop=True, auto_stop_patience=10000)
@@ -2163,22 +2505,24 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         self.assertTrue(rule.adaptive)
 
     def test_auto_stop_disabled_keeps_adapting(self):
-        rule = SPDHGAdaptiveStepSizeAngle(auto_stop=False, auto_stop_patience=2)
+        rule = SPDHGAdaptiveStepSizeAngle(
+            auto_stop=False, auto_stop_patience=2)
         spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
                       sampler=Sampler.random_with_replacement(
                           self.subsets, prob=self.PROB_WEIGHTS, seed=42))
         spdhg.run(20, verbose=0)
         self.assertTrue(rule.adaptive)
-        # buffers still allocated 
+        # buffers still allocated
         self.assertIsNotNone(rule.x_prev)
 
     def test_balancing_rebalance_increases_tau(self):
-        # _rebalance reads the residuals out of the rule's buffers, which the base class
-        # would normally have filled from the last SPDHG iteration. Set them by hand:
-        #   x_prev = 0     ->  A_0 x_prev = 0, so d depends on y_prev[0] alone
-        #   v_tmp  = 1     ->  primal residual   v = ||v_tmp||_1            > 0
-        #   y_prev[0] = 1  ->  dual residual     d = ||y_prev[0]||_1 / (p_0 sigma_0) > 0
-        # s tiny then makes  v > s*delta*d  true: the primal is behind, so tau is boosted.
+        # _rebalance reads the residuals out of the rule's buffers, which the
+        # base class would normally have filled from the last SPDHG iteration.
+        # Set them by hand: x_prev = 0 -> A_0 x_prev = 0, so d depends on
+        # y_prev[0] alone v_tmp = 1 -> primal residual v = ||v_tmp||_1 > 0
+        # y_prev[0] = 1 -> dual residual d = ||y_prev[0]||_1 / (p_0 sigma_0) >
+        # 0 s tiny then makes v > s*delta*d true: the primal is behind, so tau
+        # is boosted.
         rule = SPDHGAdaptiveStepSizeBalancing(
             initial_step_size=[1.0, 1.0], initial_alpha=0.5, eta=0.9,
             delta=1.5, s=1e-12, auto_stop=False)
@@ -2193,15 +2537,17 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         tau_new, sigma_new, changed = rule._rebalance(
             spdhg, 0, spdhg._prob_weights[0], tau, sigma)
         self.assertTrue(changed)
-        self.assertAlmostEqual(tau_new, tau / 0.5)            # tau /= (1 - alpha)
+        # tau /= (1 - alpha)
+        self.assertAlmostEqual(tau_new, tau / 0.5)
         for s_new, s_old in zip(sigma_new, sigma):
             self.assertAlmostEqual(s_new, s_old * 0.5)
-        self.assertAlmostEqual(rule.alpha, 0.5 * 0.9)         # alpha decayed by eta
+        # alpha decayed by eta
+        self.assertAlmostEqual(rule.alpha, 0.5 * 0.9)
         self.assertEqual(rule.count, 0)
 
     def test_balancing_rebalance_decreases_tau(self):
-        # same values as above (v > 0, d > 0), but s huge makes  v < s*d/delta  true:
-        # the dual is behind, so tau is shrunk.
+        # same values as above (v > 0, d > 0), but s huge makes v < s*d/delta
+        # true: the dual is behind, so tau is shrunk.
         rule = SPDHGAdaptiveStepSizeBalancing(
             initial_step_size=[1.0, 1.0], initial_alpha=0.5, eta=0.9,
             delta=1.5, s=1e12, auto_stop=False)
@@ -2222,8 +2568,9 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         self.assertAlmostEqual(rule.alpha, 0.5 * 0.9)
 
     def test_balancing_rebalance_inside_band_is_noop(self):
-        # same values again (v > 0, d > 0), but delta enormous puts v and d inside the
-        # band whatever their values, so the step sizes and alpha are left untouched.
+        # same values again (v > 0, d > 0), but delta enormous puts v and d
+        # inside the band whatever their values, so the step sizes and alpha
+        # are left untouched.
         rule = SPDHGAdaptiveStepSizeBalancing(
             initial_step_size=[1.0, 1.0], initial_alpha=0.5, eta=0.9,
             delta=1e12, s=1.0, auto_stop=False)
@@ -2243,14 +2590,25 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         self.assertAlmostEqual(rule.alpha, 0.5)
 
     def test_step_size_rule_output_reaches_the_algorithm(self):
-        # the (tau, sigma) the rule returns must be what the algorithm goes on to use:
-        # SPDHG rebinds self._tau, self._sigma from get_step_size on every iteration.
+        # the (tau, sigma) the rule returns must be what the algorithm goes on
+        # to use: SPDHG rebinds self._tau, self._sigma from get_step_size on
+        # every iteration.
         rule = SPDHGAdaptiveStepSizeBalancing(
-            initial_step_size=[1.0, 1.0], initial_alpha=0.5, delta=1.5, s=1e-12,
-            auto_stop=False)
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
-                      sampler=Sampler.random_with_replacement(
-                          self.subsets, prob=self.PROB_WEIGHTS, seed=42))
+            initial_step_size=[1.0, 1.0],
+            initial_alpha=0.5,
+            delta=1.5,
+            s=1e-12,
+            auto_stop=False,
+        )
+        spdhg = SPDHG(
+            f=self.F,
+            g=self.G,
+            operator=self.A,
+            step_size=rule,
+            sampler=Sampler.random_with_replacement(
+                self.subsets, prob=self.PROB_WEIGHTS, seed=42
+            ),
+        )
         returned = []
         unspied = rule.get_step_size
 
@@ -2264,18 +2622,29 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         tau_last, sigma_last = returned[-1]
         self.assertEqual(spdhg.tau, tau_last)
         self.assertListEqual(list(spdhg.sigma), sigma_last)
-        # and the rule did rebalance, rather than handing back its input untouched
+        # and the rule did rebalance, rather than handing back its input
+        # untouched
         self.assertNotAlmostEqual(spdhg.tau, 1.0)
         self.assertNotAlmostEqual(spdhg.sigma[0], 1.0)
 
     def test_balancing_rebalance_does_not_mutate_sigma_argument(self):
-       
+
         rule = SPDHGAdaptiveStepSizeBalancing(
-            initial_step_size=[1.0, 1.0], initial_alpha=0.5, delta=1.5, s=1e-12,
-            auto_stop=False)
-        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A, step_size=rule,
-                      sampler=Sampler.random_with_replacement(
-                          self.subsets, prob=self.PROB_WEIGHTS, seed=42))
+            initial_step_size=[1.0, 1.0],
+            initial_alpha=0.5,
+            delta=1.5,
+            s=1e-12,
+            auto_stop=False,
+        )
+        spdhg = SPDHG(
+            f=self.F,
+            g=self.G,
+            operator=self.A,
+            step_size=rule,
+            sampler=Sampler.random_with_replacement(
+                self.subsets, prob=self.PROB_WEIGHTS, seed=42
+            ),
+        )
         rule.x_prev.fill(0.0)
         rule.v_tmp.fill(1.0)
         rule.y_prev[0].fill(1.0)
@@ -2291,8 +2660,6 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         self.assertIsNot(sigma_new, sigma)
         self.assertListEqual(sigma, before)
 
-
-
     def test_angle_rebalance_aligned_increases_tau(self):
         # w = +1 >= c, the directions agree, so the primal step is increased
         rule = SPDHGAdaptiveStepSizeAngle(initial_step_size=[1.0, 1.0],
@@ -2307,7 +2674,8 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         tau_new, sigma_new, changed = rule._rebalance(
             spdhg, 0, spdhg._prob_weights[0], tau, sigma)
         self.assertTrue(changed)
-        self.assertAlmostEqual(tau_new, tau * 1.5)            # tau *= (1 + alpha)
+        # tau *= (1 + alpha)
+        self.assertAlmostEqual(tau_new, tau * 1.5)
         for s_new, s_old in zip(sigma_new, sigma):
             self.assertAlmostEqual(s_new, s_old / 1.5)
         self.assertAlmostEqual(rule.alpha, 0.5 * 0.9)
@@ -2350,4 +2718,372 @@ class TestSPDHGAdaptiveStepSize(CCPiTestClass):
         self.assertAlmostEqual(rule.alpha, 0.5)
 
 
+class TestPrimalDualStepSizeRuleHierarchy(CCPiTestClass):
 
+    def setUp(self):
+        ig = ImageGeometry(4, 4)
+        self.data = ig.allocate('random', seed=3)
+        self.K = 2 * IdentityOperator(ig)
+        self.norm_scalings = [1., 2., 3.]
+        self.subsets = len(self.norm_scalings)
+        self.A = BlockOperator(*[s * IdentityOperator(ig)
+                                 for s in self.norm_scalings])
+        self.F = BlockFunction(*[L2NormSquared(b=self.data)
+                                 for _ in range(self.subsets)])
+        self.G = 0.025 * IndicatorBox(lower=0)
+
+    def test_rule_base_classes(self):
+        pdhg_rules = [
+            PDHGConstantStepSize(),
+            PDHGStronglyConvexUpdate(gamma_g=0.5),
+            PDHGAdaptiveStepSize2013(),
+            PDHGAdaptiveStepSize2015(),
+            PDHGBayesOptimisationStepSize(),
+        ]
+        spdhg_rules = [
+            SPDHGConstantStepSize(),
+            SPDHGStepSizesFromRatio(1.0, 0.99),
+            SPDHGBayesOptimisationStepSize(),
+            SPDHGAdaptiveStepSizeBalancing(),
+            SPDHGAdaptiveStepSizeAngle(),
+        ]
+        for rule in pdhg_rules:
+            self.assertIsInstance(rule, PDStepSizeRule)
+            self.assertIsInstance(rule, PDHGStepSizeRule)
+            self.assertNotIsInstance(rule, SPDHGStepSizeRule)
+        for rule in spdhg_rules:
+            self.assertIsInstance(rule, PDStepSizeRule)
+            self.assertIsInstance(rule, SPDHGStepSizeRule)
+            self.assertNotIsInstance(rule, PDHGStepSizeRule)
+        self.assertNotIsInstance(ConstantStepSize(0.1), PDStepSizeRule)
+
+    def test_base_classes_are_abstract(self):
+        for cls in [PDStepSizeRule, PDHGStepSizeRule, SPDHGStepSizeRule]:
+            with self.assertRaises(TypeError):
+                cls()
+
+    def test_enforces_convergence(self):
+        self.assertTrue(PDHGAdaptiveStepSize2013.enforces_convergence)
+        self.assertTrue(PDHGAdaptiveStepSize2015.enforces_convergence)
+        self.assertFalse(PDHGConstantStepSize.enforces_convergence)
+        pdhg = PDHG(
+            f=L2NormSquared(b=self.data),
+            g=ZeroFunction(),
+            operator=self.K,
+            step_size=PDHGAdaptiveStepSize2015(),
+        )
+        self.assertTrue(pdhg.check_convergence())
+
+    def test_spdhg_rule_in_pdhg_raises(self):
+        with self.assertRaisesRegex(ValueError, "PDHGStepSizeRule"):
+            PDHG(
+                f=L2NormSquared(b=self.data),
+                g=ZeroFunction(),
+                operator=self.K,
+                step_size=SPDHGConstantStepSize(),
+            )
+
+    def test_pdhg_rule_in_spdhg_raises(self):
+        with self.assertRaisesRegex(ValueError, "SPDHGStepSizeRule"):
+            SPDHG(f=self.F, g=self.G, operator=self.A,
+                  step_size=PDHGConstantStepSize())
+
+    def test_spdhg_constant_and_adaptive_rules_resolve_inputs_the_same(self):
+        valid = [(None, None), (0.05, None), (None, 2.0), (None, [1., 2., 3.]),
+                 (0.05, [1., 2., 3.]), (0.05, np.array([1., 2., 3.]))]
+        invalid = [(-1., None), ('a', None), (None, -1.), (None, [1., 2.]),
+                   (None, [1., 2., -3.]), (0.05, [1., 2., 'a'])]
+        for step_size in valid:
+            with self.subTest(step_size=step_size):
+                constant = SPDHG(
+                    f=self.F,
+                    g=self.G,
+                    operator=self.A,
+                    step_size=SPDHGConstantStepSize(step_size),
+                )
+                adaptive = SPDHG(
+                    f=self.F,
+                    g=self.G,
+                    operator=self.A,
+                    step_size=SPDHGAdaptiveStepSizeBalancing(
+                        initial_step_size=step_size
+                    ),
+                )
+                self.assertAlmostEqual(constant.tau, adaptive.tau)
+                np.testing.assert_allclose(constant.sigma, adaptive.sigma)
+                self.assertEqual(len(constant.sigma), self.subsets)
+        for step_size in invalid:
+            with self.subTest(step_size=step_size):
+                with self.assertRaises(ValueError):
+                    SPDHG(f=self.F, g=self.G, operator=self.A,
+                          step_size=SPDHGConstantStepSize(step_size))
+                with self.assertRaises(ValueError):
+                    SPDHG(
+                        f=self.F,
+                        g=self.G,
+                        operator=self.A,
+                        step_size=SPDHGAdaptiveStepSizeBalancing(
+                            initial_step_size=step_size
+                        ),
+                    )
+
+    def test_resolve_step_sizes_defaults(self):
+        norms, probs, rho = [1., 2., 4.], [0.5, 0.25, 0.25], 0.99
+        tau, sigma = SPDHGStepSizeRule.resolve_step_sizes(
+            None, None, norms, probs
+        )
+        self.assertListEqual(sigma, [rho / ni for ni in norms])
+        self.assertAlmostEqual(
+            tau,
+            min(
+                rho * pi / (si * ni**2)
+                for pi, ni, si in zip(probs, norms, sigma)
+            ),
+        )
+        tau, sigma = SPDHGStepSizeRule.resolve_step_sizes(
+            0.1, None, norms, probs)
+        self.assertEqual(tau, 0.1)
+        self.assertListEqual(sigma, [rho*pi/(0.1*ni**2)
+                             for pi, ni in zip(probs, norms)])
+
+        tau, sigma = PDHGStepSizeRule.resolve_step_sizes(None, 0.5, self.K)
+        self.assertAlmostEqual(tau, 1/(0.5*self.K.norm()**2))
+        self.assertEqual(sigma, 0.5)
+
+
+class TestPrimalDualUpdateStepSizes(CCPiTestClass):
+
+    def setUp(self):
+        ig = ImageGeometry(4, 4)
+        self.data = ig.allocate('random', seed=3)
+        self.K = IdentityOperator(ig)
+        self.subsets = 3
+        self.A = BlockOperator(*[IdentityOperator(ig)
+                                 for _ in range(self.subsets)])
+        self.F = BlockFunction(*[L2NormSquared(b=self.data)
+                                 for _ in range(self.subsets)])
+        self.G = 0.025 * IndicatorBox(lower=0)
+
+    def test_update_calls_update_step_sizes(self):
+        pdhg = PDHG(f=L2NormSquared(b=self.data),
+                    g=ZeroFunction(), operator=self.K)
+        pdhg.update_step_sizes = MagicMock()
+        pdhg.run(3, verbose=0)
+        self.assertEqual(pdhg.update_step_sizes.call_count, 3)
+
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
+        spdhg.update_step_sizes = MagicMock()
+        spdhg.run(3, verbose=0)
+        self.assertEqual(spdhg.update_step_sizes.call_count, 3)
+
+    def test_update_step_sizes_uses_rule(self):
+        pdhg = PDHG(f=L2NormSquared(b=self.data),
+                    g=ZeroFunction(), operator=self.K)
+        pdhg.step_size_rule.get_step_size = MagicMock(return_value=(0.3, 0.4))
+        pdhg.update_step_sizes()
+        self.assertEqual((pdhg.tau, pdhg.sigma), (0.3, 0.4))
+
+
+class TestPDHGDeprecatedMethods(CCPiTestClass):
+
+    def setUp(self):
+        ig = ImageGeometry(4, 4)
+        self.data = ig.allocate('random', seed=3)
+        self.K = 2 * IdentityOperator(ig)
+        self.f = L2NormSquared(b=self.data)
+        self.g = L2NormSquared()
+
+    def _pdhg(self, **kwargs):
+        return PDHG(f=self.f, g=self.g, operator=self.K, **kwargs)
+
+    def test_set_step_sizes(self):
+        pdhg = self._pdhg()
+        norm = self.K.norm()
+        with self.assertWarns(DeprecationWarning):
+            pdhg.set_step_sizes(sigma=0.5, tau=0.25)
+        self.assertEqual((pdhg.tau, pdhg.sigma), (0.25, 0.5))
+        self.assertIsInstance(pdhg.step_size_rule, PDHGConstantStepSize)
+        with self.assertWarns(DeprecationWarning):
+            pdhg.set_step_sizes(sigma=0.5)
+        self.assertAlmostEqual(pdhg.tau, 1/(0.5*norm**2))
+        with self.assertWarns(DeprecationWarning):
+            pdhg.set_step_sizes(tau=0.5)
+        self.assertAlmostEqual(pdhg.sigma, 1/(0.5*norm**2))
+        with self.assertWarns(DeprecationWarning):
+            pdhg.set_step_sizes()
+        self.assertAlmostEqual(pdhg.tau, 1/norm)
+        self.assertAlmostEqual(pdhg.sigma, 1/norm)
+        with self.assertWarns(DeprecationWarning):
+            with self.assertRaises(ValueError):
+                pdhg.set_step_sizes(sigma=-1)
+        # the failed call leaves the algorithm unchanged
+        self.assertAlmostEqual(pdhg.tau, 1/norm)
+
+    def test_set_step_sizes_keeps_strong_convexity(self):
+        pdhg = self._pdhg(step_size=PDHGStronglyConvexUpdate(gamma_g=0.5))
+        with self.assertWarns(DeprecationWarning):
+            pdhg.set_step_sizes(sigma=0.5, tau=0.25)
+        self.assertIsInstance(pdhg.step_size_rule, PDHGStronglyConvexUpdate)
+        self.assertEqual(pdhg.step_size_rule.gamma_g, 0.5)
+        self.assertEqual((pdhg.tau, pdhg.sigma), (0.25, 0.5))
+
+    def test_gamma_properties(self):
+        pdhg = self._pdhg()
+        with self.assertWarns(DeprecationWarning):
+            self.assertIsNone(pdhg.gamma_g)
+        with self.assertWarns(DeprecationWarning):
+            self.assertIsNone(pdhg.gamma_fconj)
+        pdhg = self._pdhg(step_size=PDHGStronglyConvexUpdate(gamma_fconj=0.3))
+        with self.assertWarns(DeprecationWarning):
+            self.assertEqual(pdhg.gamma_fconj, 0.3)
+
+    def test_set_gamma_g_matches_rule(self):
+        pdhg = self._pdhg(step_size=(0.25, 0.5))
+        with self.assertWarns(DeprecationWarning):
+            pdhg.set_gamma_g(0.5)
+        self.assertIsInstance(pdhg.step_size_rule, PDHGStronglyConvexUpdate)
+        self.assertEqual((pdhg.tau, pdhg.sigma), (0.25, 0.5))
+        pdhg.run(5, verbose=0)
+
+        expected = self._pdhg(step_size=PDHGStronglyConvexUpdate(
+            initial_step_size=(0.25, 0.5), gamma_g=0.5))
+        expected.run(5, verbose=0)
+        self.assertAlmostEqual(pdhg.tau, expected.tau)
+        self.assertAlmostEqual(pdhg.sigma, expected.sigma)
+        np.testing.assert_allclose(
+            pdhg.solution.as_array(), expected.solution.as_array())
+
+    def test_set_gamma_fconj(self):
+        pdhg = self._pdhg()
+        with self.assertWarns(DeprecationWarning):
+            pdhg.set_gamma_fconj(0.5)
+        self.assertEqual(pdhg.step_size_rule.gamma_fconj, 0.5)
+        self.assertIsNone(pdhg.step_size_rule.gamma_g)
+
+    def test_set_gamma_both_raises(self):
+        pdhg = self._pdhg(step_size=PDHGStronglyConvexUpdate(gamma_fconj=0.5))
+        with self.assertWarns(DeprecationWarning):
+            with self.assertRaises(ValueError):
+                pdhg.set_gamma_g(0.5)
+        pdhg = self._pdhg(step_size=PDHGStronglyConvexUpdate(gamma_g=0.5))
+        with self.assertWarns(DeprecationWarning):
+            with self.assertRaises(ValueError):
+                pdhg.set_gamma_fconj(0.5)
+
+    def test_set_gamma_invalid_and_none(self):
+        pdhg = self._pdhg()
+        with self.assertWarns(DeprecationWarning):
+            with self.assertRaises(ValueError):
+                pdhg.set_gamma_g(-1)
+        with self.assertWarns(DeprecationWarning):
+            pdhg.set_gamma_g(None)
+        self.assertIsInstance(pdhg.step_size_rule, PDHGConstantStepSize)
+
+
+class TestSPDHGDeprecatedMethods(CCPiTestClass):
+
+    def setUp(self):
+        ig = ImageGeometry(4, 4)
+        self.data = ig.allocate('random', seed=3)
+        self.norm_scalings = [1., 2., 3.]
+        self.subsets = len(self.norm_scalings)
+        self.A = BlockOperator(*[s * IdentityOperator(ig)
+                                 for s in self.norm_scalings])
+        self.F = BlockFunction(*[L2NormSquared(b=self.data)
+                                 for _ in range(self.subsets)])
+        self.G = 0.025 * IndicatorBox(lower=0)
+
+    def test_set_step_sizes(self):
+        rho = 0.99
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
+        with self.assertWarns(DeprecationWarning):
+            spdhg.set_step_sizes(sigma=[1]*self.subsets, tau=100)
+        self.assertListEqual(spdhg.sigma, [1]*self.subsets)
+        self.assertEqual(spdhg.tau, 100)
+        self.assertIsInstance(spdhg.step_size_rule, SPDHGConstantStepSize)
+
+        with self.assertWarns(DeprecationWarning):
+            spdhg.set_step_sizes(sigma=[1] * self.subsets)
+        self.assertEqual(
+            spdhg.tau,
+            min(
+                rho * pi / (si * ni**2)
+                for pi, ni, si in zip(
+                    spdhg._prob_weights, spdhg._norms, spdhg.sigma
+                )
+            ),
+        )
+
+        with self.assertWarns(DeprecationWarning):
+            spdhg.set_step_sizes(tau=100)
+        self.assertListEqual(
+            spdhg.sigma,
+            [
+                rho * pi / (100 * ni**2)
+                for ni, pi in zip(spdhg._norms, spdhg._prob_weights)
+            ],
+        )
+
+        with self.assertWarns(DeprecationWarning):
+            with self.assertRaises(ValueError):
+                spdhg.set_step_sizes(tau=-1)
+        self.assertEqual(spdhg.tau, 100)
+
+    def test_set_step_sizes_from_ratio(self):
+        gamma, rho = 2., 0.9
+        spdhg = SPDHG(f=self.F, g=self.G, operator=self.A)
+        with self.assertWarns(DeprecationWarning):
+            spdhg.set_step_sizes_from_ratio(gamma, rho)
+        self.assertIsInstance(spdhg.step_size_rule, SPDHGStepSizesFromRatio)
+        self.assertListEqual(
+            spdhg.sigma, [gamma * rho / ni for ni in spdhg._norms]
+        )
+        self.assertEqual(
+            spdhg.tau,
+            min(
+                rho * pi / (si * ni**2)
+                for pi, ni, si in zip(
+                    spdhg._prob_weights, spdhg._norms, spdhg.sigma
+                )
+            ),
+        )
+        with self.assertWarns(DeprecationWarning):
+            with self.assertRaises(ValueError):
+                spdhg.set_step_sizes_from_ratio(-1., rho)
+
+
+class TestPositionalTauSigmaRaises(CCPiTestClass):
+    # Before `step_size` was introduced, the 4th and 5th positional arguments
+    # of PDHG and SPDHG were `tau` and `sigma`; such calls must give a clear
+    # error rather than a confusing one.
+
+    def setUp(self):
+        ig = ImageGeometry(3, 3)
+        self.x0 = ig.allocate(0)
+        self.K = IdentityOperator(ig)
+        self.f = L2NormSquared(b=ig.allocate(1))
+        self.g = ZeroFunction()
+        self.A = BlockOperator(self.K, self.K)
+        self.F = BlockFunction(self.f, self.f)
+
+    def test_pdhg_positional_tau_sigma_raises(self):
+        for args in [(0.5,), (0.5, 0.5), (None, 0.5), (None, [0.5])]:
+            with self.subTest(args=args):
+                with self.assertRaisesRegex(
+                        ValueError, "no longer accepts `tau` and `sigma`"):
+                    PDHG(self.f, self.g, self.K, *args)
+
+    def test_spdhg_positional_tau_sigma_raises(self):
+        for args in [(0.5,), (0.5, [1., 1.]), (None, [1., 1.]), (None, 1.)]:
+            with self.subTest(args=args):
+                with self.assertRaisesRegex(
+                        ValueError, "no longer accepts `tau` and `sigma`"):
+                    SPDHG(self.F, self.g, self.A, *args)
+
+    def test_valid_positional_calls(self):
+        pdhg = PDHG(self.f, self.g, self.K, (0.5, 0.5), self.x0)
+        self.assertEqual(pdhg.tau, 0.5)
+        pdhg = PDHG(self.f, self.g, self.K, None, [self.x0, None])
+        self.assertAlmostEqual(pdhg.tau, 1.)
+        spdhg = SPDHG(self.F, self.g, self.A, (0.05, [1., 1.]), self.x0)
+        self.assertEqual(spdhg.tau, 0.05)

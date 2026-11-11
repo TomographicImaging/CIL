@@ -20,8 +20,12 @@
 
 from cil.framework import DataContainer, BlockDataContainer
 from cil.optimisation.algorithms import Algorithm
-from cil.optimisation.utilities import StepSizeRule, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGAdaptiveStepSize2013, PDHGAdaptiveStepSize2015
-from cil.optimisation.utilities.StepSizeMethods import _validate_pdhg_step_sizes
+from cil.optimisation.utilities import (
+    StepSizeRule,
+    PDHGStepSizeRule,
+    PDHGStronglyConvexUpdate,
+    PDHGConstantStepSize,
+)
 import warnings
 import numpy as np
 from numbers import Number
@@ -31,16 +35,42 @@ import logging
 log = logging.getLogger(__name__)
 
 
+def _check_no_positional_step_sizes(step_size, initial, name):
+    """Raise a clear error for calls that pass ``tau``/``sigma`` positionally.
+
+    Before ``step_size`` was introduced, the 4th and 5th positional arguments
+    of PDHG and SPDHG were ``tau`` and ``sigma``. They are now ``step_size``
+    and ``initial``, so such calls would otherwise fail with a confusing
+    error. A number is never a valid ``step_size``, and ``initial`` must
+    contain DataContainers, so neither check can misread a valid call.
+    """
+    def is_number(x):
+        return isinstance(x, Number) and not isinstance(x, bool)
+
+    old_sigma = initial is not None and (
+        is_number(initial) or (isinstance(initial, (list, tuple))
+                               and any(is_number(v) for v in initial)))
+    if is_number(step_size) or old_sigma:
+        raise ValueError(
+            "{0} no longer accepts `tau` and `sigma` as positional arguments: "
+            "the 4th and 5th positional arguments are now `step_size` and "
+            "`initial`. Please pass the step sizes as `step_size=(tau, "
+            "sigma)`, e.g. `{0}(f, g, operator, step_size=(tau, sigma))`, or "
+            "use a step size rule.".format(name))
+
+
 class PDHG(Algorithm):
 
     r"""Primal Dual Hybrid Gradient (PDHG) algorithm, see :cite:`CP2011`, :cite:`EZXC2010`.
 
-    PDHG minimises objectives of the form: 
-    
-    .. math:: 
+    PDHG minimises objectives of the form:
+
+    .. math::
         \min_{x\in X} f(Kx) + g(x),
-     
-    where :math:`f` and the regulariser :math:`g` need to be proper, convex and lower semi-continuous. The function :math:`f` and the convex conjugate of :math:`g` must also have calculable proximal methods. 
+
+    where :math:`f` and the regulariser :math:`g` need to be proper, convex and
+    lower semi-continuous. The function :math:`f` and the convex conjugate of
+    :math:`g` must also have calculable proximal methods.
 
     Parameters
     ----------
@@ -50,8 +80,15 @@ class PDHG(Algorithm):
         A convex function with a "simple" proximal. This function must map from the operator domain to the Reals. See below for details.
     operator : LinearOperator
         A Linear Operator.
-    step_size : :class:`~cil.optimisation.utilities.StepSizeRule`, or `list` or `tuple` of length two, optional, default=None
-        Either a PDHG compatible step size rule or a `list` or `tuple`  of (tau, sigma) where sigma is the step size for the dual problem and tau is the step size for the primal problem. The step sizes can be either None,  scalar or array-objects. If not provided, default values will be set based on the operator norm as described below. See the PDHG step-size rules in :mod:`cil.optimisation.utilities.StepSizeMethods` for the adaptive and Bayesian-optimisation alternatives to a fixed step size.
+    step_size : :class:`~cil.optimisation.utilities.PDHGStepSizeRule`, or `list` or `tuple` of length two, optional, default=None
+        Either a :class:`~cil.optimisation.utilities.PDHGStepSizeRule` or a
+        `list` or `tuple`  of (tau, sigma) where sigma is the step size for the
+        dual problem and tau is the step size for the primal problem. The step
+        sizes can be either None,  scalar or array-objects. If not provided,
+        default values will be set based on the operator norm as described
+        below. See the PDHG step-size rules in
+        :mod:`cil.optimisation.utilities.StepSizeMethods` for the adaptive and
+        Bayesian-optimisation alternatives to a fixed step size.
     initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
         Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
 
@@ -62,14 +99,7 @@ class PDHG(Algorithm):
             Checks scalar sigma and tau values satisfy convergence criterion and warns if not satisfied. Can be computationally expensive for custom sigma or tau values.
         theta :  Float between 0 and 1, default 1.0
             Relaxation parameter for the over-relaxation of the primal variable.
-        gamma_g : positive :obj:`float`, optional, default=None
-            Note: this is being deprecated. Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
-        gamma_fconj : positive :obj:`float`, optional, default=None
-            Note: this is being deprecated. Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.
-        sigma :  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (tau*norm(K)**2) if tau is provided
-           Step size for the dual problem. Note: this is being deprecated. In the future, please pass this as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.
-        tau :  positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default is 1.0/norm(K) or 1.0/ (sigma*norm(K)**2) if sigma is provided
-            Step size for the primal problem. In the future, please pass this as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.
+
     Example
     -------
 
@@ -132,7 +162,9 @@ class PDHG(Algorithm):
 
     For reference, see Li, Y. and Yan, M., 2022. On the improved conditions for some primal-dual algorithms. arXiv preprint arXiv:2201.00139.
 
-    - By default, the step sizes :math:`\sigma` and :math:`\tau` are positive scalars and defined as below:
+    - By default, the step sizes :math:`\sigma` and :math:`\tau` are positive
+      scalars. If ``step_size`` is ``None``, or a tuple ``(tau, sigma)`` with
+      one or both entries ``None``, they are defined as below:
 
       * If ``sigma`` is ``None`` and ``tau`` is ``None``:
 
@@ -153,7 +185,8 @@ class PDHG(Algorithm):
         \sigma = \frac{1}{\tau\|K\|^{2}}
 
 
-    - To monitor the convergence of the algorithm, we compute the primal/dual objectives and the primal-dual gap in :meth:`objective`.\
+    - To monitor the convergence of the algorithm, we compute the primal/dual
+      objectives and the primal-dual gap in :meth:`objective`.\
 
       The primal objective is
 
@@ -193,45 +226,59 @@ class PDHG(Algorithm):
                  **kwargs):
         """Initialisation of the PDHG algorithm"""
 
+        _check_no_positional_step_sizes(step_size, initial, 'PDHG')
         self.initial = initial
-        self._sigma = kwargs.pop('sigma', None)  # To be deprecated
-        self._tau = kwargs.pop('tau', None)  # To be deprecated
-        if self._sigma is not None or self._tau is not None:  # To be deprecated
-            warnings.warn("The parameters `sigma` and `tau` are being deprecated. If passed together with `step_size` they will be ignored. In the future, please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.", category=DeprecationWarning, stacklevel=2)
         self._theta = kwargs.pop('theta', 1.0)
         if self._theta > 1 or self._theta < 0:
             raise ValueError(
-                "The relaxation parameter theta must be in the range [0,1], passed theta = {}".format(self.theta))
+                "The relaxation parameter theta must be in the range [0,1], "
+                "passed theta = {}".format(self._theta))
 
-        if (
-            (isinstance(step_size, (list, tuple)) and len(step_size)==2) or\
-            (issubclass(step_size, StepSizeRule)
-            ):
-            pass
-        elif step_size is None:
-            if self._sigma is not None or self._tau is not None:
-                # try to get sigma and tau from deprecated keywords
-                warnings.warn("The parameters `sigma` and `tau` are being deprecated. In the future, please pass these as part of the `step_size` argument, either as a tuple of (tau, sigma) or using a compatible step size rule.", category=DeprecationWarning, stacklevel=2)
-                self._sigma = kwargs.pop('sigma', None)  # To be deprecated
-                self._tau = kwargs.pop('tau', None)  # To be deprecated
+        sigma = kwargs.pop('sigma', None)  # To be deprecated
+        tau = kwargs.pop('tau', None)  # To be deprecated
+        if sigma is not None or tau is not None:  # To be deprecated
+            if step_size is not None:
+                warnings.warn(
+                    "The parameters `sigma` and `tau` are being deprecated "
+                    "and, because `step_size` was also passed, they are "
+                    "being ignored. Please pass these as part of the "
+                    "`step_size` argument, either as a tuple of (tau, sigma) "
+                    "or using a compatible step size rule.",
+                    category=DeprecationWarning,
+                    stacklevel=2,
+                )
             else:
-                # default step size rule
-                # notice that this is the current default method:
-                # sigma * tau < 1/norm(K)^2 instead of
-                # sigma * tau < 4/3/norm(K)^2
-                self._sigma = 1/self.operator.norm()
-                self._tau = 1/self.operator.norm()
-            step_size = (self._tau, self._sigma)
-                
+                warnings.warn(
+                    "The parameters `sigma` and `tau` are being deprecated. "
+                    "In the future, please pass these as part of the "
+                    "`step_size` argument, either as a tuple of (tau, sigma) "
+                    "or using a compatible step size rule.",
+                    category=DeprecationWarning,
+                    stacklevel=2,
+                )
+                step_size = (tau, sigma)
 
-            step_size = (self._tau, self._sigma)
-
-        self._gamma_g = kwargs.pop('gamma_g', None)  # To be deprecated
-        self._gamma_fconj = kwargs.pop('gamma_fconj', None)  # To be deprecated
-        if self._gamma_g is not None or self._gamma_fconj is not None:  # To be deprecated
-            warnings.warn("The parameter `gamma_g` is being deprecated. In the future, if you would like to utilise strong convexity you should use the step size method cil.optimisation.utilities.StepSizeMethods.PDHGStronglyConvexUpdate.", category=DeprecationWarning, stacklevel=2)
-            step_size = PDHGStronglyConvexUpdate(initial_step_size=(
-                self._tau, self._sigma), gamma_g=self._gamma_g, gamma_fconj=self._gamma_fconj)
+        gamma_g = kwargs.pop('gamma_g', None)  # To be deprecated
+        gamma_fconj = kwargs.pop('gamma_fconj', None)  # To be deprecated
+        if gamma_g is not None or gamma_fconj is not None:  # To be deprecated
+            warnings.warn(
+                "The parameters `gamma_g` and `gamma_fconj` are being "
+                "deprecated. In the future, if you would like to utilise "
+                "strong convexity you should use the step size method "
+                "cil.optimisation.utilities.StepSizeMethods."
+                "PDHGStronglyConvexUpdate.",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+            if isinstance(step_size, (tuple, list)):
+                initial_step_size = step_size
+            else:
+                initial_step_size = (None, None)
+            step_size = PDHGStronglyConvexUpdate(
+                initial_step_size=initial_step_size,
+                gamma_g=gamma_g,
+                gamma_fconj=gamma_fconj,
+            )
 
         self._check_convergence = kwargs.pop('check_convergence', True)
 
@@ -242,12 +289,18 @@ class PDHG(Algorithm):
 
     @property
     def tau(self):
-        """The primal step-size - Returns the currently being used step size for the primal problem. Note that this can be updated at each iteration if a step size rule is used."""
+        """The primal step-size - Returns the currently being used step size
+        for the primal problem. Note that this can be updated at each iteration
+        if a step size rule is used.
+        """
         return self._tau
 
     @property
     def sigma(self):
-        """The dual step-size  - Returns the currently being used step size for the dual problem. Note that this can be updated at each iteration if a step size rule is used."""
+        """The dual step-size - Returns the currently being used step size for
+        the dual problem. Note that this can be updated at each iteration if a
+        step size rule is used.
+        """
         return self._sigma
 
     @property
@@ -255,7 +308,7 @@ class PDHG(Algorithm):
         """The relaxation parameter for the over-relaxation of the primal variable """
         return self._theta
 
-    def set_up(self, f, g, operator, step_size=[None, None],  initial=None):
+    def set_up(self, f, g, operator, step_size=None,  initial=None):
         """Initialisation of the algorithm
 
         Parameters
@@ -268,8 +321,13 @@ class PDHG(Algorithm):
             A Linear Operator.
         initial : `DataContainer`, or `list` or `tuple` of `DataContainer`s, optional, default is a DataContainer of zeros for both primal and dual variables
             Initial point for the PDHG algorithm. If just one data container is provided, it is used for the primal and the dual variable is initialised as zeros.  If a list or tuple is passed,  the first element is used for the primal variable and the second one for the dual variable. If either of the two is not provided, it is initialised as a DataContainer of zeros.
-        step_size : :class:`~cil.optimisation.utilities.StepSizeRule`, or `list` or `tuple` of length two, optional, default=[None, None]
-            Either a PDHG compatible step size rule or a `list` or `tuple`  of (tau, sigma) where sigma is the step size for the dual problem and tau is the step size for the primal problem. The step sizes can be either scalar or array-objects. If not provided, default values will be set based on the operator norm, as described in the class documentation.
+        step_size : :class:`~cil.optimisation.utilities.PDHGStepSizeRule`, or `list` or `tuple` of length two, optional, default=None
+            Either a :class:`~cil.optimisation.utilities.PDHGStepSizeRule` or a
+            `list` or `tuple`  of (tau, sigma) where sigma is the step size for
+            the dual problem and tau is the step size for the primal problem.
+            The step sizes can be either scalar or array-objects. If not
+            provided, default values will be set based on the operator norm, as
+            described in the class documentation.
 
 
         """
@@ -281,18 +339,27 @@ class PDHG(Algorithm):
         self.g = g
         self.operator = operator
 
-        if isinstance(step_size, StepSizeRule):
-            if not hasattr(step_size, 'get_initial_step_size'):
-                raise ValueError(
-                    "The step-size rule {} does not provide initial primal/dual step sizes "
-                    "and is not compatible with PDHG.".format(type(step_size).__name__))
+        if step_size is None:
+            step_size = (None, None)
+        if isinstance(step_size, PDHGStepSizeRule):
             self.step_size_rule = step_size
+        elif isinstance(step_size, StepSizeRule):
+            raise ValueError(
+                "The step-size rule {} is not compatible with PDHG. PDHG "
+                "requires a step-size rule "
+                "derived from cil.optimisation.utilities."
+                "PDHGStepSizeRule.".format(
+                    type(step_size).__name__
+                )
+            )
         elif isinstance(step_size, (tuple, list)):
             self.step_size_rule = PDHGConstantStepSize(step_size=step_size)
         else:
-            raise ValueError("The `step_size` argument must be either None, a PDHG compatible step size rule or a tuple of (tau, sigma) where sigma is the step size for the dual problem and tau is the step size for the primal problem.")
-
-
+            raise ValueError(
+                "The `step_size` argument must be either None, a "
+                "PDHGStepSizeRule or a tuple of (tau, sigma) where sigma is "
+                "the step size for the dual problem and tau is the step size "
+                "for the primal problem.")
 
         if isinstance(initial, (tuple, list)):
             if initial[0] is not None:
@@ -318,7 +385,8 @@ class PDHG(Algorithm):
 
         self._tau, self._sigma = self.step_size_rule.get_initial_step_size(
             self)
-        _validate_pdhg_step_sizes(self._tau, self._sigma, self.operator)
+        PDHGStepSizeRule.validate_step_sizes(
+            self._tau, self._sigma, self.operator)
 
         if self._check_convergence:
             self.check_convergence()
@@ -327,10 +395,7 @@ class PDHG(Algorithm):
         log.info("%s configured", self.__class__.__name__)
 
     def _update_previous_solution(self):
-        """
-        Swaps the references to current and previous solution based on the
-        Swaps the references to current and previous solution
-        """
+        """Swaps the references to the current and previous solution."""
         tmp = self.x_old
         self.x_old = self.x
         self.x = tmp
@@ -340,7 +405,8 @@ class PDHG(Algorithm):
         return self.x_old
 
     def _pdhg_update(self):
-        """Applies the primal-dual updates for one PDHG step (see the Notes in the
+        """Applies the primal-dual updates for one PDHG step (see the Notes in
+        the
         class docstring for the update equations)."""
 
         # calculate x-bar and store in self.x_tmp
@@ -364,19 +430,174 @@ class PDHG(Algorithm):
     def update(self):
         """Performs a single iteration of the PDHG algorithm"""
         self._pdhg_update()
+        self.update_step_sizes()
 
-        # update the step sizes for special cases
+    def update_step_sizes(self):
+        """Updates the primal and dual step sizes at the end of an iteration,
+        using the step-size rule ``step_size_rule``.
+        """
         self._tau, self._sigma = self.step_size_rule.get_step_size(self)
+
+    def set_step_sizes(self, sigma=None, tau=None):
+        """Sets sigma and tau step-sizes for the PDHG algorithm. The step sizes
+        can be either scalar or array-objects.
+
+        .. deprecated::
+            Pass the step sizes to PDHG with the ``step_size`` argument
+            instead, either as a tuple ``(tau, sigma)`` or using a
+            :class:`~cil.optimisation.utilities.PDHGConstantStepSize`.
+
+        The user can set either, both or none. Values passed by the user will
+        be accepted as long as they are positive numbers, or correct shape
+        array like objects. Missing values are set from the operator norm, as
+        described in the class documentation. If the current step-size rule is
+        a :class:`~cil.optimisation.utilities.PDHGStronglyConvexUpdate`, the
+        strong convexity acceleration is kept and restarted from the new step
+        sizes.
+
+        Parameters
+        ----------
+            sigma : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default=None
+                Step size for the dual problem.
+            tau : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default=None
+                Step size for the primal problem.
+        """
+        warnings.warn(
+            "`set_step_sizes` is being deprecated. In the future, please "
+            "pass the step sizes to PDHG with the `step_size` argument, "
+            "either as a tuple of (tau, sigma) or using a compatible step "
+            "size rule.",
+            category=DeprecationWarning, stacklevel=2)
+        if isinstance(self.step_size_rule, PDHGStronglyConvexUpdate):
+            rule = PDHGStronglyConvexUpdate(
+                initial_step_size=(tau, sigma),
+                gamma_g=self.step_size_rule.gamma_g,
+                gamma_fconj=self.step_size_rule.gamma_fconj,
+            )
+        else:
+            rule = PDHGConstantStepSize(step_size=(tau, sigma))
+        tau, sigma = rule.get_initial_step_size(self)
+        PDHGStepSizeRule.validate_step_sizes(tau, sigma, self.operator)
+        self.step_size_rule = rule
+        self._tau, self._sigma = tau, sigma
+
+    @property
+    def gamma_g(self):
+        """The strongly convex constant for the function g, or ``None`` if the
+        step-size rule is not a
+        :class:`~cil.optimisation.utilities.PDHGStronglyConvexUpdate`.
+
+        .. deprecated::
+            Use the ``gamma_g`` attribute of a
+            :class:`~cil.optimisation.utilities.PDHGStronglyConvexUpdate`
+            step-size rule instead.
+        """
+        warnings.warn(
+            "The PDHG property `gamma_g` is being deprecated. In the future, "
+            "please use the step size rule "
+            "cil.optimisation.utilities.PDHGStronglyConvexUpdate.",
+            category=DeprecationWarning, stacklevel=2)
+        return getattr(self.step_size_rule, 'gamma_g', None)
+
+    @property
+    def gamma_fconj(self):
+        """The strongly convex constant for the convex conjugate of the
+        function f, or ``None`` if the step-size rule is not a
+        :class:`~cil.optimisation.utilities.PDHGStronglyConvexUpdate`.
+
+        .. deprecated::
+            Use the ``gamma_fconj`` attribute of a
+            :class:`~cil.optimisation.utilities.PDHGStronglyConvexUpdate`
+            step-size rule instead.
+        """
+        warnings.warn(
+            "The PDHG property `gamma_fconj` is being deprecated. In the "
+            "future, please use the step size rule "
+            "cil.optimisation.utilities.PDHGStronglyConvexUpdate.",
+            category=DeprecationWarning, stacklevel=2)
+        return getattr(self.step_size_rule, 'gamma_fconj', None)
+
+    def set_gamma_g(self, value):
+        '''Set the value of the strongly convex constant for function `g`.
+
+        .. deprecated::
+            Pass a
+            :class:`~cil.optimisation.utilities.PDHGStronglyConvexUpdate`
+            step-size rule to PDHG with the ``step_size`` argument instead.
+
+        The step-size rule is replaced by a
+        :class:`~cil.optimisation.utilities.PDHGStronglyConvexUpdate` starting
+        from the current step sizes.
+
+        Parameters
+        ----------
+            value : a positive number or None
+                If None, nothing is changed.
+        '''
+        warnings.warn(
+            "`set_gamma_g` is being deprecated. In the future, please pass "
+            "the step size rule "
+            "cil.optimisation.utilities.PDHGStronglyConvexUpdate to PDHG "
+            "with the `step_size` argument.",
+            category=DeprecationWarning, stacklevel=2)
+        if value is None:
+            return
+        self._set_strongly_convex_rule(gamma_g=value, gamma_fconj=getattr(
+            self.step_size_rule, 'gamma_fconj', None))
+
+    def set_gamma_fconj(self, value):
+        '''Set the value of the strongly convex constant for the convex
+        conjugate of function `f`.
+
+        .. deprecated::
+            Pass a
+            :class:`~cil.optimisation.utilities.PDHGStronglyConvexUpdate`
+            step-size rule to PDHG with the ``step_size`` argument instead.
+
+        The step-size rule is replaced by a
+        :class:`~cil.optimisation.utilities.PDHGStronglyConvexUpdate` starting
+        from the current step sizes.
+
+        Parameters
+        ----------
+            value : a positive number or None
+                If None, nothing is changed.
+        '''
+        warnings.warn(
+            "`set_gamma_fconj` is being deprecated. In the future, please "
+            "pass the step size rule "
+            "cil.optimisation.utilities.PDHGStronglyConvexUpdate to PDHG "
+            "with the `step_size` argument.",
+            category=DeprecationWarning, stacklevel=2)
+        if value is None:
+            return
+        self._set_strongly_convex_rule(gamma_g=getattr(
+            self.step_size_rule, 'gamma_g', None), gamma_fconj=value)
+
+    def _set_strongly_convex_rule(self, gamma_g, gamma_fconj):
+        """Replaces the step-size rule by a
+        :class:`~cil.optimisation.utilities.PDHGStronglyConvexUpdate` starting
+        from the current step sizes. Used by the deprecated setters.
+        """
+        rule = PDHGStronglyConvexUpdate(
+            initial_step_size=(self._tau, self._sigma),
+            gamma_g=gamma_g,
+            gamma_fconj=gamma_fconj,
+        )
+        rule.get_initial_step_size(self)
+        self.step_size_rule = rule
 
     def check_convergence(self):
         """Check whether convergence criterion for PDHG is satisfied with scalar values of tau and sigma
 
-        The criterion :math:`\\tau\\sigma\\|K\\|^{2} < 4/3` is only evaluated for
-        :class:`~cil.optimisation.utilities.PDHGConstantStepSize`, and only when both step sizes are
-        scalars. :class:`~cil.optimisation.utilities.PDHGAdaptiveStepSize2013` and
-        :class:`~cil.optimisation.utilities.PDHGAdaptiveStepSize2015` return ``True`` without a check,
-        because their backtracking step enforces the corresponding condition at every iteration. For
-        any other step-size rule the check is not implemented, so a warning is raised and ``False``
+        The criterion :math:`\\tau\\sigma\\|K\\|^{2} < 4/3` is only evaluated
+        for :class:`~cil.optimisation.utilities.PDHGConstantStepSize`, and only
+        when both step sizes are scalars. Rules with ``enforces_convergence =
+        True``, such as
+        :class:`~cil.optimisation.utilities.PDHGAdaptiveStepSize2013`, return
+        ``True`` without a check, because their backtracking step enforces the
+        corresponding condition at every iteration. For any other step-size
+        rule the check is not implemented, so a warning is raised and ``False``
         returned.
 
         Returns
@@ -393,19 +614,24 @@ class PDHG(Algorithm):
             if isinstance(self.tau, Number) and isinstance(self.sigma, Number):
                 if self.sigma * self.tau * self.operator.norm()**2 > 4/3:
                     warnings.warn(
-                        "Convergence criterion of PDHG for scalar step-sizes is not satisfied.")
+                        "Convergence criterion of PDHG for scalar step-sizes "
+                        "is not satisfied.")
                     return False
                 return True
             else:
                 warnings.warn(
-                    "Convergence criterion can only be checked for scalar values of tau and sigma, tau={0}, sigma={1}".format(self.tau, self.sigma))
-        elif isinstance(self.step_size_rule, PDHGAdaptiveStepSize2013) or isinstance(self.step_size_rule, PDHGAdaptiveStepSize2015):
+                    "Convergence criterion can only be checked for scalar "
+                    "values of tau and sigma, tau={0}, sigma={1}".format(
+                        self.tau, self.sigma
+                    )
+                )
+        elif getattr(self.step_size_rule, 'enforces_convergence', False):
             return True
         else:
             warnings.warn(
-                "Convergence checks not currently implemented for this type of step size rule.")
+                "Convergence checks not currently implemented for this type "
+                "of step size rule.")
         return False
-
 
     def update_objective(self):
         """Evaluates the primal objective, the dual objective and the primal-dual gap."""

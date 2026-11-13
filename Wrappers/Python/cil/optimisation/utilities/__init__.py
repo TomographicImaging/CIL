@@ -19,5 +19,5 @@
 
 from .sampler import Sampler
 from .sampler import SamplerRandom
-from .StepSizeMethods import ConstantStepSize, ArmijoStepSizeRule, StepSizeRule, BarzilaiBorweinStepSizeRule
+from .StepSizeMethods import ConstantStepSize, ArmijoStepSizeRule, StepSizeRule, BarzilaiBorweinStepSizeRule, PDStepSizeRule, PDHGStepSizeRule, SPDHGStepSizeRule, PDHGAdaptiveStepSize2013, PDHGStronglyConvexUpdate, PDHGConstantStepSize, PDHGBayesOptimisationStepSize, SPDHGStepSizesFromRatio, SPDHGConstantStepSize, SPDHGBayesOptimisationStepSize, SPDHGAdaptiveStepSizeBalancing, SPDHGAdaptiveStepSizeAngle
 from .preconditioner import  Preconditioner, AdaptiveSensitivity, Sensitivity

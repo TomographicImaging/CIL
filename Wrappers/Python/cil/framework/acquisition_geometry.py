@@ -2672,7 +2672,7 @@ class AcquisitionGeometry(metaclass=BackwardCompat):
         if kwargs.get("vertical", None) is not None:
             if AcquisitionType.PARALLEL & geometry_new.geom_type:
                 geometry_new = geometry_new.get_centre_slice()
-            elif AcquisitionType.CONE:
+            elif AcquisitionType.CONE & geometry_new.geom_type:
                 if kwargs.get("vertical") == 'centre' or abs(geometry_new.pixel_num_v/2 - kwargs.get("vertical")) < 1e-6:
                     geometry_new = geometry_new.get_centre_slice()
                 else:
